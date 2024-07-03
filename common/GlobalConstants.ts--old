@@ -7,8 +7,7 @@
 //   static AddCdsProject<T>(AddCdsProject: any, formData: FormData, arg2: { headers: HttpHeaders; }) {
 //     throw new Error('Method not implemented.');
 //   }
-//
-//
+
 //   // --------------------------------------------------------------------------------
 //   // -- Globally used headers in API requests
 //   // --------------------------------------------------------------------------------
