@@ -1,1 +1,0 @@
-[{"calling_no":"0","device_id":"0c042200-2200-5cbb-e173-68deeb53e200","location_latitude":"33.8904948","usage_date":"1646763552000","call_bdate":"0","called_no":"0","location_name":"Banks Money service business AT","service_provider_id":"9","location_accuracy":"8.2","usage_timeframe":"1646763552000","shape_id":0,"call_edate":"0","location_longitude":"35.4726376"}],[]

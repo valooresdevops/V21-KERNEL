@@ -1,0 +1,25 @@
+<v-grid
+allowSideBar="true"
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="amd"
+[dataApi]="getChartData"
+[frameworkComponents]="frameworkComponents"
+(onGridAdd)="onAddClick()"
+(onGridDelete)="onDeleteClick()"
+(onGridUpdate)="onUpdateClick()"
+agPrimaryKey="chartId"
+></v-grid>
+
+
+<!-- 
+<div class="chart-row"> 
+    <ng-container >
+      <div class="chart-container">
+        <v-highcharts-stocks [Highcharts]="Highcharts" [options]="chartOptions" ></v-highcharts-stocks>
+      </div>
+    </ng-container>
+  </div>  
+
+ -->
