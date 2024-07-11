@@ -18,8 +18,11 @@ export class KpiBuilderFormComponent implements OnInit {
   public isUpdate: boolean = false;
   public kpiData: any[] = [];
   public itemsData: any[] = [];
-  public showGrid: boolean ;
+  public showGrid: any ;
   public showChart: boolean ;
+  public chartDropdownValueRes: any;
+  public gridDropdownValueRes: any;
+  public ids: any;
 
   public getQueryName = GlobalConstants.getQueryNameApi;
   public getAllGridforDropdown = GlobalConstants.getAllGridforDropdown;
@@ -41,7 +44,6 @@ export class KpiBuilderFormComponent implements OnInit {
     isPercentage: new UntypedFormControl(''),
     dropdownChart:new UntypedFormControl(''),
     dropdownGrid:new UntypedFormControl(''),
-
   });
 
   ngOnInit(): void {
@@ -100,28 +102,75 @@ export class KpiBuilderFormComponent implements OnInit {
                 this.itemsData[this.kpiData[i].index] = { id: this.kpiData[i].id, type: this.kpiData[i].type, value: this.kpiData[i].value, mode: this.kpiData[i].mode, formData: this.kpiData[i].formData };
               }, 1000);
             }
+            
           }
         });
+        interface KpiGridItem
+          {
+            id: string;
+          }
 
+        this.http.get<KpiGridItem[]>(GlobalConstants.getKpiGridData + this.kpiId, { headers: GlobalConstants.headers })
+        .subscribe((res: KpiGridItem[]) => {
+          if (res == null) {
+          } else {
+            this.kpiForm.get("dropdownGrid")?.setValue(res);
+
+            this.ids = res.map((item: KpiGridItem) => item.id);
+            this.gridDropdownValueRes = this.ids;
+
+            console.log("onInit this.kpiForm.get(dropdownGrid)?.setValue(res) = " + this.kpiForm.get("dropdownGrid")?.setValue(res))
+            console.log("onInit this.gridDropdownValueRes = " + this.gridDropdownValueRes)
+          }
+        });
+          interface KpiChartItem
+          {
+            id: string;
+          }
+
+        this.http.get<KpiChartItem[]>(GlobalConstants.getKpiChartData + this.kpiId, { headers: GlobalConstants.headers })
+        .subscribe((res: KpiChartItem[]) => {
+          if (res == null) {
+          } else {
+            this.kpiForm.get("dropdownChart")?.setValue(res);
+
+            this.ids = res.map((item: KpiChartItem) => item.id);
+            this.chartDropdownValueRes = this.ids;
+            
+            console.log("onInit this.kpiForm.get(dropdownChart)?.setValue(res) = " + this.kpiForm.get("dropdownChart")?.setValue(res))
+            console.log("onInit this.chartDropdownValueRes = " + this.chartDropdownValueRes)
+          }
+        });
+    }
+  }
+
+  showdropdownChart(){
+    if(this.kpiForm.get("chart").value == false)
+    {
+      this.showChart = false;
+      this.kpiForm.get("dropdownChart").setValue('');
+      this.chartDropdownValueRes = '';
+    }
+    else
+    {
+      this.showChart = true;
 
     }
+  }
 
-  }
-  showdropdownChart(){
-    if(this.kpiForm.get("chart").value == false){
-      this.showChart = true;
-     }else{
-      this.showChart = false;
-     }
-  }
-  showdropdownGrid(){
-    if(this.kpiForm.get("grid").value == false){
-      this.showGrid = true;
-     }else{
+  showdropdownGrid()
+  {
+    if(this.kpiForm.get("grid").value == false)
+    {
       this.showGrid = false;
-     }
+      this.kpiForm.get("dropdownGrid").setValue('');
+      this.gridDropdownValueRes = '';
+    }
+    else
+    {
+      this.showGrid = true;
+    }
   }
-
 
   submit() {
     let toggleIsRatioValue;
@@ -151,19 +200,81 @@ export class KpiBuilderFormComponent implements OnInit {
       toggleReportValue = 0;
     }
 
-   if (this.kpiForm.get("dropdownGrid").value == ""){
-    gridDropdownValue=null;
-   }else{
-    gridDropdownValue=this.kpiForm.get("dropdownGrid").value.join(',');
-   }
+    if (this.kpiForm.get("dropdownGrid").value != '')
+    {
+      let numericIds: number[] = [];
 
-   if (this.kpiForm.get("dropdownChart").value == ""){
-    chartDropdownValue=null;
-   }else{
-    chartDropdownValue=this.kpiForm.get("dropdownChart").value.join(',');
-   }
-    
-    if (this.actionType == 'update') {
+      const dropdownGridValue = this.kpiForm.get("dropdownGrid").value;
+      console.log("1 dropdownGridValue === " + dropdownGridValue)
+
+      if (Array.isArray(dropdownGridValue) && dropdownGridValue.length > 0) {
+          numericIds = [];
+          console.log("2 dropdownGridValue === " + dropdownGridValue)
+
+          for (const item of dropdownGridValue) {
+              if (typeof item === 'object' && item.hasOwnProperty('id')) {
+                  numericIds.push(item.id);
+                  console.log("numericIds object === " + numericIds)
+              } else  {
+                  numericIds.push(item);
+                  console.log("numericIds number === " + numericIds)
+              }
+          }
+
+          this.gridDropdownValueRes = numericIds.join(',');
+          console.log("gridDropdownValueRes === " + this.gridDropdownValueRes)
+      }
+      else
+      {
+        numericIds = [];
+        this.gridDropdownValueRes = numericIds;
+      }
+    }
+    else
+    {
+      this.kpiForm.get("dropdownGrid").setValue('');
+      console.log("kpiForm dropdownGrid === " + this.kpiForm)
+    }
+  
+
+    if (this.kpiForm.get("dropdownChart").value != '')
+    {
+      let numericIds: number[] = [];
+
+      const dropdownChartValue = this.kpiForm.get("dropdownChart").value;
+      console.log("1 dropdownChartValue === " + dropdownChartValue)
+
+      if (Array.isArray(dropdownChartValue) && dropdownChartValue.length > 0) {
+          numericIds = [];
+          console.log("2 dropdownChartValue === " + dropdownChartValue)
+
+          for (const item of dropdownChartValue) {
+              if (typeof item === 'object' && item.hasOwnProperty('id')) {
+                  numericIds.push(item.id);
+                  console.log("numericIds object === " + numericIds)
+              } else  {
+                  numericIds.push(item);
+                  console.log("numericIds number === " + numericIds)
+              }
+          }
+
+          this.chartDropdownValueRes = numericIds.join(',');
+          console.log("chartDropdownValueRes === " + this.chartDropdownValueRes)
+      }
+      else
+      {
+        numericIds = [];
+        this.chartDropdownValueRes = numericIds;
+      }
+    }
+    else
+    {
+      this.kpiForm.get("dropdownChart").setValue('');
+      console.log("kpiForm dropdownChart === " + this.kpiForm)
+    }
+
+    if (this.actionType == 'update')
+    {
       let allData = {
         kpiId: this.kpiId,
         kpiName: this.kpiForm.get("title").value,
@@ -174,9 +285,12 @@ export class KpiBuilderFormComponent implements OnInit {
         grid: toggleGridValue,
         report: toggleReportValue,
         userId: this.informationservice.getLogeduserId(),
-        dropdownGrid : gridDropdownValue,
-        dropdownChart : chartDropdownValue
+        dropdownGrid : this.gridDropdownValueRes.toString(),
+        dropdownChart : this.chartDropdownValueRes.toString()
       }
+      console.log("this.dropdownChart = " +  this.chartDropdownValueRes);
+      console.log("this.gridDropdownValueRes = " +  this.gridDropdownValueRes);
+
       this.http.post<any>(GlobalConstants.updateKpiApi, allData, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           this.commonFunctions.reloadPage("/dsp/kpiBuilder");
@@ -193,8 +307,8 @@ export class KpiBuilderFormComponent implements OnInit {
         grid: toggleGridValue,
         report: toggleReportValue,
         userId: this.informationservice.getLogeduserId(),
-        dropdownGrid : gridDropdownValue,
-        dropdownChart : chartDropdownValue
+        dropdownGrid : this.gridDropdownValueRes,
+        dropdownChart : this.chartDropdownValueRes
       }
       this.http.post<any>(GlobalConstants.addKpiApi, allData, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {

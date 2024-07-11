@@ -158,7 +158,7 @@ export class ScreenBuilderToolComponent implements OnInit {
 
 
 
-    this._Activatedroute.paramMap.subscribe((params) => {
+    this._Activatedroute.paramMap.subscribe((params:any) => {
 
       this.screenId = params.get('id');
 
@@ -279,8 +279,8 @@ export class ScreenBuilderToolComponent implements OnInit {
       {
         headerName: '',
         field: '',
-        defaultMinWidth: '40',
-        maxWidth: '40',
+        defaultMinWidth: '0',
+        maxWidth: '0',
         cellRenderer: CellRenderer,
         cellRendererParams: {
           onClick: this.onRunCellButtonClickChart.bind(this),
@@ -597,11 +597,6 @@ export class ScreenBuilderToolComponent implements OnInit {
 
 
 
-
-
-
-
-
   onRunCellButtonClickGrid(e: any) {
     let info = {};
     this.gridCellRender = [];
@@ -662,7 +657,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               this.chartType = 'stockLine';
             } else if (res.chartType == 11) {
               this.chartType = 'stockColumn';
-            } else if (res.chartTypee == 12) {
+            } else if (res.chartType == 12) {
               this.chartType = 'ohlc';
             } else if (res.chartType == 13) {
               this.chartType = 'stockArea';
@@ -796,7 +791,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 this.newChartObject.push(
                   {
                     chart: { type: 'scatter' },
-                    title: { text: res.data.records[0].TITLE },
+                    title: { text: res.records[0].TITLE },
                     xAxis: {
                       title: {
                         text: 'X Axis'
@@ -1033,10 +1028,10 @@ export class ScreenBuilderToolComponent implements OnInit {
                   });
               }
             } else if (this.chartType == 'column') {
-              for (let j = 0; j < res.data.records.length; j++)
+              for (let j = 0; j < res.records.length; j++)
                 {
-                  this.ids.push(res.data.records[j].ID);
-                  this.names.push(Number(res.data.records[j].NAME));
+                  this.ids.push(res.records[j].ID);
+                  this.names.push(Number(res.records[j].NAME));
                 }
   
                 if(res.is3d == 1){
@@ -1067,11 +1062,11 @@ export class ScreenBuilderToolComponent implements OnInit {
                       pointFormat: 'Cars sold: {point.y}'
                   },
                   title: {
-                      text: res.data.records[0].TITLE,
+                      text: res.records[0].TITLE,
                       align: 'left'
                   },
                   subtitle: {
-                      text:res.data.records[0].TITLE,
+                      text:res.records[0].TITLE,
                       align: 'left'
                   },
                   legend: {
@@ -1092,7 +1087,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 
               this.newChartObject.push({
                 chart: { type: 'column' },
-                title: { text: res.data.records[0].TITLE },
+                title: { text: res.records[0].TITLE },
                 xAxis: [{ categories: this.ids}],
                 yAxis: [{
                   title: { text: 'Primary Axis' }
@@ -1123,7 +1118,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 Number(item.low_price),
                 Number(item.close_price)
               ]);
-              this.stockChartObject.push(
+              this.newChartObject.push(
                 {
                   rangeSelector: {
                     selected: 1
@@ -1156,7 +1151,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 Number(item.timestamp),
                 Number(item.close_price)
               ]);
-              this.stockChartObject.push(
+              this.newChartObject.push(
                 {
                   rangeSelector: {
                     selected: 1
@@ -1182,7 +1177,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 Number(item.timestamp),
                 Number(item.volume)
               ]);
-              this.stockChartObject.push(
+              this.newChartObject.push(
                 {
                   chart: {
                     alignTicks: false
@@ -1214,19 +1209,19 @@ export class ScreenBuilderToolComponent implements OnInit {
                 }
               );
             } else if (this.chartType == 'ohlc') {
-              const transformedData1 = res.data.records.map((item: any) => [ 
+              const transformedData1 = res.records.map((item: any) => [ 
                 Number(item.timestamp),
                 Number(item.open_price),
                 Number(item.high_price),
                 Number(item.low_price),
                 Number(item.close_price)]);
-                this.stockChartObject.push({
+                this.newChartObject.push({
                 rangeSelector: {
                   selected: 2
                 },
         
                 title: {
-                  text: res.data.records[0].title
+                  text: res.records[0].title
                 },
                 credits: {
                   enabled: false // Disable the credits link
@@ -1234,7 +1229,7 @@ export class ScreenBuilderToolComponent implements OnInit {
         
                 series: [{
                   type: 'ohlc',
-                  name: res.data.records[0].title,
+                  name: res.records[0].title,
                   data: transformedData1,
                   dataGrouping: {
                     units: [[
@@ -1252,7 +1247,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 Number(item.timestamp),
                 Number(item.close_price)
               ]);
-              this.stockChartObject.push({
+              this.newChartObject.push({
                 chart: {
                   height: 400
                 },
@@ -1417,26 +1412,47 @@ export class ScreenBuilderToolComponent implements OnInit {
                     });
 
                 }
-          }} else {
+          }}
+          else {
             }
             this.ids = [];
             this.names = [];
-              if((this.newChartObject.length + this.stockChartObject.length) == parts.length)
+              if((this.newChartObject.length + this.newChartObject.length) == parts.length)
               {
                 console.log(parts.length-1)
             
-                this.itemsData.push
-                ({
-                  formData: this.newChartObject,
-                  stockData: this.stockChartObject,
-                  id: this.generateSerial(),
-                  mode: "",
-                  type: "Chart",
-                  value: this.informationservice.getAgGidSelectedNode()
-                });
+                console.log("newChartObject ==== ", this.newChartObject);
+
+                console.log("formdata = " + this.newChartObject,)
+                console.log("formdata = ", JSON.stringify(this.newChartObject, null, 2));
+
+                if(this.newChartObject.length > 0)
+                {
+                  this.itemsData.push
+                  ({
+                    formData: this.newChartObject,
+                    id: this.generateSerial(),
+                    mode: "",
+                    type: "Chart",
+                    value: this.informationservice.getAgGidSelectedNode(),
+                    number: res.chartType,
+                  });
+                }
+                  
+                // if(this.stockChartObject.length > 0)
+                // {
+                //   this.itemsData.push
+                //   ({
+                //     formData: this.newChartObject,
+                //     id: this.generateSerial(),
+                //     mode: "",
+                //     type: "Stock",
+                //     value: this.informationservice.getAgGidSelectedNode()
+                //   });
+                // }
 
                 this.newChartObject = []
-                this.stockChartObject=[]
+                this.stockChartObject = []
               }
           });
       }
@@ -1466,7 +1482,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             this.chartType = 'stockLine';
           } else if (res.chartType == 11) {
             this.chartType = 'stockColumn';
-          } else if (res.chartTypee == 12) {
+          } else if (res.chartType == 12) {
             this.chartType = 'ohlc';
           } else if (res.chartType == 13) {
             this.chartType = 'stockArea';
@@ -1654,7 +1670,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               this.newChartObject.push(
                 {
                   chart: { type: 'scatter' },
-                  title: { text: res.data.records[0].TITLE },
+                  title: { text: res.records[0].TITLE },
                   xAxis: {
                     title: {
                       text: 'X Axis'
@@ -1836,10 +1852,10 @@ export class ScreenBuilderToolComponent implements OnInit {
                 });
             }
           } else if (this.chartType == 'column') {
-            for (let j = 0; j < res.data.records.length; j++)
+            for (let j = 0; j < res.records.length; j++)
               {
-                this.ids.push(res.data.records[j].ID);
-                this.names.push(Number(res.data.records[j].NAME));
+                this.ids.push(res.records[j].ID);
+                this.names.push(Number(res.records[j].NAME));
               }
 
               if(res.is3d == 1){
@@ -1870,11 +1886,11 @@ export class ScreenBuilderToolComponent implements OnInit {
                     pointFormat: 'Cars sold: {point.y}'
                 },
                 title: {
-                    text: res.data.records[0].TITLE,
+                    text: res.records[0].TITLE,
                     align: 'left'
                 },
                 subtitle: {
-                    text:res.data.records[0].TITLE,
+                    text:res.records[0].TITLE,
                     align: 'left'
                 },
                 legend: {
@@ -1895,7 +1911,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               
             this.newChartObject  = [{
               chart: { type: 'column' },
-              title: { text: res.data.records[0].TITLE },
+              title: { text: res.records[0].TITLE },
               xAxis: [{ categories: this.ids}],
               yAxis: [{
                 title: { text: 'Primary Axis' }
@@ -1926,7 +1942,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               Number(item.low_price),
               Number(item.close_price)
             ]);
-            this.stockChartObject.push(
+            this.newChartObject.push(
               {
                 rangeSelector: {
                   selected: 1
@@ -1959,7 +1975,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               Number(item.timestamp),
               Number(item.close_price)
             ]);
-            this.stockChartObject.push(
+            this.newChartObject.push(
               {
                 rangeSelector: {
                   selected: 1
@@ -1985,7 +2001,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               Number(item.timestamp),
               Number(item.volume)
             ]);
-            this.stockChartObject.push(
+            this.newChartObject.push(
               {
                 chart: {
                   alignTicks: false
@@ -2017,19 +2033,19 @@ export class ScreenBuilderToolComponent implements OnInit {
               }
             );
           } else if (this.chartType == 'ohlc') {
-            const transformedData1 = res.data.records.map((item: any) => [ 
+            const transformedData1 = res.records.map((item: any) => [ 
               Number(item.timestamp),
               Number(item.open_price),
               Number(item.high_price),
               Number(item.low_price),
               Number(item.close_price)]);
-              this.stockChartObject.push({
+              this.newChartObject.push({
               rangeSelector: {
                 selected: 2
               },
       
               title: {
-                text: res.data.records[0].title
+                text: res.records[0].title
               },
               credits: {
                 enabled: false // Disable the credits link
@@ -2037,7 +2053,7 @@ export class ScreenBuilderToolComponent implements OnInit {
       
               series: [{
                 type: 'ohlc',
-                name: res.data.records[0].title,
+                name: res.records[0].title,
                 data: transformedData1,
                 dataGrouping: {
                   units: [[
@@ -2055,7 +2071,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               Number(item.timestamp),
               Number(item.close_price)
             ]);
-            this.stockChartObject.push({
+            this.newChartObject.push({
               chart: {
                 height: 400
               },
@@ -2222,20 +2238,38 @@ export class ScreenBuilderToolComponent implements OnInit {
               }
         }} else {
            }
-           console.log("newChartObject ==== ", this.newChartObject);
-           console.log("stockChartObject ==== ", this.stockChartObject);
-           this.itemsData.push({
-             formData: this.newChartObject,
-             stockData: this.stockChartObject,
-             id: this.generateSerial(),
-             mode: "",
-             type: "Chart",
-             value: this.informationservice.getAgGidSelectedNode()
-           });
+           if(this.newChartObject.length > 0)
+           {
+              this.itemsData.push
+              ({
+                formData: this.newChartObject,
+                id: this.generateSerial(),
+                mode: "",
+                type: "Chart",
+                value: this.informationservice.getAgGidSelectedNode(),
+                number: res.chartType,
+              });
+              alert(res.chartType)
+            }
+           
+            // if(this.stockChartObject.length > 0)
+            // {
+            //   this.itemsData.push
+            //   ({
+            //     formData: this.stockChartObject,
+            //     id: this.generateSerial(),
+            //     mode: "",
+            //     type: "Stock",
+            //     value: this.informationservice.getAgGidSelectedNode(),
+            //     number: res.chartType,
+            //   });
+            //   alert(res.chartType)
+            // }
            this.newChartObject = []
            this.stockChartObject=[]
            this.ids = [];
            this.names = [];
+           this.chartType = null;
          });
      }
    }
@@ -2313,8 +2347,6 @@ export class ScreenBuilderToolComponent implements OnInit {
            });
          }, 1000);
        });
-       console.log("gridData ===================================> ", this.gridData);
-       console.log("data ===================================> ", data);
    }
  
    editorChange(i: number, serial: string) {

@@ -83,11 +83,14 @@ export class DashboardComponent implements OnInit {
     });
   }
   onSelectTab() {
+    this.ids = [];
+    this.names = [];
+    this.newChartObject = [];
+    this.allData = this.newChartObject;
     this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.allData = res;
 
-        console.log(' this.allData----------->',this.allData)
         for (let i = 0; i < this.allData.length; i++) {
           if (this.allData[i].type == 'Chart') {
             this.chartValue.push(this.allData[i]);
