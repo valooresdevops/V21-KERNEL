@@ -1,0 +1,249 @@
+package com.valoores.cassandradatacrowd.app.api;
+
+import java.util.Date;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import com.valoores.cassandradatacrowd.app.dto.CustomResponse;
+import com.valoores.cassandradatacrowd.app.model.Location;
+import com.valoores.cassandradatacrowd.app.service.IQueryBuilderService;
+import com.valoores.cassandradatacrowd.common.service.constructQueryService;
+
+/**
+ * @author marcelino.a
+ */
+
+@RestController
+@RequestMapping("/api")
+public class QueryBuilderRestController {
+
+  @Autowired
+  private IQueryBuilderService queryBuilderService;
+  
+  @Autowired
+  private constructQueryService constructQueryService;
+
+  @PostMapping("/queryBuilder")
+  public CustomResponse geAllData(@RequestBody String queryBuilder) {
+	 
+	  CustomResponse resp = CustomResponse.builder().build();
+
+    try {
+    	
+      JSONObject obj = new JSONObject(queryBuilder);
+      String attributeName = "";
+      String operator = "";
+      String value = "";
+      String whereCondition = "";
+      String id = obj.getString("id");
+      String tableName = obj.getString("tableName");
+      String type = "";
+      String attribute = "";
+      String AOIQuery = "";
+      Integer cnt = 0;
+	  JSONArray finalAOIArray = new JSONArray(); 
+	  boolean isAOI = false; 
+
+
+	  System.out.println(" queryBuilder object >>> "+queryBuilder);
+	  
+      for (int i = 0; i < obj.getJSONArray("attribute").length(); i++) {
+
+    	  if(i==0)
+    	  {
+    		  attribute +=  obj.getJSONArray("attribute").get(i) ;
+    	  }
+    	  else
+    	  {
+    		  attribute +=  ","  + obj.getJSONArray("attribute").get(i) ;
+    	  }
+    	  
+      }
+      
+      
+      if (obj.length() > 0) {
+        for (int i = 0; i < obj.getJSONArray("whereCondition").length(); i++) {
+
+          type = obj.getJSONArray("whereCondition").getJSONObject(i).get("value").getClass().getSimpleName();
+          attributeName = obj.getJSONArray("whereCondition").getJSONObject(i).getString("attributeName");
+          operator = obj.getJSONArray("whereCondition").getJSONObject(i).getString("operator");
+
+          if(attributeName.equals("AOI"))
+          {
+        	  cnt++;
+          }
+          System.out.println(" type >> "+type );
+          
+          
+            if (type.equals("Integer")) { 
+              value = String.valueOf(obj.getJSONArray("whereCondition").getJSONObject(i).getInt("value"));
+            } else if (type.equals("Long")) {
+              value = String.valueOf(obj.getJSONArray("whereCondition").getJSONObject(i).getLong("value"));
+            }else if (type.equals("BigDecimal")) {
+                value = String.valueOf(obj.getJSONArray("whereCondition").getJSONObject(i).getBigDecimal("value"));
+            }else if (type.equals("JSONArray")) {
+                value = String.valueOf(obj.getJSONArray("whereCondition").getJSONObject(i).getJSONArray("value"));
+                } else {
+              value = obj.getJSONArray("whereCondition").getJSONObject(i).getString("value");
+            }
+          
+          System.out.println(" attribute >> " + i + " = " + attributeName);
+          System.out.println(" operator >> " + i + " = " + operator);
+          System.out.println(" value >> " + i + " = " + value);
+
+          if(attributeName.equals("AOI"))
+          {
+        	  
+        	  isAOI = true;
+        	  
+        	  JSONArray aoiArray = new JSONArray(value); 
+        	  for(int h = 0 ; h < aoiArray.length(); h ++ )
+        	  {
+
+//        		  getQuery(attributeName, operator, value, type)
+//    	      	  JSONArray shapeObj = new JSONArray(value);
+            	  
+            	  
+    	      	  String qry  = constructQueryService.constructQuery(aoiArray.getJSONObject(h), "shape");
+        		  
+//        		  AOIQuery += "  expr(lucene_index," +
+//		  	  	            " '{" +
+//		  	  	            "   \"filter\":[" +qry+
+//	    	  	            "   ]" +
+//	    	  	            "}')  ";
+            	  
+            	  finalAOIArray.put(qry);
+        	  }
+        	  
+
+          }
+          else
+          {
+        	  if(!attributeName.equals("")) {
+		          if (i == 0 ) {
+		            whereCondition += "  " + getQuery(attributeName, operator, value, type);
+		          } else {
+		        	  
+		        	  if(isAOI)
+		        	  {
+		  	            whereCondition += " " + getQuery(attributeName, operator, value, type);
+		  	            isAOI = false;
+		        	  }
+		        	  else
+		        	  {
+		  	            whereCondition += " AND " + getQuery(attributeName, operator, value, type);
+		        	  }
+		          }
+        	  }
+	      }
+        	  
+        }
+        
+//        if(cnt>0)
+//        {
+//        	if(!whereCondition.equals(""))
+//        	{
+//        		whereCondition = " AND " + whereCondition;
+//        	}
+//        	 whereCondition = "WHERE "+AOIQuery +whereCondition;
+//        }
+//        else
+//        {
+//        	 whereCondition = "WHERE "+ whereCondition;
+//        }
+//        
+      }
+      System.out.println(" WHERE CONDITION QUERY = " + whereCondition);
+      queryBuilderService.GetQueryBuilderResult(attribute,whereCondition, id,finalAOIArray,tableName);
+	  resp.setStatus("success");
+
+    } catch (Exception e) {
+  	  resp.setStatus("failed");
+      e.printStackTrace();
+    }
+    return resp;
+
+  }
+
+  public String getQuery(String attribute, String operator, String value, String type) {
+    String query = "";
+
+    switch (operator) {
+    case "in":
+
+      if (attribute.equals("service_provider_id")) {
+    	  
+        query = attribute + " " + operator + " (" + value + ")";
+        
+//      }else if (attribute.equals("AOI")) {
+//    	  
+//       	  JSONArray shapeObj = new JSONArray(value);
+//       	  query = constructQueryService.constructQuery(shapeObj, "shape");
+    	  
+      }else if (type.equals("String")) {
+    	  
+        String[] result = value.split(",");
+        String dd = "";
+
+        for (int i = 0; i < result.length; i++) {
+          if (i == 0) {
+            dd = "'" + result[i] + "'";
+          } else {
+            dd = dd + ',' + "'" + result[i] + "'";
+          }
+
+        }
+        query = attribute + " " + operator + " (" + dd + ")";
+      }
+
+      break;
+    default:
+    	
+     if(attribute.equals("usage_timeframe")) {
+    	 
+         String Date = value;
+         Date Dateparse = new Date(Date);
+         long Datemillis = Dateparse.getTime();
+         query = attribute + " " + operator + " " + Datemillis + " ";
+         
+//     }else if (attribute.equals("AOI")) {
+//    	 
+//      	  JSONArray shapeObj = new JSONArray(value);
+//      	  query = constructQueryService.constructQuery(shapeObj, "shape");
+
+     }else
+     {
+    	 
+         if (type.equals("String")) {
+             query = attribute + " " + operator + " '" + value + "'";
+           } else if (type.equals("Integer")) {
+             query = attribute + " " + operator + " " + Integer.parseInt(value);
+           } else if (type.equals("Long")) {
+               query = attribute + " " + operator + " " + Long.parseLong(value);
+           } else if (type.equals("BigDecimal")) {
+               query = attribute + " " + operator + " " + Double.parseDouble(value);
+           } 
+     }
+
+
+    }
+    
+    System.out.println(" query >>> "+query );
+    
+    return query;
+  }
+  
+
+
+}

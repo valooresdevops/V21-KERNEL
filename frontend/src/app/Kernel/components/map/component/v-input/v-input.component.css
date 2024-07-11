@@ -1,0 +1,34 @@
+.mat-mdc-radio-button {
+    display: flex !important;
+    flex-direction: column;
+    margin-bottom: 5px;
+    align-items: flex-start;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of checkbox that may no longer apply for the MDC version. */
+.mat-checkbox-button {
+    min-height: 50px;
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.inputIcon {
+    top: -5px !important;
+    font-size: 14px !important;
+}
+
+.input-elem-error {
+    color: var(--red-color) !important;
+}
+  
+/* TODO(mdc-migration): The following rule targets internal classes of radio that may no longer apply for the MDC version. */
+.radio-elem-error .mat-radio-outer-circle {
+    border-color: var(--red-color) !important;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.mat-form-field-appearance-fill .mat-form-field-flex {
+    background-color: transparent !important;
+}

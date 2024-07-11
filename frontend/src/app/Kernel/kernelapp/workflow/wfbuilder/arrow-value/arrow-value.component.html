@@ -1,0 +1,18 @@
+<div style="display:flex;" >
+    <div style="min-width:60%; margin-left:5%">
+        <form [formGroup]="arrowValue">
+            <v-dropdown formControlName="valueTrueFalse" 
+                        label ="Value :"
+                        [multiple]="false" 
+                        [dataJSON]="values" 
+                        [parentForm]="arrowValue" 
+                        id="valueTrueFalse"
+                        fieldName="valueTrueFalse" ></v-dropdown>
+        </form>
+    </div>
+    <p style="left:20%; margin-left:30%" (click)="closeDialog()" class="dialog-close">X</p>
+</div>
+
+<div style="margin: 5% 40% 0 40%">
+    <v-button value="Save" btnActionType="submit" (click)="save()" ></v-button>
+</div>

@@ -1,0 +1,20 @@
+<div class="row">
+    <div class="col-lg-10">
+        <mat-slider thumbLabel 
+            aria-label="unit(s)" 
+            [min]="min" 
+            [max]="max" #ngSlider><input matSliderThumb [value]="value" (input)="onchange({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value})" #ngSliderThumb="matSliderThumb" />
+        </mat-slider>
+    </div>
+    <div class="col-lg-2">
+        <mat-form-field [appearance]="matAppearance" class="text-center" [floatLabel]="floatLabel">
+            <input matInput
+                [id]="fieldName" 
+                [name]="fieldName" 
+                [value]="value"
+                (blur)="touched"
+                [disabled]="isDisabled"
+                [formControl]="formField">
+        </mat-form-field>
+    </div>
+</div>

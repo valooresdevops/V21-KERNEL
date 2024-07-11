@@ -1,0 +1,42 @@
+{
+  "groups": [
+    {
+      "name": "keycloak.api",
+      "type": "com.valoores.v21.usm.client.config.KeycloakApiSettings",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "keycloak.api.admin-token-endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    },
+    {
+      "name": "keycloak.api.client-id",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    },
+    {
+      "name": "keycloak.api.grant-type",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    },
+    {
+      "name": "keycloak.api.password",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    },
+    {
+      "name": "keycloak.api.username",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    },
+    {
+      "name": "keycloak.api.users-endpoint",
+      "type": "java.lang.String",
+      "sourceType": "com.valoores.v21.usm.client.config.KeycloakApiSettings"
+    }
+  ],
+  "hints": []
+}

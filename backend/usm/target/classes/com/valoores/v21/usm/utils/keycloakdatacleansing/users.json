@@ -1,0 +1,5678 @@
+[
+    {
+        "id": "2e072491-48a6-479d-a750-2cdfe5fb2a93",
+        "createdTimestamp": 1641742437097,
+        "username": "aaraj-ra$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=AARAJ-RA,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c72a42a3-e844-4321-962a-5fa9368048d5"
+            ],
+            "modifyTimestamp": [
+                "20220106060417.0Z"
+            ],
+            "createTimestamp": [
+                "20170824060753.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "69931bb8-b07d-4575-b7ff-0ff492537286",
+        "createdTimestamp": 1641742437371,
+        "username": "abouhamad$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ABOUHAMAD,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "85422058-cdd0-4356-a621-f8f442847de0"
+            ],
+            "modifyTimestamp": [
+                "20220101073639.0Z"
+            ],
+            "createTimestamp": [
+                "20200625123213.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3a406829-69a7-455e-a4b9-422ca3bef94d",
+        "createdTimestamp": 1641742436891,
+        "username": "ada-bs$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ADA-BS,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "83b0014c-f19b-41a4-bd68-b1b87f970c5d"
+            ],
+            "modifyTimestamp": [
+                "20210904092006.0Z"
+            ],
+            "createTimestamp": [
+                "20140303165438.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9eacdcc7-317c-43b1-8d60-cbab1c4bbf9b",
+        "createdTimestamp": 1641742437441,
+        "username": "ahmad-b$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=AHMAD-B,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "1a30c19f-d2e9-4ecf-b26f-2f4ddd0b1aa7"
+            ],
+            "modifyTimestamp": [
+                "20210602034436.0Z"
+            ],
+            "createTimestamp": [
+                "20210412122826.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ff9431a9-009d-451d-8373-bdc4bfbde075",
+        "createdTimestamp": 1641742437493,
+        "username": "ahmad-ba$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=AHMAD-BA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "fd1fdfb0-432e-41dc-a77b-8115d4275814"
+            ],
+            "modifyTimestamp": [
+                "20220106121342.0Z"
+            ],
+            "createTimestamp": [
+                "20210525084234.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "67624a45-2947-4a91-8ea2-335485145501",
+        "createdTimestamp": 1641742437225,
+        "username": "alexi-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ALEXI-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "b3609f28-fc28-40ce-a122-d33bd45b5437"
+            ],
+            "modifyTimestamp": [
+                "20220108114442.0Z"
+            ],
+            "createTimestamp": [
+                "20180413133001.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "7884700a-3d72-4bbd-914c-1a0066ddb479",
+        "createdTimestamp": 1641742437236,
+        "username": "amany-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=AMANY-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2760c0fb-1cf9-4908-97db-64e75c44b5ac"
+            ],
+            "modifyTimestamp": [
+                "20220108053828.0Z"
+            ],
+            "createTimestamp": [
+                "20180626052201.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ebed610f-1260-49c8-9eb6-9949b5a1ed5f",
+        "createdTimestamp": 1641742437596,
+        "username": "annie-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ANNIE-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "5f6c597d-e2f9-499b-aafa-e0219d687d09"
+            ],
+            "modifyTimestamp": [
+                "20211229062549.0Z"
+            ],
+            "createTimestamp": [
+                "20211228073611.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ac368cfd-cbaf-4651-a212-346652121aa0",
+        "createdTimestamp": 1641742082055,
+        "username": "anthony-l$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ANTHONY-L,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c9a9c028-08ed-4379-a835-3c958b201d66"
+            ],
+            "modifyTimestamp": [
+                "20220107100347.0Z"
+            ],
+            "createTimestamp": [
+                "20210512080104.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "6936e7a9-1043-4393-8926-c70fd93c77bc",
+        "createdTimestamp": 1641742081461,
+        "username": "anthony-lo$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ANTHONY-LO,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4017fa10-d2ce-40fe-9c8a-cd51ea82b26b"
+            ],
+            "modifyTimestamp": [
+                "20210517065223.0Z"
+            ],
+            "createTimestamp": [
+                "20140318075444.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "91351dab-ddb8-4c71-97f5-07111fc6b0fb",
+        "createdTimestamp": 1641742081481,
+        "username": "antonio-se$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ANTONIO-SE,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7628098e-0f54-43fd-bf2e-a17e1dc4d1c7"
+            ],
+            "modifyTimestamp": [
+                "20211006125701.0Z"
+            ],
+            "createTimestamp": [
+                "20140603125237.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "7f048e54-662b-41fa-b6d6-8831c203b3a5",
+        "createdTimestamp": 1641742081668,
+        "username": "antonio-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ANTONIO-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "f1114b16-1b2c-4a02-9bda-93a928d7e5e5"
+            ],
+            "modifyTimestamp": [
+                "20220102154036.0Z"
+            ],
+            "createTimestamp": [
+                "20170627070037.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e2a828bb-db2b-4523-9947-5fbc955a7700",
+        "createdTimestamp": 1641742082081,
+        "username": "attieh-g$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ATTIEH-G,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ea0b83b6-8e71-44e9-af1f-25dbb7d7a676"
+            ],
+            "modifyTimestamp": [
+                "20220104063323.0Z"
+            ],
+            "createTimestamp": [
+                "20210610090305.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1b799c02-7d02-4ba8-8444-1f1547966710",
+        "createdTimestamp": 1641742082141,
+        "username": "bady-e$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BADY-E,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "dd613a6a-ad2a-4c6a-bc05-ebd369d04023"
+            ],
+            "modifyTimestamp": [
+                "20220107092710.0Z"
+            ],
+            "createTimestamp": [
+                "20211101100723.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5492f158-f175-4972-8eff-bf24d708a18b",
+        "createdTimestamp": 1641742081532,
+        "username": "bady-w$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BADY-W,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2f39513a-20cf-4cc9-bda3-7ff3f29663de"
+            ],
+            "modifyTimestamp": [
+                "20211229083135.0Z"
+            ],
+            "createTimestamp": [
+                "20150707083808.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "d6e95b83-a19a-4916-aaa4-27b840e6fcf5",
+        "createdTimestamp": 1641742081650,
+        "username": "bd-relay$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BD-RELAY,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ef54b576-ce97-402b-90f1-21517729c340"
+            ],
+            "modifyTimestamp": [
+                "20210924014224.0Z"
+            ],
+            "createTimestamp": [
+                "20170209073016.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9640f2da-d0cb-4bdd-860e-b24fc5370af0",
+        "createdTimestamp": 1641742082148,
+        "username": "bernard-c$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BERNARD-C,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "aa1c7fd1-5ea5-4f3d-beab-ac5c5b17230e"
+            ],
+            "modifyTimestamp": [
+                "20211108113056.0Z"
+            ],
+            "createTimestamp": [
+                "20211108112031.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "f33fc46d-2772-45c9-9d90-c3796116493c",
+        "createdTimestamp": 1641742082127,
+        "username": "bernard-ch$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BERNARD-CH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "bb1587bd-1d56-4f97-8192-9a8f6cf1d900"
+            ],
+            "modifyTimestamp": [
+                "20220101072219.0Z"
+            ],
+            "createTimestamp": [
+                "20211011114822.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "78c0db59-9e4e-4ae6-acf7-8529be88cb62",
+        "createdTimestamp": 1641742081869,
+        "username": "beyrouthy$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=BEYROUTHY,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7e9d18ef-42bf-4cd5-8cc7-f764482bcf6e"
+            ],
+            "modifyTimestamp": [
+                "20211230062456.0Z"
+            ],
+            "createTimestamp": [
+                "20190715124128.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "6810a629-fb8d-47c5-a9a8-5946c6add4f6",
+        "createdTimestamp": 1641742081529,
+        "username": "calypso$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CALYPSO,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "5df1cb11-01bb-4710-804f-edb44bdc900f"
+            ],
+            "modifyTimestamp": [
+                "20210330072144.0Z"
+            ],
+            "createTimestamp": [
+                "20150625070220.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "fcf3968b-9298-4ad7-bee1-d9aa7f77f6a1",
+        "createdTimestamp": 1641742082139,
+        "username": "carl-k$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CARL-K,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ad6d4867-030f-4991-a5b4-1d5c2b17888e"
+            ],
+            "modifyTimestamp": [
+                "20211027074737.0Z"
+            ],
+            "createTimestamp": [
+                "20211026111933.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "effc5df3-f10e-48ea-ad3b-857497649cfc",
+        "createdTimestamp": 1641742081855,
+        "username": "carlos-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CARLOS-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c81dd2a2-95af-45a7-ae4f-ca2a536d736d"
+            ],
+            "modifyTimestamp": [
+                "20220105082041.0Z"
+            ],
+            "createTimestamp": [
+                "20190115074852.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "75564d80-7947-48c7-a5da-2deabbfb126c",
+        "createdTimestamp": 1641742081882,
+        "username": "carolina$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CAROLINA,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7536b8e3-b42f-426c-841e-61b5d099765b"
+            ],
+            "modifyTimestamp": [
+                "20211217103324.0Z"
+            ],
+            "createTimestamp": [
+                "20191017061814.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "94f8af8b-5321-4baf-84de-ad442b6a1bef",
+        "createdTimestamp": 1641742081382,
+        "username": "carolina-su$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CAROLINA-SU,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "42e72f13-066d-48b2-80f1-c2a64c34a094"
+            ],
+            "modifyTimestamp": [
+                "20211212070854.0Z"
+            ],
+            "createTimestamp": [
+                "20130521084215.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c2dbc249-1260-4ce9-867d-15d35174f244",
+        "createdTimestamp": 1641742081604,
+        "username": "chadi-d$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHADI-D,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "03b464a2-f338-4b22-8b45-1389440b5b1c"
+            ],
+            "modifyTimestamp": [
+                "20220105071734.0Z"
+            ],
+            "createTimestamp": [
+                "20160310131716.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "48cc0a3a-a6e0-4cfe-b078-d779c43845f4",
+        "createdTimestamp": 1641742081621,
+        "username": "charbel-ch$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHARBEL-CH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "abdc77fb-ed6c-47d0-99c1-9887323d30c8"
+            ],
+            "modifyTimestamp": [
+                "20220104130533.0Z"
+            ],
+            "createTimestamp": [
+                "20160808105313.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3a4a5bc2-5511-41d5-a5da-c1ef0eb5dfee",
+        "createdTimestamp": 1641742081975,
+        "username": "charbel-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHARBEL-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "0a1fd2c1-894f-45b3-bf4e-279c445e5232"
+            ],
+            "modifyTimestamp": [
+                "20220103172304.0Z"
+            ],
+            "createTimestamp": [
+                "20201104061307.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b5667db4-cbcd-4cc7-bdc4-aeb7821a13a9",
+        "createdTimestamp": 1641742081624,
+        "username": "charbel-l$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHARBEL-L,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "b8408534-1a9d-47e8-aa4c-b43b582ce022"
+            ],
+            "modifyTimestamp": [
+                "20201212095420.0Z"
+            ],
+            "createTimestamp": [
+                "20160808110253.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "48b05232-2353-416d-8c7e-66ffb1a0f0e5",
+        "createdTimestamp": 1641742081980,
+        "username": "charly-c$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHARLY-C,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a32f74c5-3931-4c29-a6de-974b67e30529"
+            ],
+            "modifyTimestamp": [
+                "20220109140633.0Z"
+            ],
+            "createTimestamp": [
+                "20201104091759.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "f11e89d2-e8f8-4714-b496-cdfff2bde9f6",
+        "createdTimestamp": 1641742081861,
+        "username": "chbeyaa$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CHBEYAA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c5e88185-7192-472e-9199-d45e68a23c4a"
+            ],
+            "modifyTimestamp": [
+                "20200714073417.0Z"
+            ],
+            "createTimestamp": [
+                "20190306135323.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4a5c7af5-2498-414a-9d91-25034b6dae08",
+        "createdTimestamp": 1641742081964,
+        "username": "conf-8th$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CONF-8TH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "99629307-0f29-482e-b2db-370a1c9f8c62"
+            ],
+            "modifyTimestamp": [
+                "20210809123318.0Z"
+            ],
+            "createTimestamp": [
+                "20200716112327.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "28f991a4-f60b-4926-aee5-22eefe9e41cc",
+        "createdTimestamp": 1641742081903,
+        "username": "csctst$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CSCTST,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9834d078-d56c-45e5-aee3-a8d281b293b1"
+            ],
+            "modifyTimestamp": [
+                "20191219134357.0Z"
+            ],
+            "createTimestamp": [
+                "20191219124642.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1f57095f-4752-46a4-9d22-d948d451c6b0",
+        "createdTimestamp": 1641742081899,
+        "username": "csctstapp$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CSCTSTAPP,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "f27b40be-4fdb-4e38-a1a9-1815e05e486f"
+            ],
+            "modifyTimestamp": [
+                "20191219134257.0Z"
+            ],
+            "createTimestamp": [
+                "20191217102047.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "69a4af8a-d0f1-4726-9043-23c8a1b5093b",
+        "createdTimestamp": 1641742081901,
+        "username": "csctstdb$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=CSCTSTDB,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d51963d7-e71a-459b-9492-18012943f9a5"
+            ],
+            "modifyTimestamp": [
+                "20191219134210.0Z"
+            ],
+            "createTimestamp": [
+                "20191217113009.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a3a9a63b-46f1-45ec-8db2-f85f3d35c470",
+        "createdTimestamp": 1641742082058,
+        "username": "dani-i$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=DANI-I,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "b4dfdeeb-091b-4c2a-9288-a67d0008fe16"
+            ],
+            "modifyTimestamp": [
+                "20220101142456.0Z"
+            ],
+            "createTimestamp": [
+                "20210517055208.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "639a980b-cbca-478b-bdfc-170c9125311c",
+        "createdTimestamp": 1641742081871,
+        "username": "db2$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=DB2,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9bb6b327-849e-4d98-ab5a-42ccf61b810a"
+            ],
+            "modifyTimestamp": [
+                "20200228134027.0Z"
+            ],
+            "createTimestamp": [
+                "20190916073238.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "417607d4-97ab-4d41-ad74-65508648fe58",
+        "createdTimestamp": 1641742081492,
+        "username": "diana-e$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=DIANA-E,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9ccc08c1-4318-4b8a-b3be-629c66d21d3c"
+            ],
+            "modifyTimestamp": [
+                "20220107035600.0Z"
+            ],
+            "createTimestamp": [
+                "20140722072342.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4992d744-3bc1-46c1-9731-c042dd6e1191",
+        "createdTimestamp": 1641742082110,
+        "username": "edmond-b$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=EDMOND-B,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "b9645edd-c09b-4d52-8b80-59b59df8742c"
+            ],
+            "modifyTimestamp": [
+                "20220107083539.0Z"
+            ],
+            "createTimestamp": [
+                "20210713084302.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b2c6689c-f333-4d03-8005-cdfee97839af",
+        "createdTimestamp": 1641742081925,
+        "username": "eliana-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ELIANA-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "6d310157-b03e-4ae1-a2ea-72ec0e4c7f7d"
+            ],
+            "modifyTimestamp": [
+                "20220101174707.0Z"
+            ],
+            "createTimestamp": [
+                "20200214073654.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "fa027d3f-9093-4af4-b799-a9e4747f771c",
+        "createdTimestamp": 1641742081857,
+        "username": "elianne-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ELIANNE-S,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2fa53d7a-cb71-40e0-a015-87121c1f3db5"
+            ],
+            "modifyTimestamp": [
+                "20201110131208.0Z"
+            ],
+            "createTimestamp": [
+                "20190115142144.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "73bc5093-8cb7-4593-afb3-8cccf7125051",
+        "createdTimestamp": 1641742081395,
+        "username": "elias-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ELIAS-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "041f08b9-3003-4d39-972c-96f8e74f2085"
+            ],
+            "modifyTimestamp": [
+                "20220105223602.0Z"
+            ],
+            "createTimestamp": [
+                "20130611053443.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b0fe13f5-10cb-4295-bfe3-79ea27c4d6e7",
+        "createdTimestamp": 1641742081944,
+        "username": "elie-b$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ELIE-B,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cea525c3-7c36-45f3-a68e-8126cf15538a"
+            ],
+            "modifyTimestamp": [
+                "20211029141212.0Z"
+            ],
+            "createTimestamp": [
+                "20200622125831.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "09aae460-77b2-4ccd-b739-cb57aef56f5b",
+        "createdTimestamp": 1641742081775,
+        "username": "etien$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ETIEN,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7c637712-1c96-44a2-8bf5-69f7d2f51b35"
+            ],
+            "modifyTimestamp": [
+                "20210917161812.0Z"
+            ],
+            "createTimestamp": [
+                "20180228095348.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c5ca11ba-e61d-44fc-932b-e19a40505317",
+        "createdTimestamp": 1641742082051,
+        "username": "fady-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=FADY-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "11223db5-71e3-4d05-b1a5-005dc4538f22"
+            ],
+            "modifyTimestamp": [
+                "20220102070953.0Z"
+            ],
+            "createTimestamp": [
+                "20210511133833.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5f98ad56-1e00-42d4-833c-113ab4d9db6d",
+        "createdTimestamp": 1641742081504,
+        "username": "gabriel-n$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GABRIEL-N,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cdfa9f2c-2679-4506-9d4c-386422fc3ab4"
+            ],
+            "modifyTimestamp": [
+                "20211230220723.0Z"
+            ],
+            "createTimestamp": [
+                "20140915053447.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "2c3732b9-233d-4ac7-98e5-f31fe03d694b",
+        "createdTimestamp": 1641742081525,
+        "username": "gebran-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEBRAN-H,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "35e8213e-2c0f-4e98-b5fd-448b78c6a71c"
+            ],
+            "modifyTimestamp": [
+                "20220109132019.0Z"
+            ],
+            "createTimestamp": [
+                "20150505090125.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "468cb3f2-ebea-432b-98cc-850bfb275f94",
+        "createdTimestamp": 1641742081616,
+        "username": "george-b$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEORGE-B,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3548d949-f09d-4a55-a5ce-0ac99a39067f"
+            ],
+            "modifyTimestamp": [
+                "20211226184000.0Z"
+            ],
+            "createTimestamp": [
+                "20160802135537.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c3f883ae-b879-4c3f-bcc9-6ce82905ab3e",
+        "createdTimestamp": 1641742081949,
+        "username": "georges-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEORGES-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "347bc40e-6334-4075-816f-0ece16edb0f6"
+            ],
+            "modifyTimestamp": [
+                "20220105140255.0Z"
+            ],
+            "createTimestamp": [
+                "20200624075843.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c55b9245-a065-4962-a6c0-3b4737b4f2b9",
+        "createdTimestamp": 1641742081495,
+        "username": "georges-e$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEORGES-E,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9dc012fe-6aed-4cf3-8ecd-104b513612ea"
+            ],
+            "modifyTimestamp": [
+                "20210501182003.0Z"
+            ],
+            "createTimestamp": [
+                "20140807054149.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "575994e0-9dd1-4a6a-a058-60f70099b69e",
+        "createdTimestamp": 1641742081487,
+        "username": "georges-i$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEORGES-I,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7401e7f2-8947-42cd-934a-f2cb000d7c00"
+            ],
+            "modifyTimestamp": [
+                "20220101170509.0Z"
+            ],
+            "createTimestamp": [
+                "20140711083434.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "da3ee3bc-4384-4ff5-ab71-694cf0405417",
+        "createdTimestamp": 1641742081639,
+        "username": "georges-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GEORGES-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4b58e23c-0bf7-4556-a642-02ba43e44dca"
+            ],
+            "modifyTimestamp": [
+                "20211212220542.0Z"
+            ],
+            "createTimestamp": [
+                "20161123120757.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "576a3254-c805-4e17-98a0-b5a158bc5f4d",
+        "createdTimestamp": 1641742081839,
+        "username": "gerard-n$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GERARD-N,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ea7a9a8b-2456-485e-9bc8-50de5ee9a5aa"
+            ],
+            "modifyTimestamp": [
+                "20201207202720.0Z"
+            ],
+            "createTimestamp": [
+                "20181114120510.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c9cc5fc9-7d70-4c58-b55f-60d2e656c6ac",
+        "createdTimestamp": 1641742082053,
+        "username": "ghadi-g$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GHADI-G,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "bcff22ff-9967-4a9f-80b6-49210321c736"
+            ],
+            "modifyTimestamp": [
+                "20210930085009.0Z"
+            ],
+            "createTimestamp": [
+                "20210512054258.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "7826525d-943b-44f6-add9-ef53744f42f1",
+        "createdTimestamp": 1641742082060,
+        "username": "ghalia-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GHALIA-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "1e38ff15-e491-4772-a0b3-dd9238d27f02"
+            ],
+            "modifyTimestamp": [
+                "20220103155125.0Z"
+            ],
+            "createTimestamp": [
+                "20210517090813.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a8999d6c-5af2-49bb-8119-800b29bdbdd3",
+        "createdTimestamp": 1641742081821,
+        "username": "gisele$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GISELE,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "6b2a6ce8-44b7-4968-a171-248b780189a5"
+            ],
+            "modifyTimestamp": [
+                "20220104092859.0Z"
+            ],
+            "createTimestamp": [
+                "20180620104430.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "7b25e170-b84b-4f4e-b4ea-63d9964b614c",
+        "createdTimestamp": 1641742081642,
+        "username": "gisele-c$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=GISELE-C,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2a21daf0-f086-4a6a-95c4-530f9bf6b21c"
+            ],
+            "modifyTimestamp": [
+                "20200520232722.0Z"
+            ],
+            "createTimestamp": [
+                "20161213083132.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "cd6689aa-18f5-4369-86be-be60f38778cb",
+        "createdTimestamp": 1641742081269,
+        "username": "hardin$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=HARDIN,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "5cd9bbc0-615b-4690-889f-e7a4203f0a72"
+            ],
+            "modifyTimestamp": [
+                "20220107003724.0Z"
+            ],
+            "createTimestamp": [
+                "20110808090319.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "848c4565-1cd3-4eb4-a1cc-c757a306b28f",
+        "createdTimestamp": 1641742081645,
+        "username": "hiba-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=HIBA-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "78a686c1-0f2c-4a1c-8147-df483122436a"
+            ],
+            "modifyTimestamp": [
+                "20220104204805.0Z"
+            ],
+            "createTimestamp": [
+                "20170105125214.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "77c8af31-d5d6-497e-879b-cb1b06cafadc",
+        "createdTimestamp": 1641742081441,
+        "username": "ibrahim-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=IBRAHIM-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "69d543a1-4f84-4fbd-aa14-05c99d29ad55"
+            ],
+            "modifyTimestamp": [
+                "20220109174404.0Z"
+            ],
+            "createTimestamp": [
+                "20140115074655.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b2b09fc3-689e-43d4-8fc9-d0bfb1799a99",
+        "createdTimestamp": 1641742081522,
+        "username": "ibs-internal$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=IBS-INTERNAL,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "054a4628-4c5e-47be-a141-99d52fd337f2"
+            ],
+            "modifyTimestamp": [
+                "20220105205702.0Z"
+            ],
+            "createTimestamp": [
+                "20150430130542.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e3425d27-6803-4ea5-9e9d-464419ea16a8",
+        "createdTimestamp": 1641742081297,
+        "username": "idtechpc$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=IDTECHPC,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "483416a9-3607-46e2-a1be-52ab023a1f70"
+            ],
+            "modifyTimestamp": [
+                "20220109130546.0Z"
+            ],
+            "createTimestamp": [
+                "20120130095257.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "90ea012b-bd40-4c80-befe-84ec2dab8234",
+        "createdTimestamp": 1641742081674,
+        "username": "imad-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=IMAD-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "f6ff00d4-6332-48a0-8d69-93ed658df45e"
+            ],
+            "modifyTimestamp": [
+                "20220105124922.0Z"
+            ],
+            "createTimestamp": [
+                "20170901062436.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1c18345c-d3a5-433e-88e2-422a04aea891",
+        "createdTimestamp": 1641742081656,
+        "username": "invia$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=INVIA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9cf45c42-820d-42fa-827e-a1ac465b8c1a"
+            ],
+            "modifyTimestamp": [
+                "20220108175512.0Z"
+            ],
+            "createTimestamp": [
+                "20170315091642.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "bcf629ec-45ea-4615-8c9f-93506dbb86da",
+        "createdTimestamp": 1641742081929,
+        "username": "iris-k$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=IRIS-K,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "bdd55a68-6010-425b-b951-0d1f50f3c54f"
+            ],
+            "modifyTimestamp": [
+                "20211028061529.0Z"
+            ],
+            "createTimestamp": [
+                "20200306075350.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "bf8873d1-4518-441e-aef3-8a73f075584b",
+        "createdTimestamp": 1641742081957,
+        "username": "j0se-n$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=J0SE-N,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ee28f119-53e5-49a6-a961-fd8b6c7cf5b7"
+            ],
+            "modifyTimestamp": [
+                "20220105205903.0Z"
+            ],
+            "createTimestamp": [
+                "20200702053811.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "78cccf5c-6577-4a09-aedb-32cd43704fd5",
+        "createdTimestamp": 1641742081907,
+        "username": "jaalouki$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JAALOUKI,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4eaf150b-f6c9-4429-b04f-cac424275874"
+            ],
+            "modifyTimestamp": [
+                "20220102194706.0Z"
+            ],
+            "createTimestamp": [
+                "20200106071746.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "d6d0228b-34b9-435f-bedd-015c07c74994",
+        "createdTimestamp": 1641742082202,
+        "username": "jad-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JAD-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "51eb470d-71b4-4cf2-ab69-54b4c22de860"
+            ],
+            "modifyTimestamp": [
+                "20220109164951.0Z"
+            ],
+            "createTimestamp": [
+                "20211230082340.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "27b50e78-54dc-4554-8b34-4d5b60cb162a",
+        "createdTimestamp": 1641742081968,
+        "username": "jad-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JAD-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "28fb9c01-5023-4800-b893-5d40d9384683"
+            ],
+            "modifyTimestamp": [
+                "20220103000008.0Z"
+            ],
+            "createTimestamp": [
+                "20200911114604.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ddb90825-5d93-467e-8bf5-aca49afe405d",
+        "createdTimestamp": 1641742082173,
+        "username": "jana-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JANA-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "14b02b23-df92-4853-955e-759ffd7ca643"
+            ],
+            "modifyTimestamp": [
+                "20220104111826.0Z"
+            ],
+            "createTimestamp": [
+                "20211124095851.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5e3ba901-f641-4f6b-b216-0abcac27f1c4",
+        "createdTimestamp": 1641742082123,
+        "username": "jana-z$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JANA-Z,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d184f2fa-30f5-40c4-965e-e1af633d429f"
+            ],
+            "modifyTimestamp": [
+                "20211001053825.0Z"
+            ],
+            "createTimestamp": [
+                "20210930071126.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "944b0288-16ee-416c-a88e-47ece12a51f2",
+        "createdTimestamp": 1641742081996,
+        "username": "jana-zo$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JANA-ZO,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "6d3a612a-3de1-4fa7-860a-f73a11f33559"
+            ],
+            "modifyTimestamp": [
+                "20220103060433.0Z"
+            ],
+            "createTimestamp": [
+                "20210316085954.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5eaef9cb-74c9-4811-9d33-1ba6619b5528",
+        "createdTimestamp": 1641742082064,
+        "username": "jason-g$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JASON-G,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2767cfa7-cab7-4784-9a29-ffb3c7329a19"
+            ],
+            "modifyTimestamp": [
+                "20210928073718.0Z"
+            ],
+            "createTimestamp": [
+                "20210519062444.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "095bb0ee-ffe9-4284-989e-4735768bf846",
+        "createdTimestamp": 1641742082009,
+        "username": "jessica-k$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JESSICA-K,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4976cdc9-abff-4064-8c9d-91c066e50a21"
+            ],
+            "modifyTimestamp": [
+                "20210928073229.0Z"
+            ],
+            "createTimestamp": [
+                "20210406052653.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "64ca5e74-6ffe-44be-ae27-96dba9c95e91",
+        "createdTimestamp": 1641742081933,
+        "username": "jihane-lap$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JIHANE-LAP,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "94a958ad-c057-42ec-a4b1-59de1c07d4b8"
+            ],
+            "modifyTimestamp": [
+                "20201202143327.0Z"
+            ],
+            "createTimestamp": [
+                "20200312102009.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "cf3cb3ef-0d5b-4efb-b8e7-97a96af51abc",
+        "createdTimestamp": 1641742081842,
+        "username": "jim-gh$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JIM-GH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cfcd99eb-2e03-4e17-989e-af0bf78e463c"
+            ],
+            "modifyTimestamp": [
+                "20220105090750.0Z"
+            ],
+            "createTimestamp": [
+                "20181203073309.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "56e0a429-aaed-4e3a-a498-ac09e18a559c",
+        "createdTimestamp": 1641742081520,
+        "username": "joe-r$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOE-R,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ad055024-96b4-4cbc-b9e7-2670cfed2b58"
+            ],
+            "modifyTimestamp": [
+                "20220106165734.0Z"
+            ],
+            "createTimestamp": [
+                "20150305064039.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "02390092-e2ac-4525-b810-9a845be8ae45",
+        "createdTimestamp": 1641742082176,
+        "username": "joelle-e$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOELLE-E,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ad6853f4-7f57-4962-9e0f-41789a59ca47"
+            ],
+            "modifyTimestamp": [
+                "20220105092143.0Z"
+            ],
+            "createTimestamp": [
+                "20211125093945.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b3e94953-fb5e-4bcf-abc7-ddc4d7b13e34",
+        "createdTimestamp": 1641742081772,
+        "username": "joelle-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOELLE-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "0ecfa818-e2a8-45cf-9a68-9d3ef4d4c572"
+            ],
+            "modifyTimestamp": [
+                "20220105174638.0Z"
+            ],
+            "createTimestamp": [
+                "20180227114954.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "94646d1a-91cd-45a6-95fc-b5f7786c31f7",
+        "createdTimestamp": 1641742081813,
+        "username": "johnny$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOHNNY,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "60cd85a4-79ee-4315-8092-ca260a268a56"
+            ],
+            "modifyTimestamp": [
+                "20210420110611.0Z"
+            ],
+            "createTimestamp": [
+                "20180515134811.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b4243326-7357-4a96-899a-f84f78492f1b",
+        "createdTimestamp": 1641742081430,
+        "username": "joseph-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOSEPH-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "aaab4492-693a-43b8-bf38-e0563217733c"
+            ],
+            "modifyTimestamp": [
+                "20220105223122.0Z"
+            ],
+            "createTimestamp": [
+                "20130830122358.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3c98dcab-4a9c-4246-9b89-ece4e90ae32c",
+        "createdTimestamp": 1641742082021,
+        "username": "joseph-d$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOSEPH-D,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "dcdea8a7-6e6c-440e-bdf7-ff2fff151ad2"
+            ],
+            "modifyTimestamp": [
+                "20220101100414.0Z"
+            ],
+            "createTimestamp": [
+                "20210408091819.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c1192d17-5800-4f19-b22b-303d8665f29a",
+        "createdTimestamp": 1641742081484,
+        "username": "josephine-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=JOSEPHINE-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e77679ae-d1d8-420f-b61a-433b136fc585"
+            ],
+            "modifyTimestamp": [
+                "20190503063116.0Z"
+            ],
+            "createTimestamp": [
+                "20140708070726.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c8013aff-f673-4113-8934-7d97acd838d5",
+        "createdTimestamp": 1641742082084,
+        "username": "karen-b$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=KAREN-B,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2d6a18be-c3f7-4652-8c76-eed08e071ed0"
+            ],
+            "modifyTimestamp": [
+                "20211103071641.0Z"
+            ],
+            "createTimestamp": [
+                "20210611113246.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "77f13b74-d7c0-4d59-ab04-d349784617f0",
+        "createdTimestamp": 1641742082153,
+        "username": "karl-c$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=KARL-C,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "8a834e2d-314b-4f1c-b446-5f19a159571f"
+            ],
+            "modifyTimestamp": [
+                "20220103055932.0Z"
+            ],
+            "createTimestamp": [
+                "20211110122707.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a580876f-590c-45f0-a501-19d0918de642",
+        "createdTimestamp": 1641742081917,
+        "username": "karl-n$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=KARL-N,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2dcb58cb-117f-4d22-b226-3af5993b61cc"
+            ],
+            "modifyTimestamp": [
+                "20211008060208.0Z"
+            ],
+            "createTimestamp": [
+                "20200123085936.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4b6b7d33-ca34-4945-8e00-13c65a5bf0a6",
+        "createdTimestamp": 1641742081911,
+        "username": "karl-na$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=KARL-NA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3230d299-601b-486c-89e8-c98a8f16e4e3"
+            ],
+            "modifyTimestamp": [
+                "20201025160743.0Z"
+            ],
+            "createTimestamp": [
+                "20200107063534.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a01e6787-9ccf-4249-9383-727a1bce7a8c",
+        "createdTimestamp": 1641742081970,
+        "username": "kosovi$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=KOSOVI,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3ba0594f-2eba-477f-a05a-1e474286854f"
+            ],
+            "modifyTimestamp": [
+                "20220109090631.0Z"
+            ],
+            "createTimestamp": [
+                "20200915130847.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c4ac2fd7-2186-4ce4-8fde-e5806d36615c",
+        "createdTimestamp": 1641742081333,
+        "username": "liliane-g$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=LILIANE-G,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9d67a905-d839-447a-aee7-2ff2bec7b55e"
+            ],
+            "modifyTimestamp": [
+                "20201117114131.0Z"
+            ],
+            "createTimestamp": [
+                "20120723112719.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "38f77166-e801-4b03-a164-b891e538493d",
+        "createdTimestamp": 1641742081934,
+        "username": "lilianne-gh$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=LILIANNE-GH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "64e2dec6-d231-4fa5-86d9-a5234a10c720"
+            ],
+            "modifyTimestamp": [
+                "20220104234553.0Z"
+            ],
+            "createTimestamp": [
+                "20200318132112.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "f709c8c0-307a-4c9d-bd62-014e96551ff6",
+        "createdTimestamp": 1641742081509,
+        "username": "loadrunner$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=LOADRUNNER,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "1ce16a5c-6c36-4477-bfa5-41b3111e770e"
+            ],
+            "modifyTimestamp": [
+                "20220106155435.0Z"
+            ],
+            "createTimestamp": [
+                "20141014110558.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "0bb17843-b9b0-4295-893c-5a0e0a3989cc",
+        "createdTimestamp": 1641742081875,
+        "username": "louay-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=LOUAY-A,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "191e70e6-6eb2-403d-90f9-f099245116b5"
+            ],
+            "modifyTimestamp": [
+                "20220108233453.0Z"
+            ],
+            "createTimestamp": [
+                "20190924091901.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "403f994a-7237-47d2-89bf-1b73b00dadf6",
+        "createdTimestamp": 1641742081966,
+        "username": "marah-tohme$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MARAH-TOHME,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a661288f-9764-4944-a37b-3c418c7d3c2e"
+            ],
+            "modifyTimestamp": [
+                "20220105083007.0Z"
+            ],
+            "createTimestamp": [
+                "20200803084236.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5c58be49-9adc-4736-936c-43d6597fc48a",
+        "createdTimestamp": 1641742081922,
+        "username": "marcelino-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MARCELINO-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c79c7e3d-9d84-4698-bd24-5b74eda51f62"
+            ],
+            "modifyTimestamp": [
+                "20211231033153.0Z"
+            ],
+            "createTimestamp": [
+                "20200124070633.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "eea2d592-24e2-41a0-b0db-06a4057b69d8",
+        "createdTimestamp": 1641742081816,
+        "username": "mariam-t$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MARIAM-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "221edaaa-2ee6-4cde-a7a4-35ad31e86fea"
+            ],
+            "modifyTimestamp": [
+                "20210611110912.0Z"
+            ],
+            "createTimestamp": [
+                "20180604103433.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c40b9132-80e6-499a-b848-53b1be71911e",
+        "createdTimestamp": 1641742081924,
+        "username": "mariia-r$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MARIIA-R,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "eb7a8ded-8f9f-4846-b8c4-1967df8bf87c"
+            ],
+            "modifyTimestamp": [
+                "20211227112504.0Z"
+            ],
+            "createTimestamp": [
+                "20200124123220.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3f703885-99d4-4f32-9531-fdce8af3c2fc",
+        "createdTimestamp": 1641742081830,
+        "username": "marleine-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MARLEINE-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c84c22c9-17ee-493a-bb17-473bf21459fe"
+            ],
+            "modifyTimestamp": [
+                "20210712123256.0Z"
+            ],
+            "createTimestamp": [
+                "20180903060741.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ee0de0d7-8640-47e3-bb49-b9ebf270d366",
+        "createdTimestamp": 1641742081800,
+        "username": "maya-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MAYA-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "edc78614-e61d-427b-910d-82a40efe508d"
+            ],
+            "modifyTimestamp": [
+                "20220104234817.0Z"
+            ],
+            "createTimestamp": [
+                "20180410111326.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e25fddae-0817-4901-96cd-8372816f0276",
+        "createdTimestamp": 1641742081959,
+        "username": "michael-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MICHAEL-M,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "14def816-609f-4337-a396-ba4646a26a88"
+            ],
+            "modifyTimestamp": [
+                "20220104012344.0Z"
+            ],
+            "createTimestamp": [
+                "20200708125142.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3feee7ab-473a-4726-9f05-fd75dac5cd2a",
+        "createdTimestamp": 1641742082015,
+        "username": "michel-g$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MICHEL-G,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e15ef75c-04e3-4370-bacd-fe3af295b087"
+            ],
+            "modifyTimestamp": [
+                "20210629052900.0Z"
+            ],
+            "createTimestamp": [
+                "20210406091036.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "88d99219-a0d8-409f-9019-d65850d5f475",
+        "createdTimestamp": 1641742082030,
+        "username": "mike-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MIKE-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ce5c81b6-73bf-43a1-a780-ff910b9daf02"
+            ],
+            "modifyTimestamp": [
+                "20220107224642.0Z"
+            ],
+            "createTimestamp": [
+                "20210409124738.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "51387f8b-1db4-40e3-9d98-a24229bc2145",
+        "createdTimestamp": 1641742081369,
+        "username": "multimedia-serv$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=MULTIMEDIA-SERV,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e57c1481-27e1-4fda-9897-d0aed70ffa73"
+            ],
+            "modifyTimestamp": [
+                "20211227194524.0Z"
+            ],
+            "createTimestamp": [
+                "20130405060405.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a68faf75-d950-4a27-9b47-e716438a7163",
+        "createdTimestamp": 1641742081954,
+        "username": "nabil-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=NABIL-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ac226caf-fe17-4567-b921-3c4134b0344d"
+            ],
+            "modifyTimestamp": [
+                "20200701110846.0Z"
+            ],
+            "createTimestamp": [
+                "20200701110401.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "34bc4ecb-6527-46f6-acc6-8f367e07a58c",
+        "createdTimestamp": 1641742081255,
+        "username": "nadim-k$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=NADIM-K,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "370d77cc-9271-4bda-8c3a-4d507caa2eb2"
+            ],
+            "modifyTimestamp": [
+                "20220103034940.0Z"
+            ],
+            "createTimestamp": [
+                "20101230124749.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "2685c9e0-5b6b-44bd-ba28-99383b27b092",
+        "createdTimestamp": 1641742081859,
+        "username": "nadim-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=NADIM-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "eca71120-18e8-42f3-9e41-a4241d1b008b"
+            ],
+            "modifyTimestamp": [
+                "20191228223713.0Z"
+            ],
+            "createTimestamp": [
+                "20190304061136.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "10823d94-b155-4dbe-ac48-fab1c71855c2",
+        "createdTimestamp": 1641742082017,
+        "username": "nadine-n$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=NADINE-N,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "117a5d00-e3f4-4e9e-8c9e-9e2dee7f406b"
+            ],
+            "modifyTimestamp": [
+                "20220105210105.0Z"
+            ],
+            "createTimestamp": [
+                "20210408085311.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1eabf011-a6b9-4037-a3e1-378cd20a402b",
+        "createdTimestamp": 1641742081695,
+        "username": "nas$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=nas,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "765c35a0-7b54-4f39-af1e-457c4b50778a"
+            ],
+            "modifyTimestamp": [
+                "20220103171412.0Z"
+            ],
+            "createTimestamp": [
+                "20180103151528.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4db817e9-8ad6-47d2-8802-75352cfc8ccd",
+        "createdTimestamp": 1641742081764,
+        "username": "noura-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=NOURA-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "92143a14-2f0a-4b4b-a576-0a50320d3195"
+            ],
+            "modifyTimestamp": [
+                "20211009025048.0Z"
+            ],
+            "createTimestamp": [
+                "20180131100509.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "c495f6ab-46bb-4210-9abe-738d6618a8df",
+        "createdTimestamp": 1641742081689,
+        "username": "olga$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=OLGA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3680147a-cf65-4b19-8425-089d5a43fe7b"
+            ],
+            "modifyTimestamp": [
+                "20220105024701.0Z"
+            ],
+            "createTimestamp": [
+                "20171208143216.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9904fdda-de67-4fc1-ae98-87370de2a85e",
+        "createdTimestamp": 1641742081378,
+        "username": "orangehrm-prod$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ORANGEHRM-PROD,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d2d1e94b-80ca-431d-9201-0e5790ddba54"
+            ],
+            "modifyTimestamp": [
+                "20220101203836.0Z"
+            ],
+            "createTimestamp": [
+                "20130513131441.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ed748eb3-497d-4f9c-a94a-2526e8fe33e5",
+        "createdTimestamp": 1641742081653,
+        "username": "patch$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PATCH,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3c7b7fd9-9551-42f7-a90f-d1ee98e5427b"
+            ],
+            "modifyTimestamp": [
+                "20210929122256.0Z"
+            ],
+            "createTimestamp": [
+                "20170303142119.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a4c025af-4eea-4563-bd0a-1016f25851f2",
+        "createdTimestamp": 1641742081777,
+        "username": "patrice-d$",
+        "enabled": false,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PATRICE-D,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a12d1026-4582-4825-a146-631f2ec1e740"
+            ],
+            "modifyTimestamp": [
+                "20200820083715.0Z"
+            ],
+            "createTimestamp": [
+                "20180228100643.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "6efcac7b-ac2f-4a70-86fa-0722db35ac67",
+        "createdTimestamp": 1641742081545,
+        "username": "patrice-succar$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PATRICE-SUCCAR,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e9588fca-480b-4e65-be41-d01d7d52887f"
+            ],
+            "modifyTimestamp": [
+                "20220108162425.0Z"
+            ],
+            "createTimestamp": [
+                "20150901074412.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "406a3df8-49c9-473b-b90c-cafd3d41ec28",
+        "createdTimestamp": 1641742082034,
+        "username": "perla-succar$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PERLA-SUCCAR,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "6b702b14-7f85-4411-ac07-ba1c35838811"
+            ],
+            "modifyTimestamp": [
+                "20210512054140.0Z"
+            ],
+            "createTimestamp": [
+                "20210416120301.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "79fd3b8d-919b-4ffe-af28-e689eb545050",
+        "createdTimestamp": 1641742082050,
+        "username": "peter-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PETER-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d4884200-edef-4d21-9335-32e82111999c"
+            ],
+            "modifyTimestamp": [
+                "20220106071755.0Z"
+            ],
+            "createTimestamp": [
+                "20210504072006.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b1b94a21-51ad-42ab-b891-5aa2283d9585",
+        "createdTimestamp": 1641742081847,
+        "username": "pierre-a$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=PIERRE-A,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "35e871ec-7e2c-4c46-acd0-b9b002768088"
+            ],
+            "modifyTimestamp": [
+                "20201104072615.0Z"
+            ],
+            "createTimestamp": [
+                "20190102091542.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b9648e61-593f-4e5d-bf09-4e6ba1bebd1c",
+        "createdTimestamp": 1641742081769,
+        "username": "rabih-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RABIH-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "15818f07-842b-43e9-943c-10a9c7c631fa"
+            ],
+            "modifyTimestamp": [
+                "20211229145118.0Z"
+            ],
+            "createTimestamp": [
+                "20180216141114.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "21a6d47a-fd2f-4bdd-8ed6-a9c57a0bafd6",
+        "createdTimestamp": 1641742081973,
+        "username": "rachel$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RACHEL,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "06fca47b-597f-4584-9d4d-ff42b247a9f3"
+            ],
+            "modifyTimestamp": [
+                "20220108023429.0Z"
+            ],
+            "createTimestamp": [
+                "20201005060329.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b433adea-bda1-4ff7-9fe2-3ba551a8e1df",
+        "createdTimestamp": 1641742082132,
+        "username": "raja-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RAJA-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "627957af-92e0-4384-a89e-74d4b2a5a2c1"
+            ],
+            "modifyTimestamp": [
+                "20220103230108.0Z"
+            ],
+            "createTimestamp": [
+                "20211014070156.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ab40da9b-342f-4858-897d-aa815f8a7c3c",
+        "createdTimestamp": 1641742082039,
+        "username": "ralph-c$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RALPH-C,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "986aff4c-8863-4e1f-9374-7166e1e49641"
+            ],
+            "modifyTimestamp": [
+                "20220103155307.0Z"
+            ],
+            "createTimestamp": [
+                "20210420081237.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4403840a-437b-4ef8-bf82-30a4ea31ab61",
+        "createdTimestamp": 1641742081927,
+        "username": "ralph-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RALPH-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "8aa7d96a-1341-44a5-b149-77a7b6ef7163"
+            ],
+            "modifyTimestamp": [
+                "20200914074849.0Z"
+            ],
+            "createTimestamp": [
+                "20200214102214.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4bf12f4d-f777-4cfb-b5ce-d3aa34404a0e",
+        "createdTimestamp": 1641742081631,
+        "username": "ramii$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RAMII,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "1763b2bf-40ce-4557-a0cd-899969e40962"
+            ],
+            "modifyTimestamp": [
+                "20200925064840.0Z"
+            ],
+            "createTimestamp": [
+                "20160830054233.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "2083e390-7fe8-4a5c-bca4-eb812f957739",
+        "createdTimestamp": 1641742081550,
+        "username": "reine-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=REINE-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7c0be841-7114-4b26-9bc8-de4fb6449e58"
+            ],
+            "modifyTimestamp": [
+                "20220104064847.0Z"
+            ],
+            "createTimestamp": [
+                "20150930143314.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "acc14ad7-e5f8-48c4-a50d-99daf3f776f7",
+        "createdTimestamp": 1641742081514,
+        "username": "rita-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=RITA-T,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c94dee98-00d3-4b5e-935a-397582e5d63a"
+            ],
+            "modifyTimestamp": [
+                "20220106152933.0Z"
+            ],
+            "createTimestamp": [
+                "20141119115846.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "eab5ccf2-3fab-4492-bc41-2342ea2b9f1f",
+        "createdTimestamp": 1641742081989,
+        "username": "rola-sa$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROLA-SA,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "7702129c-d800-4efe-a3e9-dd2c6e808793"
+            ],
+            "modifyTimestamp": [
+                "20210423073535.0Z"
+            ],
+            "createTimestamp": [
+                "20201223081616.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "fa3522ef-27b7-4b66-9e35-0bf4b3e85695",
+        "createdTimestamp": 1641742081895,
+        "username": "roody$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROODY,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3d03f408-5c6f-4f78-9945-b3ae5472d60e"
+            ],
+            "modifyTimestamp": [
+                "20201130063631.0Z"
+            ],
+            "createTimestamp": [
+                "20191209074626.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "522c5d91-e6bf-47a2-aa35-e16b50f953ef",
+        "createdTimestamp": 1641742081663,
+        "username": "roody-vpn$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROODY-VPN,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "f6ff09e9-4228-4a1d-a3db-5d1d7c905cd8"
+            ],
+            "modifyTimestamp": [
+                "20211213075436.0Z"
+            ],
+            "createTimestamp": [
+                "20170504130907.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9d3bc0f9-2c56-4b8a-bb88-ae7c1c49c406",
+        "createdTimestamp": 1641742081374,
+        "username": "ros-server$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROS-SERVER,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a192692c-fbdf-49fd-ab5a-5d3f04fb2b02"
+            ],
+            "modifyTimestamp": [
+                "20191105165741.0Z"
+            ],
+            "createTimestamp": [
+                "20130411083330.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "bedd42f7-af6a-4d6d-b7e6-d7195aad76a6",
+        "createdTimestamp": 1641742081832,
+        "username": "rouba-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROUBA-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2ce0212a-a559-43c5-9a7b-6f60c8c365d4"
+            ],
+            "modifyTimestamp": [
+                "20210210081426.0Z"
+            ],
+            "createTimestamp": [
+                "20181001063921.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e1437619-c01b-41dc-9cfe-78f559faf7e6",
+        "createdTimestamp": 1641742081541,
+        "username": "roula-sa$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ROULA-SA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "46c6a769-4c6b-4b63-b5ff-d23dada26707"
+            ],
+            "modifyTimestamp": [
+                "20201230005501.0Z"
+            ],
+            "createTimestamp": [
+                "20150826053013.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e4382e59-1077-492c-8e5b-608324aed44e",
+        "createdTimestamp": 1641742082076,
+        "username": "safia-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SAFIA-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2946a775-71f2-4b67-b5c3-c87686d67364"
+            ],
+            "modifyTimestamp": [
+                "20211222091837.0Z"
+            ],
+            "createTimestamp": [
+                "20210531072851.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "ac43bec6-7605-4e81-9041-b8b047d66842",
+        "createdTimestamp": 1641742081983,
+        "username": "salloum$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SALLOUM,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c3999fb8-9aec-40c6-bbd3-747b7494af6f"
+            ],
+            "modifyTimestamp": [
+                "20220102203442.0Z"
+            ],
+            "createTimestamp": [
+                "20201110060643.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "af8cba1e-c8bf-4aa0-a4aa-ddd91c7f2ed2",
+        "createdTimestamp": 1641742081897,
+        "username": "samira-t$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SAMIRA-T,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a858a2a4-35e6-43ce-ba08-980bac255f7e"
+            ],
+            "modifyTimestamp": [
+                "20220106233558.0Z"
+            ],
+            "createTimestamp": [
+                "20191211093548.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a6419487-fdc1-4573-8d50-e1d01bbab749",
+        "createdTimestamp": 1641742082041,
+        "username": "sandy-s$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SANDY-S,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4d063582-97d9-41cc-b6df-5c87192e7875"
+            ],
+            "modifyTimestamp": [
+                "20220108071946.0Z"
+            ],
+            "createTimestamp": [
+                "20210504054705.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9c9b1a29-18b4-4ca0-8749-3bf71fb96946",
+        "createdTimestamp": 1641742082046,
+        "username": "sarah-j$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SARAH-J,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3454f31b-9af9-4da5-9ffa-1a6b29f761e1"
+            ],
+            "modifyTimestamp": [
+                "20210504084049.0Z"
+            ],
+            "createTimestamp": [
+                "20210504071543.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "8015adc4-fc4a-4fc4-9354-0c97a96c396d",
+        "createdTimestamp": 1641742082027,
+        "username": "sarah-ja$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SARAH-JA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "97496bcf-1964-489b-a8bc-6789514d015c"
+            ],
+            "modifyTimestamp": [
+                "20220108070416.0Z"
+            ],
+            "createTimestamp": [
+                "20210408113954.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "899696db-a422-480f-890f-52973f43cde6",
+        "createdTimestamp": 1641742081915,
+        "username": "shadowfax$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SHADOWFAX,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3a857ff2-37da-4b1e-a943-b9acb0be4238"
+            ],
+            "modifyTimestamp": [
+                "20220104064652.0Z"
+            ],
+            "createTimestamp": [
+                "20200122070933.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "0b41334d-7dfb-430b-9c82-9ec49c21ca4f",
+        "createdTimestamp": 1641742081909,
+        "username": "sindy-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SINDY-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "6f6e3758-f150-47c7-9d2b-d98748e0ef23"
+            ],
+            "modifyTimestamp": [
+                "20211217061026.0Z"
+            ],
+            "createTimestamp": [
+                "20200106140124.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e1ab1390-fa5c-4de8-9216-9d1848c516ac",
+        "createdTimestamp": 1641742081835,
+        "username": "soft-pc$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SOFT-PC,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c273bcd6-5daf-44d2-98cc-44b2bc4199e8"
+            ],
+            "modifyTimestamp": [
+                "20190828063717.0Z"
+            ],
+            "createTimestamp": [
+                "20181002105427.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "457ee90c-966d-4d0b-9b3a-c79bfc8a598d",
+        "createdTimestamp": 1641742081611,
+        "username": "softsolutions$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SOFTSOLUTIONS,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "4743238a-31f2-4006-bb84-7a532a886ab4"
+            ],
+            "modifyTimestamp": [
+                "20181204134211.0Z"
+            ],
+            "createTimestamp": [
+                "20160418142422.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5602bccb-7dd2-4d16-8c50-0955cb345155",
+        "createdTimestamp": 1641742081905,
+        "username": "solar$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SOLAR,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "a6348777-dc6f-4a9a-996a-ec960aa6ca69"
+            ],
+            "modifyTimestamp": [
+                "20191220094355.0Z"
+            ],
+            "createTimestamp": [
+                "20191220094234.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a498b847-3b38-4eb5-a887-39439d7138a5",
+        "createdTimestamp": 1641742081501,
+        "username": "ss-pricing$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SS-PRICING,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c60f8fcd-6016-41c2-950d-541d72ffc863"
+            ],
+            "modifyTimestamp": [
+                "20191128232811.0Z"
+            ],
+            "createTimestamp": [
+                "20140910115045.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9293280f-cebe-4eb3-a948-dff63687e41c",
+        "createdTimestamp": 1641742081301,
+        "username": "sslb_bdc$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SSLB_BDC,OU=Domain Controllers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "16b372d8-e64b-418d-8e86-320e8364e408"
+            ],
+            "modifyTimestamp": [
+                "20220107231709.0Z"
+            ],
+            "createTimestamp": [
+                "20120206144520.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "b51c20ea-f569-4f98-a93f-d91e78061807",
+        "createdTimestamp": 1641742081087,
+        "username": "sslb_pdc$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=SSLB_PDC,OU=Domain Controllers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "289b5e1c-4d4d-4449-81f4-7c30f2dcaaed"
+            ],
+            "modifyTimestamp": [
+                "20220108184643.0Z"
+            ],
+            "createTimestamp": [
+                "20110105091308.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e5ed2b04-bf4b-4195-9672-f56f1ddc3d73",
+        "createdTimestamp": 1641742081681,
+        "username": "tamy-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=TAMY-M,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "0f1b4637-7bdc-4bb3-ad98-02033d694d41"
+            ],
+            "modifyTimestamp": [
+                "20211125085512.0Z"
+            ],
+            "createTimestamp": [
+                "20171103071234.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "9923b3f4-8bc9-492b-84b2-dff124c9127a",
+        "createdTimestamp": 1641742081961,
+        "username": "tatiana-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=TATIANA-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e3a12d3d-def4-4c3b-a349-a4d7864e0df6"
+            ],
+            "modifyTimestamp": [
+                "20201103092258.0Z"
+            ],
+            "createTimestamp": [
+                "20200708125619.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e5000194-07d9-47bc-9b80-19e8ca7b72a9",
+        "createdTimestamp": 1641742081660,
+        "username": "therese-za$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=THERESE-ZA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "b598cd35-851a-4a37-94d3-f5bb3dd4afb6"
+            ],
+            "modifyTimestamp": [
+                "20211231143124.0Z"
+            ],
+            "createTimestamp": [
+                "20170330082443.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "f4cbb7b4-5962-46ea-860c-275c1bc4d687",
+        "createdTimestamp": 1641742081619,
+        "username": "tony-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=TONY-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cbd4a8b5-62fa-4c2e-90c7-b60a9b7bcb18"
+            ],
+            "modifyTimestamp": [
+                "20210218232332.0Z"
+            ],
+            "createTimestamp": [
+                "20160808090216.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "88a7bead-5bac-4fc6-bcc4-5d7b358ffaa5",
+        "createdTimestamp": 1641742081913,
+        "username": "tron$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=TRON,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "ee440842-3c68-4748-a849-cefc05dacb41"
+            ],
+            "modifyTimestamp": [
+                "20211230044755.0Z"
+            ],
+            "createTimestamp": [
+                "20200114141359.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "047d5905-9de7-40dd-bf52-8bdd7938b3b4",
+        "createdTimestamp": 1641742082157,
+        "username": "turuss$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=TURUSS,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "69238447-eada-4df8-ae61-a190855741fe"
+            ],
+            "modifyTimestamp": [
+                "20211228121412.0Z"
+            ],
+            "createTimestamp": [
+                "20211116072553.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "8b7c06f3-54c1-4c49-ba37-211882b4af44",
+        "createdTimestamp": 1641742081939,
+        "username": "valaptop$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALAPTOP,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d2309347-b9e6-4432-8636-f802ad4649a0"
+            ],
+            "modifyTimestamp": [
+                "20200601081406.0Z"
+            ],
+            "createTimestamp": [
+                "20200427075716.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "e3b3e727-f166-4ada-9984-fe4d2c50248e",
+        "createdTimestamp": 1641742082104,
+        "username": "valoores$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORES,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "16925e37-0316-4191-89cf-7c60b22ca98d"
+            ],
+            "modifyTimestamp": [
+                "20220107174647.0Z"
+            ],
+            "createTimestamp": [
+                "20210709072911.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "14c78c41-58ed-4634-bda4-399d57495e3a",
+        "createdTimestamp": 1641742081867,
+        "username": "valoores-conf8$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORES-CONF8,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3a934c07-eab5-4cd9-9351-a67811b39feb"
+            ],
+            "modifyTimestamp": [
+                "20191025032810.0Z"
+            ],
+            "createTimestamp": [
+                "20190709080535.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "12fd15ca-2d09-4f4c-8203-2d54441aa614",
+        "createdTimestamp": 1641742081941,
+        "username": "valoores-it$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORES-IT,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "c827fc00-4365-46cf-8b09-5724fc9fca48"
+            ],
+            "modifyTimestamp": [
+                "20210921065912.0Z"
+            ],
+            "createTimestamp": [
+                "20200513093222.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "43340e0c-2771-48ef-9482-83f76461e34b",
+        "createdTimestamp": 1641742081865,
+        "username": "valooreshrrm$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORESHRRM,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "40aa9962-820a-459a-8b36-9af7ca5c92da"
+            ],
+            "modifyTimestamp": [
+                "20210323085750.0Z"
+            ],
+            "createTimestamp": [
+                "20190604111417.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "37148c6e-bb4a-4cca-bed1-b8a16e05c0a4",
+        "createdTimestamp": 1641742081985,
+        "username": "valooresqib1$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORESQIB1,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "fc0107db-50e0-465f-8239-c69476c03da5"
+            ],
+            "modifyTimestamp": [
+                "20220109130940.0Z"
+            ],
+            "createTimestamp": [
+                "20201117081607.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a18fd187-d45e-4df0-8898-279b9a0f51a6",
+        "createdTimestamp": 1641742081987,
+        "username": "valooresqib2$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VALOORESQIB2,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "22881ff9-7ad6-4a92-8718-b8c8785cf380"
+            ],
+            "modifyTimestamp": [
+                "20220101201350.0Z"
+            ],
+            "createTimestamp": [
+                "20201119071753.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "55070855-a3b6-49d4-a349-837c4c27e7c2",
+        "createdTimestamp": 1641742081844,
+        "username": "vanessa$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VANESSA,OU=IT,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "52de9bb5-8b27-42e5-9d17-930a415f89bc"
+            ],
+            "modifyTimestamp": [
+                "20200922060636.0Z"
+            ],
+            "createTimestamp": [
+                "20181228063626.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a9b63099-d5cf-4a67-9000-fb9fd38c55c4",
+        "createdTimestamp": 1641742081629,
+        "username": "vanessa-h$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VANESSA-H,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "8c3ee822-9c7d-4f10-9937-f1de30ba4394"
+            ],
+            "modifyTimestamp": [
+                "20220105033517.0Z"
+            ],
+            "createTimestamp": [
+                "20160824081517.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a747d9f0-22ca-424a-9641-0dbba04c7113",
+        "createdTimestamp": 1641742081886,
+        "username": "vanessa-ma$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VANESSA-MA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "2af411fa-5aab-4c10-b146-b43b046bd05b"
+            ],
+            "modifyTimestamp": [
+                "20220103051454.0Z"
+            ],
+            "createTimestamp": [
+                "20191115092921.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "422d24b9-783f-410b-852d-eadb8a5eb3bf",
+        "createdTimestamp": 1641742081647,
+        "username": "venusaur$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VENUSAUR,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "3a57fb84-2af0-48fb-8da7-ddc89cd5fe0c"
+            ],
+            "modifyTimestamp": [
+                "20200312071211.0Z"
+            ],
+            "createTimestamp": [
+                "20170207130055.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1aec1637-46cf-4b37-b809-891aa6e87862",
+        "createdTimestamp": 1641742081931,
+        "username": "venusaurr$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=VENUSAURR,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cb3fa7c5-c762-481d-bff5-28d1337004ba"
+            ],
+            "modifyTimestamp": [
+                "20200707020456.0Z"
+            ],
+            "createTimestamp": [
+                "20200312071154.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "3d67c5b8-1861-4548-a313-ca41e2aebfef",
+        "createdTimestamp": 1641742081626,
+        "username": "wadiaa$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=WADIAA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "45414ea6-1dd3-446d-a323-c21cddf5107a"
+            ],
+            "modifyTimestamp": [
+                "20220105152226.0Z"
+            ],
+            "createTimestamp": [
+                "20160809083216.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "42604bf9-3f6b-45c1-8693-ea9ed88a4424",
+        "createdTimestamp": 1641742081863,
+        "username": "windows8pro$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=WINDOWS8PRO,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e36319b9-2e91-4786-8666-2bc07ed78c0b"
+            ],
+            "modifyTimestamp": [
+                "20191029083449.0Z"
+            ],
+            "createTimestamp": [
+                "20190405050554.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "a82ca710-08cd-454f-87ad-4984f59be7d5",
+        "createdTimestamp": 1641742081884,
+        "username": "yara-ka$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=YARA-KA,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "cf4b3aca-df1c-43a0-be5b-f3126eb3bb6a"
+            ],
+            "modifyTimestamp": [
+                "20211124123710.0Z"
+            ],
+            "createTimestamp": [
+                "20191111125940.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "4eedf2a8-9add-4be3-ba2f-783c22d51c0a",
+        "createdTimestamp": 1641742081994,
+        "username": "yousefmelhem$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=YOUSEFMELHEM,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "58022060-58aa-4499-93a6-e981877ad72c"
+            ],
+            "modifyTimestamp": [
+                "20220103090945.0Z"
+            ],
+            "createTimestamp": [
+                "20210312122746.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "adf28bd9-2c82-41d3-acc5-d6afb300dc72",
+        "createdTimestamp": 1641742082028,
+        "username": "youssef-f$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=YOUSSEF-F,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d0802596-b2a3-42b8-8177-4628eb271abb"
+            ],
+            "modifyTimestamp": [
+                "20220101000324.0Z"
+            ],
+            "createTimestamp": [
+                "20210408121744.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "343b6200-e8d0-4419-a9ba-5c5ffd83d93f",
+        "createdTimestamp": 1641742081893,
+        "username": "youssef-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=YOUSSEF-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "d1bc4f8f-a195-4117-b36e-e294e344226d"
+            ],
+            "modifyTimestamp": [
+                "20210312081628.0Z"
+            ],
+            "createTimestamp": [
+                "20191209061614.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "94a11e2e-ccbc-4477-abb5-6660c33d6bc1",
+        "createdTimestamp": 1641742082006,
+        "username": "zaynab-r$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ZAYNAB-R,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "9a60b633-9ce1-46a8-a74d-b94101d003f6"
+            ],
+            "modifyTimestamp": [
+                "20220108101016.0Z"
+            ],
+            "createTimestamp": [
+                "20210331105004.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "6112607a-cad4-4c7e-aeeb-4d86586e558d",
+        "createdTimestamp": 1641742081457,
+        "username": "zeina-k$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ZEINA-K,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "55cbb0c9-d45f-4171-9742-a94300e89908"
+            ],
+            "modifyTimestamp": [
+                "20210420112413.0Z"
+            ],
+            "createTimestamp": [
+                "20140305070925.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "1f16e967-9e83-41c2-9c29-cccce88c21a6",
+        "createdTimestamp": 1641742082134,
+        "username": "zeina-m$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ZEINA-M,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "e85e0bcc-9086-4605-8ee3-f5d8f249b5f6"
+            ],
+            "modifyTimestamp": [
+                "20220105021036.0Z"
+            ],
+            "createTimestamp": [
+                "20211025092541.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "681eed9f-39dc-4f43-aedb-5f10c8397f77",
+        "createdTimestamp": 1641742081479,
+        "username": "zeina-m-pc$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ZEINA-M-PC,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "db07bd27-c679-459f-ab5f-3e8d726cf550"
+            ],
+            "modifyTimestamp": [
+                "20201105012719.0Z"
+            ],
+            "createTimestamp": [
+                "20140515075703.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    },
+    {
+        "id": "5b7312e1-0d0a-41ab-987d-7b7ee1d205f9",
+        "createdTimestamp": 1641742081982,
+        "username": "zeina-mousallem$",
+        "enabled": true,
+        "totp": false,
+        "emailVerified": false,
+        "federationLink": "e737fb2a-dd53-40e6-8346-a99c645a5ceb",
+        "attributes": {
+            "LDAP_ENTRY_DN": [
+                "CN=ZEINA-MOUSALLEM,CN=Computers,DC=beirut,DC=softsolutions-group,DC=com"
+            ],
+            "LDAP_ID": [
+                "1e432e5f-24f3-4cd5-b422-ab161dc7a2e8"
+            ],
+            "modifyTimestamp": [
+                "20211025050032.0Z"
+            ],
+            "createTimestamp": [
+                "20201109060231.0Z"
+            ]
+        },
+        "disableableCredentialTypes": [],
+        "requiredActions": [],
+        "notBefore": 0,
+        "access": {
+            "manageGroupMembership": true,
+            "view": true,
+            "mapRoles": true,
+            "impersonate": true,
+            "manage": true
+        }
+    }
+]
