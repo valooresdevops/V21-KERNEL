@@ -21,7 +21,7 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.1.8.12";
+  public static endPointAddress = "10.10.10.78";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -242,7 +242,7 @@ export class GlobalConstants {
   public static createFormBuilder = GlobalConstants.inDispGatewat + 'api/createFormBuilder';
   public static getNewMenuNameApi = GlobalConstants.inDispGatewat + 'api/getNewMenuName/';
   public static getAllTabs = GlobalConstants.inDispGatewat + 'api/getAllTabs/';
-  public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns/';
+public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns/';
   public static getAllButtons = GlobalConstants.inDispGatewat + 'api/getAllButtons/';
   public static getAllColumnsSuspended = GlobalConstants.inDispGatewat + 'api/getAllColumnsNotSuspended/';
   public static getSyslinesDataApi = GlobalConstants.inDispGatewat + 'api/getSysLinesData/';
