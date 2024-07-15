@@ -86,11 +86,14 @@ export class InputComponent {
           const getAllFieldSetsApiURL = from(axios.get(GlobalConstants.getAllFieldSetsApi + this.objectId));
           const getAllFieldSetsApi = await lastValueFrom(getAllFieldSetsApiURL);
           this.fieldsetData = getAllFieldSetsApi.data;
+          console.log("fieldsetData DATA API>>>>>>>>>>>",getAllFieldSetsApi.data);
 
           const getColumnsApiURL = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
           const getColumnsApi = await lastValueFrom(getColumnsApiURL);
           let getColumnsApiData = getColumnsApi.data;
 
+          console.log("COLUMN DATA API>>>>>>>>>>>",getColumnsApi.data);
+          
           for (let g = 0; g < this.fieldsetData.length; g++) {
             let dataa = getColumnsApiData.filter((el: any) => {
               return Number(el.groupId) === Number(this.fieldsetData[g].id);

@@ -144,9 +144,11 @@ export class TabsComponent implements AfterContentInit,OnInit {
 
       let tabLength = this.tabs._results.length;
       if (tabLength > 6) {
-        $("#"+this.navId).css({ "display": "flex", "flex-direction": "column", "overflow-x": "auto", "height": "100px", "border": "0" });
+      //  $("#"+this.navId).css({ "display": "flex", "flex-direction": "column", "overflow-x": "auto", "height": "100px", "border": "0" });
+      $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px", "border": "0" });
+
       } else {
-        $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "50px", "border": "0" });
+        $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px", "border": "0" });
       }
 
       $("#"+this.navId).show();

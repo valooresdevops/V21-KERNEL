@@ -17,7 +17,7 @@ export class GlobalConstants {
   public static headers = new HttpHeaders().set('Content-Type', 'application/json');
   public static loginHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
   // --------------------------------------------------------------------------------
-  // -- Globally used parameterspublic
+  // -- Globally used parameterspublic--1
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
@@ -242,7 +242,7 @@ export class GlobalConstants {
   public static createFormBuilder = GlobalConstants.inDispGatewat + 'api/createFormBuilder';
   public static getNewMenuNameApi = GlobalConstants.inDispGatewat + 'api/getNewMenuName/';
   public static getAllTabs = GlobalConstants.inDispGatewat + 'api/getAllTabs/';
-  public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns/';
+public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns/';
   public static getAllButtons = GlobalConstants.inDispGatewat + 'api/getAllButtons/';
   public static getAllColumnsSuspended = GlobalConstants.inDispGatewat + 'api/getAllColumnsNotSuspended/';
   public static getSyslinesDataApi = GlobalConstants.inDispGatewat + 'api/getSysLinesData/';
