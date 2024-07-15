@@ -6,6 +6,7 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { HttpClient } from '@angular/common/http';
 import { ButtonRendererComponent } from './buttonRenderer.component';
 import { KpiBuilderPreviewComponent } from 'src/app/Kernel/kernelapp/in-display/object-builder/kpi-builder-preview/kpi-builder-preview.component';
+import { InformationService } from 'src/app/Kernel/services/information.service';
 @Component({
   selector: 'app-kpi-ratio-popup',
   templateUrl: './kpi-ratio-popup.component.html',
@@ -19,7 +20,8 @@ export class KpiRatioPopupComponent implements OnInit {
   frameworkComponents: any;
   constructor(private http: HttpClient,
     public commonFunctions: CommonFunctions,
-    private dialog: MatDialog,) {
+    private dialog: MatDialog,
+    public informationService: InformationService,) {
 
     this.onRunButtonClick = this.onRunButtonClick.bind(this);
 
@@ -63,7 +65,8 @@ export class KpiRatioPopupComponent implements OnInit {
 
   onRunButtonClick(e: any) {
     let info = {};
-    this.agGridSelectedNodes = localStorage.getItem('agGidSelectedNode');
+    this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
+    
     let selectedNodes = this.agGridSelectedNodes;
 
     if (localStorage.getItem("agGidSelectedNode").includes(",") || localStorage.getItem("agGidSelectedNode") == "") {
@@ -72,14 +75,12 @@ export class KpiRatioPopupComponent implements OnInit {
 
       this.http.post<any>(GlobalConstants.decodeKpiQuery + selectedNodes, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
-          //console.log(res);
           info = {
             data: res,
-            kpiId: localStorage.getItem('agGidSelectedNode')
+            kpiId: this.informationService.getAgGidSelectedNode(),
           };
         });
-
-
+        
       setTimeout(() => {
 
         const dialogConfig = new MatDialogConfig();
@@ -100,18 +101,19 @@ export class KpiRatioPopupComponent implements OnInit {
 
   }
   Insert() {
-    this.agGridSelectedNodes = localStorage.getItem('agGidSelectedNode');
+    this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
     let selectedNodes = this.agGridSelectedNodes;
+
     let allData = {
       kpiId: selectedNodes,
-      templateId: localStorage.getItem('selectedTabId')
+      templateId: this.informationService.getSelectedTabId(),
     }
+
     this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
       { headers: GlobalConstants.headers }).subscribe({
         next: (res) => {
         },
         error: (error) => {
-          //console.log(error);
         }
       });
 

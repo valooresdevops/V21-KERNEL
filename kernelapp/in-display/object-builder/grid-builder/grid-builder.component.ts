@@ -87,6 +87,9 @@ export class GridBuilderComponent implements OnInit {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '700px';
     dialogConfig.height = '700px';
+    this.action = 'add';
+    
+    this.dataservice.setactionType(this.action);
 
     const dialogRef = this.dialog.open(GridBuilderFormComponent, {
       // data: info,

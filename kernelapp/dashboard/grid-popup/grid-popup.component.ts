@@ -4,6 +4,7 @@ import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { HttpClient } from '@angular/common/http';
+import { InformationService } from 'src/app/Kernel/services/information.service';
 
 @Component({
   selector: 'app-grid-popup',
@@ -17,6 +18,7 @@ export class GridPopupComponent implements OnInit {
 
   constructor(private http: HttpClient,
     public commonFunctions: CommonFunctions,
+    public informationService: InformationService,
     private dialog: MatDialog,) { }
 
   ngOnInit(): void {
@@ -49,17 +51,15 @@ export class GridPopupComponent implements OnInit {
   }
   Insert() {
     let allData = {
-      gridId: localStorage.getItem('agGidSelectedNode'),
-      templateId: localStorage.getItem('selectedTabId'),
+      gridId: this.informationService.getAgGidSelectedNode(),
+      templateId: this.informationService.getSelectedTabId(),
     }
 
     this.http.post<any>(GlobalConstants.addDashboardGrid, allData,
       { headers: GlobalConstants.headers }).subscribe({
         next: (res) => {
-          //console.log(res);
         },
         error: (error) => {
-          //console.log(error);
         }
       });
 

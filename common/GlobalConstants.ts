@@ -21,7 +21,7 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.1.8.10";
+  public static endPointAddress = "10.1.8.12";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -304,6 +304,8 @@ export class GlobalConstants {
   public static exportRules  = GlobalConstants.inDispGatewat + 'api/exportRules/';
   public static importDynamicRulesApi  = GlobalConstants.inDispGatewat + 'api/importDynamicRules/';
   public static insertLogsDataApi  = GlobalConstants.inDispGatewat + 'api/insertLogsData/';
+  public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
+  public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
 
   
   
