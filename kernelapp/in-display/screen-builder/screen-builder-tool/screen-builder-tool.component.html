@@ -23,13 +23,13 @@
                         <div class="chart-row">
                           <ng-container>
                             <div class="chart-container" >
-                              <div *ngIf="item.number == 1 || item.number == 2 || item.number == 3 || item.number == 4 || item.number == 5 || item.number == 6 || item.number == 7 || item.number == 8 || item.number == 9">
+                              <!-- <div *ngIf="item.number == 1 || item.number == 2 || item.number == 3 || item.number == 4 || item.number == 5 || item.number == 6 || item.number == 7 || item.number == 8 || item.number == 9">
                                 <v-highcharts [Highcharts]="Highcharts" [options]="items1"></v-highcharts>
-                              </div>
+                              </div> -->
                               
-                              <div *ngIf="item.number > 9">
+                              <!-- <div *ngIf="item.number > 9"> -->
                                 <v-highcharts-stocks [Highcharts]="Highcharts" [options]="items1"></v-highcharts-stocks>
-                              </div>
+                              <!-- </div> -->
                             </div>
                           </ng-container>
                         </div>
