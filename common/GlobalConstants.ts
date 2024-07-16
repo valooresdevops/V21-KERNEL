@@ -17,11 +17,11 @@ export class GlobalConstants {
   public static headers = new HttpHeaders().set('Content-Type', 'application/json');
   public static loginHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
   // --------------------------------------------------------------------------------
-  // -- Globally used parameterspublic
+  // -- Globally used parameterspublic--1
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.10.10.78";
+  public static endPointAddress = "10.1.8.12";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
