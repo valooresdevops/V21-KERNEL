@@ -75,7 +75,7 @@ export class ColumnModifierComponent implements OnInit {
 
     this.AllMenus = GlobalConstants.getMenusButton;
 
-    this._Activatedroute.paramMap.subscribe((params) => {
+    this._Activatedroute.paramMap.subscribe((params:any) => {
       this.objectId = params.get('childId');
       this.columnId = params.get('columnId');
       this.isLinkFlag = Number(params.get("isLink")) == 1 ? true : false;
@@ -184,7 +184,7 @@ export class ColumnModifierComponent implements OnInit {
       columnModifier.push(jsonParams);
       let columnModifier1 = JSON.stringify(columnModifier);
 
-      this.http.post<any>(GlobalConstants.columnModifierApi + this.columnId + "/"+this.informationservice.getLogeduserId(), columnModifier1, { headers: GlobalConstants.headers }).subscribe(
+      this.http.post<any>(GlobalConstants.columnModifierApi + this.columnId+"/"+this.informationservice.getLogeduserId() , columnModifier1, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           if (res.status == 'Fail') {
             this.commonFunctions.alert("alert", res.description);
