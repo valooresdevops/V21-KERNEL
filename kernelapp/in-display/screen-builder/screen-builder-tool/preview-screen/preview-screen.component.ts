@@ -56,7 +56,7 @@ export class PreviewScreenComponent implements OnInit {
   
   
   
-        const response = await axios.get(GlobalConstants.getScreenPreviewData + jsonString);
+        const response = await axios.get(GlobalConstants.getScreenPreviewData + this.menuVariable);
         console.log("Response:", response);
         const responseaxios = response.data;
         let data =responseaxios[0].screenData;

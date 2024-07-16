@@ -7063,7 +7063,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                       height: '90%',
                     });
 
-                    dialogRef.afterClosed().subscribe(result => {
+                    dialogRef.afterClosed().subscribe((result: any) => {
                     });
 
 
@@ -7286,11 +7286,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       whereConditions: this.whereConditionAr
     }];
     this.http.post<any>(GlobalConstants.dynamicDeleteFormBuilderApi, jsonVal).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.commonFunctions.alert("alert", "Deleted Successfully");
         this.getAllColums();
       },
-      error: (error) => {
+      error: (error: any) => {
         console.log(error);
       }
     });
@@ -7551,7 +7551,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
           height: '25%',
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: any) => {
         });
 
       }else{
@@ -7592,7 +7592,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
           height: '20%',
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: any) => {
         });
 
     }else{

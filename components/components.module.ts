@@ -77,7 +77,10 @@ import {VHighChartsComponent} from './v-highcharts/v-highcharts.component';
 import { NavbarComponent } from './map/component/menu/menu.component';
 import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-stocks.component';
 // import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-stocks.component';
-
+import { TextmenuComponent } from './map/component/textmenu/textmenu.component';
+import { HeaderComponent } from './map/component/header/header.component';
+import { PropertiesComponent } from './map/component/properties/properties.component';
+import { TimelineComponent } from './map/timeline/timeline.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -134,7 +137,11 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
         VDynamicReportComponent,
         VHighChartsComponent,
         VHighchartsStocksComponent,
-        NavbarComponent
+        NavbarComponent,
+        TextmenuComponent,
+        HeaderComponent,
+        PropertiesComponent,
+        TimelineComponent
 
     ],
     imports: [
@@ -199,7 +206,11 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
         ToastrModule,
         VHighChartsComponent,
         VHighchartsStocksComponent,
-        NavbarComponent
+        NavbarComponent,
+        TextmenuComponent,
+        HeaderComponent,
+        PropertiesComponent,
+        TimelineComponent
 
     ],
     schemas: [
@@ -208,6 +219,7 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
     providers: [
         PopupComponent,
         MapComponent,
+        TimelineComponent,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: Http_Interceptor,
