@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'v-toggle',
@@ -21,7 +21,7 @@ export class VToggleComponent implements ControlValueAccessor, AfterViewInit {
   public isDisabled!: boolean;
 
   @Input() public label: any;
-  @Input() public parentForm?: UntypedFormGroup;
+  @Input() public parentForm?: FormGroup;
   @Input() public fieldName: string = '';
   @Input() public color: string = ''; // Acceptable colors: primary, warn
   @Input() public checked: boolean  = false;
@@ -40,9 +40,9 @@ export class VToggleComponent implements ControlValueAccessor, AfterViewInit {
     }
   }
 
-  get formField():UntypedFormControl {
+  get formField():FormControl {
     if(this.fieldName != '') {
-      return this.parentForm?.get( this.fieldName ) as UntypedFormControl;
+      return this.parentForm?.get( this.fieldName ) as FormControl;
     }
   }
 

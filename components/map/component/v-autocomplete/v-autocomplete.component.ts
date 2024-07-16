@@ -1,11 +1,11 @@
 import { Component, forwardRef, Input } from '@angular/core';
-import { ControlValueAccessor, UntypedFormControl, FormGroup, FormGroupDirective, NgForm, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, FormGroup, FormGroupDirective, NgForm, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { map, startWith } from 'rxjs/operators';
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
-  isErrorState(control: UntypedFormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
     const isSubmitted = form && form.submitted;
     return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
   }
@@ -42,8 +42,8 @@ export class AutocompleteComponent implements ControlValueAccessor {
 
   filteredOptions?: Observable<string[]>;
 
-  get formField():UntypedFormControl {
-    return this.parentForm?.get( this.fieldName ) as UntypedFormControl;
+  get formField():FormControl {
+    return this.parentForm?.get( this.fieldName ) as FormControl;
   }
 
   matcher = new MyErrorStateMatcher();

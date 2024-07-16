@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'v-label',
@@ -10,14 +10,14 @@ export class LabelComponent implements OnInit {
 
   @Input() public text: any;
   @Input() public required: any = "false";
-  @Input() public parentForm?: UntypedFormGroup;
+  @Input() public parentForm?: FormGroup;
   @Input() public fieldName: string = '';
 
   constructor() {}
 
-  get formField():UntypedFormControl {
+  get formField():FormControl {
     if(this.fieldName != '') {
-      return this.parentForm?.get( this.fieldName ) as UntypedFormControl;
+      return this.parentForm?.get( this.fieldName ) as FormControl;
     }
   }
 

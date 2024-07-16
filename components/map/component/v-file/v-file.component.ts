@@ -1,5 +1,5 @@
 import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
@@ -30,7 +30,7 @@ export class VFileComponent implements ControlValueAccessor {
 
   public selectedFile!: any;
   
-  @Input() public parentForm?: UntypedFormGroup;
+  @Input() public parentForm?: FormGroup;
   @Input() public fieldName: any;
   @Input() public required: any;
   @Input() public acceptedFileTypes: any;
@@ -62,7 +62,7 @@ export class VFileComponent implements ControlValueAccessor {
 
     // If value is being used in a form then create form field
     if(this.fieldName != '') {
-      this.formFieldd = this.parentForm?.get( this.fieldName ) as UntypedFormControl;
+      this.formFieldd = this.parentForm?.get( this.fieldName ) as FormControl;
     }
 
     // Filter browse file based on acceptedFileTypes

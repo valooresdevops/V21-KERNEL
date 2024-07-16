@@ -1,0 +1,35 @@
+<div id="row"  *ngFor="let element of Data">    
+ 
+       
+    <div *ngIf="element.is_grid===false" [formGroup]="myGroup">
+      
+           <!-- <v-input formControlName="user" [required]="true"  label="user"
+                type="text" id="user" fieldName="user"></v-input>
+                
+                 <v-input formControlName="Hits" [required]="true" label="Hits"
+                type="text" id="Hits" fieldName="Hits"></v-input> -->
+         <!-- <app-header id="Header" [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header> -->
+         <v-fieldset title="{{element.FieldsetName}}" class="my-2"></v-fieldset>
+
+         <div *ngFor="let elt of element.fields" style=" display: inline-flex; margin: 10px;" class="col-4 col-md-4">
+        <v-input    formControlName="{{elt.Name}}" [required]="true"  label="{{elt.Name}}"
+        type="text" id="{{elt.Name}}" fieldName="{{elt.Name}}"  [value]="elt.Data"></v-input>
+ 
+    </div>
+</div>
+   <div *ngIf="element.is_grid===true"> 
+    <v-fieldset title="{{element.FieldsetName}}"  class="my-2"></v-fieldset>
+
+    <app-v-ag-grid class="grid2" [headerHeight]="20" [columnDefs]="columndefs" [rowData]="rowdata"  [Title]="Data"  [distinct]="false"  [pagination]="true"  [pagination]="true" [contextmenu]="false"   >  </app-v-ag-grid>
+
+   </div>   
+ 
+   <!-- <v-fieldset title="Pattern Analysis/Association View" class="my-2"></v-fieldset>
+
+   <div *ngFor="let name of Data" style=" display: inline-flex; margin: 10px;" class="col-4 col-md-4">
+  <v-input    formControlName="{{name}}" [required]="true"  label="{{name}}"
+  type="text" id="{{name}}" fieldName="{{name}}"  [value]=""></v-input>
+
+</div> -->
+
+</div>
