@@ -356,7 +356,7 @@ setTimeout(() => {
   }
 
 //this.autoSizeAllColumns();
-this.paginationPageSize=15;
+// this.paginationPageSize=15;
 
   }
 
