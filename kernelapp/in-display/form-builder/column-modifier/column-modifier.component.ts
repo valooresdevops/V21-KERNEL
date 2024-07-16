@@ -125,7 +125,7 @@ export class ColumnModifierComponent implements OnInit {
       let isEditable = this.modifierForm.controls['isEditable']?.value;
       if(defaultValue == undefined){
         defaultValue = 0;
-      } 
+      }
 
       if(mandatoryQuery == undefined){
         mandatoryQuery = 0;
@@ -185,6 +185,7 @@ export class ColumnModifierComponent implements OnInit {
       let columnModifier1 = JSON.stringify(columnModifier);
 
       this.http.post<any>(GlobalConstants.columnModifierApi + this.columnId+"/"+this.informationservice.getLogeduserId() , columnModifier1, { headers: GlobalConstants.headers }).subscribe(
+
         (res: any) => {
           if (res.status == 'Fail') {
             this.commonFunctions.alert("alert", res.description);
@@ -215,7 +216,7 @@ export class ColumnModifierComponent implements OnInit {
         this.modifierForm.controls['mandatoryQuery'].setValue(res[0].mandatoryQuery);
         this.modifierForm.controls['tableName'].setValue(res[0].tableName);
         this.modifierForm.controls['dependencyDefaultValue'].setValue(res[0].dependencyDefaultValue);
-console.log("value of isEditable >>>>>>> ",res[0].isEditable);        
+console.log("value of isEditable >>>>>>> ",res[0].isEditable);
         if (res[0].isMandatory == "0") {
           this.modifierForm.controls['isMandatory'].setValue(false);
         } else if (res[0].isMandatory == "1") {
@@ -223,7 +224,7 @@ console.log("value of isEditable >>>>>>> ",res[0].isEditable);
         } else if (res[0].isMandatory == "2") {
           this.modifierForm.controls['isMandatory'].setValue(true);
         }
-        
+
         if (res[0].isMultiple == "0") {
           this.modifierForm.controls['isMultiple'].setValue(false);
         } else {
@@ -256,15 +257,15 @@ console.log("value of isEditable >>>>>>> ",res[0].isEditable);
         }else{
           this.modifierForm.controls['isEditable'].setValue(true);
         }
-       
+
         this.mandatoryFlag = res[0].isMandatory;
-        
+
         this.commonFunctions.handleLookupElem("query", this.modifierForm);
         this.commonFunctions.handleLookupElem("qbeReadOnly", this.modifierForm);
         this.commonFunctions.handleLookupElem("defaultValue", this.modifierForm);
         this.commonFunctions.handleLookupElem("mandatoryQuery", this.modifierForm);
         this.commonFunctions.handleLookupElem("dependencyDefaultValue", this.modifierForm);
-         
+
         if(this.mandatoryFlag == 0){
           this.toggleValue = 1;
           this.readOnlyIsExluced = false;
@@ -273,7 +274,7 @@ console.log("value of isEditable >>>>>>> ",res[0].isEditable);
           this.readOnlyIsExluced = true;
         }
       });
-      
+
   }
 
   toggleChange(){
