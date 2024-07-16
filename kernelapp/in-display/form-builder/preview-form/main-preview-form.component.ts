@@ -36,6 +36,7 @@ export class PreviewFormComponent implements OnInit {
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
   public isGrid: any | undefined;
+  public hasMultipleSelection: any | undefined;
   public isQueryForm: any | undefined;
   public isDynamicReport: any | undefined;
   public previewGridApi: string = '';
@@ -60,7 +61,7 @@ export class PreviewFormComponent implements OnInit {
   public isLink: any;
   public hiddenColumns: any[] = [];
   public datatobesent:any[]=[];
-
+  public selectionType:any="single";
   hiddenForm = new UntypedFormGroup({});
   menuForm = new UntypedFormGroup({});
   public userId: number = Number(this.informationservice.getLogeduserId());
@@ -554,6 +555,7 @@ export class PreviewFormComponent implements OnInit {
             "sourceQuery": res[i].sourceQuery,
             "isAdvancedSearch": res[i].isAdvancedSearch,
             "isGrid": res[i].isGrid,
+            "hasMultipleSelection": res[i].hasMultipleSelection,
             "isQueryForm": res[i].isQueryForm,
             "isDynamicReport": res[i].isDynamicReport,
             "isReadOnly": res[i].isReadOnly,
@@ -590,7 +592,11 @@ export class PreviewFormComponent implements OnInit {
         }else{
           this.informationservice.setIsDynamicReport(false);
         }
-        
+        if(this.tableOptions1[0].hasMultipleSelection=='1'){
+        this.selectionType="multiple";
+      }else{
+        this.selectionType="single";
+      }
         this.tableOptions1 = this.tableOptions1.filter(value => value.isMain == '1');
         this.http.get<any>(GlobalConstants.getMenuNameApi + this.objectId).subscribe((data: any) => {
           this.AllTabs = data;

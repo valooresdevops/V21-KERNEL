@@ -572,6 +572,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               "canDelete": res[i].canDelete,
               "canModify": res[i].canModify,
               "isAdvancedSearch": res[i].isAdvancedSearch,
+              "hasMultipleSelection": res[i].hasMultipleSelection,
               "isQueryForm": res[i].isQueryForm,
               "isDynamicReport": res[i].isDynamicReport,
               "isGrid": res[i].isGrid,

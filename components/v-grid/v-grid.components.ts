@@ -356,7 +356,7 @@ setTimeout(() => {
   }
 
 //this.autoSizeAllColumns();
-this.paginationPageSize=15;
+// this.paginationPageSize=15;
 
   }
 
@@ -451,31 +451,58 @@ this.paginationPageSize=15;
   }
     
     if (selectionType == "unselected") {
+      this.selectedNodesAr=this.selectedNodesAr.replace(/\s/g,"");
+
+      console.log("EVENT>>>>>>>>>>>>>",event.data);
+      console.log("OLD ARRAY>>>>>",this.selectedNodesAr);
       let selectedNodesJson = JSON.parse(this.selectedNodesAr);
-      for (let u = 0; u < selectedNodesJson.length; u++) {
-        for (let uu = u + 1; uu < selectedNodesJson.length; uu++) {
-          let test = 0;
-          for (let x = 0; x < nbOfPrimaryKeys; x++) {
-            if (this.agPrimaryKey.indexOf(",") != -1) {
-              let val = this.agPrimaryKey.split(",")[x];
-              if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
-                test = test + 1;
-              }
-            } else {
-              let val = this.agPrimaryKey;
-              if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
-                test = test + 1;
-              }
-            }
-          }
-          if (test == nbOfPrimaryKeys) {
-            // selectedNodesJson[uu].rowSlectedStatus = "deleted";
-            selectedNodesJson.splice(u, 1);
-            test = 0;
-          }
+     // let primaryKeysList = this.agPrimaryKey.split(",");
+      let commonKeys = Object.keys(event.node.data).reduce((result:any, key) => {
+        if (this.agPrimaryKey.includes(key)) {
+          result[key] = event.node.data[key];
         }
-      }
+        return result;
+      }, {});
+      console.log("JSON OBJECT KEYS>>>>>>>>>>",JSON.stringify(commonKeys));
+
+      // for (let u = 0; u < selectedNodesJson.length; u++) {
+      //   for (let uu = u + 1; uu < selectedNodesJson.length; uu++) {
+      //     let test = 0;
+      //     for (let x = 0; x < nbOfPrimaryKeys; x++) {
+      //       if (this.agPrimaryKey.indexOf(",") != -1) {
+      //         let val = this.agPrimaryKey.split(",")[x];
+      //         if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
+      //           test = test + 1;
+      //         }
+      //       } else {
+      //         let val = this.agPrimaryKey;
+      //         if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
+      //           test = test + 1;
+      //         }
+      //       }
+      //     }
+      //     if (test == nbOfPrimaryKeys) {
+      //       // selectedNodesJson[uu].rowSlectedStatus = "deleted";
+      //       selectedNodesJson.splice(u, 1);
+      //       test = 0;
+      //     }
+      //   }
+      // }
       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
+      this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(commonKeys),"");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
+      this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
+      this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
+      this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+      this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+      this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
+      this.selectedNodesAr = this.selectedNodesAr.replace(",,", ",");
+      this.selectedNodesAr = this.selectedNodesAr.replace(",]", "]");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[,", "[");
+
+      console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
+      
     }
  //   console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
 console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
@@ -514,7 +541,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
       }
     }, 1000);
    
-    console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
+    //console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
     this.rowContSelected = this.rowContSelected + 1;
     // If primary key is not available, throw exception Primary key is required
     if (this.agPrimaryKey != '') {
@@ -545,8 +572,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
 
             }else{
-          ////////////////////////////////////////////////////  
+          ////////////////////////////////////////////////////
             this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
+
           }
 
             console.log("this.informationservice.setAgGidSelectedNode on row selected :", this.informationservice.getAgGidSelectedNode())
@@ -634,6 +662,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
                 }else{
             
+                  
             this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             console.log("this.informationservice.setAgGidSelectedNode unselected :", this.informationservice.getAgGidSelectedNode())
  }

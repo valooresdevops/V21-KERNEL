@@ -4604,6 +4604,7 @@ console.log("isGrid ========",isGrid);
           "condition": conditionTest,
           "sourceQuery": getAllTabs.data[i].sourceQuery,
           "isAdvancedSearch": getAllTabs.data[i].isAdvancedSearch,
+          "hasMultipleSelection": getAllTabs.data[i].hasMultipleSelection,
           "isQueryForm": getAllTabs.data[i].isQueryForm,
           "isDynamicReport": getAllTabs.data[i].isDynamicReport,
           "isGrid": isGrid,

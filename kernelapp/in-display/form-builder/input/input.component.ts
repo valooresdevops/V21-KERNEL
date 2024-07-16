@@ -31,6 +31,7 @@ export class InputComponent {
 
   isGrid: any;
   isQueryForm: any;
+  hasMultipleSelection: any;
   isDynamicReport:any;
   test: any = [];
   AllTabs: any = [];
@@ -187,6 +188,7 @@ export class InputComponent {
         "sourceQuery": getAllTabsApi.data[i].sourceQuery,
         "isAdvancedSearch": getAllTabsApi.data[i].isAdvancedSearch,
         "isGrid": getAllTabsApi.data[i].isGrid,
+        "hasMultipleSelection": getAllTabsApi.data[i].hasMultipleSelection,
         "isQueryForm": getAllTabsApi.data[i].isQueryForm,
         "isDynamicReport": getAllTabsApi.data[i].isDynamicReport,
         "isReadOnly": getAllTabsApi.data[i].isReadOnly,
