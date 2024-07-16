@@ -239,8 +239,8 @@ export class ScreenBuilderToolComponent implements OnInit {
       {
         headerName: '',
         field: '',
-        defaultMinWidth: '40',
-        maxWidth: '40',
+        defaultMinWidth: '50',
+        maxWidth: '50',
         cellRenderer: CellRenderer,
         cellRendererParams: {
           onClick: this.onRunCellButtonClickGrid.bind(this),
@@ -327,8 +327,8 @@ export class ScreenBuilderToolComponent implements OnInit {
       {
         headerName: '',
         field: '',
-        defaultMinWidth: '40',
-        maxWidth: '40',
+        defaultMinWidth: '50',
+        maxWidth: '50',
         cellRenderer: CellRenderer,
         cellRendererParams: {
           onClick: this.onRunCellButtonClickKpi.bind(this),
@@ -666,6 +666,7 @@ export class ScreenBuilderToolComponent implements OnInit {
 
             if (this.chartType == 'heatmap') {
               this.newChartObject.push({
+                type:'Chart',
                 chart: {
                   type: 'heatmap',
                   marginTop: 40,
@@ -770,6 +771,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 if(res.is3d == 1){
                   this.newChartObject.push(
                     {
+                      type:'Chart',
                       chart: { type: 'scatter'},
                       title: { text: res.records[0].TITLE },
                       xAxis: {
@@ -791,6 +793,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 }else{           
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: { type: 'scatter' },
                     title: { text: res.records[0].TITLE },
                     xAxis: {
@@ -821,6 +824,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 const transformedData = res.records.map((item: any) => [item.NAME, parseFloat(item.Y)]);
 
                 this.newChartObject.push({
+                  type:'Chart',
                   chart: {
                     type: 'pie',
                     options3d: {
@@ -846,6 +850,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               } else {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: { type: 'pie' },
                     title: { text: res.records[0].TITLE },
                     series: [{
@@ -865,6 +870,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               if (res.is3d == 1) {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: {
                       type: this.chartType,
                       options3d: {
@@ -893,6 +899,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               } else {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: { type: this.chartType },
                     title: { text: res.records[0].TITLE },
                     xAxis: {
@@ -920,6 +927,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   if(res.is3d == 1){
                     this.newChartObject.push(
                       {
+                        type:'Chart',
                         chart: { type: 'area',
                           options3d: {
                             enabled: true,
@@ -946,6 +954,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }else{
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: { type: 'area' },
                     title: { text: res.records[0].TITLE },
                     xAxis: {
@@ -972,6 +981,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               if (res.is3d == 1) {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: {
                       type: 'line',
                       options3d: {
@@ -1012,6 +1022,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               } else {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: { type: 'line' },
                     title: { text: res.records[0].TITLE },
                     xAxis: {
@@ -1039,6 +1050,7 @@ export class ScreenBuilderToolComponent implements OnInit {
   
   
                   this.newChartObject.push({
+                    type:'Chart',
                     chart: {
                       renderTo: 'container',
                       type: 'column',
@@ -1087,6 +1099,7 @@ export class ScreenBuilderToolComponent implements OnInit {
   
                 
               this.newChartObject.push({
+                type:'Chart',
                 chart: { type: 'column' },
                 title: { text: res.records[0].TITLE },
                 xAxis: [{ categories: this.ids}],
@@ -1121,6 +1134,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               ]);
               this.newChartObject.push(
                 {
+                  type:'Stock',
                   rangeSelector: {
                     selected: 1
                   },
@@ -1154,6 +1168,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               ]);
               this.newChartObject.push(
                 {
+                  type:'Stock',
                   rangeSelector: {
                     selected: 1
                   },
@@ -1180,6 +1195,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               ]);
               this.newChartObject.push(
                 {
+                  type:'Stock',
                   chart: {
                     alignTicks: false
                   },
@@ -1217,6 +1233,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 Number(item.low_price),
                 Number(item.close_price)]);
                 this.newChartObject.push({
+                  type:'Stock',
                 rangeSelector: {
                   selected: 2
                 },
@@ -1244,71 +1261,53 @@ export class ScreenBuilderToolComponent implements OnInit {
                 }]
               });
             } else if (this.chartType == 'stockArea') {
-              const transformedData1 = res.records.map((item: any) => [
+              const transformedData1 = res.records.map((item: any) => [ 
                 Number(item.timestamp),
-                Number(item.close_price)
-              ]);
-              this.newChartObject.push({
-                chart: {
-                  height: 400
-                },
-                credits: {
-                  enabled: false
-                },
-
-                title: {
-                  text: res.records[0].title
-                },
-
-                subtitle: {
-                  text: 'Click small/large buttons or change window size to test ' +
-                    'responsiveness'
-                },
-
+                Number(item.close_price)]);
+  
+              this.newChartObject = [{
+                type:'Stock',
                 rangeSelector: {
                   selected: 1
-                },
-
-                series: [{
+              },
+      
+              title: {
+                  text: res.records[0].title
+              },
+      
+              series: [{
                   name: res.records[0].title,
                   data: transformedData1,
-                  type: 'area',
+                  type: 'areaspline',
                   threshold: null,
                   tooltip: {
-                    valueDecimals: 2
-                  }
-                }],
-
-                responsive: {
-                  rules: [{
-                    condition: {
-                      maxWidth: 500
-                    },
-                    chartOptions: {
-                      chart: {
-                        height: 300
+                      valueDecimals: 2
+                  },
+                  fillColor: {
+                      linearGradient: {
+                          x1: 0,
+                          y1: 0,
+                          x2: 0,
+                          y2: 1
                       },
-                      chartOptions: {
-                        chart: {
-                          height: 300
-                        },
-                        subtitle: {
-                          text: null
-                        },
-                        navigator: {
-                          enabled: false
-                        }
-                      }
-                    }
-                  }]
-                }
-              });
-            } else if (this.chartType == 'semiPie') {
+                      stops: [
+                          [0, Highcharts.getOptions().colors[0]],
+                          [
+                              1,
+                              Highcharts.color(
+                                  Highcharts.getOptions().colors[0]
+                              ).setOpacity(0).get('rgba')
+                          ]
+                      ]
+                  }
+              }]}]
+            }else if (this.chartType == 'semiPie') {
 
               const transformedData = res.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
               if (res.is3d == 1) {
                 this.newChartObject.push(
                   {
+                    type:'Chart',
                     chart: {
                       plotBackgroundColor: null,
                       plotBorderWidth: 0,
@@ -1365,6 +1364,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 if (res.is3d == 1) {
                   this.newChartObject.push(
                     {
+                      type:'Chart',
                       chart: {
                         plotBackgroundColor: null,
                         plotBorderWidth: 0,
@@ -1418,13 +1418,13 @@ export class ScreenBuilderToolComponent implements OnInit {
             }
             this.ids = [];
             this.names = [];
-              if((this.newChartObject.length + this.newChartObject.length) == parts.length)
+              if((this.newChartObject.length) == parts.length)
               {
                 console.log(parts.length-1)
             
                 console.log("newChartObject ==== ", this.newChartObject);
 
-                console.log("formdata = " + this.newChartObject,)
+                console.log("formdata = " + this.newChartObject)
                 console.log("formdata = ", JSON.stringify(this.newChartObject, null, 2));
 
                 if(this.newChartObject.length > 0)
@@ -1439,7 +1439,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                     number: res.chartType,
                   });
                 }
-                  
+                  console.log('itemsData----->',this.itemsData);
                 // if(this.stockChartObject.length > 0)
                 // {
                 //   this.itemsData.push
@@ -1945,6 +1945,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             ]);
             this.newChartObject.push(
               {
+                type:'Stock',
                 rangeSelector: {
                   selected: 1
                 },
@@ -1978,6 +1979,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             ]);
             this.newChartObject.push(
               {
+                type:'Stock',
                 rangeSelector: {
                   selected: 1
                 },
@@ -2004,6 +2006,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             ]);
             this.newChartObject.push(
               {
+                type:'Stock',
                 chart: {
                   alignTicks: false
                 },
@@ -2041,6 +2044,7 @@ export class ScreenBuilderToolComponent implements OnInit {
               Number(item.low_price),
               Number(item.close_price)]);
               this.newChartObject.push({
+              type:'Stock',
               rangeSelector: {
                 selected: 2
               },
@@ -2068,65 +2072,46 @@ export class ScreenBuilderToolComponent implements OnInit {
               }]
             })
           } else if (this.chartType == 'stockArea') {
-            const transformedData1 = res.records.map((item: any) => [
+            const transformedData1 = res.records.map((item: any) => [ 
               Number(item.timestamp),
-              Number(item.close_price)
-            ]);
-            this.newChartObject.push({
-              chart: {
-                height: 400
-              },
-              credits: {
-                enabled: false
-              },
+              Number(item.close_price)]);
 
-              title: {
-                text: res.records[0].title
-              },
-
-              subtitle: {
-                text: 'Click small/large buttons or change window size to test ' +
-                  'responsiveness'
-              },
-
+            this.newChartObject = [{
+              type:'Stock',
               rangeSelector: {
                 selected: 1
-              },
-
-              series: [{
+            },
+    
+            title: {
+                text: res.records[0].title
+            },
+    
+            series: [{
                 name: res.records[0].title,
                 data: transformedData1,
-                type: 'area',
+                type: 'areaspline',
                 threshold: null,
                 tooltip: {
-                  valueDecimals: 2
-                }
-              }],
-
-              responsive: {
-                rules: [{
-                  condition: {
-                    maxWidth: 500
-                  },
-                  chartOptions: {
-                    chart: {
-                      height: 300
+                    valueDecimals: 2
+                },
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
                     },
-                    chartOptions: {
-                      chart: {
-                        height: 300
-                      },
-                      subtitle: {
-                        text: null
-                      },
-                      navigator: {
-                        enabled: false
-                      }
-                    }
-                  }
-                }]
-              }
-            });
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [
+                            1,
+                            Highcharts.color(
+                                Highcharts.getOptions().colors[0]
+                            ).setOpacity(0).get('rgba')
+                        ]
+                    ]
+                }
+            }]}]
           } else if (this.chartType == 'semiPie') {
 
             const transformedData = res.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
@@ -2250,7 +2235,6 @@ export class ScreenBuilderToolComponent implements OnInit {
                 value: this.informationservice.getAgGidSelectedNode(),
                 number: res.chartType,
               });
-              alert(res.chartType)
             }
            
             // if(this.stockChartObject.length > 0)

@@ -12,7 +12,7 @@
 <!-- Leaflet Measure JavaScript -->
 <script src="https://unpkg.com/leaflet-measure/dist/leaflet-measure.min.js"></script>
 
-<app-navbar id="mmm" [SimulID]="navbarSimulId" (displayclusters2)="getsenarioId($event)"></app-navbar>
+<app-navbar id="mmm" [SimulID]="navbarSimulId" (displayclusters2)="getsenarioId($event)"  (openProperties)="openPropertiesForm($event)"></app-navbar>
 
 <ng-template #popupContent >
    <div class="modal-header">
@@ -96,12 +96,15 @@
   </div>
 </ng-template>
 <div id="ref" style=" display: flex;position:absolute;right: 12px;top: 104px;" >
-<button id="refreshJsp" (click)="test33()">
-      refresh <i class="fa-solid fa-arrows-rotate"></i>
-  </button>
-<button id="3point" style="margin-top: -22px; background-color: white;color: black;border: 1px solid black;" (click)="bars()">
-  <i class="fa-solid fa-bars"></i>
-</button></div>
+  <!-- <button id="refreshJsp" (click)="test33()">
+        refresh <i class="fa-solid fa-arrows-rotate"></i>
+    </button>
+  <button id="3point" style="margin-top: -22px;z-index:9999999999999;background-color: white;color: black;border: 1px solid black;" (click)="bars()">
+    <i class="fa-solid fa-ellipsis-vertical"></i>
+  </button> -->
+  <app-textmenu *ngIf="showTextMenu"  [nextActionMenuList]="nextActionMenuList"></app-textmenu>
+  
+  </div>
 
 <ng-template #Queue2>
   <div style="display: flex; flex-direction: column; align-items: center; font-weight: bold; font-family: Calibri; font-size: 14px; font-style: italic; padding: 0px 14px;" class="content">
@@ -151,7 +154,13 @@
   <app-v-table  #childRef [tableData]="Datatable" [tablerow]="tablerow" [tableColumns]="displayedColumns"  [routeDevices]="routeDevicestable" [typeofdata]="typeofdata"  (clickedRow)="changeview($event)"  (clickedDeviceId)="clickedDeviceId($event)"
   ></app-v-table>
  </div>
- <!-- <div id="tabletest" *ngIf="openTable===true" style="display: none;" >
+ 
+ <ng-template #showPropertiesForm  >
+<!-- <app-properties  [showForm]="true"></app-properties> -->
+<app-properties [SimulID]="PropertiesSimulID" (openProperties)="openPropertiesForm($event)"></app-properties>
+</ng-template>
+
+<!-- <div id="tabletest" *ngIf="openTable===true" style="display: none;" >
   <app-v-table   [tableColumns]="displayedColumns"     (clickedRow)="changeview($event)"
   ></app-v-table>
  </div> -->
@@ -417,6 +426,12 @@ saveshapes
 refreshJsp
 </button>
 
+<button id="DisplayFromSenario"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="DisplayFromSenario()"
+>
+refreshJsp
+</button>
 
 <button id="DisplayCdr"
   style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
@@ -514,7 +529,7 @@ style="position: absolute; bottom: 0; z-index: 999999999999; left: 300px; displa
 </button> -->
 
 
-<div  class="timeline" style="display: none ;position: absolute;top: 617px;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
+<div  class="timeline" style="display: none ;position: absolute;top: 808px;;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
   
   <button (click)="startTimeline()" [disabled]="isRunning">Start</button>
   <button (click)="ReverseTimeline()" [disabled]="isRunning">Reverse</button>
@@ -632,9 +647,9 @@ displaysenario
 class="showMeasure showMeasure_Layout dropdown">
 <i class="fas fa-ruler-combined"></i>
 <!-- <img src="/src/assets/img/" alt="map" class="dropbtn"> -->
-<div class="dropdown-content">
-  <a id="Polygondraw" (click)="startDrawingPolygon()" title='Measure in meters square'>Polygon</a>
-  <a id="Linedraw" (click)="startDrawingPolyline()" title='Measure in meters'>Polyline</a>
+<div   style="z-index: 999999999999999999 !important ;"  class="dropdown-content">
+  <a     id="Polygondraw" (click)="startDrawingPolygon()" title='Measure in meters square'>Polygon</a>
+  <a     id="Linedraw" (click)="startDrawingPolyline()" title='Measure in meters'>Polyline</a>
 </div>
 </div>
 
@@ -895,84 +910,24 @@ class="showMeasure showMeasure_Layout dropdown">
 </div>
 
 
-<div id="refresh" style=" position: absolute; z-index: 9999999999999 ; background-color:white;
+<div   *ngIf="ShowHeader" id="refresh" style=" position: absolute; z-index: 9999999999999 ; background-color:white;
 display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; ">
-  
-  <h1 id="text1">Begin Operation</h1>
-  <input id="type" type="datetime-local" [(ngModel)]="beginOperation2">
-  <h1 id="text1">End Operation</h1>
-  <input id="type" type="datetime-local" [(ngModel)]="endOperation2">
-  <h1 id="text1">Type:</h1>
+<fieldset > 
+   <legend id="legend">Simulation</legend>  
 
-    
-    
-  <select id="type" name="type" [(ngModel)]="selectedType" (change)="changeType(selectedType)">
-    <option *ngFor="let type of simulationtype" id="{{type[0]}}" [value]="type[0]">{{type[1]}}</option>
-  </select>
+<app-header id="Header" [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
+</fieldset>
+</div>
+
+<!-- <app-navbar   (openProperties)="openPropertiesForm($event)"></app-navbar> -->
+
+<!-- <div   *ngIf="showPropertiesForm" id="refresh" style=" position: absolute; z-index: 9999999999999 ; background-color:white;
+display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; ">
+<fieldset> 
+   <legend id="legend">hiiiii</legend>  
+</fieldset>
+</div> -->
 
 
 
- 
-    <div *ngIf="selectedType == 2" (change)="changeType($event.target.value)">
-    <div>
-        <label for="device" style="font-weight: bold;
-        font-size: 14px;"> Device</label><br> 
-        <input type="text" id="device" name="device"  [(ngModel)]="deviceValue">
-    </div>
-    <div>
-        <label for="country" style="font-weight: bold;
-        font-size: 14px;">Country</label><br>
-        <input type="text" id="country" name="country"  [(ngModel)]="countryValue">
-      </div> </div>
-
-    <div *ngIf="selectedType == 6" (change)="changeType($event.target.value)">
-    <div>
-        <label for="country" style="font-weight: bold;
-        font-size: 14px;"> Country</label><br>
-        <input type="text" id="country" name="country"  [(ngModel)]="countryValue">
-      </div> </div>
-
-      <div *ngIf="selectedType == 7" (change)="changeType($event.target.value)">
-       <div><label for="device" style="font-weight: bold;
-        font-size: 14px;">Device</label><br>
-            <input type="text" id="device" name="device"  [(ngModel)]="deviceValue">
-        </div>
-       
-          
-         <div>
-            <label for="MeterFrom" style="font-weight: bold;
-            font-size: 14px;">Meter From</label><br>
-            <input type="text" id="MeterFrom" name="MeterFrom"  [(ngModel)]="MeterFromValue">
-        </div> <div>
-        <label for="MeterTo" style="font-weight: bold;
-        font-size: 14px;">Meter To</label><br>
-            <input type="text" id="MeterTo" name="MeterTo"  [(ngModel)]="MeterToValue">
-        </div>
-         <div> 
-            <label for="country" style="font-weight: bold;
-            font-size: 14px;"> Country</label><br>
-            <input type="text" id="country" name="country"  [(ngModel)]="countryValue">
-          </div> 
-          <div> 
-            <label for="TimeLimit" style="font-weight: bold;
-            font-size: 14px;">Time Limit</label><br>
-            <input type="text" id="TimeLimit" name="TimeLimit"  [(ngModel)]="TimeLimitValue">
-          </div> </div>
-    
-          <div *ngIf="selectedType == 11" (change)="changeType($event.target.value)">
-            <div>
-                <label for="IMSI_ID" style="font-weight: bold;
-                font-size: 14px;">IMSI ID</label><br>
-                <input type="text" id="IMSI_ID" name="IMSI_ID"  [(ngModel)]="IMSI_IDValue">
-              </div> </div>
-
-              <div *ngIf="selectedType == 13" (change)="changeType($event.target.value)">
-                <div>
-                    <label for="GROUPS" style="font-weight: bold;
-                    font-size: 14px;">GROUPS</label><br>
-                    <input type="text" id="GROUPS" name="GROUPS"  [(ngModel)]="GROUPSValue">
-                  </div> </div> <br>
-
-  
-  
-</div>  
+<!-- <button id="openproperties" style="display: none;" ></button> -->

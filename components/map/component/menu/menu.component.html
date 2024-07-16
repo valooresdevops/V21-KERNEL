@@ -4,14 +4,13 @@
 <!-- menu -->
 
 
-<div _ngcontent-xnm-c86="" class="reset"><button _ngcontent-xnm-c86="" class="menu-trash" id="reset" (click)="reset()">
+<!-- <div _ngcontent-xnm-c86="" class="reset"><button _ngcontent-xnm-c86="" class="menu-trash" id="reset" (click)="reset()">
 <span _ngcontent-xnm-c86="">
 
   <i class="fa-solid fa-trash" style="color: black;"></i> </span>
 </button>
 <span _ngcontent-xnm-c86="">
-</span></div>
-
+</span></div> -->
 
 <!-- menu -->
 
@@ -79,7 +78,6 @@
     </div>  -->
 
   </div>
-
   <!-- <span class="nav-button next"><img src="./assets/icons/right.png" alt="menu" style="width: 25px;"></span> -->
 </div>
 <div *ngIf="isContextMenuOpen" style="position: relative;" [ngStyle]='{"left.px": contextMenuPosition.x }'>
@@ -89,6 +87,7 @@
     <!-- <button>Link To Case</button> -->
     <button (click)="editName()" style="color: black;">Edit Name</button>
     <button (click)="deleteSimul()" style="color: black;">Delete</button>
+    <button (click)="onOpenProperties()" style="color: black;">Properties</button>
      <!-- <div  class="tooltipsssss"  style=" position: absolute;
         top: 100%;
         left: 0;
@@ -103,5 +102,29 @@
         </div>   -->
     <!-- <button (click)="addnewSenario()">Add case</button> -->
   </div>
+
+    
 </div>
+
+<div id="simulation2">
+  <div class="refresh">
+   
+    <button class="menu-trash" id="reset" (contextmenu)="call($event,'ShowHeader')" (click)="call($event,'refresh')">
+      <span>
+        <i class="fa-solid fa-arrows-rotate" style="color:black"></i>
+      </span>
+    </button>
+    <span></span>
+  </div>
+  <div class="bars">
+    <button class="menu-trash"   id="reset" (click)="call($event,'nextAction')">
+      <span>
+        <i class="fa-solid fa-ellipsis-vertical" style="color:black"></i>
+      </span>
+    </button>
+    <span></span>
+  </div>
+</div>
+
+
 

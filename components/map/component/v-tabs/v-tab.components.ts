@@ -1,8 +1,8 @@
  import { Component, Input, OnInit } from '@angular/core';
  import { HttpClient } from '@angular/common/http';
- import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
+ import { GlobalConstants } from 'src/app/common/GlobalConstants';
  import { ActivatedRoute } from '@angular/router';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
  @Component({
    selector: 'v-tab',
    styleUrls: ['./v-tabs.component.css'],
@@ -21,7 +21,7 @@ import { UntypedFormGroup } from '@angular/forms';
    @Input() active = false;
    @Input() fontawesome: any;
    @Input() menuVariable:any;
-   @Input() parentForm: UntypedFormGroup;
+   @Input() parentForm: FormGroup;
 
    public showScreen : boolean = true;
    public userId : String = localStorage.getItem("userId");

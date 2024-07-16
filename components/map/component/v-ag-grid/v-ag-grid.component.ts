@@ -79,12 +79,19 @@ public groupDefaultExpanded = -1;
   }
   @ViewChild('popup') popup: any;
   ngOnInit(): void {
-
+console.log("rowData-------",this.rowData);
     //console.log('rowdata>>>',this.rowData);
     if(localStorage.getItem('multiselection')){
       this.multiselection=JSON.parse(localStorage.getItem('multiselection'));
     }
-   
+   if(this.treeData==true){
+        this.groupDefaultExpanded=-1;
+      
+      }else{
+      
+        this.groupDefaultExpanded=0;
+      
+      }
 
   }
   frameworkComponents = {
@@ -104,7 +111,10 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
       action: () => {
         //console.log('params>>>', params);
         //console.log('params>>>', params.node.key);
-        navigator.clipboard.writeText(params.value);
+        // navigator.clipboard.writeText(params.value);
+        this.gridApi.copyToClipboard(params.value);
+
+        
       },
       cssClasses: ['redFont', 'bold'],
     },
@@ -131,7 +141,9 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
         action: () => {
           //console.log('params>>>', params);
           //console.log('params>>>', params.node.key);
-          navigator.clipboard.writeText(params.value);
+          // navigator.clipboard.writeText(params.value);
+          this.gridApi.copyToClipboard(params.value);
+
         },
         cssClasses: ['redFont', 'bold'],
       },
@@ -383,6 +395,7 @@ autoGroupColumnDef = {
   cellRendererParams: {
     innerRenderer: 'group',
     suppressCount: true,
+    expandedByDefault: false
   },
   
 };
@@ -427,8 +440,12 @@ onGridReady(params: GridReadyEvent) {
  
   this.gridApi = params.api;
   this.columnApi = params.columnApi;
-  //console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
+  console.log("params.api<<<<<<<",params.api);
+  console.log(" params.columnApi", params.columnApi);
+  console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
   this.total=params.api.getDisplayedRowCount();
+
+ // console.log("getDisplayedRowCount",this.getDisplayedRowCount);
   // this.gridApi.deselectAll();
   this.gridApi.addEventListener('rowGroupOpened', function (event:any) {
     // Check if the row group is related to the "Device_id" column
@@ -437,6 +454,9 @@ onGridReady(params: GridReadyEvent) {
   
   });
 }
+  getDisplayedRowCount(arg0: string, getDisplayedRowCount: any) {
+    throw new Error('Method not implemented.');
+  }
 handleCheckboxChange(event: any) {
   this.isChecked = event.target.checked;
 
@@ -508,6 +528,8 @@ this.dataservice.setDHselectedDevice(this.dataselected);
   //console.log("dataaaaaaaaaaa--------------",this.dataselected);
   this.selectedarrayemit.emit(this.selectedarray);
 }
+
+
 
 
 }

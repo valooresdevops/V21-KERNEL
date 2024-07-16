@@ -1,5 +1,5 @@
 import { Component, EventEmitter, forwardRef, Input, Output, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormControl, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -24,7 +24,7 @@ export class InputComponent implements ControlValueAccessor
   public isDisabled!: boolean;
   
   // General elements
-  @Input() public parentForm?: UntypedFormGroup; // used to specify the formgroup of the element
+  @Input() public parentForm?: FormGroup; // used to specify the formgroup of the element
   @Input() public fieldName: string = ''; // used to set formControl field name
   @Input() public fieldNamee: string = ''; // used to set formControl field name
   @Input() public matAppearance: any = 'fill'; // Mainly used for material design look and feel
@@ -55,7 +55,7 @@ export class InputComponent implements ControlValueAccessor
 
   public formFieldd: any;
 
-  get formField(): UntypedFormControl
+  get formField(): FormControl
   {
     if (this.fieldName != '')
     {
@@ -103,7 +103,7 @@ export class InputComponent implements ControlValueAccessor
   public writeValue(value: string): void
   {
     this.value = value;
-    this.formFieldd = this.parentForm?.get(this.fieldName) as UntypedFormControl;
+    this.formFieldd = this.parentForm?.get(this.fieldName) as FormControl;
 
     // Handle enable / disable on form elements
     if (this.fieldName != '')

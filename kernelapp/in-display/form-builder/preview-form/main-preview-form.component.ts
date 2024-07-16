@@ -943,6 +943,9 @@ export class PreviewFormComponent implements OnInit {
             }
           }
         });
+      }else if(buttonAction == "6"){
+        this.dialog.closeAll();
+      
       }
     }
   }
