@@ -21,7 +21,7 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.10.10.78";
+  public static endPointAddress = "10.1.8.16";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -391,6 +391,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getAllRulesApi =  GlobalConstants.inDispGatewat +'api/getDBRCombo/';
   public static getColNameAndColId =  GlobalConstants.inDispGatewat +'api/getColNameAndColId/';
   public static callingApi = GlobalConstants.inDispGatewat + 'api';
+  public static getAllQueriesHeaderList =  GlobalConstants.inDispGatewat +'api/getAllQueriesHeaderList/';
 
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
