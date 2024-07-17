@@ -149,7 +149,7 @@ export class NewTabComponent implements OnInit {
   onUpdateClick() {
 
     let data = [{ objectId: this.objectId, actionType: 'update', objectPId: this.objectPId }];
-
+console.log('data--------->',data)
     const dialogRef = this.dialog.open(FormUpdateComponent, {
       width: "800px",
       height: "650px",
