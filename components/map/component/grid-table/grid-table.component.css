@@ -9,7 +9,7 @@
   max-height: 260px ;
 }
 
-.mat-mdc-table {
+.mat-table {
   overflow: auto;
   /* max-height: 500px; */
 }

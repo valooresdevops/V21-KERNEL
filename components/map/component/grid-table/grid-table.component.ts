@@ -3,7 +3,7 @@ import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import CircularJSON from 'circular-json';
-import { DataService } from 'src/app/Kernel/services/data.service';
+import { DataService } from 'src/app/data.service';
 
 
 @Component({

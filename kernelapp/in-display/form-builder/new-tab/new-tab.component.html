@@ -19,6 +19,10 @@
         </div>
 
         <div class="col-lg-4">
+            <v-toggle label="Has Multiple Selection" formControlName="hasMultipleSelection" [parentForm]="newTabForm" fieldName="hasMultipleSelection"></v-toggle>
+        </div>
+
+        <div class="col-lg-4">
             <v-toggle label="Is Query Form" formControlName="isQueryForm" [parentForm]="newTabForm" fieldName="isQueryForm" (toggleChange)="isQueryFormChange()"> </v-toggle>
         </div>
 

@@ -20,8 +20,7 @@ import * as L from "leaflet";
 import { AgGridModule } from "ag-grid-angular";
 import { PopupComponent } from "../component/popup/popup.component";
 
-// import "@geoman-io/leaflet-geoman-free";
-// import "@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css";
+import "@geoman-io/leaflet-geoman-free";
 import "leaflet-measure";
 import "leaflet-measure-path";
 import "leaflet-mouse-position";
@@ -39,7 +38,6 @@ import { empty, from, interval, lastValueFrom, Observable, of, Subscriber, Subsc
 // import "leaflet-draw/dist/leaflet.draw.css";
 import $ from "jquery";
 import { ActivatedRoute } from "@angular/router";
-
 import * as turf from "@turf/turf";
 import { VAgGridComponent } from "../component/v-ag-grid/v-ag-grid.component";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -59,7 +57,7 @@ import Swal from "sweetalert2";
 // import 'leaflet-arc';
 import 'leaflet-arc';
 import { ICellRendererParams } from "ag-grid-community";
-import { UntypedFormBuilder, UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
 import { VTableComponent } from "../component/v-table/v-table.component";
@@ -79,6 +77,7 @@ import { Coords } from "../Interface/coords";
 import { DatacrowdService } from "../Services/datacrowd.service";
 import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
+import { InformationService } from "src/app/Kernel/services/information.service";
 
 declare let alertify: any;
 
@@ -171,9 +170,9 @@ export class MapComponent implements OnInit {
   Timecoverted: any;
   speedTime: any = 1;
   interval: any;
-  startDateControl: any = new UntypedFormControl();
-  nameFormControl: any = new UntypedFormControl();
-  typeFormControl: any = new UntypedFormControl();
+  startDateControl: any = new FormControl();
+  nameFormControl: any = new FormControl();
+  typeFormControl: any = new FormControl();
   private routedatajson: any;
 
   isSelectMode = false;
@@ -333,7 +332,7 @@ export class MapComponent implements OnInit {
   flagInQueue :number = 0;  
   confirmBreakRes: boolean = false;
   isImage:boolean=false;
-  imagepath:any='/assets/img/ba4eaf7e-33a6-4c65-8dc2-626345a3ab70.png';
+  imagepath:any='../assets/img/ba4eaf7e-33a6-4c65-8dc2-626345a3ab70.png';
   magnifyingGlass:any;
   obj2:any={
     "reportName": "No Name",
@@ -454,10 +453,12 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   simulationtype: any;
   simulationData: any;
   records: any;
+  PropertiesSimulID: any;
 
   countryCellRenderer(params: ICellRendererParams) {
     const flag =
-      '<img border="0" width="15" height="10" src="/cybercrowd/angular/assets/img/singleperson.png">';
+      // '<img border="0" width="15" height="10" src="/assets/img/singleperson.png">';
+      '<img border="0" width="15" height="10" src="../../assets/img/singleperson.png">';
     return flag;
   }
 
@@ -492,7 +493,6 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
       width: 500,
       valueGetter: (params: any) => {
         if (typeof (params.data) != "undefined") {
-         console.log("date",params.data)
           return this.dateTtoDate(params.data.Date);
 
         }
@@ -538,7 +538,6 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
     
       valueGetter: (params: any) => {
         if (typeof (params.data) != "undefined") {
-          console.log("date",params.data)
 
           const date = new Date(params.data.Date);
         
@@ -1238,10 +1237,10 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   addnewsenariocount:number=0;
   templates:any[]=[];
   dimmedTemplate:boolean=false;
-  colorFormControl: any = new UntypedFormControl();
-  templateForm: UntypedFormGroup;
+  colorFormControl: any = new FormControl();
+  templateForm: FormGroup;
   formValues: any[] = [];
-  templateForms: UntypedFormGroup[] = [];
+  templateForms: FormGroup[] = [];
   allRoutedatajson:any[]=[];
   routeDevices:any;
   usagetime:any[]=[];
@@ -1282,6 +1281,13 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   Senario_reportType:any;
   isDimmed:boolean=false;
   cursorlnglat:any;
+  nextActionMenuList:any[]=[];
+
+  showTextMenu: boolean = false;
+  ShowHeader:boolean=false;
+  Convertedsimulationtype:any;
+  dateTimeFrom:any;
+  dateTimeTo:any;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -1300,9 +1306,10 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
     private el: ElementRef,
     private workerService: WorkerService,
     // private notif:NotificationComponent,
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: FormBuilder,
     // public chatService: ChatService,
-    private http:HttpClient
+    private http:HttpClient,
+    public informationservice: InformationService,
 
   ) { }
   @ViewChild('popup') popup: any;
@@ -1326,10 +1333,12 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   @ViewChild('saveSimul') saveSimul: any;
   @ViewChild('approuting') approuting: any;
   @ViewChild('SimulInfo') SimulInfo: any;
+  @ViewChild('showPropertiesForm', { static: false }) showPropertiesForm: ElementRef;
 
 
   
   async ngOnInit(): Promise<void> {
+    $('.breadcrumb').css('display', 'none');
     $('#refresh').css('display', 'none');
     $('.magnifying-glass1').css('display', 'none');
    // $('#showAdditionalInputs').css('display', 'none');
@@ -1339,17 +1348,8 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
 
     $('.graphtools').css('display', 'none');
     $('#moretools').css('display', 'none');
-    var button = document.getElementById("refreshJsp");
-    var div = document.getElementById("refresh");
 
-    button.addEventListener("contextmenu", function(event) {
-        event.preventDefault(); // Prevent the default right-click menu from appearing
-        if (div.style.display === "none") {
-            div.style.display = "block"; // Show the div
-        } else {
-            div.style.display = "none"; // Hide the div
-        }
-    });
+
     // //console.log('ang window.parent.parent>>>', window.parent.parent);
     await this.datacrowdService.getShapelimit().then((res: any) => {
       console.log('getShapelimit>>', res)
@@ -1417,7 +1417,8 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
     });
 
 
-    await  this.httpClient.get('/assets/custom.geo.json').subscribe((geojsonData: any) => {
+    // await  this.httpClient.get('/assets/custom.geo.json').subscribe((geojsonData: any) => {
+      await  this.httpClient.get('../assets/custom.geo.json').subscribe((geojsonData: any) => {
         const geoJsonOptions: L.GeoJSONOptions = {
           style: this.customStyleFunction, // Optional: Define a custom styling function
 
@@ -1458,12 +1459,30 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
     }
 
 
+    await this.datacrowdService.getSimulationTypes().then((res: any) => {
+      this.simulationtype = res;
+      console.log('simulationtype >>>>>>>>>>>>>>>>>', this.simulationtype);
+      this.Convertedsimulationtype=this.convertArray(this.simulationtype);
+      console.log('Convertedsimulationtype >>>>>>>>>>>>>>>>>', this.Convertedsimulationtype);
 
+    });
 
     //console.log("data from jsp=", (window.parent.parent.parent[7] as any))
     // alert("A_ISCase>>>>>>>>>>>>>>>="+(window.parent.parent.parent[7] as any).A_ISCase);
     // alert("A_locSimulId>>>>>>>>>>>>>>>="+(window.parent.parent.parent[7] as any).A_locSimulId);
-
+    var button = document.getElementById("reset1");
+    // var button = document.getElementById("refreshJsp");
+    var div = document.getElementById("refresh");
+if(button!=null){
+  button.addEventListener("contextmenu", function(event) {
+    event.preventDefault(); // Prevent the default right-click menu from appearing
+    if (div.style.display === "none") {
+        div.style.display = "block"; // Show the div
+    } else {
+        div.style.display = "none"; // Hide the div
+    }
+});
+}
 
     L.control.mousePosition({
       "emptyString": "Unavailable",
@@ -1554,23 +1573,15 @@ this.magnifiedMap = L.map('magnifying-glass1', {
   zoomControl: false
 }).setView([35, 33], 18);
 
-let idtype = 'mapbox/satellite-streets-v11';
-let newLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    'Imagery Â© <a href="https://www.mapbox.com/">Mapbox</a>',
-  maxNativeZoom: 19,
-  maxZoom: 25,
-  id: idtype,
-  tileSize: 512,
-  zoomOffset: -1,
-  accessToken: 'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
-});
-
+let idtype = "s,h&x";
+    let googleLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=' + idtype + '={x}&y={y}&z={z}', {
+      maxNativeZoom: 19,
+      maxZoom: 25,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    this.magnifiedMap.addLayer(googleLayer);
 // Add new tile layer to the map
-this.magnifiedMap.addLayer(newLayer);
 
-// Attach click event listener to the layer
  
  
 $('.magnifying-glass1').css('display', 'none');
@@ -1604,6 +1615,8 @@ console.log("currentWidth----",currentWidth,"---currentHeight---",currentHeight)
 
 });
 
+console.log("generateColumns ><<><><>",this.generateColumns('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities'))
+console.log("generateRowData ><<><><>",this.generateRowData('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities',[["\"3CD0A7B8-B53A-4DF3-A10A-9EB9DF6D7F0C\"",2,1,1696712400000,1696712400000,1,1,"LB","Baabda"],["\"a5f497f7-5479-44c7-ade1-77a939555b1b\"",2,1,1696885200000,1696885200000,1,1,"LB","Baabda"]]))
 
 }
 
@@ -1679,29 +1692,30 @@ this.addnewSenario();
     }),
   };
   singlepersonicon = L.icon({
-    iconUrl: "/cybercrowd/angular/assets/img/singleperson.png",
+    iconUrl: "../assets/img/singleperson.png",
+    
     iconSize: [32, 32],
   });
 
   groupicon = L.icon({
-    iconUrl: "/cybercrowd/angular/assets/img/group.png",
+    iconUrl: "../assets/img/group.png",
     iconSize: [32, 32],
   });
   caricon = L.icon({
-    iconUrl: "/cybercrowd/angular/assets/img/car.png",
+    iconUrl: "../assets/img/car.png",
     iconSize: [32, 32],
   });
 
   robbery = L.icon({
-    iconUrl: "/cybercrowd/angular/assets/img/robbery.png",
+    iconUrl: "../assets/img/robbery.png",
     iconSize: [32, 32],
   });
   boat = L.icon({
-    iconUrl: "/cybercrowd/angular/assets/img/boat1.png",
+    iconUrl: "../assets/img/boat1.png",
     iconSize: [32, 32],
   });
   bus = L.icon({
-    iconUrl: "/assets/img/bus.png",
+    iconUrl: "../assets/img/bus.png",
     iconSize: [32, 32],
   });
   options = {
@@ -1756,7 +1770,6 @@ this.addnewSenario();
           iconAnchor: [13, 41],
           iconUrl:
             "https://unpkg.com/leaflet@1.4.0/dist/images/marker-icon.png",
-          iconRetinaUrl: "680f69f3c2e6b90c1812a813edf67fd7.png",
           shadowUrl:
             "https://unpkg.com/leaflet@1.4.0/dist/images/marker-shadow.png",
         }),
@@ -1767,7 +1780,7 @@ this.addnewSenario();
       circle: {
         shapeOptions: {},
       },
-      rectangle: false as false,
+      rectangle:false as false,
 
       circlemarker: false as false,
     },
@@ -3050,19 +3063,7 @@ if(this.indexTimeline==1){
       this.map.removeLayer(this.cotravelermarker);
 
     }
-    if (this.isSimul == true) {
-      //console.log("clearforsimul>>>>");
-      (window.parent.parent.parent[7] as any).clearforsimul();
 
-    }
-    else {
-      //console.log("clearshapes>>>>");
-// if((window.parent.parent.parent[7] as any)){
-//   (window.parent.parent.parent[7] as any).clearshapes();
-
-// }
-
-    }
 
 
 
@@ -3146,7 +3147,7 @@ if(this.indexTimeline==1){
     //console.log("coord after clear", this.Coord);
 
     //console.log("fixedMarkersArray after clear", this.fixedMarkersArray);
-    this.datacrowdService.deleteLastSimualtionID(this.usercode);
+    // this.datacrowdService.deleteLastSimualtionID(this.usercode);
     //console.log("searchlocation>>>>><<<<", $("#searchlocation"));
     $('#searchlocation').val('');
     this.dataService.setData('');
@@ -3229,6 +3230,7 @@ this.routedatajson=[];
     this.routeDevices=[];
     this.datajson=[];
 // this.dataService.setroutedevices("");
+this.reportType=1;
   }
 
 
@@ -5872,7 +5874,6 @@ console.log('iiiiiii>>>>>> 0', this.records)
      
     };
     const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
-    console.log('test>>>>>>>>>>' , formattedDate);
     return formattedDate;
   }
 
@@ -6202,7 +6203,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
 
 }
   breakProcess() {
-  window.location.href = 'https://'+window.location.hostname+':9999/cybercrowd/angular/index.html'; 
+  window.location.href = 'https://'+window.location.hostname+':9999/index.html'; 
 }
 
   async test2() {
@@ -6673,14 +6674,14 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
     //console.log("thisCenter " + thisCenter);
 
     //var iconVar = "/assets/img/icons/"+element[2]+".png";
-    var iconVar = "assets/img/icons/" + object.TYPE + ".png";
+    var iconVar = "../assets/assets/img/icons/" + object.TYPE + ".png";
     //console.log("iconVar=", iconVar);
 
 
     if (!this.imageExists(iconVar)) {
       //console.log("image NOT  exists >>> ")
 
-      iconVar = "/assets/img/icons/percentage.png";
+      iconVar = "../assets/assets/img/icons/percentage.png";
     }
     else {
       //console.log("image exists >>> ")
@@ -6843,13 +6844,17 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
   }
 
   displayFixedElements(object: any) {
+
     //console.log(" object element   ====", object)
 
     const fixelementsString = object;
+    console.log("object----------",object);
+
     //console.log("fixelementsString   ====", fixelementsString)
 
     //console.log(" object element22   ====", object)
     if (object.length > 0) {
+     
       this.dataType
       this.fixedMarkersGroup = new L.MarkerClusterGroup({
         spiderfyOnMaxZoom: true,
@@ -6885,6 +6890,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
         },
       });
 
+      
 
       var thisCenter = this.globalCoord;
       object.forEach((element: any, key: any) => {
@@ -6892,16 +6898,18 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
         if (element[4].replace(/[^.]/g, "").length == 1) {
           thisCenter = [element[4], element[3]];
           //var iconVar = "/assets/img/icons/"+element[2]+".png";
-          var iconVar = "assets/img/icons/" + element[2] + ".png";
+          var iconVar = "/assets/assets/img/icons/" + element[2] + ".png";
+           
           //console.log("iconVar=" + iconVar);
 
 
           if (!this.imageExists(iconVar)) {
-            //console.log("image exists >>> ")
-            iconVar = "/cybercrowd/angular/assets/img/icons/percentage.png";
+            alert("image exists >>> ")
+            iconVar = "/assets/assets/img/icons/percentage.png";
+            
           }
           else { }
-
+console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
           if (element[2] == "percentage") {
             this.fixedElementMarker = this.binddataforfixedElements(element[4], element[3], element[2] + "  " + element.percentage + " %", iconVar).on('click', e => e.target.remove());
             this.fixedElementMarkerLoop = this.binddataforfixedElements(element[4], element[3], element[2] + "  " + element.percentage + " %", iconVar).on('click', e => e.target.remove());
@@ -9006,6 +9014,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
       },
     });
     let count=0;
+    console.log("this.CdrData",this.CdrData);
     for (let i = 0; i < this.CdrData.BTS[0].length; i++) {
       //this.displayFixedElements(this.CdrData[0][i]);
 
@@ -9032,6 +9041,8 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
     //console.log('countttttttttttt----------',count);
 
   }
+
+
 
   clearsectors(event: any) {
     if (event == false) {
@@ -9444,44 +9455,255 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
     });
     //console.log('11111111111111>>>>>>',  );
 
-    for (var j = 0; j < 1; j++) {
-      for (var i = 0; i < this.datajson.markerPositions.length; i++) {
-        this.myMarker = L.marker([
-          Number(this.datajson.markerPositions[i][0]),
-          Number(this.datajson.markerPositions[i][1]),
-        ]);
-        // this.marker.addLayer(this.markers);
-        this.myMarker.off("click");
-        this.myMarker.on("mousedown", (e: any) => {
-          if (e.originalEvent.buttons == 2) {
-            e.target.openPopup();
-            // alert(2);
-          }
-          if (e.originalEvent.buttons == 1) {
-            //  alert(1);
-          }
+    // for (var j = 0; j < 1; j++) {
+    //   for (var i = 0; i < this.datajson.markerPositions.length; i++) {
+    //     this.myMarker = L.marker([
+    //       Number(this.datajson.markerPositions[i][0]),
+    //       Number(this.datajson.markerPositions[i][1]),
+    //     ]);
+    //     // this.marker.addLayer(this.markers);
+    //     this.myMarker.off("click");
+    //     this.myMarker.on("mousedown", (e: any) => {
+    //       if (e.originalEvent.buttons == 2) {
+    //         e.target.openPopup();
+    //         // alert(2);
+    //       }
+    //       if (e.originalEvent.buttons == 1) {
+    //         //  alert(1);
+    //       }
 
-        });
+    //     });
 
+    //   }
+
+
+    //   this.rowData = [];
+    //   this.datajson.markerPositions.forEach((element: any, key: any) => {
+    //     this.myMarker = this.binddata(
+    //       element[0],
+    //       element[1],
+    //       element[2],
+    //       element[3],
+    //       element[4],
+    //       element[5],
+    //       ""
+    //     );
+    //     this.myMarker.lat = element[0];
+    //     this.myMarker.lng = element[1];
+    //     this.myMarker.timestamp = element[3];
+    //     this.myMarker.tel = element[2];
+    //     this.myMarker.name = element[4];
+    //     this.myMarker.off("click");
+    //     this.myMarker.on("mousedown", async (e: any) => {
+    //       if (e.originalEvent.buttons == 2) {
+    //         //console.log("markerChildrensssssss", e.target)
+    //         this.rowData = [];
+    //         var jsonaggrid = {
+    //           Device_id: e.target.tel,
+    //           Tel: e.target.name,
+    //           Date: e.target.timestamp,
+    //           Hits: "1",
+    //           Coord: e.target.lat + ',' + e.target.lng,
+
+    //         };
+    //         this.rowData.push(jsonaggrid);
+
+
+    //         const componentfactory =
+    //           this.componentFactoryResolver.resolveComponentFactory(
+    //             VAgGridComponent
+    //           );
+    //         const componentref =
+    //           this.viewContainerRef.createComponent(componentfactory);
+    //         componentref.instance.rowData = this.rowData;
+    //         componentref.instance.columnDefs = this.columnDefs;
+    //         componentref.instance.headerHeight = 0;
+    //         // componentref.instance.selectdevices = true;
+    //         componentref.instance.Title = "Here On";
+    //         componentref.instance.distinct = true;
+    //         componentref.changeDetectorRef.detectChanges();
+    //         const html2 = componentref.location.nativeElement;
+    //         componentref.instance.Grid2Type = 'btn-54';
+    //         componentref.instance.GridID = 'GeoGridbyDevice';
+
+
+    //         await html2;
+
+    //         $('.ag-theme-balham').css('height', '130px');
+
+    //         // /  e.target.openPopup(html2, e.target._latlng);
+    //         this.map.openPopup(html2, e.target._latlng);
+
+
+    //       } else if (e.originalEvent.buttons == 1) {
+
+    //       }
+
+    //     });
+    //     this.marker.addLayer(this.myMarker);
+    //     //  this.filterData2(this.datajson.markerPositions, this.marker, this.controlLayers);
+
+    //     $('#controlbutton').css('display', '');
+
+    //   })
+    //   this.marker.addTo(this.map);
+
+    // };
+
+
+    // const componentfactory =
+    //   this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+    // const componentref =
+    //   this.viewContainerRef.createComponent(componentfactory);
+    // const html1 = (componentref.location.nativeElement.style.display = "none");
+    // componentref.instance.columnDefs = this.columnDefs;
+    // componentref.changeDetectorRef.detectChanges();
+    // this.marker.off("click");
+    // this.marker.on("clustermousedown", async (e: any) => {
+    //   if (e.originalEvent.buttons == 2) {
+    //     var markerChildrens = e.layer.getAllChildMarkers();
+
+    //     //console.log("markerChildrens>>><<<", markerChildrens)
+    //     //console.log('rowdata before1>>>>>>', this.rowData)
+
+    //     this.rowData = [];
+    //     //console.log('rowdata before2>>>>>>', this.rowData)
+
+    //     for (var j = 0; j < markerChildrens.length; j++) {
+    //       var jsonaggrid = {
+    //         Device_id: markerChildrens[j].tel,
+    //         Tel: markerChildrens[j].name,
+    //         Date: markerChildrens[j].timestamp,
+    //         Hits: "1",
+    //         Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+
+    //       };
+    //       //console.log('rowdata jsonaggrid>>>>', jsonaggrid)
+    //       this.rowData.push(jsonaggrid);
+    //     }
+    //     //console.log('rowdata after>>>>>>', this.rowData)
+    //     const componentfactory =
+    //       this.componentFactoryResolver.resolveComponentFactory(
+    //         VAgGridComponent
+    //       );
+    //     const componentref =
+    //       this.viewContainerRef.createComponent(componentfactory);
+    //     componentref.instance.rowData = this.rowData;
+    //     componentref.instance.columnDefs = this.columnDefs;
+    //     componentref.instance.headerHeight = 0;
+    //     // componentref.instance.selectdevices = true;
+    //     componentref.instance.Title = "Here On";
+    //     componentref.instance.distinct = true;
+    //     componentref.changeDetectorRef.detectChanges();
+    //     componentref.instance.pagination = false;
+    //     componentref.instance.rowGrouping = true;
+    //     componentref.instance.contextmenu = false;
+    //     componentref.instance.Grid2Type = 'btn-54';
+    //     componentref.instance.GridID = 'GeoGridbyDevice';
+
+    //     const html1 = componentref.location.nativeElement;
+    //     await html1;
+
+
+
+
+    //     this.map.openPopup(html1, e.layer.getLatLng());
+    //     if (markerChildrens.length < 3) {
+    //       // $('#agGrid').css('height','10px');
+    //       $('.ag-theme-balham').css('height', '130px');
+
+    //     } else {
+    //       $('.ag-theme-balham').css('height', ' 250px ');
+
+    //     }
+    //   }
+    // });
+
+    if (this.datajson !== null) {
+
+      this.markerLoop = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      let lastMarkerLat:any;
+      let lastMarkerLng:any;
+
+      for (var j = 0; j < 1; j++) {
+        for (var i = 0; i < this.datajson; i++) {
+          this.markers = L.marker([
+            Number(this.datajson[i].location_latitude),
+            Number(this.datajson[i].location_longitude)
+         
+          ]);
+          this.markers.off("click");
+          this.markers.on("mousedown", (e: any) => {
+            if (e.originalEvent.buttons == 2) {
+              e.target.openPopup();
+
+            }
+            if (e.originalEvent.buttons == 1) {
+              //  alert(1);
+            }
+          });
+          this.markersArray.push(this.markers)
+          
+  lastMarkerLat = this.datajson[i][4];
+  lastMarkerLng = this.datajson[i][3];
+        }
       }
+ 
+
+      //       markersBatch.push(marker);
+      //     }
+
+      //     // Apply event listeners to the batch of markers
+      //     markersBatch.forEach(marker => {
+      //       marker.off("click");
+      //       marker.on("mousedown", (e: any) => {
+      //         if (e.originalEvent.buttons == 2) {
+      //           e.target.openPopup();
+      //         }
+      //         if (e.originalEvent.buttons == 1) {
+      //           // alert(1);
+      //         }
+      //       });
+
+      //       this.markersArray.push(marker);
+      //     });
+
+      //     // Clear markersBatch to free up memory
+      //     markersBatch.length = 0;
+      //   }
+      // }
+      // // End the timer and log the elapsed time
+      // //console.timeEnd('loopTime');
+
+      //     //  this.marker.openPopup(
+      //     //  html11
+      //     //  );
+
 
 
       this.rowData = [];
-      this.datajson.markerPositions.forEach((element: any, key: any) => {
+      this.datajson.forEach((element: any, key: any) => {
         this.myMarker = this.binddata(
-          element[0],
-          element[1],
-          element[2],
-          element[3],
           element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
           element[5],
           ""
         );
-        this.myMarker.lat = element[0];
-        this.myMarker.lng = element[1];
-        this.myMarker.timestamp = element[3];
-        this.myMarker.tel = element[2];
-        this.myMarker.name = element[4];
+
+        this.myMarker.lat = element[4];
+        this.myMarker.lng = element[3]
+        this.myMarker.timestamp = element[1]
+        this.myMarker.tel = element[0];
+        this.myMarker.name = element[2];
+        this.marker.addLayer(this.myMarker);
+        this.markerLoop.addLayer(this.myMarker);
         this.myMarker.off("click");
         this.myMarker.on("mousedown", async (e: any) => {
           if (e.originalEvent.buttons == 2) {
@@ -9493,7 +9715,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
               Date: e.target.timestamp,
               Hits: "1",
               Coord: e.target.lat + ',' + e.target.lng,
-
+              //Lat:e.target.lat
             };
             this.rowData.push(jsonaggrid);
 
@@ -9511,14 +9733,15 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
             componentref.instance.Title = "Here On";
             componentref.instance.distinct = true;
             componentref.changeDetectorRef.detectChanges();
-            const html2 = componentref.location.nativeElement;
             componentref.instance.Grid2Type = 'btn-54';
-            componentref.instance.GridID = 'GeoGridbyDevice';
+            componentref.instance.GridID = 'GeoGrid1';
 
-
+            const html2 = componentref.location.nativeElement;
             await html2;
 
+            // $('#agGrid').css('height','10px');
             $('.ag-theme-balham').css('height', '130px');
+
 
             // /  e.target.openPopup(html2, e.target._latlng);
             this.map.openPopup(html2, e.target._latlng);
@@ -9529,85 +9752,101 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
           }
 
         });
-        this.marker.addLayer(this.myMarker);
-        //  this.filterData2(this.datajson.markerPositions, this.marker, this.controlLayers);
+      });
 
-        $('#controlbutton').css('display', '');
+      const componentfactory =
+        this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+      const componentref =
+        this.viewContainerRef.createComponent(componentfactory);
+      const html1 = (componentref.location.nativeElement.style.display = "none");
+      componentref.instance.columnDefs = this.columnDefs;
+      componentref.changeDetectorRef.detectChanges();
+      this.marker.off("click");
+      this.marker.on("clustermousedown", async (e: any) => {
+        if (e.originalEvent.buttons == 2) {
 
-      })
-      this.marker.addTo(this.map);
-
-    };
+          var markerChildrens = e.layer.getAllChildMarkers();
 
 
-    const componentfactory =
-      this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-    const componentref =
-      this.viewContainerRef.createComponent(componentfactory);
-    const html1 = (componentref.location.nativeElement.style.display = "none");
-    componentref.instance.columnDefs = this.columnDefs;
-    componentref.changeDetectorRef.detectChanges();
-    this.marker.off("click");
-    this.marker.on("clustermousedown", async (e: any) => {
-      if (e.originalEvent.buttons == 2) {
-        var markerChildrens = e.layer.getAllChildMarkers();
 
-        //console.log("markerChildrens>>><<<", markerChildrens)
-        //console.log('rowdata before1>>>>>>', this.rowData)
 
-        this.rowData = [];
-        //console.log('rowdata before2>>>>>>', this.rowData)
 
-        for (var j = 0; j < markerChildrens.length; j++) {
-          var jsonaggrid = {
-            Device_id: markerChildrens[j].tel,
-            Tel: markerChildrens[j].name,
-            Date: markerChildrens[j].timestamp,
-            Hits: "1",
-            Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+          this.rowData = [];
 
-          };
-          //console.log('rowdata jsonaggrid>>>>', jsonaggrid)
-          this.rowData.push(jsonaggrid);
+          for (var j = 0; j < markerChildrens.length; j++) {
+            var jsonaggrid = {
+              Device_id: markerChildrens[j].tel,
+              Tel: markerChildrens[j].name,
+              Date: markerChildrens[j].timestamp,
+              Hits: "1",
+              Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+              // Lat:markerChildrens[j].lat
+            };
+            this.rowData.push(jsonaggrid);
+          }
+
+          //console.log("markerChildrens>>>>>", markerChildrens);
+
+          const componentfactory =
+            this.componentFactoryResolver.resolveComponentFactory(
+              VAgGridComponent
+            );
+          const componentref =
+            this.viewContainerRef.createComponent(componentfactory);
+          componentref.instance.rowData = this.rowData;
+          componentref.instance.columnDefs = this.columnDefs;
+          componentref.instance.headerHeight = 0;
+          // componentref.instance.selectdevices = true;
+          componentref.instance.Title = "Here On";
+          componentref.instance.distinct = true;
+          componentref.changeDetectorRef.detectChanges();
+          componentref.instance.pagination = false;
+          componentref.instance.rowGrouping = true;
+          componentref.instance.contextmenu = false;
+          componentref.instance.Grid2Type = 'btn-54';
+          componentref.instance.GridID = 'GeoGrid1';
+          const html1 = componentref.location.nativeElement;
+    
+          await html1;
+          //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+          if (markerChildrens.length < 3) {
+            // $('#agGrid').css('height','10px');
+            $('.ag-theme-balham').css('height', '130px');
+
+          } else {
+            $('.ag-theme-balham').css('height', ' 250px ');
+
+          }
+
+
+          this.map.openPopup(html1, e.layer.getLatLng());
+
+          // $(".modal-content").css("width","650px");
+          // $(".modal-content").css("right","200px");
+          // $(".modal-content").css("padding","10px");
+          // $(".modal-content").css("top","85px");
+          // $(".modal-content").draggable({
+          //   axis: "both",
+          //   cursor: "move"
+          // });
+          //  this.modalRef =this.modalService.open(this.popupContent1);
+
         }
-        //console.log('rowdata after>>>>>>', this.rowData)
-        const componentfactory =
-          this.componentFactoryResolver.resolveComponentFactory(
-            VAgGridComponent
-          );
-        const componentref =
-          this.viewContainerRef.createComponent(componentfactory);
-        componentref.instance.rowData = this.rowData;
-        componentref.instance.columnDefs = this.columnDefs;
-        componentref.instance.headerHeight = 0;
-        // componentref.instance.selectdevices = true;
-        componentref.instance.Title = "Here On";
-        componentref.instance.distinct = true;
-        componentref.changeDetectorRef.detectChanges();
-        componentref.instance.pagination = false;
-        componentref.instance.rowGrouping = true;
-        componentref.instance.contextmenu = false;
-        componentref.instance.Grid2Type = 'btn-54';
-        componentref.instance.GridID = 'GeoGridbyDevice';
-
-        const html1 = componentref.location.nativeElement;
-        await html1;
-
-
-
-
-        this.map.openPopup(html1, e.layer.getLatLng());
-        if (markerChildrens.length < 3) {
-          // $('#agGrid').css('height','10px');
-          $('.ag-theme-balham').css('height', '130px');
-
-        } else {
-          $('.ag-theme-balham').css('height', ' 250px ');
+        if (e.originalEvent.buttons == 1) {
+          // alert(4);
 
         }
-      }
-    });
 
+        //open popup;
+      });
+
+      this.map.addLayer(this.marker);
+      // this.map.setView([lastMarkerLat, lastMarkerLng],12);
+      
+      this.magnifiedMap.addLayer(this.markerLoop);
+      this.layerGroup.addLayer(this.marker);
+   
+}
 
 
   }
@@ -9616,10 +9855,13 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
     const angleStep = 5; // Adjust as needed for the level of detail
     const coordinates = [];
 
+
     for (let angle = startAngle; angle <= stopAngle; angle += angleStep) {
       const radians = (angle - 90) * (Math.PI / 180);
       const lat = center[0] + (radius * Math.cos(radians)) / 111.32;
       const lon = center[1] + (radius * Math.sin(radians)) / (111.32 * Math.cos(center[0] * (Math.PI / 180)));
+console.log("lat----",lat);
+console.log("lon----",lon);
 
       coordinates.push([lat, lon]);
     }
@@ -10200,13 +10442,13 @@ this.test33();
   async displayClusters2(AlocSimulId:any){
     this.displayclusters=true;
 
-    await this.datacrowdService.getsimualtion(AlocSimulId, this.usercode).then((res: any) => {
+    await this.datacrowdService.getSimulationobject(AlocSimulId).then((res: any) => {
       this.datajson = res;
       //console.log("getsimultion response >>>>", this.datajson);
     });
     //console.log("this.datajson.markerPositions>>>>", this.datajson.markerPositions);
 
-    if (this.datajson.markerPositions !== null) {
+    if (this.datajson !== null) {
       //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
       this.marker = L.markerClusterGroup({
         spiderfyOnMaxZoom: false,
@@ -10218,14 +10460,15 @@ this.test33();
         animate: true,
         singleMarkerMode: true,
       });
-      let lastMarkerLat = 0;
-      let lastMarkerLng = 0;
+      let lastMarkerLat:any;
+      let lastMarkerLng:any;
 
       for (var j = 0; j < 1; j++) {
-        for (var i = 0; i < this.datajson.markerPositions.length; i++) {
+        for (var i = 0; i < this.datajson; i++) {
           this.markers = L.marker([
-            Number(this.datajson.markerPositions[i][0]),
-            Number(this.datajson.markerPositions[i][1]),
+            Number(this.datajson[i].location_latitude),
+            Number(this.datajson[i].location_longitude)
+         
           ]);
           this.markers.off("click");
           this.markers.on("mousedown", (e: any) => {
@@ -10239,11 +10482,10 @@ this.test33();
           });
           this.markersArray.push(this.markers)
           
-  lastMarkerLat = this.datajson.markerPositions[i][0];
-  lastMarkerLng = this.datajson.markerPositions[i][1];
+  lastMarkerLat = this.datajson[i][4];
+  lastMarkerLng = this.datajson[i][3];
         }
       }
-
  
 
       //       markersBatch.push(marker);
@@ -10276,25 +10518,24 @@ this.test33();
       //     //  );
 
 
-      this.map.setView([lastMarkerLat, lastMarkerLng],12);
 
       this.rowData = [];
-      this.datajson.markerPositions.forEach((element: any, key: any) => {
+      this.datajson.forEach((element: any, key: any) => {
         this.myMarker = this.binddata(
-          element[0],
-          element[1],
-          element[2],
-          element[3],
           element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
           element[5],
           ""
         );
 
-        this.myMarker.lat = element[0];
-        this.myMarker.lng = element[1];
-        this.myMarker.timestamp = element[3];
-        this.myMarker.tel = element[2];
-        this.myMarker.name = element[4];
+        this.myMarker.lat = element[4];
+        this.myMarker.lng = element[3]
+        this.myMarker.timestamp = element[1]
+        this.myMarker.tel = element[0];
+        this.myMarker.name = element[2];
         this.marker.addLayer(this.myMarker);
         this.markerLoop.addLayer(this.myMarker);
         this.myMarker.off("click");
@@ -10432,14 +10673,224 @@ this.test33();
       });
 
       this.map.addLayer(this.marker);
+      // this.map.setView([lastMarkerLat, lastMarkerLng],12);
       
       this.magnifiedMap.addLayer(this.markerLoop);
       this.layerGroup.addLayer(this.marker);
-      this.layerGroup.addLayer(this.markers);
+   
 }
 
 }
 
+async displayClustersforfixedelements(object:any){
+  this.displayclusters=true;
+  console.log("object22222222------",object);
+
+   
+  //console.log("this.datajson.markerPositions>>>>", this.datajson.markerPositions);
+
+  // if (this.datajson !== null) {
+    //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+    this.marker = L.markerClusterGroup({
+      spiderfyOnMaxZoom: false,
+      animate: true,
+      singleMarkerMode: true,
+    });
+    this.markerLoop = L.markerClusterGroup({
+      spiderfyOnMaxZoom: false,
+      animate: true,
+      singleMarkerMode: true,
+    });
+    let lastMarkerLat:any;
+    let lastMarkerLng:any;
+
+    for (var j = 0; j < 1; j++) {
+      for (var i = 0; i < object; i++) {
+        this.markers = L.marker([
+          Number(object[i][3]),
+          Number(object[i][4])
+       
+        ]);
+        this.markers.off("click");
+        this.markers.on("mousedown", (e: any) => {
+          if (e.originalEvent.buttons == 2) {
+            e.target.openPopup();
+
+          }
+          if (e.originalEvent.buttons == 1) {
+            //  alert(1);
+          }
+        });
+        this.markersArray.push(this.markers)
+        
+  lastMarkerLat = object[i][4];
+  lastMarkerLng = object[i][3];
+      }
+    }
+
+
+    this.rowData = [];
+    object.forEach((element: any, key: any) => {
+      this.myMarker = this.binddata(
+        element[4],
+        element[3],
+        element[1],
+        element[0],
+        element[2],
+        element[5],
+        ""
+      );
+
+      this.myMarker.lat = element[4];
+      this.myMarker.lng = element[3]
+      this.myMarker.timestamp = element[1]
+      this.myMarker.tel = element[0];
+      this.myMarker.name = element[2];
+      this.marker.addLayer(this.myMarker);
+      this.markerLoop.addLayer(this.myMarker);
+      this.myMarker.off("click");
+      this.myMarker.on("mousedown", async (e: any) => {
+        if (e.originalEvent.buttons == 2) {
+          //console.log("markerChildrensssssss", e.target)
+          this.rowData = [];
+          var jsonaggrid = {
+            Device_id: e.target.tel,
+            Tel: e.target.name,
+            Date: e.target.timestamp,
+            Hits: "1",
+            Coord: e.target.lat + ',' + e.target.lng,
+            //Lat:e.target.lat
+          };
+          this.rowData.push(jsonaggrid);
+
+
+          const componentfactory =
+            this.componentFactoryResolver.resolveComponentFactory(
+              VAgGridComponent
+            );
+          const componentref =
+            this.viewContainerRef.createComponent(componentfactory);
+          componentref.instance.rowData = this.rowData;
+          componentref.instance.columnDefs = this.columnDefs;
+          componentref.instance.headerHeight = 0;
+          // componentref.instance.selectdevices = true;
+          componentref.instance.Title = "Here On";
+          componentref.instance.distinct = true;
+          componentref.changeDetectorRef.detectChanges();
+          componentref.instance.Grid2Type = 'btn-54';
+          componentref.instance.GridID = 'GeoGrid1';
+
+          const html2 = componentref.location.nativeElement;
+          await html2;
+
+          // $('#agGrid').css('height','10px');
+          $('.ag-theme-balham').css('height', '130px');
+
+
+          // /  e.target.openPopup(html2, e.target._latlng);
+          this.map.openPopup(html2, e.target._latlng);
+
+
+        } else if (e.originalEvent.buttons == 1) {
+
+        }
+
+      });
+    });
+
+    const componentfactory =
+      this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+    const componentref =
+      this.viewContainerRef.createComponent(componentfactory);
+    const html1 = (componentref.location.nativeElement.style.display = "none");
+    componentref.instance.columnDefs = this.columnDefs;
+    componentref.changeDetectorRef.detectChanges();
+    this.marker.off("click");
+    this.marker.on("clustermousedown", async (e: any) => {
+      if (e.originalEvent.buttons == 2) {
+        var markerChildrens = e.layer.getAllChildMarkers();
+
+
+
+
+
+        this.rowData = [];
+
+        for (var j = 0; j < markerChildrens.length; j++) {
+          var jsonaggrid = {
+            Device_id: markerChildrens[j].tel,
+            Tel: markerChildrens[j].name,
+            Date: markerChildrens[j].timestamp,
+            Hits: "1",
+            Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+            // Lat:markerChildrens[j].lat
+          };
+          this.rowData.push(jsonaggrid);
+        }
+
+        //console.log("markerChildrens>>>>>", markerChildrens);
+
+        const componentfactory =
+          this.componentFactoryResolver.resolveComponentFactory(
+            VAgGridComponent
+          );
+        const componentref =
+          this.viewContainerRef.createComponent(componentfactory);
+        componentref.instance.rowData = this.rowData;
+        componentref.instance.columnDefs = this.columnDefs;
+        componentref.instance.headerHeight = 0;
+        // componentref.instance.selectdevices = true;
+        componentref.instance.Title = "Here On";
+        componentref.instance.distinct = true;
+        componentref.changeDetectorRef.detectChanges();
+        componentref.instance.pagination = false;
+        componentref.instance.rowGrouping = true;
+        componentref.instance.contextmenu = false;
+        componentref.instance.Grid2Type = 'btn-54';
+        componentref.instance.GridID = 'GeoGrid1';
+        const html1 = componentref.location.nativeElement;
+        await html1;
+        //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+        if (markerChildrens.length < 3) {
+          // $('#agGrid').css('height','10px');
+          $('.ag-theme-balham').css('height', '130px');
+
+        } else {
+          $('.ag-theme-balham').css('height', ' 250px ');
+
+        }
+
+
+        this.map.openPopup(html1, e.layer.getLatLng());
+
+        // $(".modal-content").css("width","650px");
+        // $(".modal-content").css("right","200px");
+        // $(".modal-content").css("padding","10px");
+        // $(".modal-content").css("top","85px");
+        // $(".modal-content").draggable({
+        //   axis: "both",
+        //   cursor: "move"
+        // });
+        //  this.modalRef =this.modalService.open(this.popupContent1);
+
+      }
+      if (e.originalEvent.buttons == 1) {
+        // alert(4);
+
+      }
+
+      //open popup;
+    });
+
+    this.map.addLayer(this.marker);
+    // this.map.setView([lastMarkerLat, lastMarkerLng],12);
+    
+    this.magnifiedMap.addLayer(this.markerLoop);
+    this.layerGroup.addLayer(this.marker);
+ 
+// }
+
+}
   async displayShapes(AlocSimulId :any){
   await this.datacrowdService.getExecutionParam(AlocSimulId).then((res: any) => {
     this.ExecutionParam = res;
@@ -10607,7 +11058,7 @@ let res:any;
           //   iconSize: L.point(32, 32)
           // });
           return L.icon({
-            iconUrl: '/assets/img/icons/sectors.png',
+            iconUrl: '../assets/img/icons/sectors.png',
             iconSize: [32, 32],
             iconAnchor: [16, 32],
           });
@@ -11274,20 +11725,20 @@ changebar(){
  }
 
 }
-async displaysector(): Promise<void>{
- 
-           
-     let x:any=[];
+    async displaysector(): Promise<void>{
+    
+              
+      let x:any=[];
     
             
 
-  this.markerClusterGroup = new L.MarkerClusterGroup({
+    this.markerClusterGroup = new L.MarkerClusterGroup({
     spiderfyOnMaxZoom: true,
     animate: true,
     singleMarkerMode: false,
     zoomToBoundsOnClick: false,
     maxClusterRadius: 50, 
-  });
+    });
         this.fixedMarkersGroup = new L.MarkerClusterGroup({
           spiderfyOnMaxZoom: true,
           animate: true,
@@ -11312,18 +11763,18 @@ async displaysector(): Promise<void>{
           for (let j = 0; j < x[i].SECTORS.length; j++) {
             count =j;
 
-           this.drawarc(Number(x[i].BTS.LATITUDE), Number(x[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(x[i].SECTORS[j]) - 22.5, 90 + Number(x[i].SECTORS[j]) + 22.5, this.SectorColor, '', x[i].INFO);
+            this.drawarc(Number(x[i].BTS.LATITUDE), Number(x[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(x[i].SECTORS[j]) - 22.5, 90 + Number(x[i].SECTORS[j]) + 22.5, this.SectorColor, '', x[i].INFO);
                 if ((i) % 100=== 0){
-  
+
     const simplifiedFeatures = this.simplifyGeoJSON(this.Sectorfeatures);
           this.addFeaturesToCluster(simplifiedFeatures);
                     await this.delay1(500);
               }
           }
         }
-         //console.log("Sectorfeatures",this.Sectorfeatures)
+          //console.log("Sectorfeatures",this.Sectorfeatures)
         try{
-         
+          
           
         }catch(error){
           //console.error("Error creating polygon:", error);
@@ -11331,12 +11782,12 @@ async displaysector(): Promise<void>{
 
 
 
-  }
+    }
 
     delay1(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-
+ 
   drawarc(lat: any, lng: any, Radius: any, StartAngle: any, StopAngle: any, AngleColor: any, object: any, sinfo2: any) {
  
     const center = [lat, lng]; // Replace with your center coordinates
@@ -11353,8 +11804,9 @@ async displaysector(): Promise<void>{
       fillColor: this.SectorFillColor,
       fillOpacity: 0.1,
     };
-    //console.log("objecttttttt-----------",object);
-    
+    console.log("center-----------",center);
+    console.log("Radius-----------",Radius);
+
     this.sector = L.polygon(this.getSectorCoordinates(center, radius, startAngle, stopAngle), sectorOptions);
     
     console.log("sector===",this.sector);
@@ -11385,7 +11837,7 @@ async displaysector(): Promise<void>{
         this.sector.Technology = '';
         this.sector.off("click");
         this.sector.on('mousedown', async (e: any) => {
-          //console.log('e>>>>>', e)
+          console.log('e>>>>>', e);
 
           // this.datacrowdService.getData().then((data:any) => {
           //   this.datajson = data;
@@ -11395,7 +11847,7 @@ async displaysector(): Promise<void>{
           this.CdrRowData2 = [];
           this.CdrRowData = [];
           // this.datajson.markerPositions.forEach((element: any, key: any) => {
-          //console.log('sinfo2 inn>>>>>>', sinfo2)
+          console.log('sinfo2 inn>>>>>>', sinfo2)
           //console.log('e.target.lat>>>>>>', e.target.lat);
           //console.log('e.target.lat>>>>>>', typeof e.target.lat);
           //console.log('sinfo2  lat inn>>>>>>', typeof sinfo2[0][3])
@@ -11407,7 +11859,7 @@ async displaysector(): Promise<void>{
 
             return element[1] === e.target.Azimuth && element[3] === e.target.lat && element[2] === e.target.lng
           });
-          //console.log('findedSectors when right click', findedSectors)
+          console.log('findedSectors when right click', findedSectors)
 
           findedSectors.forEach((info: any, key: any) => {
             var Cdrjsonaggrid =
@@ -11441,7 +11893,7 @@ async displaysector(): Promise<void>{
 
 
           });
-
+          console.log('this.CdrRowData>>>>>', this.CdrRowData);
 
           const componentfactory =
             this.componentFactoryResolver.resolveComponentFactory(
@@ -11490,17 +11942,18 @@ async displaysector(): Promise<void>{
       //console.log("sectoe11111------------",this.sector);
       this.sector.off("click");
       this.sector.on('mousedown', async (e: any) => {
-        //console.log('e>>>>>', e)
+        console.log('e>>>>>', e);
 
         // this.datacrowdService.getData().then((data:any) => {
         //   this.datajson = data;
         // });
-        //console.log('object>>>>>>', object)
+        console.log('object>>>>>>', object);
+        console.log('eeeeeee>>>>>>', e.target);
 
         this.TcdRowData = [];
+        console.log('Azimuth >>>>>>', e.target.Azimuth ," lat--",e.target.lat,"   lng-------",e.target.lng);
 
         // this.datajson.markerPositions.forEach((element: any, key: any) => {
-
         let findedSectors: any = object.filter((element: any) => {
           return element[7] === e.target.Azimuth && element[4] === e.target.lat && element[5] === e.target.lng
         });
@@ -11525,7 +11978,7 @@ async displaysector(): Promise<void>{
           this.TcdRowData.push(jsonaggrid);
 
         });
-
+console.log(" this.TcdRowData-------", this.TcdRowData);
 
         const componentfactory =
           this.componentFactoryResolver.resolveComponentFactory(
@@ -11573,7 +12026,6 @@ async displaysector(): Promise<void>{
 
     this.sectorId++;
   }
-
   
 
   addRandomPolygons(): void {
@@ -11781,7 +12233,7 @@ async displaysector(): Promise<void>{
         var markers = cluster.getAllChildMarkers();
         var html = '<div  class="groupOfPerson"></div>';
         return L.icon({
-          iconUrl: '/cybercrowd/angular/assets/img/group.png',
+          iconUrl: '../assets/img/group.png',
           iconSize: [32, 32],
           iconAnchor: [16, 32],
         });
@@ -13306,12 +13758,9 @@ DisplayInQueue(){
     await this.datacrowdService.getExecutionParam(event).then((res:any)=>{
         console.log("getExecutionParam111",res);
         this.Senario_reportType=res.reportType;
-      if((window.parent.parent.parent[7] as any)){
-        (window.parent.parent.parent[7] as any).ChangeHeaderParameter(res);
-      
-      }
+
           });
-    if (this.Senario_reportType == 11) {
+    if (this.Senario_reportType == "11") {
       await this.datacrowdService.getsimualtion(this.simulationid, this.usercode).then((res: any) => {
         this.datajson = res;
         console.log("getsimultion response >>>>", this.datajson);
@@ -13321,7 +13770,15 @@ DisplayInQueue(){
       $('#controlbutton').css('display', '');
       this.tcd();
 
-    }else{
+    }else if(this.Senario_reportType == "10"){
+      // alert(111);
+      await this.datacrowdService.getSimulationobject(event).then((res: any) => {
+        this.datajson = res;
+        //console.log("getsimultion response >>>>", this.datajson);
+      });
+      this.scandevices();
+      this.displayShapes(event);    }
+    else{
       this.displayClusters2(event);
       this.displayShapes(event);
   
@@ -14829,7 +15286,7 @@ toggleColor(){ this.isGreen = !this.isGreen;
         // Add arrow marker at the last point
         const lastPointLatLng = this.arraystatic2[this.arraystatic2.length - 1];
         const arrowIcon = L.icon({
-          iconUrl: "/cybercrowd/angular/assets/img/singleperson.png", // Path to your arrow icon
+          iconUrl: "../assets/img/singleperson.png", // Path to your arrow icon
           iconSize: [32, 32], 
           iconAnchor: [10, 10],
         });
@@ -15425,9 +15882,9 @@ toggleColor(){ this.isGreen = !this.isGreen;
 
   
 
-  
   clickedDeviceId(eventData: any) {
-    //console.log('eventData------', eventData);
+    console.log('eventData------', eventData);
+    console.log('this.routedatajson------', this.routedatajson);
     this.selectedDeviceId=eventData;
     let tableroutearray:any[]=[];
 
@@ -15437,7 +15894,7 @@ toggleColor(){ this.isGreen = !this.isGreen;
      }
     });
     //console.log("tableroutearray-----------",tableroutearray);
-    this.typeofdata='trace';
+    this.typeofdata=eventData.type;
     this.opentableData(tableroutearray, this.typeofdata);
   }
 
@@ -15450,10 +15907,10 @@ toggleColor(){ this.isGreen = !this.isGreen;
   
       array.forEach((elt:any)=>{
         let x:any = {
-          deviceid: elt[2],
-          Time:  this.dateTtoDate(elt[3]),
-          Lng: elt[1],
-          lat: elt[0],
+          deviceid: elt[0],
+          Time:  this.dateTtoDate(elt[1]),
+          Lng: elt[4],
+          lat: elt[3],
         }
         this.Datatable1.unshift(x);
         this.Datatable=this.Datatable1;
@@ -15483,6 +15940,8 @@ toggleColor(){ this.isGreen = !this.isGreen;
   }
     console.log("this.Datatable-----------",this.Datatable);
   }
+
+
 
   Routedevice(event:any){
     let deviceId=event.srcElement.id;
@@ -15641,114 +16100,121 @@ clearRoutes(){
 
 
 
-  async getrouteLine(){
-    console.log("this.isRunningRoute----",this.isRunningRoute);
-    console.log("this.routeDevices----",this.routeDevices);
-    console.log("this.Devices----",this.Devices);
-    
-    if (this.isRunningRoute==false) {
-      return;
-  }
-    this.openTable=true;
-    // this.isRunningRoute = true;
+async getrouteLine(){
+  console.log("this.isRunningRoute----",this.isRunningRoute);
+  console.log("this.routeDevices----",this.routeDevices);
+  console.log("this.Devices----",this.Devices);
   
-    let array:any[]=[];
-    let route:any[]=[];
-    let routeDevices1:any[]=[];
-    let routeDevices:any[]=[];
+  if (this.isRunningRoute==false) {
+    return;
+}
+  this.openTable=true;
+  // this.isRunningRoute = true;
+
+  let array:any[]=[];
+  let route:any[]=[];
+  let routeDevices1:any[]=[];
+  let routeDevices:any[]=[];
+
+  // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
   
-    // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
-    
-    routeDevices = this.dataService.getroutedevices().split(',');
-    this.routeDevicestable=routeDevices;
-    console.log("this.routeDevices-----------", routeDevices)
-    let colorarray:any[]=['green','red',this.SectorColor,'yellow','purpule'];
-     routeDevices.forEach((deviceId:any,index:any)=>{
-       
-      routeDevices1.push({'deviceid':deviceId,'color':colorarray[index]})
+  // routeDevices = this.dataService.getroutedevices().split(',');
+  routeDevices = this.Devices.split(',');
+  this.routeDevicestable=routeDevices;
+  console.log("this.routeDevices-----------", routeDevices)
+  let colorarray:any[]=['green','red',this.SectorColor,'yellow','purpule'];
+   routeDevices.forEach((deviceId:any,index:any)=>{
+     
+    routeDevices1.push({'deviceid':deviceId,'color':colorarray[index]})
+  });
+
+// let routeDevices1= [{'deviceid':'4e79560f-e59a-4d7b-8b91-6dddbd571c57','color':'green'},{'deviceid':'436cab63-5002-475d-8d11-c321e5850659','color':"red"}]
+this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
+
+ 
+  let datajson:any;
+  // await this.http.get<any[]>('/assets/angularjson.json').subscribe((data:any[]) => {
+    $('#controlbutton').css('display', '');
+    $('#routebar').css('display', '');
+    // console.log("data-----------",data)
+    // datajson=data;
+    datajson=this.datajson;
+    // datajson=this.datajson;
+     this.routedatajson=datajson;
+
+    //  let markerPositions = datajson['markerPositions'];
+     let markerPositions = datajson;
+     console.log("markerPositions-----------",markerPositions)
+     this.routedatajson=this.routedatajson;
+     this.displayRoute=true;
+     this.displayclusters=true;
+    // this.displayRouteLine(markerPositions);
+
+    // console.log('routedatajson----------',this.routedatajson);
+
+
+  let color;
+  let x1:any=[{'deviceid':'','color':''}];
+  // let data11:any=this.routedatajson.markerPositions;
+  let data11:any=this.routedatajson;
+  // console.log("data11----",data11);
+  // console.log("animatedmarker1----",this.animatedmarker1);
+  // console.log("route[route.length-1]----",route[route.length-1]);
+  let arrayfortable:any[]=[];
+  
+    console.log("speedTimeRoute----",this.speedTimeRoute);
+    // console.log("routeDevices1----", routeDevices1);
+  // for( let i=this.indexRoute;i<data11.length;i++){
+    // console.log("data11[i][2]----", data11[i][2]);
+  
+    setTimeout(async ()  => {
+       let elt=data11[this.indexRoute];
+      x1 =  routeDevices1.find((a:any)=>{
+      // console.log("aaaaaa----",a);
+      return  a.deviceid==elt[0]
     });
 
-  // let routeDevices1= [{'deviceid':'4e79560f-e59a-4d7b-8b91-6dddbd571c57','color':'green'},{'deviceid':'436cab63-5002-475d-8d11-c321e5850659','color':"red"}]
-  this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
+color=x1.color;
 
-   
-    let datajson:any;
-    // await this.http.get<any[]>('/assets/angularjson.json').subscribe((data:any[]) => {
-      $('#controlbutton').css('display', '');
-      $('#routebar').css('display', '');
-      // console.log("data-----------",data)
-      // datajson=data;
-      datajson=this.datajson;
-      // datajson=this.datajson;
-       this.routedatajson=datajson;
-
-       let markerPositions = datajson['markerPositions'];
-       console.log("markerPositions-----------",markerPositions)
-       this.routedatajson=this.routedatajson;
-       this.displayRoute=true;
-       this.displayclusters=true;
-      // this.displayRouteLine(markerPositions);
-
-      // console.log('routedatajson----------',this.routedatajson);
+  console.log("x1--------",x1);
+  var greenIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-'+color+'.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
 
 
-    let color;
-    let x1:any=[{'deviceid':'','color':''}];
-    let data11:any=this.routedatajson.markerPositions;
-    // console.log("data11----",data11);
-    // console.log("animatedmarker1----",this.animatedmarker1);
-    // console.log("route[route.length-1]----",route[route.length-1]);
-    let arrayfortable:any[]=[];
-    
-      console.log("speedTimeRoute----",this.speedTimeRoute);
-      // console.log("routeDevices1----", routeDevices1);
-    // for( let i=this.indexRoute;i<data11.length;i++){
-      // console.log("data11[i][2]----", data11[i][2]);
-    
-      setTimeout(async ()  => {
-        let elt=data11[this.indexRoute];
-        x1 =  routeDevices1.find((a:any)=>{
-        // console.log("aaaaaa----",a);
-        return  a.deviceid==elt[2]
-      });
 
- color=x1.color;
+this.animatedmarker1=L.marker([elt[4],elt[3]], {icon: greenIcon}).addTo(this.map);
 
-    console.log("x1--------",x1)
-    var greenIcon = new L.Icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-'+color+'.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
-   
 
-this.animatedmarker1=L.marker([elt[0],elt[1]], {icon: greenIcon}).addTo(this.map);
-let animatedmarker1:any=L.marker([elt[0],elt[1]], {icon: greenIcon}).addTo(this.magnifiedMap);
+let animatedmarker1:any=L.marker([elt[4],elt[3]], {icon: greenIcon}).addTo(this.magnifiedMap);
 
 this.animatedmarker1.deviceid=x1.deviceid;
 
-if(this.routingMarkerArr[elt[2]]){
-   this.map.removeLayer(this.routingMarkerArr[elt[2]]);
+if(this.routingMarkerArr[elt[0]]){
+ this.map.removeLayer(this.routingMarkerArr[elt[0]]);
 }
 
-if(this.routingMarkerArrLoop[elt[2]]){
-  this.magnifiedMap.removeLayer(this.routingMarkerArrLoop[elt[2]]);
+if(this.routingMarkerArrLoop[elt[0]]){
+this.magnifiedMap.removeLayer(this.routingMarkerArrLoop[elt[0]]);
 }
 
-this.routingMarkerArr[elt[2]]=this.animatedmarker1;
-this.routingMarkerArrLoop[elt[2]]=animatedmarker1;
+this.routingMarkerArr[elt[0]]=this.animatedmarker1;
+this.routingMarkerArrLoop[elt[0]]=animatedmarker1;
 route.push(this.animatedmarker1);
 if(this.animatedmarker1!='undefined'){
-  this.routeDeviceArray.push(this.animatedmarker1);
+this.routeDeviceArray.push(this.animatedmarker1);
 
 }
 if( animatedmarker1!='undefined'){
-  this.routeDeviceArrayLoop.push( animatedmarker1);
+this.routeDeviceArrayLoop.push( animatedmarker1);
 
 }
+console.log("this.routeDeviceArray-------",this.routeDeviceArray);
 
 arrayfortable.push(elt);
 
@@ -15769,8 +16235,8 @@ await this.getrouteLine();
 
 // }
 console.log("this.speedTimeRoute----",this.speedTimeRoute);
-    // });
-  }
+  // });
+}
 
   displayRouteLine(datajson:any[]){
     //  this.routeDevices= ['3CD0A7B8-B53A-4DF3-A10A-9EB9DF6D7F0C','912c1b4f-9077-4d0b-ad9d-19951ef08e30']
@@ -15851,7 +16317,7 @@ console.log("this.speedTimeRoute----",this.speedTimeRoute);
 
 async  getRoutebytime(){
   let datajson:any;
-    await this.http.get<any[]>('/assets/angularjson.json').subscribe((data:any[]) => {
+    await this.http.get<any[]>('../assets/angularjson.json').subscribe((data:any[]) => {
       $('#controlbutton').css('display', '');
       console.log("data-----------",data)
         datajson=data;
@@ -15897,7 +16363,7 @@ async  getRoutebytime(){
         this.handleRouteData(data, deviceArray);
 
         // Fetching additional data from the json file
-        let jsonData = await this.http.get<any[]>('/cybercrowd/angular/assets/routejson.json').toPromise();
+        let jsonData = await this.http.get<any[]>('../assets/routejson.json').toPromise();
         this.handleRouteData(jsonData, deviceArray);
     } catch (error) {
         console.error('Error fetching route data:', error);
@@ -16070,7 +16536,7 @@ private handleRouteData(data: any, deviceArray?: any[]) {
     let routeDevices1:any[]=[];
     let routeDevices:any[]=[];
     let objcolor:any[]=[];
-    this,this.openTable=true;
+    this.openTable=true;
     this.isRunningRoute=true;
     $('#routebar1').css('display', '');
     $('#routebar').css('display', 'none');
@@ -16079,7 +16545,8 @@ private handleRouteData(data: any, deviceArray?: any[]) {
   // }
     // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
     
-    routeDevices = this.dataService.getroutedevices().split(',');
+    // routeDevices = this.dataService.getroutedevices().split(',');
+    routeDevices = this.Devices.split(',');
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
     let colorarray:any[]=['green','red',this.SectorColor,'yellow','purpule'];
@@ -16103,10 +16570,11 @@ private handleRouteData(data: any, deviceArray?: any[]) {
       datajson=this.datajson;
       this.routedatajson=datajson;
   
-      let markerPositions = datajson['markerPositions'];
+      // let markerPositions = datajson['markerPositions'];
+      let markerPositions = datajson
       routeDevices1.forEach((a:any)=> { 
       let deviceArray=  markerPositions.filter((elt:any)=>{
-          return  a.deviceid===elt[2]
+          return  a.deviceid===elt[0]
             
           });
           objcolor.push({color:a.color,data:deviceArray,deviceId:a.deviceid,index:0});
@@ -16127,10 +16595,12 @@ private handleRouteData(data: any, deviceArray?: any[]) {
         return;
       }
   
-      let currentDevice= markerPositions[this.currentIndex][2];
+      let currentDevice= markerPositions[this.currentIndex][0];
       console.log("currentDevice-----------",currentDevice);
   
     let x=  objcolor.find((elt:any)=>{
+      console.log("elt-----------",elt);
+
       return elt.deviceId==currentDevice});
       console.log("x-----------",x);
         // x.index=this.routecountobj;
@@ -16142,10 +16612,12 @@ private handleRouteData(data: any, deviceArray?: any[]) {
         // this.polylines.push(polyline);
   
         // if(this.currentIndex>0){
-     
-        let polyline = L.polyline([[x.data[x.index][0],x.data[x.index][1]],[x.data[x.index+1][0],x.data[x.index+1][1]]],{color:x.color}).addTo(this.map);
-        let polyline1 = L.polyline([[x.data[x.index][0],x.data[x.index][1]],[x.data[x.index+1][0],x.data[x.index+1][1]]],{color:x.color}).addTo(this.magnifiedMap);
 
+     
+        let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.map);
+        let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
+
+        console.log("polyline--------",polyline);
         // Decorate the polyline
         // L.polylineDecorator(polyline, {
         //   patterns: [{
@@ -16184,52 +16656,7 @@ private handleRouteData(data: any, deviceArray?: any[]) {
   }
 
 
-  
-  getsenarioId(obj:any){
-    console.log("obj><><><<>",obj);
-    // this.Senario_reportType=obj.reportType;
-
-    if(obj.action=="displaysenario"){
-    this.dataService.setsenarioID(obj.simulID);
-    // console.log('displaysenario>>>>>>>>>>>>',$("#displaysenario"));
-    // $("#displaysenario").click();
-    this.displaysenarioSequence();
-    }else if(obj.action=="addnewSenario"){
-      let parentSenario=localStorage.setItem("parentSenario",obj.simulID);
-    this.senarioParentName=obj.simulID;
-    this.addnewSenario()
-      // this.mapChanges=obj;
-        
-      // let obj22:any={
-      //   senarioParentName:this.senarioParentName,
-      //   simulationid:this.simulationid,
-      //   Action:"addnewMenu",
-      //   senariocount:this.senariocount,
-      //   senarioFlag:this.senarioFlag
-      
-      // }
-        
-      // // this.senarioIdOutput.emit(obj22);
-      // this.navbarSimulId=obj22;
-    }else if(obj.action=="addProperties"){
-this.modalService.open(this.SimulInfo);
-
-$(".modal-content").css("width", "650px");
-$(".modal-content").css("right", "200px");
-$(".modal-content").css("padding", "10px");
-$(".modal-content").css("top", "85px");
-$(".modal-content").draggable({
-  axis: "both",
-  cursor: "move"
-});
-
-    }else  if(obj.action=="reset"){
-      this.clearShapes();
-
-    }
-    
-    
-      }
+   
    
  
     
@@ -16418,9 +16845,9 @@ $(".modal-content").draggable({
     }
 
     showTimeline(){
+    
       this.timelineFlag=1;
-     (window.parent as any).hideSimulation();
-        this.displayTarget = true;
+      this.displayTarget = true;
       $('#Map').css('display','none');
       $('#Graph').css('display','none');
       $('#Timeline').css('display','');
@@ -16447,13 +16874,13 @@ $(".modal-content").draggable({
      
   
   //this.router.navigate(['/map2']);
-  console.log("window>>",window as any);
-  console.log("window,parent>>",window.parent as any);
-  console.log("window.parent.parent>>",window.parent.parent as any);
-  console.log("window.parent.parent.parent>>",window.parent.parent.parent as any);
+  // console.log("window>>",window as any);
+  // console.log("window,parent>>",window.parent as any);
+  // console.log("window.parent.parent>>",window.parent.parent as any);
+  // console.log("window.parent.parent.parent>>",window.parent.parent.parent as any);
   
-  // console.log('222222222222222222222---------',window.parent.parent.parent.parent.$(".popupExists").parent().hide());
-  (window.parent.parent.parent[7] as any).showmapGraph('map');
+  // // console.log('222222222222222222222---------',window.parent.parent.parent.parent.$(".popupExists").parent().hide());
+  // (window.parent.parent.parent[7] as any).showmapGraph('map');
   
   
       }
@@ -16473,7 +16900,25 @@ console.log("deviceValue",this.deviceValue)
 console.log("selectedType",this.selectedType) 
 
 
-  if(this.reportType!=1 && this.reportType!=10 && this.reportType!=3 && this.reportType!=8 && this.reportType!=9 && this.reportType!=11){
+
+await this.datacrowdService.getSimulationId().then((res:any)=>{
+  //console.log('getcountry2>>>>',res);
+  this.simulationid=res;
+  //console.log("countrycode finall",this.countrycode)
+})
+
+if(this.senariocount==0){
+  this.senarioParentName=this.simulationid;
+  this.firstsenario=this.simulationid;
+  this.internalcode=this.simulationid;
+
+}
+if(this.reportType!=1 && this.reportType!=10 && this.reportType!=3 && this.reportType!=8 && this.reportType!=9 && this.reportType!=11){
+  console.log('countrycode>>>>',this.countrycode);
+    
+    if(typeof this.countrycode=="undefined"){
+
+    }
     await this.datacrowdService.getALLcountryIDS().then(async (res:any)=>{
       //console.log('getALLcountryIDS>>>>',res);
 
@@ -16483,7 +16928,7 @@ console.log("selectedType",this.selectedType)
           //console.log('getcountry2>>>>',res);
           this.countrycode=res;
           this.countrycode=this.convertCountryCode(this.countrycode);
-          //console.log("countrycode finall",this.countrycode)
+          console.log("countrycode finall",this.countrycode)
         })
 
     })
@@ -16493,8 +16938,21 @@ console.log("selectedType",this.selectedType)
   let queryjson:any;
   this.reportType=this.selectedType;
   await console.log('reportType >>', this.reportType);
+  if (typeof this.DateTimeFrom === 'undefined' || this.DateTimeFrom === null ||this.DateTimeFrom.includes('undefined')) {
+    // Set DateTimeFrom to one year ago from today
+    let oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    this.DateTimeFrom = this.convertDate2(oneYearAgo.toISOString()); // Convert to ISO string format
+}
 
-if(this.reportType=="1"){
+// Check if DateTimeTo is undefined or null
+if (typeof this.DateTimeTo === 'undefined' || this.DateTimeTo === null || this.DateTimeTo.includes('undefined')) {
+    // Set DateTimeTo to today's date
+    let today = new Date();
+    this.DateTimeTo = this.convertDate2(today.toISOString()); // Convert to ISO string format
+}
+
+if(this.reportType=="1" ){
 
   queryjson={
     "reportName": "No Name",
@@ -16502,9 +16960,9 @@ if(this.reportType=="1"){
     "reportTypeId": this.selectedType.toString(),
     "TimeZone": "",
     "RecipientUser": "",
-    "DateTimeFrom": "06/06/2023 00:00",
+    "DateTimeFrom":  this.DateTimeFrom,
     "RecipientEmail": "",
-    "DateTimeTo": "06/06/2024 01:00",
+    "DateTimeTo": this.DateTimeTo,
     "Coordinates":this.Coord,
     "meter": "",
     "Devices": this.deviceValue,
@@ -16512,7 +16970,7 @@ if(this.reportType=="1"){
     "dataType": "",
     "telephoneNumber": "",
     "EDGEHEIGHT": "10",
-    "simulationId": "186494",
+    "simulationId": this.simulationid.toString(),
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
@@ -16520,25 +16978,54 @@ if(this.reportType=="1"){
     "BtsTypeSlected": ""
   };
 }else if(this.reportType=="2"){
-  let device = localStorage.getItem('deviceselected');
 
+  if (this.marker) {
+    this.map.removeLayer(this.marker);
+
+  }
+
+  if (this.markerLoop) {
+    this.markerLoop.clearLayers();
+
+  }
+  // let device = localStorage.getItem('deviceselected');
+
+
+  if (!JSON.parse(localStorage.getItem("multiselection"))) {
+    this.multiselection = [];
+
+  } else {
+    //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")));
+    //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")).join());
+
+    this.multiselection = JSON.parse(localStorage.getItem("multiselection")).join();
+    if (this.Devices == "" || typeof this.Devices == "undefined") {
+
+      this.Devices = this.multiselection;
+    } else {
+
+      this.Devices = this.Devices + ',' + this.multiselection;
+
+    }
+  }
+  
    queryjson={
     "reportName": "No Name",
-    "reportType": "2",
-    "reportTypeId": "2",
+    "reportType": this.selectedType.toString(),
+    "reportTypeId": this.selectedType.toString(),
     "TimeZone": "",
     "RecipientUser": "",
-    "DateTimeFrom": "06/06/2023 00:00",
+    "DateTimeFrom":this.DateTimeFrom,
     "RecipientEmail": "",
-    "DateTimeTo": "06/06/2024 01:00",
+    "DateTimeTo": this.DateTimeTo,
     "Coordinates":[],
     "meter": "",
-    "Devices": device,
+    "Devices": this.Devices,
     "isCSVAttached": "",
     "dataType": "",
     "telephoneNumber": "",
     "EDGEHEIGHT": "10",
-    "simulationId": "186494",
+    "simulationId": this.simulationid.toString(),
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": this.countrycode,
@@ -16546,8 +17033,170 @@ if(this.reportType=="1"){
     "BtsTypeSlected": ""
   };
 
+}
+
+if(this.reportType=="1" ||this.reportType=="6"){
+
+  queryjson={
+    "reportName": "No Name",
+    "reportType": this.selectedType.toString(),
+    "reportTypeId": this.selectedType.toString(),
+    "TimeZone": "",
+    "RecipientUser": "",
+    "DateTimeFrom":  this.DateTimeFrom,
+    "RecipientEmail": "",
+    "DateTimeTo": this.DateTimeTo,
+    "Coordinates":this.Coord,
+    "meter": "",
+    "Devices": this.deviceValue,
+    "isCSVAttached": "",
+    "dataType": "",
+    "telephoneNumber": "",
+    "EDGEHEIGHT": "10",
+    "simulationId": this.simulationid.toString(),
+    "userCode": "8158 ",
+    "imsiId": this.IMSI_IDValue,
+    "countryCode": "",
+    "senario": "-1",
+    "BtsTypeSlected": ""
+  };
+}
+
+
+else if(this.reportType=="3"){
+
+  if (!JSON.parse(localStorage.getItem("multiselection"))) {
+    this.multiselection = [];
+
+  } else {
+    //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")));
+    //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")).join());
+
+    this.multiselection = JSON.parse(localStorage.getItem("multiselection")).join();
+    if (this.Devices == "" || typeof this.Devices == "undefined") {
+
+      this.Devices = this.multiselection;
+    } else {
+
+      this.Devices = this.Devices + ',' + this.multiselection;
+
+    }
+  }
+     queryjson={
+    "reportName": "No Name",
+    "reportType": this.selectedType.toString(),
+    "reportTypeId": this.selectedType.toString(),
+    "TimeZone": "",
+    "RecipientUser": "",
+    "DateTimeFrom":  this.DateTimeFrom,
+    "RecipientEmail": "",
+    "DateTimeTo": this.DateTimeTo,
+    "Coordinates":this.Coord,
+    "meter": "",
+    "Devices": this.Devices,
+    "isCSVAttached": "",
+    "dataType": "",
+    "telephoneNumber": "",
+    "EDGEHEIGHT": "10",
+    "simulationId": this.simulationid.toString(),
+    "userCode": "8158 ",
+    "imsiId": this.IMSI_IDValue,
+    "countryCode": "",
+    "senario": "-1",
+    "BtsTypeSlected": ""
+  };
+
+  
 }else if(this.reportType=="10"){
-  alert("111");
+  //let device = localStorage.getItem('deviceselected');
+ 
+  queryjson={
+    "reportName": "No Name",
+    "reportType": this.selectedType.toString(),
+    "reportTypeId": this.selectedType.toString(),
+    "TimeZone": "",
+    "RecipientUser": "",
+    "DateTimeFrom":  this.DateTimeFrom,
+    "RecipientEmail": "",
+    "DateTimeTo": this.DateTimeTo,
+    "Coordinates":this.Coord,
+    "meter": "",
+    "Devices": this.deviceValue,
+    "isCSVAttached": "",
+    "dataType": "",
+    "telephoneNumber": "",
+    "EDGEHEIGHT": "10",
+    "simulationId": this.simulationid.toString(),
+    "userCode": "8158 ",
+    "imsiId": this.IMSI_IDValue,
+    "countryCode": "",
+    "senario": "-1",
+    "BtsTypeSlected": ""
+  };
+  for (const elt of queryjson.Coordinates) {
+    if(elt.Type==='Circle'){
+      let turfshape:any = turf.circle([elt.center.lng, elt.center.lat], elt.radius / 1000, { units: 'kilometers' });
+
+      const intersectingRegions:any = [];
+ 
+      //console.log("geoJsonData ",this.geojsonData);
+      // Iterate through each feature in the GeoJSON data
+      
+      this.geojsonData.features.forEach((feature: any) => {
+
+        // Check if the circle intersects with the feature
+       const doesIntersect = turf.booleanOverlap(turf.simplify(feature),turf.simplify(turfshape));
+        //console.log('doesIntersect' ,doesIntersect)
+    
+        // //console.log('doesIntersect2', doesIntersect2);
+        
+    
+        if (doesIntersect) {
+          intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+         }else{
+         const doesIntersect2 = turf.booleanPointInPolygon(
+           turf.point([elt.center.lng, elt.center.lat]), // Create a Turf.js Point from circle center
+           feature // Assuming the GeoJSON feature is a Polygon
+         );
+          if (doesIntersect2) {
+            intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+          }
+        }
+
+
+
+       
+      });
+  
+      console.log('zz circle>>>>',intersectingRegions);
+
+
+      ///
+      let  C_countryCodes:any
+    
+
+
+  await this.datacrowdService.getcountry(intersectingRegions).then((ress:any)=>{
+   console.log('getcountry>>>>',ress);
+   // C_subregion=ress[0];
+   // C_region=ress[1];
+   // C_Country=ress[2];
+   C_countryCodes=ress;
+ 
+ }) 
+
+
+ elt.countrycodes=this.convertCountryCode(C_countryCodes);
+    }
+  };
+      
+  console.log("queryjson",queryjson)
+  this.datajson = await this.getSimulationData(queryjson);
+  console.log('datajson>', this.datajson);
+  this.scandevices();
+
+
+}else if(this.reportType=="11"){
   //let device = localStorage.getItem('deviceselected');
   queryjson={
     "reportName": "No Name",
@@ -16555,26 +17204,154 @@ if(this.reportType=="1"){
     "reportTypeId": this.selectedType.toString(),
     "TimeZone": "",
     "RecipientUser": "",
-    "DateTimeFrom": "06/06/2023 00:00",
+    "DateTimeFrom": this.DateTimeFrom,
     "RecipientEmail": "",
-    "DateTimeTo": "06/06/2024 01:00",
-    "Coordinates":this.Coord,
+    "DateTimeTo":this.DateTimeTo,
+    "Coordinates":[],
     "meter": "",
     "Devices":"",
     "isCSVAttached": "",
     "dataType": "",
     "telephoneNumber": "",
     "EDGEHEIGHT": "10",
-    "simulationId": "186494",
+    "simulationId": this.simulationid.toString(),
     "userCode": "8158 ",
-    "imsiId": "",
+    "imsiId": this.ImsiID,
     "countryCode": "",
     "senario": "-1",
     "BtsTypeSlected": ""
   };
-}
+  await this.datacrowdService.getTCDSimulationObject(this.ImsiID).then((res:any)=>{
+    console.log("getTCDSimulationObject res",res);
+    this.datajson=res;
+    this.tcd();
+
+  })
+}else if(this.reportType=="8" ||this.reportType=="9"){
+ 
+  const dialogRef =  this.dialog.open(this.BtsType);
+  //  //console.log("cRdaius111>>",$('.bulkRadius'))
+
+
+
+   dialogRef.afterClosed().subscribe(async result => {
+
+    console.log("BtsTypeSlected>>>>",this.BtsTypeSlected)
+    queryjson={
+      "reportName": "No Name",
+      "reportType": this.selectedType.toString(),
+      "reportTypeId": this.selectedType.toString(),
+      "TimeZone": "",
+      "RecipientUser": "",
+      "DateTimeFrom":  this.DateTimeFrom,
+      "RecipientEmail": "",
+      "DateTimeTo": this.DateTimeTo,
+      "Coordinates":this.Coord,
+      "meter": "",
+      "Devices": this.deviceValue,
+      "isCSVAttached": "",
+      "dataType": "",
+      "telephoneNumber": "",
+      "EDGEHEIGHT": "10",
+      "simulationId": this.simulationid.toString(),
+      "userCode": "8158 ",
+      "imsiId": this.IMSI_IDValue,
+      "countryCode": "",
+      "senario": "-1",
+      "BtsTypeSlected": this.BtsTypeSlected
+    };
+
 
     console.log('queryjson >>', queryjson);
+
+    for (const elt of queryjson.Coordinates) {
+      if(elt.Type==='Circle'){
+        let turfshape:any = turf.circle([elt.center.lng, elt.center.lat], elt.radius / 1000, { units: 'kilometers' });
+
+        const intersectingRegions:any = [];
+   
+        //console.log("geoJsonData ",this.geojsonData);
+        // Iterate through each feature in the GeoJSON data
+        
+        this.geojsonData.features.forEach((feature: any) => {
+ 
+          // Check if the circle intersects with the feature
+         const doesIntersect = turf.booleanOverlap(turf.simplify(feature),turf.simplify(turfshape));
+          //console.log('doesIntersect' ,doesIntersect)
+      
+          // //console.log('doesIntersect2', doesIntersect2);
+          
+      
+          if (doesIntersect) {
+            intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+           }else{
+           const doesIntersect2 = turf.booleanPointInPolygon(
+             turf.point([elt.center.lng, elt.center.lat]), // Create a Turf.js Point from circle center
+             feature // Assuming the GeoJSON feature is a Polygon
+           );
+            if (doesIntersect2) {
+              intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+            }
+          }
+ 
+ 
+ 
+         
+        });
+    
+        console.log('zz circle>>>>',intersectingRegions);
+
+
+        ///
+        let  C_countryCodes:any
+      
+ 
+ 
+    await this.datacrowdService.getcountry(intersectingRegions).then((ress:any)=>{
+     console.log('getcountry>>>>',ress);
+     // C_subregion=ress[0];
+     // C_region=ress[1];
+     // C_Country=ress[2];
+     C_countryCodes=ress;
+   
+   }) 
+ 
+
+   elt.countrycodes=this.convertCountryCode(C_countryCodes);
+      }
+    };
+        
+  this.datajson = await this.getSimulationData(queryjson);
+  console.log('datajson>', this.datajson);
+  console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
+  if(this.BtsTypeSlected=="BTS"){
+
+  }else{
+   
+    this.displayFixedElements(this.datajson.fixedelements);
+    this.displayClustersforfixedelements(this.datajson.geo);
+     
+  }
+  
+
+
+  });
+
+}
+
+
+
+console.log("this.reportType  >>",this.reportType)
+console.log("this.reportType  >>",typeof this.reportType)
+
+
+    console.log("queryjson IIII  ",queryjson)
+if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && this.reportType!="10" ){
+    console.log('queryjson >>', queryjson);
+
+
+
+    
     for (const elt of queryjson.Coordinates) {
       if(elt.Type==='Circle'){
         let turfshape:any = turf.circle([elt.center.lng, elt.center.lat], elt.radius / 1000, { units: 'kilometers' });
@@ -16633,11 +17410,49 @@ if(this.reportType=="1"){
     };
     
 
+    if(this.reportType =="3"){
+      if (!this.Coord || this.Coord.length < 2) {
 
-    console.log("queryjson IIII  ",queryjson)
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.data = {
+          content: 'Select more than one Area',
+        };
 
-    this.datajson = await this.getSimulationData(queryjson);
-    console.log('datajson>', this.datajson);
+        this.dialog.open(ContentmodalComponent, dialogConfig);
+
+        localStorage.clear();
+      } else {
+        let shouldExecuteTest = true; // Flag variable
+
+        await this.Coord.forEach((obj : any) => {
+          //console.log('obj>>>>>>>>', obj);
+          if (
+            obj.selectedStartDate === '' ||
+            obj.selectedEndDate === '' ||
+            typeof obj.selectedStartDate === 'undefined' ||
+            typeof obj.selectedEndDate === 'undefined'
+          ) {
+            const dialogConfig = new MatDialogConfig();
+            dialogConfig.data = {
+              content: 'Date each Shape!!!',
+            };
+
+            this.dialog.open(ContentmodalComponent, dialogConfig);
+            shouldExecuteTest = false; // Set the flag to false if any object meets the condition
+          }
+        });
+
+        if (shouldExecuteTest) {
+          this.datajson = await this.getSimulationData(queryjson);
+          console.log('datajson>', this.datajson);        }
+
+      }
+    }else{
+      this.datajson = await this.getSimulationData(queryjson);
+      console.log('datajson>', this.datajson);
+    }
+    
+
 //return this.datajson;
     if (this.datajson !== null) {
       //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
@@ -16789,6 +17604,7 @@ if(this.reportType=="1"){
       this.marker.off("click");
       this.marker.on("clustermousedown", async (e: any) => {
         if (e.originalEvent.buttons == 2) {
+
           var markerChildrens = e.layer.getAllChildMarkers();
 
 
@@ -16830,6 +17646,7 @@ if(this.reportType=="1"){
           componentref.instance.Grid2Type = 'btn-54';
           componentref.instance.GridID = 'GeoGrid1';
           const html1 = componentref.location.nativeElement;
+    
           await html1;
           //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
           if (markerChildrens.length < 3) {
@@ -16864,25 +17681,479 @@ if(this.reportType=="1"){
       });
 
       this.map.addLayer(this.marker);
-      // this.map.setView([lastMarkerLat, lastMarkerLng],12);
+      //  this.map.setView([lastMarkerLat, lastMarkerLng],12);
       
       this.magnifiedMap.addLayer(this.markerLoop);
       this.layerGroup.addLayer(this.marker);
    
-}
+}}
 
+if(this.senarioFlag==true){
+  this.senariocount++;
 
 //this.isFormVisible = false;
-
- } 
-bars(){
+let obj22:any={
+  senarioParentName:this.senarioParentName,
+  simulationid:this.simulationid,
+  Action:"addnewMenu",
+  senariocount:this.senariocount,
+  senarioFlag:this.senarioFlag,
+  reportType:this.reportType
 }
+  
+// this.senarioIdOutput.emit(obj22);
+    this.navbarSimulId=obj22;
+
+
+    }
+    let obj:any={"table_id": this.simulationid }
+
+    await this.datacrowdService.SaveSimul(obj);
+ } 
+ async bars(){
+  await this.datacrowdService.getNextActionMenuList().then((response:any)=>{
+  console.log("response===========",response);
+  this.nextActionMenuList=response;
+  
+  });
+    this.showTextMenu = !this.showTextMenu;
+    this.ShowHeader=false;
+  }
+  
   
     changeType(type: number) {
       this.selectedType = type;
       console.log('Selected Type:', this.selectedType); // Debugging log
     }
     
+    async DisplayFromSenario(){
+      console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+
+if(data[0].COLNAME=="BTS_CELL_ID"){
+  console.log("data >>>>>>>>>>",data);
+  console.log("data z>>>>>>>>>>",[ parseInt(data[0].COLVALUE)]);
+
+
+  await this.datacrowdService
+  .getfixedelementsObject([ parseInt(data[0].COLVALUE)])
+  .then(async (res: any) => {
+    console.log('res>>', res);
+    this.displayFixedElements(res);
+
+  });
+
+
+}else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
+  await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+    console.log("res in getSimulationobject ",res);
+    this.datajson=res;
+    if (this.datajson !== null) {
+      //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+      this.marker = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      this.markerLoop = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      let lastMarkerLat:any;
+      let lastMarkerLng:any;
+  
+      for (var j = 0; j < 1; j++) {
+        for (var i = 0; i < this.datajson; i++) {
+          this.markers = L.marker([
+            Number(this.datajson[i].location_latitude),
+            Number(this.datajson[i].location_longitude)
+         
+          ]);
+          this.markers.off("click");
+          this.markers.on("mousedown", (e: any) => {
+            if (e.originalEvent.buttons == 2) {
+              e.target.openPopup();
+  
+            }
+            if (e.originalEvent.buttons == 1) {
+              //  alert(1);
+            }
+          });
+          this.markersArray.push(this.markers)
+          
+  lastMarkerLat = this.datajson[i][4];
+  lastMarkerLng = this.datajson[i][3];
+        }
+      }
+  
+  
+      //       markersBatch.push(marker);
+      //     }
+  
+      //     // Apply event listeners to the batch of markers
+      //     markersBatch.forEach(marker => {
+      //       marker.off("click");
+      //       marker.on("mousedown", (e: any) => {
+      //         if (e.originalEvent.buttons == 2) {
+      //           e.target.openPopup();
+      //         }
+      //         if (e.originalEvent.buttons == 1) {
+      //           // alert(1);
+      //         }
+      //       });
+  
+      //       this.markersArray.push(marker);
+      //     });
+  
+      //     // Clear markersBatch to free up memory
+      //     markersBatch.length = 0;
+      //   }
+      // }
+      // // End the timer and log the elapsed time
+      // //console.timeEnd('loopTime');
+  
+      //     //  this.marker.openPopup(
+      //     //  html11
+      //     //  );
+  
+  
+  
+      this.rowData = [];
+      this.datajson.forEach((element: any, key: any) => {
+        this.myMarker = this.binddata(
+          element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
+          element[5],
+          ""
+        );
+  
+        this.myMarker.lat = element[4];
+        this.myMarker.lng = element[3]
+        this.myMarker.timestamp = element[1]
+        this.myMarker.tel = element[0];
+        this.myMarker.name = element[2];
+        this.marker.addLayer(this.myMarker);
+        this.markerLoop.addLayer(this.myMarker);
+        this.myMarker.off("click");
+        this.myMarker.on("mousedown", async (e: any) => {
+          if (e.originalEvent.buttons == 2) {
+            //console.log("markerChildrensssssss", e.target)
+            this.rowData = [];
+            var jsonaggrid = {
+              Device_id: e.target.tel,
+              Tel: e.target.name,
+              Date: e.target.timestamp,
+              Hits: "1",
+              Coord: e.target.lat + ',' + e.target.lng,
+              //Lat:e.target.lat
+            };
+            this.rowData.push(jsonaggrid);
+  
+  
+            const componentfactory =
+              this.componentFactoryResolver.resolveComponentFactory(
+                VAgGridComponent
+              );
+            const componentref =
+              this.viewContainerRef.createComponent(componentfactory);
+            componentref.instance.rowData = this.rowData;
+            componentref.instance.columnDefs = this.columnDefs;
+            componentref.instance.headerHeight = 0;
+            // componentref.instance.selectdevices = true;
+            componentref.instance.Title = "Here On";
+            componentref.instance.distinct = true;
+            componentref.changeDetectorRef.detectChanges();
+            componentref.instance.Grid2Type = 'btn-54';
+            componentref.instance.GridID = 'GeoGrid1';
+  
+            const html2 = componentref.location.nativeElement;
+            await html2;
+  
+            // $('#agGrid').css('height','10px');
+            $('.ag-theme-balham').css('height', '130px');
+  
+  
+            // /  e.target.openPopup(html2, e.target._latlng);
+            this.map.openPopup(html2, e.target._latlng);
+  
+  
+          } else if (e.originalEvent.buttons == 1) {
+  
+          }
+  
+        });
+      });
+  
+      const componentfactory =
+        this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+      const componentref =
+        this.viewContainerRef.createComponent(componentfactory);
+      const html1 = (componentref.location.nativeElement.style.display = "none");
+      componentref.instance.columnDefs = this.columnDefs;
+      componentref.changeDetectorRef.detectChanges();
+      this.marker.off("click");
+      this.marker.on("clustermousedown", async (e: any) => {
+        if (e.originalEvent.buttons == 2) {
+          var markerChildrens = e.layer.getAllChildMarkers();
+  
+  
+  
+  
+  
+          this.rowData = [];
+  
+          for (var j = 0; j < markerChildrens.length; j++) {
+            var jsonaggrid = {
+              Device_id: markerChildrens[j].tel,
+              Tel: markerChildrens[j].name,
+              Date: markerChildrens[j].timestamp,
+              Hits: "1",
+              Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+              // Lat:markerChildrens[j].lat
+            };
+            this.rowData.push(jsonaggrid);
+          }
+  
+          //console.log("markerChildrens>>>>>", markerChildrens);
+  
+          const componentfactory =
+            this.componentFactoryResolver.resolveComponentFactory(
+              VAgGridComponent
+            );
+          const componentref =
+            this.viewContainerRef.createComponent(componentfactory);
+          componentref.instance.rowData = this.rowData;
+          componentref.instance.columnDefs = this.columnDefs;
+          componentref.instance.headerHeight = 0;
+          // componentref.instance.selectdevices = true;
+          componentref.instance.Title = "Here On";
+          componentref.instance.distinct = true;
+          componentref.changeDetectorRef.detectChanges();
+          componentref.instance.pagination = false;
+          componentref.instance.rowGrouping = true;
+          componentref.instance.contextmenu = false;
+          componentref.instance.Grid2Type = 'btn-54';
+          componentref.instance.GridID = 'GeoGrid1';
+          const html1 = componentref.location.nativeElement;
+          await html1;
+          //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+          if (markerChildrens.length < 3) {
+            // $('#agGrid').css('height','10px');
+            $('.ag-theme-balham').css('height', '130px');
+  
+          } else {
+            $('.ag-theme-balham').css('height', ' 250px ');
+  
+          }
+  
+  
+          this.map.openPopup(html1, e.layer.getLatLng());
+  
+          // $(".modal-content").css("width","650px");
+          // $(".modal-content").css("right","200px");
+          // $(".modal-content").css("padding","10px");
+          // $(".modal-content").css("top","85px");
+          // $(".modal-content").draggable({
+          //   axis: "both",
+          //   cursor: "move"
+          // });
+          //  this.modalRef =this.modalService.open(this.popupContent1);
+  
+        }
+        if (e.originalEvent.buttons == 1) {
+          // alert(4);
+  
+        }
+  
+        //open popup;
+      });
+  
+      this.map.addLayer(this.marker);
+      // this.map.setView([lastMarkerLat, lastMarkerLng],12);
+      
+      this.magnifiedMap.addLayer(this.markerLoop);
+      this.layerGroup.addLayer(this.marker);
+   
+  }
+  
+   });
+  this.displayShapes(data[0].COLVALUE);
+
+  this.senarioParentName=data[0].COLVALUE;
+  this.simulationid=data[0].COLVALUE;
+
+  let obj:any={
+    senarioParentName:this.senarioParentName,
+    simulationid:this.simulationid,
+    Action:"DisplayFromSenario",
+    senariocount:this.senariocount,
+    senarioFlag:this.senarioFlag,
+    reportType:this.reportType
+
+
+  }
+  // this.senarioIdOutput.emit(this.senarioParentName);
+  this.navbarSimulId=obj;
+}
+// data.forEach(async (element: any, key: any) => {
+
+
+// }); 
+
+    }
+
+    getsenarioId(obj:any){
+      console.log("obj><><><<>",obj);
+      // this.Senario_reportType=obj.reportType;
+  
+      if(obj.action=="displaysenario"){
+      this.dataService.setsenarioID(obj.simulID);
+      // console.log('displaysenario>>>>>>>>>>>>',$("#displaysenario"));
+      // $("#displaysenario").click();
+      this.displaysenarioSequence();
+      }else if(obj.action=="addnewSenario"){
+        let parentSenario=localStorage.setItem("parentSenario",obj.simulID);
+      this.senarioParentName=obj.simulID;
+      this.addnewSenario()
+        // this.mapChanges=obj;
+          
+        // let obj22:any={
+        //   senarioParentName:this.senarioParentName,
+        //   simulationid:this.simulationid,
+        //   Action:"addnewMenu",
+        //   senariocount:this.senariocount,
+        //   senarioFlag:this.senarioFlag
+        
+        // }
+          
+        // // this.senarioIdOutput.emit(obj22);
+        // this.navbarSimulId=obj22;
+      }else if(obj.action=="addProperties"){
+  this.modalService.open(this.SimulInfo);
+  
+  $(".modal-content").css("width", "650px");
+  $(".modal-content").css("right", "200px");
+  $(".modal-content").css("padding", "10px");
+  $(".modal-content").css("top", "85px");
+  $(".modal-content").draggable({
+    axis: "both",
+    cursor: "move"
+  });
+  
+      }else  if(obj.action=="reset"){
+        this.clearShapes();
+  
+      }else if(obj.action=="nextAction"){
+  
+        // this.showTextMenu=!this.showTextMenu;
+        this.bars();
+  
+      }else if(obj.action=="refresh"){
+        this.test33();
+  
+      }else if(obj.action=="ShowHeader"){
+        this.ShowHeader=!this.ShowHeader;
+        this.showTextMenu=false;
+    
+      }
+      
+        }
+
+        CatchHeaderParam(param:any){
+          console.log("param",param);
+          this.Devices=param.Device;
+          this.reportType=param.TYPE;
+          this.selectedType=param.TYPE;
+          this.ImsiID=param.IMSI_ID;
+          this.DateTimeFrom=this.convertDate(param.dateTimeFrom);
+          this.DateTimeTo=this.convertDate(param.dateTimeTo);
+          console.log("this.dateTimeFrom-----",this.dateTimeFrom);
+          console.log("this.DateTimeTo-----",this.dateTimeTo);
+
+              }
+convertArray(input: any[]): { id: number, name: string }[] {
+      return input.map(item => ({
+        id: item[0],
+        name: item[1]
+      }));
+    }
+
+
+      convertDate(dateString:any) {
+      // Split the date and time parts
+      let [datePart, timePart] = dateString.split('T');
+      // Split the date part into year, month, and day
+      let [year, month, day] = datePart.split('-');
+      console.log("111111111111111----",[year, month, day]);
+      timePart = timePart.replace('Z', '');
+      // Format the date as MM/DD/YYYY
+      let formattedDate = `${month}/${day}/${year} ${timePart}`;
+    console.log("formattedDate----",formattedDate);
+      return formattedDate;
+    }
+    
+    
+    convertDate2(dateString: any) {
+      let [datePart, timePart] = dateString.split('T');
+      let [year, month, day] = datePart.split('-');
+      timePart = timePart.replace('Z', '');
+      let [hour, minute, second] = timePart.split(':');
+      let formattedDate = `${month}/${day}/${year} ${hour}:${minute}`;
+      console.log("formattedDate----", formattedDate);
+      return formattedDate;
+    }
+
+    openPropertiesForm(SimulID:any) {
+      this.PropertiesSimulID=SimulID;
+      // this.showPropertiesForm=true;
+    // this.showPropertiesForm=this.dataService.getopenProperties();
+    // console.log("this.showPropertiesForm---",this.showPropertiesForm);
+    this.modalService.open(this.showPropertiesForm);
+    
+    $(".modal-content").css("width", "650px");
+    $(".modal-content").css("right", "200px");
+    $(".modal-content").css("padding", "10px");
+    $(".modal-content").css("top", "85px");
+    $(".modal-content").draggable({
+      axis: "both",
+      cursor: "move"
+    });
+
+    console.log("fielDValue>>",$("#fielDValue"));
+  
+    }
+
+
+
+    generateColumns(csv: string): Array<any> {
+      return csv.split(',').map(header => ({
+        headerName: header,
+        field: header,
+        sortable: true,
+        filter: "agSetColumnFilter",
+        autoSizeColumns: true,
+        padding: 0,
+        sort: 'desc'
+      }));
+    }
+  
+    generateRowData(csvString: string, data: any[]) {
+      let rowdata:any=[];
+      const keys = csvString.split(',');
+  
+      data.forEach((item) => {
+        let jsonaggrid:any = {};
+        keys.forEach((key, index) => {
+          jsonaggrid[key] = item[index];
+        });
+        rowdata.push(jsonaggrid);
+      });
+      return rowdata;
+    }
 }
 
 

@@ -128,7 +128,7 @@ export class FormUpdateComponent implements OnInit {
           "createdBy":this.informationservice.getLogeduserId()
         };
         NewArrayUpdateJson.push(object);
-
+        console.log("NewArrayUpdateJson>>>>>>>>>>>>",NewArrayUpdateJson);
         this.http.post<any>(GlobalConstants.updateGridApi + this.objectId, NewArrayUpdateJson, { headers: GlobalConstants.headers }).subscribe(
           (res: any) => {
 
@@ -186,6 +186,7 @@ export class FormUpdateComponent implements OnInit {
                     if (i == deletedValues.length - 1) {
                       deleteJson += "{" + "\"" + "columnName" + "\"" + ":" + "\"" + deletedValues[i] + "\"" + "}";
                       deleteJson = "[" + deleteJson + "]";
+                      console.log("LLLLLLLLLLLLLLLLLLLLLLLLLL>>>>>>>>>>>>>>>>",this.informationservice.getLogeduserId());
 
                       object = {
                         "tableOwner": ownerName,
@@ -209,6 +210,7 @@ export class FormUpdateComponent implements OnInit {
                       if (i == addedValues.length - 1) {
                         insertJson += "{" + "\"" + "columnName" + "\"" + ":" + "\"" + addedValues[i] + "\"" + "}";
                         insertJson = "[" + insertJson + "]";
+                        console.log("LLLLLLLLLLLLLLLLLLLLLLLLLL>>>>>>>>>>>>>>>>",this.informationservice.getLogeduserId());
                         object = {
                           "tableOwner": ownerName,
                           "tableName": table,
@@ -226,7 +228,7 @@ export class FormUpdateComponent implements OnInit {
                       }
                     }
                   }
-
+                  console.log("NewArrayUpdateJson2>>>>>>>>>>",NewArrayUpdateJson);
                   this.http.post<any>(GlobalConstants.updateGridApi + this.objectId, NewArrayUpdateJson, { headers: GlobalConstants.headers }).subscribe(
                     (res: any) => {
                       if (res.status == 'Fail') {

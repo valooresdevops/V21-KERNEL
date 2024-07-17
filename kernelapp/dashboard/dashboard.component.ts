@@ -725,10 +725,8 @@ export class DashboardComponent implements OnInit {
                   }];}
             
               }else if(this.chartType == 'pie'){
-                  console.log(this.allData[i].data.records);
                   let pieData: any[]= [];
                   for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                    console.log(this.allData[i].data.records[j])
                     this.ids.push(this.allData[i].data.records[j].NAME);
                     this.names.push(Number(this.allData[i].data.records[j].Y));
                   }
@@ -737,7 +735,6 @@ export class DashboardComponent implements OnInit {
                   });
 
                   if(this.allData[i].is3d == 1){
-                    console.log('IS3D>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
                     const transformedData = this.allData[i].data.records.map((item:any) => [item.NAME, parseFloat(item.Y)]);
 
                     this.newChartObject  = [{
@@ -784,8 +781,7 @@ export class DashboardComponent implements OnInit {
                   Number(item.high_price),
                   Number(item.low_price),
                   Number(item.close_price)]);
-          
-          
+                    
                 this.newChartObject = [{
                   rangeSelector: {
                     selected: 1
@@ -850,6 +846,7 @@ export class DashboardComponent implements OnInit {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.volume)]);
+                  
                 this.newChartObject = [{
                   chart: {
                     alignTicks: false
@@ -908,56 +905,42 @@ export class DashboardComponent implements OnInit {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.close_price)]);
+
                 this.newChartObject = [{
-                  chart: {
-                    height: 400
-                  },
-                  credits: {
-                    enabled: false // Disable the credits link
-                  },
-          
-                  title: {
-                    text: this.allData[i].data.records[0].title
-                  },
-          
-                  subtitle: {
-                    text: 'Click small/large buttons or change window size to test ' +
-                      'responsiveness'
-                  },
-          
                   rangeSelector: {
                     selected: 1
-                  },
-          
-                  series: [{
+                },
+        
+                title: {
+                    text: this.allData[i].data.records[0].title
+                },
+        
+                series: [{
                     name: 'AAPL Stock Price',
                     data: transformedData1,
-                    type: 'area',
+                    type: 'areaspline',
                     threshold: null,
                     tooltip: {
-                      valueDecimals: 2
+                        valueDecimals: 2
+                    },
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [
+                                1,
+                                Highcharts.color(
+                                    Highcharts.getOptions().colors[0]
+                                ).setOpacity(0).get('rgba')
+                            ]
+                        ]
                     }
-                  }],
-          
-                  responsive: {
-                    rules: [{
-                      condition: {
-                        maxWidth: 500
-                      },
-                      chartOptions: {
-                        chart: {
-                          height: 300
-                        },
-                        subtitle: {
-                          text: null
-                        },
-                        navigator: {
-                          enabled: false
-                        }
-                      }
-                    }]
-                  }
-                }]
+                }]}]
               } else{
               }
               this.ids = [];

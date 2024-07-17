@@ -791,54 +791,36 @@ export class ChartBuilderFormComponent implements OnInit {
         Number(item.timestamp),
         Number(item.close_price)]);
       this.stockObject = [{
-        chart: {
-          height: 400
-        },
-        credits: {
-          enabled: false // Disable the credits link
-        },
-
-        title: {
-          text: this.data.records[0].title
-        },
-
-        subtitle: {
-          text: 'Click small/large buttons or change window size to test ' +
-            'responsiveness'
-        },
-
-        rangeSelector: {
-          selected: 1
-        },
-
-        series: [{
-          name: 'AAPL Stock Price',
-          data: transformedData1,
-          type: 'area',
-          threshold: null,
-          tooltip: {
-            valueDecimals: 2
-          }
-        }],
-
-        responsive: {
-          rules: [{
-            condition: {
-              maxWidth: 500
-            },
-            chartOptions: {
-              chart: {
-                height: 300
+          title: {
+              text: 'AAPL Stock Price'
+          },
+  
+          series: [{
+              name: 'AAPL Stock Price',
+              data: transformedData1,
+              type: 'areaspline',
+              threshold: null,
+              tooltip: {
+                  valueDecimals: 2
               },
-              subtitle: {
-                text: null
-              },
-              navigator: {
-                enabled: false
+              fillColor: {
+                  linearGradient: {
+                      x1: 0,
+                      y1: 0,
+                      x2: 0,
+                      y2: 1
+                  },
+                  stops: [
+                      [0, Highcharts.getOptions().colors[0]],
+                      [
+                          1,
+                          Highcharts.color(
+                              Highcharts.getOptions().colors[0]
+                          ).setOpacity(0).get('rgba')
+                      ]
+                  ]
               }
-            }
-          }]
-        }
+        }]
       }]
     } else {
       this.data = null;

@@ -1,0 +1,34 @@
+<div id="main">
+    <div id="timeline-container"></div>
+    <div id="formContainer" [class.hidden]="isHidden">
+        <form [formGroup]="form">
+            <!-- Dropdown to Select the Field to Display -->
+            <label for="fieldSelect">Select Field:</label>
+            <select id="fieldSelect" [(ngModel)]="selectedField" name="fieldSelect"
+                (change)="onFieldSelectChange($event)">
+                <option value="DeviceId">Device Id</option>
+                <option value="Simulation_name">Simulation Name</option>
+                <option value="Type">Type</option>
+            </select>
+            <br>
+
+            <!-- Conditionally Display Form Fields -->
+            <div *ngIf="selectedField === 'DeviceId'">
+                <label for="input1">Device Id:</label>
+                <input type="text" id="input1" formControlName="DeviceId">
+            </div>
+            <div *ngIf="selectedField === 'Simulation_name'">
+                <label for="input2">Simulation Name:</label>
+                <input type="text" id="input2" formControlName="Simulation_name">
+            </div>
+            <div *ngIf="selectedField === 'Type'">
+                <label for="selectOption">Select Option:</label>
+                <select id="selectOption" formControlName="Type">
+                    <option *ngFor="let type of simulationTypesArray" [value]="type[1]">{{ type[1] }}</option>
+                </select>
+            </div>
+        </form>
+        <button id="readValuesButton" (click)="readValues()">Submit</button>
+    </div>
+    <div id="report-container"></div>
+</div>

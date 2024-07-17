@@ -1,0 +1,22 @@
+
+<!-- <v-grid allowSideBar="true"
+ sizeColumnsToFit="true"
+     agToolBar="amd" 
+    agPrimaryKey="gridId" 
+    (onGridAdd)="onAddClick()" 
+    (onGridDelete)="onDeleteClick()"
+    (onGridUpdate)="onUpdateClick()">
+</v-grid> -->
+<v-grid
+allowSideBar="true"
+[dataApi]=""
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="amd"
+agPrimaryKey="QBE_ID,import_flag"
+agRowSelection="single"
+(onGridAdd)="onAddClick()"
+(onGridDelete)="onDeleteClick()"
+(onGridUpdate)="onUpdateClick()"
+></v-grid>

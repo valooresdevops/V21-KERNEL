@@ -2,26 +2,41 @@
   <v-tab tabTitle="Type">
 <form>
     <div class="example-list listContainer1">
-
-
-         <div class="box"  *ngFor="let options of newChartObject let i = index" >
-          <div class="chart-row"> 
-            <ng-container >
-              <div class="chart-container">
-                <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type,'c')"></v-highcharts>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4" *ngFor="let options of newChartObject; let i = index">
+              <div class="box" style="width: 100%;">
+                <div style="width: fit-content;"> 
+                  <ng-container>
+                    <div class="chart-container">
+                      <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type, 'c')"></v-highcharts>
+                    </div>
+                  </ng-container>
+                </div>    
               </div>
-            </ng-container>
-          </div>    
-        </div> 
-        <div class="box1"  *ngFor="let options of stockObject let i = index" >
-          <div class="chart-row"> 
-            <ng-container >
-              <div class="chart-container">
-                <v-highcharts-stocks [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.series[0].type, 's')"></v-highcharts-stocks>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6" *ngFor="let options of stockObject; let i = index">
+              <div class="box1" style="width: 100%;">
+                <div class="chart-row"> 
+                  <ng-container>
+                    <div class="chart-container" style="width: 100%;">
+                      <v-highcharts-stocks 
+                        [Highcharts]="Highcharts" 
+                        [options]="options" 
+                        (click)="nextTab(options.series[0].type, 's')">
+                      </v-highcharts-stocks>
+                    </div>
+                  </ng-container>
+                </div>    
               </div>
-            </ng-container>
-          </div>    
-        </div> 
+            </div>
+          </div>
+        </div>
     </div>
     <!-- <v-button  (click)="goNext()"  value="Next"></v-button> -->
 </form>
