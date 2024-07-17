@@ -16913,25 +16913,24 @@ if(this.senariocount==0){
   this.internalcode=this.simulationid;
 
 }
-if(this.reportType!=1 && this.reportType!=10 && this.reportType!=3 && this.reportType!=8 && this.reportType!=9 && this.reportType!=11){
+if(this.reportType!=="1" && this.reportType!=="10" && this.reportType!=="3" && this.reportType!=="8" && this.reportType!=="9" && this.reportType!=="11"){
   console.log('countrycode>>>>',this.countrycode);
-    
     if(typeof this.countrycode=="undefined"){
-
+      await this.datacrowdService.getALLcountryIDS().then(async (res:any)=>{
+        //console.log('getALLcountryIDS>>>>',res);
+  
+        this.countrycode=res;
+  
+         await this.datacrowdService.getcountry2(this.countrycode).then((res:any)=>{
+            //console.log('getcountry2>>>>',res);
+            this.countrycode=res;
+            this.countrycode=this.convertCountryCode(this.countrycode);
+            console.log("countrycode finall",this.countrycode)
+          })
+  
+      })
     }
-    await this.datacrowdService.getALLcountryIDS().then(async (res:any)=>{
-      //console.log('getALLcountryIDS>>>>',res);
-
-      this.countrycode=res;
-
-       await this.datacrowdService.getcountry2(this.countrycode).then((res:any)=>{
-          //console.log('getcountry2>>>>',res);
-          this.countrycode=res;
-          this.countrycode=this.convertCountryCode(this.countrycode);
-          console.log("countrycode finall",this.countrycode)
-        })
-
-    })
+  
   }
  
 
@@ -17346,7 +17345,7 @@ console.log("this.reportType  >>",typeof this.reportType)
 
 
     console.log("queryjson IIII  ",queryjson)
-if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && this.reportType!="10" ){
+if(this.reportType !=="11" && this.reportType!=="8" && this.reportType!=="9" && this.reportType!=="10" ){
     console.log('queryjson >>', queryjson);
 
 
