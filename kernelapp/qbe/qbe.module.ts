@@ -27,6 +27,8 @@ import { AddReportComponent } from './reportdesigner/add-report/add-report.compo
 import { RunReportParametersComponent } from './reportdesigner/run-report-parameters/run-report-parameters.component';
 import { ImportQueryComponent } from './query-builder/import-query/import-query.component';
 import { SecurityUserQueryComponent } from './query-builder/static-query-builder/security-query/security-user-query/security-user-query.component';
+import { ExecuteCqlQueryComponent } from './query-builder/cqlsh/execute-cqlquery/execute-cqlquery.component';
+import { AdvanceRowIdComponent } from './query-builder/cqlsh/advance-row-id/advance-row-id.component';
 @NgModule({
   declarations: [
     QbeComponent,
@@ -36,6 +38,7 @@ import { SecurityUserQueryComponent } from './query-builder/static-query-builder
     ParameterBuilderComponent,
     SavequeryComponent,
     ExecuteQueryComponent,
+    ExecuteCqlQueryComponent,
     ButtonRendererComponent,
     LinkQueryComponent,
     SecurityQueryComponent,
@@ -47,11 +50,11 @@ import { SecurityUserQueryComponent } from './query-builder/static-query-builder
     DataFilterComponent,
     ShowGeneratedQueryComponent,
     CqlshComponent,
+    AdvanceRowIdComponent,
     AddReportComponent,
     RunReportParametersComponent,
     ImportQueryComponent,
-    SecurityUserQueryComponent
-   
+    SecurityUserQueryComponent   
   ],
   imports: [
     ComponentsModule,

@@ -357,12 +357,13 @@ if(this.actionType=='update'){
 
   executeQuery() {
     this.query=this.myTextarea;
+    
     let info = {};
       info = {
         query: this.myTextarea,
         actionType: this.actionType,
       };
-    
+    console.log('info-------> : ',info)
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '700px';
     dialogConfig.height = '700px';

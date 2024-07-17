@@ -15,10 +15,10 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
 
 @Component({
   selector: 'app-execute-query',
-  templateUrl: './execute-query.component.html',
-  styleUrls: ['./execute-query.component.css']
+  templateUrl: './execute-cqlquery.component.html',
+  styleUrls: ['./execute-cqlquery.component.css']
 })
-export class ExecuteQueryComponent implements OnInit {
+export class ExecuteCqlQueryComponent implements OnInit {
   public agColumns: AgColumns[] = [];
   // public agColumnsJson:any = [];
   
@@ -46,30 +46,25 @@ export class ExecuteQueryComponent implements OnInit {
     public datepipe: DatePipe,
     private route: Router,
     public informationservice: InformationService) { }
+    public queryID:any; 
 
 
     public agColumnsJson: any = [];
 
   ngOnInit(): void {
-
+    if(this.informationservice.getAgGidSelectedNode() !=''){
+      this.queryID = JSON.parse(this.informationservice.getAgGidSelectedNode())[0].QBE_ID;
+    }else{
+      this.queryID = 0;
+    }
     this.http.post<any>(GlobalConstants.getParamSession+"paramAdd_"+sessionStorage.getItem("session_serial"),{}).subscribe(
       async (res: any) => {
         if (res.status == 'Fail') {
-console.log('FAIL')
         } else {
 
           for(let i = 0; i < res.length; i++) {
             console.log("PARAM>>>>>>>>",res[i]);
-         // if(res[i].paramType=="query"){
-          // const getSubQueriesApi=from(axios.get(GlobalConstants.getSubQueries+sessionStorage.getItem("session_serial")+"/"+res[i].paramDefault+"/"+this.informationservice.getLogeduserId()))
-          // const getSubQueries=await lastValueFrom(getSubQueriesApi);
-          // this.subQuery=getSubQueries.data[0].query;
-
-           // this.data.query=this.data.query.replaceAll("["+res[i].paramName+"]",this.subQuery);
-
-       //   }else{
           this.paramValForm.addControl(res[i].paramName, new UntypedFormControl(''));
-        //  }
           }
         this.parameters = res;
         console.log("THIS PARAMETERS>>>>>>>>>>",this.parameters);
@@ -89,44 +84,6 @@ console.log('FAIL')
         }
       });
   }
-
-  // execution(){
-  //   this.showExecGrid=true;
-
-  //   this.currentQuery=this.data.query;
-
-  //   if(this.formExists==true){
-
-  //     for(let i=0;i<this.parameters.length;i++){   
-  //       if(this.parameters[i].paramType!="query"){
-  //       this.currentQuery=this.currentQuery.replaceAll("["+this.parameters[i].paramName+"]","'"+this.paramValForm.get(this.parameters[i].paramName)?.value+"'");
-  //       }
-  //     }
-  //   }
-    
-  
-
-  //   this.http.get<any>(GlobalConstants.fetchDynamicHeaderData+"execHeads_"+sessionStorage.getItem("session_serial")).subscribe(
-  //     (res: any) => {
-  //       if (res.status == 'Fail') {
-  //         this.commonFunctions.alert("alert", res.description);
-  //       } else {
-          
-  //         for(let i = 0; i < res.length; i++) {
-  //           this.agColumnsJson.push({"headerName": res[i].headerName, "field": res[i].field});
-  //         }
-  //         this.agColumns.push(this.agColumnsJson);
-  //         this.currentQuery=btoa(this.currentQuery);
-
-  //         this.fetchDynamicData=GlobalConstants.fetchDynamicData +this.currentQuery;
-      
-  //       }
-
-  //     });
-     
-  //   this.agColumns.push(this.agColumnsJson);
-  // }
-
   async execution(){
     this.agColumnsJson=[];
     this.agColumns=[];
@@ -148,38 +105,46 @@ console.log('FAIL')
           let multiParam=this.paramValForm.get(this.parameters[i].paramName)?.value.replaceAll(",","','");
           this.currentQuery=this.currentQuery.replaceAll("["+this.parameters[i].paramName+"]","'"+multiParam+"'");
         }else{
-          this.currentQuery=this.currentQuery.replaceAll("["+this.parameters[i].paramName+"]","'"+this.paramValForm.get(this.parameters[i].paramName)?.value+"'");
+          //jpppppp
+          console.log('------>',this.parameters[i]);
+          if(this.parameters[i].paramType == 'text'){
+            this.currentQuery=this.currentQuery.replaceAll("["+this.parameters[i].paramName+"]","'"+this.paramValForm.get(this.parameters[i].paramName)?.value+"'");
+
+          }else{
+            this.currentQuery=this.currentQuery.replaceAll("["+this.parameters[i].paramName+"]",this.paramValForm.get(this.parameters[i].paramName)?.value);
+
+          }
         }
       }
 
       console.log("The current Query is>>>>>>>>",this.currentQuery);
 
-      console.log("The encoded Query is>>>>>>",btoa(this.currentQuery));
+      // console.log("The encoded Query is>>>>>>",btoa(this.currentQuery));
 
     }
-    
+console.log('jp----------------------------->',this.informationservice.getAgGidSelectedNode())
+    if(this.informationservice.getAgGidSelectedNode() !=''){
+      this.queryID = JSON.parse(this.informationservice.getAgGidSelectedNode())[0].QBE_ID;
+    }else{
+      this.queryID = 0;
+    }
+
+    // if(this.queryID == undefined || this.queryID == '' || this.queryID == null){
+    //   this.queryID = 0;
+    // }
       
-    // this.agColumnsJson.push({
-    //     headerName: '',
-    //     field: '',
-    //     checkboxSelection: true,
-    //     width: '25px',
-    //     headerCheckboxSelection: true
-    //   });
-      
-            this.http.get<any>(GlobalConstants.fetchDynamicHeaderData+"execHeads_"+sessionStorage.getItem("session_serial")).subscribe(
+            this.http.get<any>(GlobalConstants.cqlFetchDynamicHeaderData+"execHeads_"+sessionStorage.getItem("session_serial")+"/"+this.queryID).subscribe(
       (res: any) => {
         if (res.status == 'Fail') {
           this.commonFunctions.alert("alert", res.description);
         } else {
-          
           for(let i = 0; i < res.length; i++) {
             this.agColumnsJson.push({"headerName": res[i].headerName, "field": res[i].field});
           }
-          this.agColumns.push(this.agColumnsJson);
-          this.currentQuery=btoa(this.currentQuery);
 
-          this.fetchDynamicData=GlobalConstants.fetchDynamicData +this.currentQuery;
+          this.agColumns.push(this.agColumnsJson);
+          // this.currentQuery=btoa(this.currentQuery);
+          this.fetchDynamicData=GlobalConstants.cqlFetchDynamicData +this.currentQuery+"/"+this.queryID;
       
         }
 

@@ -1,0 +1,11 @@
+<v-grid  
+  allowSideBar="false"
+  [agColumns]="agColumns"
+  [paginationPageSize]="50"
+  agToolBar="ad"
+  [dataApi]="dataApi"
+  [allowPagination]="false"
+  [agOnGridEvents]="true"
+  (onGridEventSave)="gridEventSave($event)"
+  [showOrHideButton]="true">
+</v-grid>

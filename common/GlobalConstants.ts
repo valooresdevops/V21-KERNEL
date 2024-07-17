@@ -21,7 +21,7 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.10.10.78";
+  public static endPointAddress = "10.1.8.37";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -175,10 +175,12 @@ export class GlobalConstants {
   public static addQueryData = GlobalConstants.qbeGateway + 'api/addQueryData';
   public static deleteQueryData = GlobalConstants.qbeGateway + 'api/deleteQueryData/';
   public static validateQuery = GlobalConstants.qbeGateway + 'api/validateQuery/';
-  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery/';
+  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery';
 
   public static fetchDynamicData = GlobalConstants.qbeGateway + 'api/fetchDynamicData/';
   public static cqlFetchDynamicData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicData/';
+  public static cqlFetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicHeaderData/';
+
 
   public static fetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/fetchDynamicHeaderData/';
   public static addParamSession = GlobalConstants.qbeGateway + 'api/addParamSession/';
@@ -210,9 +212,6 @@ export class GlobalConstants {
   public static getQbeQueryCreatedBy =  GlobalConstants.qbeGateway + 'api/getQbeQueryCreatedBy/';
 
   
-
-
-  
   //---------REPORT BUILDER-----------////
   public static executeReport=GlobalConstants.qbeGateway + 'api/executeReport/';
   public static getReportsData=GlobalConstants.qbeGateway + 'api/getReportsData/';
@@ -225,6 +224,10 @@ export class GlobalConstants {
   public static updateReport=GlobalConstants.qbeGateway + 'api/updateReport/';
   public static checkParameters=GlobalConstants.qbeGateway + 'api/checkParameters/';
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
+  public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
+  public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+
+
 
 
   // --------------------------------------------------------------------------------
