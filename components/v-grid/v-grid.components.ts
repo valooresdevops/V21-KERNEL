@@ -785,30 +785,51 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
     }
 ////////////////////////////////////////////////////
   }
+onCellEditingStopped(event: any) {
+  let primaryKey = this.agPrimaryKey.toLowerCase();
+  let rowPrimaryKey = event.data[primaryKey];
+  let jsonRow = {...event.data }; // create a copy of the original object
 
-  onCellEditingStopped(event: any) {
+  if (typeof (rowPrimaryKey) === "undefined") {
+    rowPrimaryKey = "";
+  }
 
-    let primaryKey = this.agPrimaryKey.toLowerCase();
-    let rowPrimaryKey = event.data[primaryKey];
-    let jsonRow: any = JSON.stringify(event.data).slice(0, -1);
-
-    if (typeof (rowPrimaryKey) === "undefined") {
-      rowPrimaryKey = "";
-    }
-
-    for (let i = 0; i < this.gridModifiedRows.length; i++) {
-      if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
-        this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
-      }
-    }
-
-    jsonRow = jsonRow + ',' + '"modeType"' + ":" + '"~updateRow~"' + "}";
-    jsonRow = JSON.parse(jsonRow);
-    if (rowPrimaryKey != "") {
-      // Condition used to only take into consideration the Updated rows and not the added ones as well
-      this.gridModifiedRows.push(jsonRow);
+  for (let i = 0; i < this.gridModifiedRows.length; i++) {
+    if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
+      this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
     }
   }
+
+  jsonRow.modeType = "~updateRow~"; // add the new property
+
+  if (rowPrimaryKey!= "") {
+    // Condition used to only take into consideration the Updated rows and not the added ones as well
+    this.gridModifiedRows.push(jsonRow);
+  }
+}
+  // onCellEditingStopped(event: any) {
+
+  //   let primaryKey = this.agPrimaryKey.toLowerCase();
+  //   let rowPrimaryKey = event.data[primaryKey];
+  //   let jsonRow: any = JSON.stringify(event.data).slice(0, -1);
+
+  //   if (typeof (rowPrimaryKey) === "undefined") {
+  //     rowPrimaryKey = "";
+  //   }
+
+  //   for (let i = 0; i < this.gridModifiedRows.length; i++) {
+  //     if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
+  //       this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
+  //     }
+  //   }
+
+  //   jsonRow = jsonRow + ',' + '"modeType"' + ":" + '"~updateRow~"' + "}";
+  //   jsonRow = JSON.parse(jsonRow);
+  //   if (rowPrimaryKey != "") {
+  //     // Condition used to only take into consideration the Updated rows and not the added ones as well
+  //     this.gridModifiedRows.push(jsonRow);
+  //   }
+  // }
 
   addNewAgRow() {
     // Used to add a new line to the grid
@@ -1032,9 +1053,25 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
         if (this.staticData == -1) {
           
           try {
-            
-            const gridDataApi = gridParam == "" ? from(axios.get(this.dataApi)) : from(axios.post(this.dataApi, gridParam));
-            // const gridDataApi = from(axios.post(this.dataApi, gridParam));
+            const gridDataApi = gridParam === "" 
+  ? from(axios.get(this.dataApi)) 
+  : from(axios.post(this.dataApi, gridParam));
+
+gridDataApi.subscribe(
+  response => {
+    console.log('Data fetched successfully:', response.data);
+  },
+  error => {
+    console.error('Error fetching data:', error);
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    }
+  }
+);
+            // console.log("data apiiiiiiiiiiiiiiiii isssssssss::::",axios.get(this.dataApi));
+            // const gridDataApi = gridParam == "" ? from(axios.get(this.dataApi)) : from(axios.post(this.dataApi, gridParam));
+            // // const gridDataApi = from(axios.post(this.dataApi, gridParam));
             const gridData = await lastValueFrom(gridDataApi);
 
             if (this.rowModelType == 'clientSide') {

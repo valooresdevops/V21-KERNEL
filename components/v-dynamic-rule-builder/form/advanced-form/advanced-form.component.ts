@@ -236,8 +236,10 @@ export class AdvancedFormComponent implements OnInit {
           values: this.conditions,
         },
         editable: true,
-        cellDataType: true
+        cellDataType: true,
+        cellClass: 'ag-rich-select-list, ag-rich-select-list-item, ag-rich-select-list-item:hover'
       },
+      
       {
         headerName: 'Value',
         field: 'value',
@@ -360,29 +362,70 @@ console.log("event >>>>>>> ",event);
   }
 }
 
+// class DropdownCellRenderer {
+//   setValues(filteredValues: any) {
+//     throw new Error('Method not implemented.');
+//   }
+//   eGui: any;
+
+//   init(params: any) {
+//     if (params.value != undefined) {
+//       if (params.value.name != undefined) {
+//         this.eGui = document.createElement('div');
+//         this.eGui.innerHTML = `<span style="position:fixed;background-color: yellow; text-overflow: ellipsis; z-index: 9999999999999999999999999 !important;">${params.value.name}</span>`;
+//       } else {
+//         this.eGui = document.createElement('div');
+//         this.eGui.innerHTML = `<span style="overflow: hidden;background-color: yellow;position:fixed;top:0; text-overflow: ellipsis; z-index: 9999999999999999999999999 !important;">${params.value}</span>`;
+//       }
+//     }
+//   }
+//   getGui() {
+//     return this.eGui;
+//   }
+//   refresh(params: any) {
+//     return false;
+//   }
+// }
 class DropdownCellRenderer {
-  setValues(filteredValues: any) {
-    throw new Error('Method not implemented.');
-  }
-  eGui: any;
+  eGui: HTMLElement | null = null;
 
   init(params: any) {
-    if (params.value != undefined) {
-      if (params.value.name != undefined) {
-        this.eGui = document.createElement('div');
-        this.eGui.innerHTML = `<span style="overflow: hidden; text-overflow: ellipsis">${params.value.name}</span>`;
-      } else {
-        this.eGui = document.createElement('div');
-        this.eGui.innerHTML = `<span style="overflow: hidden; text-overflow: ellipsis">${params.value}</span>`;
-      }
+    if (params.value !== undefined) {
+      const span = document.createElement('span');
+      span.style.cssText = `
+        
+        
+        background-color: #f0f0f0 !important; /* Green background */
+        color: #333 !important; /* Dark text color */
+        border-radius: 5px !important; /* Rounded corners */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; /* Subtle shadow for depth */
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important; /* Ensure content is visible outside */
+        z-index: 2147483646 !important; /* Ensure it's on top */
+        position: absolute !important; /* Adjusted to ensure visibility */
+        top:100 !important;
+        margin-bottom:10% !important;
+      `;
+
+      span.textContent = params.value.name !== undefined ? params.value.name : params.value;
+
+      this.eGui = document.createElement('div');
+      this.eGui.style.cssText = `
+        position: absolute; /* Ensure absolute positioning */
+        top: 0; /* Adjust positioning as needed */
+        left: 0; /* Adjust positioning as needed */
+        bottom:20;
+      `;
+      this.eGui.appendChild(span);
     }
   }
+
   getGui() {
-    return this.eGui;
+    return this.eGui!;
   }
+
   refresh(params: any) {
     return false;
   }
 }
-
-

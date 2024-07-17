@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModules } from '../../custom-modules/common.module'
 import { ComponentsModule } from './../../components/components.module';
 import { InDisplayRoutingModule } from './in-display-routing.module';
-
+import { BrowserModule } from '@angular/platform-browser';
 import { FormBuilderComponent } from './form-builder/form-builder.component';
 import { ScreenBuilderComponent } from './screen-builder/screen-builder.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -39,6 +39,10 @@ import { KpiBuilderPreviewComponent } from './object-builder/kpi-builder-preview
 import { OrderManagementComponent } from './form-builder/order-management/order-management.component';
 import { ChartFromKpiBuilderComponent } from './object-builder/chart-from-kpi-builder/chart-from-kpi-builder.component';
 import { CustomFieldComponent } from './form-builder/custom-field/custom-field.component';
+import { MasterLinkAnalysisComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-analysis.component';
+import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
+import { ExecutedReportsComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports.component';
+import { ExecutedReportsFormComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports-form/executed-reports-form.component';
 
 @NgModule({
     declarations: [
@@ -75,7 +79,11 @@ import { CustomFieldComponent } from './form-builder/custom-field/custom-field.c
         KpiBuilderPreviewComponent,
         OrderManagementComponent,
         ChartFromKpiBuilderComponent,
-        CustomFieldComponent
+        CustomFieldComponent,
+        MasterLinkAnalysisComponent, 
+        MasterLinkFormComponent,
+        ExecutedReportsComponent,
+        ExecutedReportsFormComponent,
     ],
     imports: [
         InDisplayRoutingModule,
@@ -86,7 +94,11 @@ import { CustomFieldComponent } from './form-builder/custom-field/custom-field.c
         CKEditorModule,
         CommonModules,
         // AgGridModule.withComponents([]),
-        AgGridModule
-    ]
+        AgGridModule,
+        BrowserModule,
+        AgGridModule , 
+    ] ,
+    exports: [MasterLinkFormComponent, 
+    ],
 })
 export class InDisplayModule { }

@@ -20,7 +20,9 @@ import { RatioBuilderFormComponent } from './object-builder/ratio-builder-form/r
 import { ChartBuilderTypeComponent } from './object-builder/chart-builder-type/chart-builder-type.component';
 import { GridBuilderComponent } from './object-builder/grid-builder/grid-builder.component';
 import { GridBuilderFormComponent } from './object-builder/grid-builder-form/grid-builder-form.component';
-
+import { MasterLinkAnalysisComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-analysis.component';
+import { ExecutedReportsComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports.component';
+import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
 const routes: Routes = [
    {
       path: 'augmentedConfig',
@@ -185,7 +187,52 @@ const routes: Routes = [
             component: DynamicScreenComponent
          }
       ]
-   }
+   },
+   {
+      path: 'masterLink',
+      data: { breadcrumb: 'Master Link '},
+      children: [
+         {
+            path: '',
+            component: MasterLinkAnalysisComponent
+         }, {
+            path: 'add',
+            component: MasterLinkFormComponent
+         },
+      ]
+   },
+   {
+      path: 'executedReports',
+      data: { breadcrumb: 'Executed Reports '},
+      children: [
+         {
+            path: '',
+            component: ExecutedReportsComponent
+         },
+      ]
+   },
+   // {
+   //    path: 'knowledgeGraph',
+   //    data: { breadcrumb: 'Knowledge Graph' },
+   //    children: [
+   //       {
+   //          path: 'masterLink',
+   //          component: MasterLinkAnalysisComponent,
+   //       },
+   //       {
+   //          data: { breadcrumb: 'Executed Reports'},
+   //          path: 'executedReports',
+   //          component: ExecutedReportsComponent,
+   //          // children:[
+   //          //    {
+   //          //       path:'',
+   //          //       component:GridBuilderFormComponent
+   //          //    },
+   //          // ]
+   //       }
+   //    ]
+   // },
+   
 ]
 
 
