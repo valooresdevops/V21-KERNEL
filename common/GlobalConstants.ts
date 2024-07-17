@@ -17,11 +17,12 @@ export class GlobalConstants {
   public static headers = new HttpHeaders().set('Content-Type', 'application/json');
   public static loginHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
   // --------------------------------------------------------------------------------
-  // -- Globally used parameterspublic
+  // -- Globally used parameterspublic--1
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.1.8.16";
+
+  public static endPointAddress = window.location.hostname;
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -416,8 +417,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateQueryForm = GlobalConstants.inDispGatewat + 'api/updateQueryForm';
 
 //datacrowd
-public static  ipAddressDataCrowd = "https://"+ GlobalConstants.endPointAddress +":8088";
-public static ipAddress = "https://"+ GlobalConstants.endPointAddress +":8088";
+public static  ipAddressDataCrowd = "http://"+ GlobalConstants.endPointAddress +":8088";
+public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
 

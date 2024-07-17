@@ -1,0 +1,71 @@
+<form [formGroup]="form">
+  <div class="row">
+  
+  
+      <div >
+      <v-input formControlName="dateTimeFrom" [required]="true" [parentForm]="form" label="dateTimeFrom"
+              type="datetime-local" id="dateTimeFrom" fieldName="dateTimeFrom"></v-input>
+              
+               <v-input formControlName="dateTimeTo" [required]="true" [parentForm]="form" label="dateTimeTo"
+              type="datetime-local" id="dateTimeTo" fieldName="dateTimeTo"></v-input>
+            
+            
+            
+              <v-dropdown formControlName="TYPE" [required]="true" 
+              [dataJSON]="simulationtype" id="TYPE" label="TYPE" [parentForm]="form"
+              fieldName="TYPE"  (onChangeEvent)="changeType($event)"></v-dropdown>
+     
+  
+              <div  *ngIf="selectedType == 2 ||selectedType == 6||selectedType == 7">
+                  <div *ngIf="selectedType == 2 ||selectedType == 7 ">
+                   
+                    <v-input formControlName="Device" [required]="true" [parentForm]="form" label="Device"
+                    type="text" id="Device" fieldName="Device"></v-input>
+                  
+                  </div> 
+                
+                    <!-- <label for="country" style="font-weight: bold; font-size: 14px;">Country</label><br>
+                    <input type="text" id="country" formControlName="countryValue">
+                  -->
+                  <v-input formControlName="countryValue" 
+                  [parentForm]="form" type="lookup" [lookupStaticData]="getAllProcAndPack" id="countryValue"
+                  lookupWidth="700px" lookupHeight="700px" label="Country" fieldName="countryValue" lookupSelection="multiple">
+                </v-input>
+           
+              
+                
+                    </div>
+                  
+                 
+                        <div *ngIf="selectedType == 7" >
+                
+                            
+                         
+                            <v-input formControlName="MeterFrom" [required]="true" [parentForm]="form" label="MeterFrom"
+                            type="text" id="MeterFrom" fieldName="MeterFrom"></v-input> 
+                              <v-input formControlName="MeterTo" [required]="true" [parentForm]="form" label="MeterTo"
+                              type="text" id="MeterTo" fieldName="MeterTo"></v-input>
+                            
+                            <v-input formControlName="TimeLimit" [required]="true" [parentForm]="form" label="TimeLimit"
+                            type="text" id="TimeLimit" fieldName="TimeLimit"></v-input>
+                           
+      
+                          </div> 
+                             <div *ngIf="selectedType == 11" >
+                              <v-input formControlName="IMSI_ID" [required]="true" [parentForm]="form" label="IMSI_ID"
+                            type="text" id="IMSI_ID" fieldName="IMSI_ID"></v-input>
+                           
+      
+                                 
+                                  </div>  <div *ngIf="selectedType == 13" >
+                                    <v-input formControlName="GROUPS" [required]="true" [parentForm]="form" label="GROUPS"
+                                    type="text" id="GROUPS" fieldName="GROUPS"></v-input>
+                                   
+              
+                                      
+                                  </div>    
+      </div>   
+   </div>
+  
+  </form>
+  <button id="SendData" style="display:none;" (click)="sendparam()"></button> 

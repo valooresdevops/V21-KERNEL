@@ -31,6 +31,7 @@ export class NewTabComponent implements OnInit {
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
   public isQueryForm: any;
+  public hasMultipleSelection: any;
   public isDynamicReport: any;
   public actionType: any;
   public menuName: any;
@@ -50,6 +51,7 @@ export class NewTabComponent implements OnInit {
     orderField: new UntypedFormControl(''),
     isGrid: new UntypedFormControl(''),
     isQueryForm: new UntypedFormControl(''),
+    hasMultipleSelection: new UntypedFormControl(''),
     isDynamicReport: new UntypedFormControl(''),
     readOnlyQbeId: new UntypedFormControl(''),
     isAdvancedSearch: new UntypedFormControl(''),
@@ -293,6 +295,7 @@ export class NewTabComponent implements OnInit {
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
+          hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -310,9 +313,10 @@ export class NewTabComponent implements OnInit {
         };
         List.push(jsonParams);
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
+        this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
         this.isDynamicReport = this.newTabForm.controls['isDynamicReport']?.value;
-
+        
         // }
 
         this.http.post<any>(GlobalConstants.createTabApi, List, { headers: GlobalConstants.headers }).subscribe(
@@ -340,6 +344,7 @@ export class NewTabComponent implements OnInit {
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
           isMain: this.isMainTab,
@@ -410,6 +415,12 @@ export class NewTabComponent implements OnInit {
           this.newTabForm.controls['isDynamicReport'].setValue(false);
         } else {
           this.newTabForm.controls['isDynamicReport'].setValue(true);
+        }
+
+        if (res[0].hasMultipleSelection == "0") {
+          this.newTabForm.controls['hasMultipleSelection'].setValue(false);
+        } else {
+          this.newTabForm.controls['hasMultipleSelection'].setValue(true);
         }
 
         if (res[0].isQueryForm == "0") {

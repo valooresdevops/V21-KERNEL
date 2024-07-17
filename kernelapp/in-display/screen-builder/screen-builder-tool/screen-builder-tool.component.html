@@ -4,7 +4,7 @@
     <div [class]="showRightButtons ? 'col-lg-8' : 'col-lg-12'" [attr.colspan]="showRightButtons ? '1' : '2'">
 
       <ng-container>
-        <div cdkDropList class="example-list listContainer" (cdkDropListDropped)="drop($event)">
+        <div cdkDropList class="example-list listContainer" style="margin-: 20px;" (cdkDropListDropped)="drop($event)">
 
 
           <div class="example-box columnsGrid" *ngFor="let item of itemsData;let i = index" cdkDrag>
@@ -14,54 +14,34 @@
                   (click)="removeScreenElement(item.id)">
                 </v-button>
               </div>
+
               <div class="listContainerCol mx-auto text-center" style="width: fit-content;">
-                <ng-container *ngIf="item.type === 'Chart' || item.type === 'Stock'; then chart"></ng-container>
+                <ng-container *ngIf="item.type === 'Chart'; then chart"></ng-container>
                 <div>
                   <ng-template #chart>
                     <div class="charts-grid">
-                      <div class="box" *ngFor="let items1 of item.formData">
-                        <div class="chart-row">
-                          <ng-container>
-                            <div class="chart-container" >
-                              <div *ngIf="item.number == 1 || item.number == 2 || item.number == 3 || item.number == 4 || item.number == 5 || item.number == 6 || item.number == 7 || item.number == 8 || item.number == 9">
-                                <v-highcharts [Highcharts]="Highcharts" [options]="items1"></v-highcharts>
-                              </div>
-                              
-                              <div *ngIf="item.number > 9">
-                                <v-highcharts-stocks [Highcharts]="Highcharts" [options]="items1"></v-highcharts-stocks>
-                              </div>
-                            </div>
-                          </ng-container>
-                        </div>
+                      <div class="chart-container" *ngFor="let items1 of item.formData">
+                        <ng-container *ngIf="items1.type === 'Stock'; then StockTemplate else ChartTemplate"></ng-container>
+              
+                        <ng-template #ChartTemplate>
+                          <v-highcharts [Highcharts]="Highcharts" [options]="items1"></v-highcharts>
+                        </ng-template>
+              
+                        <ng-template #StockTemplate>
+                          <v-highcharts-stocks [Highcharts]="Highcharts" [options]="items1"></v-highcharts-stocks>
+                        </ng-template>
                       </div>
-                      </div>
+                    </div>
                   </ng-template>
                 </div>
-
-                <!-- <div>
-                  <ng-container *ngIf="item.type === 'Stock' ; then stock"></ng-container>
-                  <ng-template #stock>
-                    <div class="charts-grid">
-                      
-                      <div class="box" *ngFor="let items of item.formData">
-                          <div class="chart-row">
-                            <ng-container>
-                              <div class="stock-container">
-                                <v-highcharts-stocks [Highcharts]="Highcharts" [options]="items"></v-highcharts-stocks>
-                              </div>
-                            </ng-container>
-                          </div>
-                      </div>
-                      </div>
-                  </ng-template>
-                </div> -->
               </div>
+              
 
 
 
-                <ng-container *ngIf="item.type === 'Kpi'; then KpiTemplate"></ng-container>
-                <ng-template #KpiTemplate>
-                  <div class="listContainerColKpi" style="margin-right: 35%;">
+              <ng-container *ngIf="item.type === 'Kpi'; then KpiTemplate"></ng-container>
+              <ng-template #KpiTemplate>
+                <div class="listContainerColKpi" style="margin-right: 35%;">
 
                   <div>
                     <div style="width: 100%;text-align: center;">
@@ -95,12 +75,12 @@
                     <v-button style="font-size: 16px;margin: 0px 5px;" [fontawesome]="'fa fa-th kpi_title_color'"
                       (click)="openGrid(item)"></v-button>
                   </div>
-</div>
-                </ng-template>
+                </div>
+              </ng-template>
 
 
 
-                  <div class="listContainerCol">
+              <div class="listContainerCol">
 
 
 

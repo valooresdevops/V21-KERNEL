@@ -18,7 +18,7 @@ export class DynamicScreenComponent implements OnInit {
     private http: HttpClient) { }
 
   ngOnInit(): void {
-    this._Activatedroute.paramMap.subscribe((params) => {
+    this._Activatedroute.paramMap.subscribe((params:any) => {
       this.menuVariable = params.get('menuVariable');
     });
     

@@ -176,3 +176,20 @@ button {
   transform: translateY(10px);
   z-index: 9999999999;
 } */
+
+
+#simulation2 {
+  display: flex;
+  justify-content: flex-end; /* Align items to the right */
+  position: absolute;
+  top: 62px;
+  right: 36px;
+}
+
+
+
+#simulation2 .menu-trash {
+  background: none;
+  border: none;
+  cursor: pointer;
+}

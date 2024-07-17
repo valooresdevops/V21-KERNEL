@@ -1,11 +1,22 @@
-<input type="text" style="width: 90%;" [(ngModel)]="searchTerm" (input)="applySearch()" placeholder="Search...">
+<div class="input-container">
+  <!-- <span style="margin: 10px;"><i class="fa-solid fa-caret-down" style="color: #616161;"></i></span> -->
+  <span style="margin: 10px;"  (click)="toggleDropdown()"><i class="fa-solid fa-caret-down" style="color: #616161;"></i></span>
+ 
+    <!-- <button (click)="toggleDropdown()" class="dropbtn">Dropdown</button> -->
+ 
+
+  <input type="text" [(ngModel)]="searchTerm" (input)="applySearch()" placeholder="Search...">
+</div>
 
 
 <div style="height: 300px; overflow: auto;"  #datatable>
+  <div id="myDropdown" [ngClass]="{'dropdown-content': true, 'show': isDropdownOpen}" >
+   <span  *ngFor="let deviceId of routeDevices" (click)="DeviceIdclicked(deviceId)">{{deviceId}}</span>
+  </div>
   <table id="table">
     <thead>
       <tr>
-        <th *ngFor="let column of tableColumns" (click)="applySort(column)">
+        <th [ngStyle]='getColumnStyle(column)' *ngFor="let column of tableColumns" (click)="applySort(column)">
           {{ column }}
           <span *ngIf="sortColumn === column">
             {{ sortDirection === 'desc' ? '▲' : '▼' }}
@@ -15,7 +26,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of filteredData | searchFilter : searchText  | paginate: config" (click)="rowClicked(item)">
-        <td *ngFor="let column of tableColumns">
+        <td  [ngStyle]='getColumnStyle(column)' *ngFor="let column of tableColumns">
             {{ item[column] }}
         </td>
       </tr>
@@ -31,4 +42,3 @@
 
 
 </div>
-

@@ -247,7 +247,7 @@ export class InputComponent implements ControlValueAccessor {
       height: this.lookupHeight,
       data: data 
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result:any) => {
       if (result) {
         
         this.parentForm?.controls[this.fieldName].setValue(localStorage.getItem('agGidSelectedLookup_(' + this.fieldName + ')_id'));

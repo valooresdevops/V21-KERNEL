@@ -7,12 +7,15 @@
 </div>
   <div *ngIf="test_1 == '1'">
     <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery == '-1'" allowSideBar="true"
+    [agRowSelection]="selectionType"
       [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true"
       [paginationPageSize]="8" [dataApi]="previewGridApi" [dataApiParam]="previewGridApiParam"
       (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()" [isAdvancedSearch]="tableOption.isAdvancedSearch">
     </v-grid>
 
-    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1'" allowSideBar="true"
+    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1'" 
+    [agRowSelection]="selectionType"
+    allowSideBar="true"
       [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true"
       [paginationPageSize]="8" [dataApiParam]="previewGridApiParam" [staticData]="gridStaticData"
       (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()" [isAdvancedSearch]="tableOption.isAdvancedSearch">
