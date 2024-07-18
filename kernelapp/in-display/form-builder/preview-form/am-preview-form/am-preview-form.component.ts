@@ -1572,7 +1572,7 @@ export class AmPreviewFormComponent implements OnInit {
                     else if (action == "Show Button") {
                     ////elie///////
                     executeOnFieldAdv = ruleData[i].data;
-                    
+
                     }
                     //////////
                     else if (action == "Execute Query") {
@@ -2860,7 +2860,6 @@ console.log("dateTypes=",dateTypes);
                       //   comparedField = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       // }
                     }
-console.log("comparedField =",comparedField);
                   } else if (ruleData[i].step == 202) {
                     if (ruleData[i].data != "") {
                       // comparedToField = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -3063,15 +3062,15 @@ console.log("conditionValue=",conditionValue);
 
                       //jppppppppppp
                       let testIds = Array.isArray(ruleData[i].data) ? ruleData[i].data : [ruleData[i].data];
-                    
+
                       let data = this.test.filter((el: any) => {
                         return testIds.includes(el.id);
                       });
-                    
+
                       let defaultFields = data.map(el => el.name);
-                    
+
                       defaultField = defaultFields.join(', ');
-                                        
+
                     }
                   } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
@@ -5055,7 +5054,7 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
       }
       console.log("IS GRID 1st LAST>>>>",isGrid);
 
-      
+
     }
       /////////////////////////////////////////////////
       ///////////////////////////////////////////////
@@ -6141,7 +6140,7 @@ console.log("befor calling the load rules");
     for (let j = 0; j < fieldNames.length; j++) {
         const currentFieldName = fieldNames[j].trim();
     for (let i = 0; i < this.test.length; i++) {
-      
+
       if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
         localStorage.setItem("signatureImage",value);
         this.oldsignature = value;
@@ -6190,15 +6189,16 @@ console.log("befor calling the load rules");
   }
 
   async loadFieldDependencyForForm() {
-
+console.log('objectId------>',this.objectId)
     const getFieldDependenciesUrl = from(axios.post(GlobalConstants.getFieldDependencies + this.objectId));
     const getFieldDependencies = await lastValueFrom(getFieldDependenciesUrl);
     let data = getFieldDependencies.data;
+    console.log('data---------->',data)
 
 
     let fieldName: string = '';
     for (let i = 0; i < data.length; i++) {
-
+console.log('COLUMN_ID---->',data[i].COLUMN_ID)
 
       if ($("#field_" + data[i].COLUMN_ID).length > 0) {
         fieldName = $("#field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
@@ -7137,6 +7137,8 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               dynamicTable: jsonData
             }];
 
+            console.log("jsonData ------------ > " , jsonData);
+            console.log("jsonVal  ------------ > " , jsonVal);
             this.ruleCallApiData=JSON.stringify(this.handleSelectedRowIds(this.amInfo.selectedRowId, "form,button"));
 
             this.http.post<any>(GlobalConstants.updateDynForm, jsonVal, { headers: GlobalConstants.headers }).subscribe(

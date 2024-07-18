@@ -21,7 +21,7 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.1.8.12";
+  public static endPointAddress = "10.1.8.21";
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -131,7 +131,7 @@ export class GlobalConstants {
   public static getInDisplayLogs  = GlobalConstants.usmGateway + 'api/getInDisplayLogs/';
   public static getInDisplayLogsDetails  = GlobalConstants.usmGateway + 'api/getInDisplayLogsDetails/';
 
-  
+
   // --------------------------------------------------------------------------------
   // -- CDS APIs used in the application
   // --------------------------------------------------------------------------------
@@ -209,10 +209,10 @@ export class GlobalConstants {
   public static deleteQbeSecurityChanges =  GlobalConstants.qbeGateway + 'api/deleteQbeSecurityChanges';
   public static getQbeQueryCreatedBy =  GlobalConstants.qbeGateway + 'api/getQbeQueryCreatedBy/';
 
-  
 
 
-  
+
+
   //---------REPORT BUILDER-----------////
   public static executeReport=GlobalConstants.qbeGateway + 'api/executeReport/';
   public static getReportsData=GlobalConstants.qbeGateway + 'api/getReportsData/';
@@ -307,8 +307,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
 
-  
-  
+
+
   // ----------------------IN DISPLAY: SCREEN BUILDER------------------------------------------------------------------------\
   public static getDBRGrid = GlobalConstants.inDispGatewat + 'api/getDBRGrid/';
   public static getDBRGridByRuleActionAndColumnId = GlobalConstants.inDispGatewat + 'api/getDBRGridByRuleActionAndObjectId/';

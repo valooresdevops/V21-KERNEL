@@ -165,7 +165,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
           $(".context-menu").addClass("hidden");
           $("#context_" + tab.tabId).removeClass("hidden");
         }
-        
+
 
         if(this.informationservice.getClickedTab()==null){
         this.informationservice.setClickedTab(tab.title);
@@ -200,7 +200,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
 
           this.informationservice.setTabpath(JSON.stringify(tabJson));
         }
-        
+
       } else {
         let selectedTab: any = tab;
         if (tab.isForIndisplayModify == 1 || tab.isForIndisplayDelete == 1) {
@@ -211,7 +211,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
         // activate the tab the user has clicked on.
         selectedTab[0].active = true;
         this.informationservice.setSelectedTabName(selectedTab[0].title);
-        
+
         this.informationservice.setSelectedTabId(selectedTab[0].tabId);
       }
       this.eventEmitterService.onTabActionClickFn();

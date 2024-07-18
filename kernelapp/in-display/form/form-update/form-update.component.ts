@@ -39,6 +39,7 @@ export class FormUpdateComponent implements OnInit {
     tables: new UntypedFormControl(''),
     columns: new UntypedFormControl(['']),
     order: new UntypedFormControl(''),
+    descriptionent: new UntypedFormControl(''),
   });
   ngOnInit(): void {
 
