@@ -21,12 +21,8 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-<<<<<<< HEAD
-  public static endPointAddress = "10.1.8.21";
-=======
 
   public static endPointAddress = window.location.hostname;
->>>>>>> ef884cf4b91005347bb3b5d8fc96a7bb73c6c6b3
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
