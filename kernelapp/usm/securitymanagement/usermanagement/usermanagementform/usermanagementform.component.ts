@@ -344,7 +344,7 @@ export class Usermanagementform implements OnInit {
             });
             formData.append('media', f);
           }
-
+          console.log("INFORMATION SERVICE>>>>>>>>>>>>>",this.informationservice.getLogeduserId());
           formData.append('username', this.userForm.get('username').value);
           formData.append('password', newPassword);
           formData.append('firstName', this.userForm.get('firstName').value);

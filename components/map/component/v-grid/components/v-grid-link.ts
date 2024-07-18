@@ -3,7 +3,7 @@ import { AgRendererComponent } from 'ag-grid-angular';
 
 @Component({
     template: `<span *ngIf="params.accessRightParam == '0'">{{params.value}}</span>
-        <a *ngIf="params.accessRightParam == '1'" class="ag-row-hyperlink" routerLink="url" >{{params.value}}</a>`
+        <a *ngIf="params.accessRightParam == '1'" class="ag-row-hyperlink" [routerLink]="url">{{params.value}}</a>`
 })
 export class LinkCellRenderer implements AgRendererComponent {    
     params: any;

@@ -120,7 +120,7 @@
                      [groupAllowUnbalanced]="true"
                      >
     </ag-grid-angular>
-    <form style="position: absolute;" [formGroup]="paginationChange" *ngIf="allowPagination">
+    <form style="position: relative;" [formGroup]="paginationChange" *ngIf="allowPagination">
         <v-dropdown id="paginationSizeToggle" 
                     (onChangeEvent)="changeGridPagination()" 
                     formControlName="value" 

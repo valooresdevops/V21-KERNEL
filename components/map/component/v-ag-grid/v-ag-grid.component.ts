@@ -79,12 +79,19 @@ public groupDefaultExpanded = -1;
   }
   @ViewChild('popup') popup: any;
   ngOnInit(): void {
-
+console.log("rowData-------",this.rowData);
     //console.log('rowdata>>>',this.rowData);
     if(localStorage.getItem('multiselection')){
       this.multiselection=JSON.parse(localStorage.getItem('multiselection'));
     }
-   
+   if(this.treeData==true){
+        this.groupDefaultExpanded=-1;
+      
+      }else{
+      
+        this.groupDefaultExpanded=0;
+      
+      }
 
   }
   frameworkComponents = {
@@ -102,9 +109,27 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
       // custom item
       name: 'Copy',
       action: () => {
-        //console.log('params>>>', params);
-        //console.log('params>>>', params.node.key);
-        navigator.clipboard.writeText(params.value);
+         // Check if navigator.clipboard is available and we're in a secure context
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(params.node.key)
+        .then(() => console.log('Copying to clipboard was successful!'))
+        .catch(err => console.error('Failed to copy text: ', err));
+    } else {
+      console.warn('Clipboard API is not available in this context.');
+      // Inline fallback method if Clipboard API is not available
+      const textarea = document.createElement("textarea");
+      textarea.textContent = params.node.key;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        console.log('Copying to clipboard using fallback method.');
+      } catch (error) {
+        console.error("Fallback copy to clipboard failed.", error);
+      }
+    }
+        
       },
       cssClasses: ['redFont', 'bold'],
     },
@@ -129,9 +154,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
         // custom item
         name: 'Copy',
         action: () => {
-          //console.log('params>>>', params);
-          //console.log('params>>>', params.node.key);
-          navigator.clipboard.writeText(params.value);
+          // Check if navigator.clipboard is available and we're in a secure context
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(params.node.key)
+              .then(() => console.log('Copying to clipboard was successful!'))
+              .catch(err => console.error('Failed to copy text: ', err));
+          } else {
+            console.warn('Clipboard API is not available in this context.');
+            // Inline fallback method if Clipboard API is not available
+            const textarea = document.createElement("textarea");
+            textarea.textContent = params.node.key;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+              document.execCommand("copy");
+              document.body.removeChild(textarea);
+              console.log('Copying to clipboard using fallback method.');
+            } catch (error) {
+              console.error("Fallback copy to clipboard failed.", error);
+            }
+          }
         },
         cssClasses: ['redFont', 'bold'],
       },
@@ -156,9 +198,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
           // custom item
           name: 'Copy',
           action: () => {
-            //console.log('params>>>', params);
-            //console.log('params>>>', params.node.key);
-            navigator.clipboard.writeText(params.node.key);
+            // Check if navigator.clipboard is available and we're in a secure context
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard.writeText(params.node.key)
+                .then(() => console.log('Copying to clipboard was successful!'))
+                .catch(err => console.error('Failed to copy text: ', err));
+            } else {
+              console.warn('Clipboard API is not available in this context.');
+              // Inline fallback method if Clipboard API is not available
+              const textarea = document.createElement("textarea");
+              textarea.textContent = params.node.key;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                console.log('Copying to clipboard using fallback method.');
+              } catch (error) {
+                console.error("Fallback copy to clipboard failed.", error);
+              }
+            }
           },
           cssClasses: ['redFont', 'bold'],
         },
@@ -383,6 +442,7 @@ autoGroupColumnDef = {
   cellRendererParams: {
     innerRenderer: 'group',
     suppressCount: true,
+    expandedByDefault: false
   },
   
 };
@@ -427,8 +487,12 @@ onGridReady(params: GridReadyEvent) {
  
   this.gridApi = params.api;
   this.columnApi = params.columnApi;
-  //console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
+  console.log("params.api<<<<<<<",params.api);
+  console.log(" params.columnApi", params.columnApi);
+  console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
   this.total=params.api.getDisplayedRowCount();
+
+ // console.log("getDisplayedRowCount",this.getDisplayedRowCount);
   // this.gridApi.deselectAll();
   this.gridApi.addEventListener('rowGroupOpened', function (event:any) {
     // Check if the row group is related to the "Device_id" column
@@ -437,6 +501,9 @@ onGridReady(params: GridReadyEvent) {
   
   });
 }
+  getDisplayedRowCount(arg0: string, getDisplayedRowCount: any) {
+    throw new Error('Method not implemented.');
+  }
 handleCheckboxChange(event: any) {
   this.isChecked = event.target.checked;
 
@@ -508,6 +575,8 @@ this.dataservice.setDHselectedDevice(this.dataselected);
   //console.log("dataaaaaaaaaaa--------------",this.dataselected);
   this.selectedarrayemit.emit(this.selectedarray);
 }
+
+
 
 
 }

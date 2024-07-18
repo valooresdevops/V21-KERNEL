@@ -265,7 +265,12 @@ getSimulationNextAction(obj:any){
 
  
  async getExecutionParam(queryId:any){
-  let response= this.httpClient.get(this.ipAddress+"/api/getExecutionParam/"+queryId).toPromise();
+  const options = {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  let response= this.httpClient.post<any>(this.ipAddress+"/api/getExecutionParam/"+queryId,options).toPromise();
   
    console.log('getExecutionParam>>>>>>',response);
   return response; 
@@ -636,13 +641,13 @@ async getchatbotrecords(){
 
 async displayTimelineDay(id:any){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.1.8.37:8111/kwg/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>('https://10.10.10.78:8111/kwg/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
    console.log('displayTimeline>>>>>>',response);
   return response; 
 }
 async DisplayTimelineYear(){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.1.8.37:8111/kwg/api/DisplayTimelineYear/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>('https://10.10.10.78:8111/kwg/api/DisplayTimelineYear/',{ headers }).toPromise();
    console.log('DisplayTimelineYear>>>>>>',response);
   return response; 
 }
@@ -657,7 +662,6 @@ async finalDisplayTimeline(process :any , date:any){
 async getDrillDownTimeline(simulationName :any){
   const headers = { 'Content-Type': 'application/json' };
   let response= this.httpClient.get<any>(this.ipAddressKYG+'/api/getDrillDownTimeline/'+simulationName+'/',{ headers }).toPromise();
-   console.log('getDrillDownTimeline>>>>>>',response);
   return response; 
 }
 
@@ -769,5 +773,67 @@ async getCommonDevicesTimeline(object :any){
   let response=await this.httpClient.post<any>(this.ipAddressKYG+"/api/getCommonDevicesTimeline/",object, {headers: GlobalConstants.headers}).toPromise();
   return response; 
 }
+async getNextActionMenuList(){
 
+  let response=  this.httpClient.get<any>(this.ipAddress+"/api/getNextActionMenuList", {headers: GlobalConstants.headers}).toPromise();
+  console.log('getNextActionMenuList>>>>>>',response);
+
+  return response; 
+}
+
+async getObjectIdNextMenu(codemenu:any){
+  console.log('codemenu>>>>>>',codemenu);
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getObjectId/"+codemenu, {headers: GlobalConstants.headers}).toPromise();
+  console.log('getNextActionMenuList>>>>>>',response);
+
+  return response; 
+}
+
+async getSimulationobject(scenariosId:any){
+  console.log('scenariosId>>>>>>',scenariosId);
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getSimulationObject/"+scenariosId, {headers: GlobalConstants.headers}).toPromise();
+  console.log('getSimulationobject>>>>>>',response);
+
+  return response; 
+}
+
+async getCountryCode() {
+  let response= await this.httpClient.get<any>(this.ipAddress+"/api/getCountryCode/").toPromise();
+  console.log('getcountry>>>>>>',response);
+  return response; 
+
+}
+async getSimulationId(){
+  let response=await this.httpClient.get<any>(this.ipAddress+"/api/getId/", {headers: GlobalConstants.headers}).toPromise();
+  console.log("getSimulationId====",response);
+  return response; 
+}
+
+async SaveSimul(object :any){
+  let response= await this.httpClient.post<any>(this.ipAddressDataCrowd+"/api/SaveSimul/",object, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+async getReportHtml(id :any,simulationID:any,offlineOnlineflag:number){
+  const headers = { 'Content-Type': 'application/json' };
+  let response= this.httpClient.post<any>(this.ipAddressKYG+'/api/getReportHtml/'+id+'/'+simulationID+'/'+offlineOnlineflag,{ headers }).toPromise();
+  return response; 
+}
+
+async getTCDSimulationObject(ImsiID:any){
+  console.log('ImsiID>>>>>>',ImsiID);
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getTCDSimulationObject/"+ImsiID, {headers: GlobalConstants.headers}).toPromise();
+  console.log('getSimulationobject>>>>>>',response);
+
+  return response; 
+}
+
+
+async getPropertiesObj(SimulID:any){
+  console.log('SimulID>>>>>>',SimulID);
+  let response=  this.httpClient.get(this.ipAddress+"/api/getPropertiesObj/"+SimulID).toPromise();
+  console.log('getPropertiesObj>>>>>>',response);
+
+  return response; 
+}
 }

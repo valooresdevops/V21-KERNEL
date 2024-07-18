@@ -356,7 +356,7 @@ setTimeout(() => {
   }
 
 //this.autoSizeAllColumns();
-this.paginationPageSize=15;
+// this.paginationPageSize=15;
 
   }
 
@@ -451,31 +451,58 @@ this.paginationPageSize=15;
   }
     
     if (selectionType == "unselected") {
+      this.selectedNodesAr=this.selectedNodesAr.replace(/\s/g,"");
+
+      console.log("EVENT>>>>>>>>>>>>>",event.data);
+      console.log("OLD ARRAY>>>>>",this.selectedNodesAr);
       let selectedNodesJson = JSON.parse(this.selectedNodesAr);
-      for (let u = 0; u < selectedNodesJson.length; u++) {
-        for (let uu = u + 1; uu < selectedNodesJson.length; uu++) {
-          let test = 0;
-          for (let x = 0; x < nbOfPrimaryKeys; x++) {
-            if (this.agPrimaryKey.indexOf(",") != -1) {
-              let val = this.agPrimaryKey.split(",")[x];
-              if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
-                test = test + 1;
-              }
-            } else {
-              let val = this.agPrimaryKey;
-              if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
-                test = test + 1;
-              }
-            }
-          }
-          if (test == nbOfPrimaryKeys) {
-            // selectedNodesJson[uu].rowSlectedStatus = "deleted";
-            selectedNodesJson.splice(u, 1);
-            test = 0;
-          }
+     // let primaryKeysList = this.agPrimaryKey.split(",");
+      let commonKeys = Object.keys(event.node.data).reduce((result:any, key) => {
+        if (this.agPrimaryKey.includes(key)) {
+          result[key] = event.node.data[key];
         }
-      }
+        return result;
+      }, {});
+      console.log("JSON OBJECT KEYS>>>>>>>>>>",JSON.stringify(commonKeys));
+
+      // for (let u = 0; u < selectedNodesJson.length; u++) {
+      //   for (let uu = u + 1; uu < selectedNodesJson.length; uu++) {
+      //     let test = 0;
+      //     for (let x = 0; x < nbOfPrimaryKeys; x++) {
+      //       if (this.agPrimaryKey.indexOf(",") != -1) {
+      //         let val = this.agPrimaryKey.split(",")[x];
+      //         if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
+      //           test = test + 1;
+      //         }
+      //       } else {
+      //         let val = this.agPrimaryKey;
+      //         if (selectedNodesJson[u][val] == selectedNodesJson[uu][val]) {
+      //           test = test + 1;
+      //         }
+      //       }
+      //     }
+      //     if (test == nbOfPrimaryKeys) {
+      //       // selectedNodesJson[uu].rowSlectedStatus = "deleted";
+      //       selectedNodesJson.splice(u, 1);
+      //       test = 0;
+      //     }
+      //   }
+      // }
       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
+      this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(commonKeys),"");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
+      this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
+      this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
+      this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+      this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+      this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
+      this.selectedNodesAr = this.selectedNodesAr.replace(",,", ",");
+      this.selectedNodesAr = this.selectedNodesAr.replace(",]", "]");
+      this.selectedNodesAr = this.selectedNodesAr.replace("[,", "[");
+
+      console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
+      
     }
  //   console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
 console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
@@ -514,7 +541,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
       }
     }, 1000);
    
-    console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
+    //console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
     this.rowContSelected = this.rowContSelected + 1;
     // If primary key is not available, throw exception Primary key is required
     if (this.agPrimaryKey != '') {
@@ -545,8 +572,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
 
             }else{
-          ////////////////////////////////////////////////////  
+          ////////////////////////////////////////////////////
             this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
+
           }
 
             console.log("this.informationservice.setAgGidSelectedNode on row selected :", this.informationservice.getAgGidSelectedNode())
@@ -634,6 +662,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
                 }else{
             
+                  
             this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             console.log("this.informationservice.setAgGidSelectedNode unselected :", this.informationservice.getAgGidSelectedNode())
  }
@@ -785,30 +814,51 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
     }
 ////////////////////////////////////////////////////
   }
+onCellEditingStopped(event: any) {
+  let primaryKey = this.agPrimaryKey.toLowerCase();
+  let rowPrimaryKey = event.data[primaryKey];
+  let jsonRow = {...event.data }; // create a copy of the original object
 
-  onCellEditingStopped(event: any) {
+  if (typeof (rowPrimaryKey) === "undefined") {
+    rowPrimaryKey = "";
+  }
 
-    let primaryKey = this.agPrimaryKey.toLowerCase();
-    let rowPrimaryKey = event.data[primaryKey];
-    let jsonRow: any = JSON.stringify(event.data).slice(0, -1);
-
-    if (typeof (rowPrimaryKey) === "undefined") {
-      rowPrimaryKey = "";
-    }
-
-    for (let i = 0; i < this.gridModifiedRows.length; i++) {
-      if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
-        this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
-      }
-    }
-
-    jsonRow = jsonRow + ',' + '"modeType"' + ":" + '"~updateRow~"' + "}";
-    jsonRow = JSON.parse(jsonRow);
-    if (rowPrimaryKey != "") {
-      // Condition used to only take into consideration the Updated rows and not the added ones as well
-      this.gridModifiedRows.push(jsonRow);
+  for (let i = 0; i < this.gridModifiedRows.length; i++) {
+    if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
+      this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
     }
   }
+
+  jsonRow.modeType = "~updateRow~"; // add the new property
+
+  if (rowPrimaryKey!= "") {
+    // Condition used to only take into consideration the Updated rows and not the added ones as well
+    this.gridModifiedRows.push(jsonRow);
+  }
+}
+  // onCellEditingStopped(event: any) {
+
+  //   let primaryKey = this.agPrimaryKey.toLowerCase();
+  //   let rowPrimaryKey = event.data[primaryKey];
+  //   let jsonRow: any = JSON.stringify(event.data).slice(0, -1);
+
+  //   if (typeof (rowPrimaryKey) === "undefined") {
+  //     rowPrimaryKey = "";
+  //   }
+
+  //   for (let i = 0; i < this.gridModifiedRows.length; i++) {
+  //     if (rowPrimaryKey === this.gridModifiedRows[i][primaryKey]) {
+  //       this.gridModifiedRows[i]["modeType"] = "~toBeRemoved~";
+  //     }
+  //   }
+
+  //   jsonRow = jsonRow + ',' + '"modeType"' + ":" + '"~updateRow~"' + "}";
+  //   jsonRow = JSON.parse(jsonRow);
+  //   if (rowPrimaryKey != "") {
+  //     // Condition used to only take into consideration the Updated rows and not the added ones as well
+  //     this.gridModifiedRows.push(jsonRow);
+  //   }
+  // }
 
   addNewAgRow() {
     // Used to add a new line to the grid
@@ -1032,9 +1082,25 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
         if (this.staticData == -1) {
           
           try {
-            
-            const gridDataApi = gridParam == "" ? from(axios.get(this.dataApi)) : from(axios.post(this.dataApi, gridParam));
-            // const gridDataApi = from(axios.post(this.dataApi, gridParam));
+            const gridDataApi = gridParam === "" 
+  ? from(axios.get(this.dataApi)) 
+  : from(axios.post(this.dataApi, gridParam));
+
+gridDataApi.subscribe(
+  response => {
+    console.log('Data fetched successfully:', response.data);
+  },
+  error => {
+    console.error('Error fetching data:', error);
+    if (error.response) {
+      console.error('Status:', error.response.status);
+      console.error('Data:', error.response.data);
+    }
+  }
+);
+            // console.log("data apiiiiiiiiiiiiiiiii isssssssss::::",axios.get(this.dataApi));
+            // const gridDataApi = gridParam == "" ? from(axios.get(this.dataApi)) : from(axios.post(this.dataApi, gridParam));
+            // // const gridDataApi = from(axios.post(this.dataApi, gridParam));
             const gridData = await lastValueFrom(gridDataApi);
 
             if (this.rowModelType == 'clientSide') {

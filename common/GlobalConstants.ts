@@ -21,7 +21,12 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
+<<<<<<< HEAD
   public static endPointAddress = "10.1.8.21";
+=======
+
+  public static endPointAddress = window.location.hostname;
+>>>>>>> ef884cf4b91005347bb3b5d8fc96a7bb73c6c6b3
 
   // --------------------------------------------------------------------------------
   // -- API Gateways
@@ -175,10 +180,12 @@ export class GlobalConstants {
   public static addQueryData = GlobalConstants.qbeGateway + 'api/addQueryData';
   public static deleteQueryData = GlobalConstants.qbeGateway + 'api/deleteQueryData/';
   public static validateQuery = GlobalConstants.qbeGateway + 'api/validateQuery/';
-  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery/';
+  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery';
 
   public static fetchDynamicData = GlobalConstants.qbeGateway + 'api/fetchDynamicData/';
   public static cqlFetchDynamicData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicData/';
+  public static cqlFetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicHeaderData/';
+
 
   public static fetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/fetchDynamicHeaderData/';
   public static addParamSession = GlobalConstants.qbeGateway + 'api/addParamSession/';
@@ -225,6 +232,10 @@ export class GlobalConstants {
   public static updateReport=GlobalConstants.qbeGateway + 'api/updateReport/';
   public static checkParameters=GlobalConstants.qbeGateway + 'api/checkParameters/';
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
+  public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
+  public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+
+
 
 
   // --------------------------------------------------------------------------------
@@ -391,6 +402,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getAllRulesApi =  GlobalConstants.inDispGatewat +'api/getDBRCombo/';
   public static getColNameAndColId =  GlobalConstants.inDispGatewat +'api/getColNameAndColId/';
   public static callingApi = GlobalConstants.inDispGatewat + 'api';
+  public static getAllQueriesHeaderList =  GlobalConstants.inDispGatewat +'api/getAllQueriesHeaderList/';
 
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
@@ -415,8 +427,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateQueryForm = GlobalConstants.inDispGatewat + 'api/updateQueryForm';
 
 //datacrowd
-public static  ipAddressDataCrowd = "https://"+ GlobalConstants.endPointAddress +":8088";
-public static ipAddress = "https://"+ GlobalConstants.endPointAddress +":8088";
+public static  ipAddressDataCrowd = "http://"+ GlobalConstants.endPointAddress +":8088";
+public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
 
