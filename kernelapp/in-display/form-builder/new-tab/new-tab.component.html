@@ -39,7 +39,16 @@
 
         <!-- (onChangeEvent)="onParamSelect($event)" -->
         <!-- ------------------------------------------- -->
-
+        <div class="col-lg-4">
+            <v-toggle label="Is Title" formControlName="isDynamicTitleEnabled" [parentForm]="newTabForm" (toggleChange)="isTitleChange()"
+                fieldName="isDynamicTitleEnabled"> </v-toggle>
+        </div>
+        <div class="col-lg-4" *ngIf="showisTitle">
+            <v-input  formControlName="dynamicTitleName" [parentForm]="newTabForm" type="lookup" required="showisTitle"
+            [lookupDataApi]="getAllColumns" lookupWidth="700px" lookupHeight="700px" label="Add Title Field" (toggleChange)="isTitleFieldChange()"
+            fieldName="dynamicTitleName">
+        </v-input>
+        </div>
         <div class="col-lg-4">
             <v-toggle label="Is Dynamic Report" formControlName="isDynamicReport" [parentForm]="newTabForm" fieldName="isDynamicReport" (toggleChange)="isDynamicReportChange()"> </v-toggle>
         </div>
@@ -60,10 +69,12 @@
                 fieldName="isAdvancedSearch"> </v-toggle>
         </div>
         <div class="col-lg-4" *ngIf="showAddSearchProcedure">
-            <v-input  formControlName="addSearchProcedure" [parentForm]="newTabForm" type="lookup"
-            [lookupDataApi]="getAllProcAndPack" lookupWidth="700px" lookupHeight="700px" label="Add Procedure"
-            fieldName="addSearchProcedure">
-        </v-input>
+            <v-toggle label="Call Api  On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
+            fieldName="callRestApi"> </v-toggle>
+        </div>
+        <div class="col-lg-4" *ngIf="showCallApi">
+            <v-input formControlName="callRestApi2" type="text" label="End Of Url"  [parentForm]="newTabForm"
+            fieldName="callRestApi2"></v-input>
         </div>
         <div class="col-lg-4">
             <v-input formControlName="canAdd" [parentForm]="newTabForm" type="lookup" [lookupDataApi]="getSourceQuery"
@@ -80,6 +91,12 @@
             <v-input formControlName="canModify" [parentForm]="newTabForm" type="lookup"
                 [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Modify"
                 fieldName="canModify">
+            </v-input>
+        </div>
+        <div class="col-lg-4">
+            <v-input formControlName="canImport" [parentForm]="newTabForm" type="lookup"
+                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Import"
+                fieldName="canImport">
             </v-input>
         </div>
         <div class="col-lg-4">

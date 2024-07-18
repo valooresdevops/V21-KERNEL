@@ -41,6 +41,9 @@ export class NewTabComponent implements OnInit {
   showAddSearchProcedure:any;
   showQueryFormButtonCombo:any;
   public getAllProcAndPack: string = '';
+  showCallApi:any;
+  showisTitle:any;
+  public getAllColumns: any;
   queryFormpossibleButtons:any[]=[{id:'1',name:'Save'},{id:'2',name:'Execute'},{id:'3',name:'Rule'}];
 
   // public reloadUrl: string = '';
@@ -63,6 +66,12 @@ export class NewTabComponent implements OnInit {
     isSave: new UntypedFormControl(''),
     isQueryFormSelectedButtons: new UntypedFormControl(''),
     addSearchProcedure:new UntypedFormControl(''),
+    callRestApi:new UntypedFormControl(''),
+    isDynamicTitleEnabled:new UntypedFormControl(''),
+    dynamicTitleName:new UntypedFormControl(''),
+    canImport: new UntypedFormControl(''),
+
+    callRestApi2:new UntypedFormControl(''),
   });
   agPrimaryKey: any;
 
@@ -127,6 +136,8 @@ export class NewTabComponent implements OnInit {
         this.getAllColums();
       }
     });
+    this.getAllColumns= GlobalConstants.getAllColumnsTitle +this.objectId;
+    console.log('getAllColumns>>>>>>>',this.getAllColumns)
   }
   onAddClick() {
     let data = [{ objectId: this.objectId, actionType: 'saveNew', objectPId: this.objectPId }];
@@ -262,6 +273,12 @@ console.log('data--------->',data)
         let condition =  this.newTabForm.controls['condition']?.value;
         let isReadOnly = this.newTabForm.controls['isReadOnly']?.value;
         let isAdvencedSearchProcedure = this.newTabForm.controls['addSearchProcedure']?.value;
+        let isDynamicTitleEnabled =  this.newTabForm.controls['isDynamicTitleEnabled']?.value;
+        let dynamicTitleName =  this.newTabForm.controls['dynamicTitleName']?.value;
+        let canImport = this.newTabForm.controls['canImport']?.value;
+
+        let callRestApi =  this.newTabForm.controls['callRestApi']?.value;
+        let callRestApi2 =  this.newTabForm.controls['callRestApi2']?.value;
         if(condition == undefined){
           condition = 0;
         }
@@ -282,6 +299,9 @@ console.log('data--------->',data)
         }
         if(readOnlyQbeId == undefined){
           readOnlyQbeId = 0;
+        }
+        if(canImport == undefined || canImport == ""){
+          canImport = 0;
         }
       if (this.actionType == 'saveNew') {
         let List = [];
@@ -310,6 +330,12 @@ console.log('data--------->',data)
           advancedSearchProcedureName:isAdvencedSearchProcedure,
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
+          callRestApi: false,
+          isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
+          dynamicTitleName: dynamicTitleName,
+          canImport: canImport,
+          
+
         };
         List.push(jsonParams);
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
@@ -357,7 +383,11 @@ console.log('data--------->',data)
           canModify: canModify,
           condition: condition,
           advancedSearchProcedureName:isAdvencedSearchProcedure,
-          
+          canImport: canImport,
+          callRestApi:this.newTabForm.controls['callRestApi']?.value,
+          callRestApi2:callRestApi2,
+          isDynamicTitleEnabled: isDynamicTitleEnabled,
+          dynamicTitleName: dynamicTitleName,
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
           readOnlyQbeId: readOnlyQbeId
@@ -404,13 +434,22 @@ console.log('data--------->',data)
         this.newTabForm.controls['isSave'].setValue(res[0].isSave);
         this.newTabForm.controls['readOnlyQbeId'].setValue(res[0].readOnlyQbeId);
         this.newTabForm.controls['addSearchProcedure'].setValue(res[0].advancedSearchProcedureName);
+        this.newTabForm.controls['isDynamicTitleEnabled'].setValue(res[0].isDynamicTitleEnabled);
+        this.newTabForm.controls['canImport'].setValue(res[0].canImport);
+        this.newTabForm.controls['callRestApi2'].setValue(res[0].apiFunctionName);
 
         if (res[0].isGrid == "0") {
           this.newTabForm.controls['isGrid'].setValue(false);
         } else {
           this.newTabForm.controls['isGrid'].setValue(true);
         }
-        
+        if (res[0].isApiEnabled == "0") {
+          this.newTabForm.controls['callRestApi'].setValue(false);
+
+        } else {
+          this.newTabForm.controls['callRestApi'].setValue(true);
+          this.showCallApi=true;
+        }
         if (res[0].isDynamicReport == "0") {
           this.newTabForm.controls['isDynamicReport'].setValue(false);
         } else {
@@ -456,8 +495,15 @@ console.log('data--------->',data)
           this.newTabForm.controls['isAdvancedSearch'].setValue(false);
         } else {
           this.showAddSearchProcedure = true;
-
           this.newTabForm.controls['isAdvancedSearch'].setValue(true);
+        }
+        if (res[0].isDynamicTitleEnabled == "0") {
+          this.showisTitle = false;
+          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(false);
+        } else {
+          this.showisTitle = true;
+
+          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(true);
         }
         this.isMainTab = res[0].isMain;
 
@@ -468,6 +514,7 @@ console.log('data--------->',data)
         this.commonFunctions.handleLookupElem("canDelete", this.newTabForm);
         this.commonFunctions.handleLookupElem("sourceQuery", this.newTabForm);
         this.commonFunctions.handleLookupElem("readOnlyQbeId", this.newTabForm);
+        this.commonFunctions.handleLookupElem("canImport", this.newTabForm);
 
         res.objectId = this.objectId;
 
@@ -488,19 +535,43 @@ console.log('data--------->',data)
     }else{
       this.showQueryFormButtonCombo=false;
     }
+    
+  }
+
+
+  isAdvancedSearchChange(){
+    if(this.newTabForm.get('isAdvancedSearch').value==true){
+      this.showAddSearchProcedure=true;
+    }else{
+      this.showAddSearchProcedure=false;
+      // this.newTabForm.controls['addSearchProcedure'].setValue('');    
+    }
+  }
+
+
+  isTitleChange(){
+    if(this.newTabForm.get('isDynamicTitleEnabled').value==true){
+      this.showisTitle=true;
+    }else{
+      this.showisTitle=false;
+      // this.newTabForm.controls['isTitleField'].setValue('');    
+    }
   }
 
   isDynamicReportChange(){
     
     
   }
-  isAdvancedSearchChange(){
-    if(this.newTabForm.get('isAdvancedSearch').value==true){
-      this.showAddSearchProcedure=true;
+
+  isCallApi(){
+    if(this.newTabForm.get('callRestApi').value==true){
+      this.showCallApi=true;
     }else{
-      this.showAddSearchProcedure=false;
-      this.newTabForm.controls['addSearchProcedure'].setValue('');    
+      this.showCallApi=false;
     }
+  }
+  isTitleFieldChange(){
+    console.log('<><><><> ',this.newTabForm.controls['isTitleField']?.value)
   }
 
 }
