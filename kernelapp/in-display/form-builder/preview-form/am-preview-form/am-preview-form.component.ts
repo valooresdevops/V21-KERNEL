@@ -136,6 +136,8 @@ export class AmPreviewFormComponent implements OnInit {
     { id: 3, name: 'Execute Query' }
   ];
   public ruleCallApiData:any=[];
+  public getFieldDynamicTitle:any;
+  public getFieldDynamicTitleValue: string = '';
 
   constructor(private dialogRef: MatDialogRef<AmPreviewFormComponent>,
     @Inject(MAT_DIALOG_DATA) public lookupData: any,
@@ -6097,6 +6099,10 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
         this.setFormValues();
       }
     }
+    setTimeout(() => {
+      this.handleDialogTitle();      
+    }, 100)
+
   }
 
 
@@ -6171,79 +6177,141 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
       this.cdr.detectChanges();
     }
   }
+  async handleFormFieldValues(fieldName: string, value: any) {
+    const getFieldDynamicTitleUrl =await axios.post(GlobalConstants.getFieldDynamicTitle + this.objectId); 
+    const responseaxios =  getFieldDynamicTitleUrl.data;
+    
+        this.getFieldDynamicTitle = responseaxios;
+        const fieldNames = fieldName.split(',');
+       
+        // Loop over each field name
+        for (let j = 0; j < fieldNames.length; j++) {
+            const currentFieldName = fieldNames[j].trim();
+            if(this.getFieldDynamicTitle == currentFieldName){
+              this.getFieldDynamicTitleValue = value;
+             }
+        for (let i = 0; i < this.test.length; i++) {
+    
+          if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+            localStorage.setItem("signatureImage",value);
+            this.oldsignature = value;
+            break;
+          }
+        }
+        let data = this.test.filter((el: any) => {
+          return el.name === currentFieldName;
+        });
+    
+        //jp and charbel <3
+    
+        // this.dynamicForm.controls[currentFieldName].setValue('');
+    
+        if (this.dynamicForm.get(currentFieldName)) {
+          this.dynamicForm.removeControl(currentFieldName);
+          this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
+    
+          if (value == null || value == 'null' || value == 'empty') {
+            value = '';
+          }
+          if(data[0] != undefined && data[0].columnType == "combo"){
+            let newQuery : any;
+            newQuery = data[0].query;
+            // change this code to a dynamic code
+            // if(newQuery = [0]){
+            //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+            // }
+            data[0].query = [];
+            this.cdr.detectChanges();
+            data[0].query = newQuery;
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+            this.dynamicForm.controls[currentFieldName].setValue(value);
+        }else if(data[0] != undefined && data[0].columnType == "phone number"){
+          this.cdr.detectChanges();     
+          this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        }
+          else {
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+          }
+          if (value != null) {
+            this.registerTouchedField(currentFieldName);
+          }
+          this.cdr.detectChanges();
+        }
+      }
+      }
+  // handleFormFieldValues(fieldName: string, value: any) {
+  //   // for (let i = 0; i < this.test.length; i++) {
+  //   //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
+  //   //     localStorage.setItem("signatureImage",value);
+  //   //     this.oldsignature = value;
+  //   //     break;
+  //   //   }
+  //   // }
+  //   // let data = this.test.filter((el: any) => {
+  //   //   return el.name === fieldName;
+  //   // });
+  //   // this.dynamicForm.controls[fieldName].setValue('');
+  //   // if (this.dynamicForm.get(fieldName)) {
+  //   //   this.dynamicForm.removeControl(fieldName);
+  //   //   this.dynamicForm.addControl(fieldName, new FormControl(''));
 
-  handleFormFieldValues(fieldName: string, value: any) {
-    // for (let i = 0; i < this.test.length; i++) {
-    //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
-    //     localStorage.setItem("signatureImage",value);
-    //     this.oldsignature = value;
-    //     break;
-    //   }
-    // }
-    // let data = this.test.filter((el: any) => {
-    //   return el.name === fieldName;
-    // });
-    // this.dynamicForm.controls[fieldName].setValue('');
-    // if (this.dynamicForm.get(fieldName)) {
-    //   this.dynamicForm.removeControl(fieldName);
-    //   this.dynamicForm.addControl(fieldName, new FormControl(''));
+  //   //jppppppppppp
+  //   //console.log("fieldName=",fieldName);
+  //   //console.log("CHECKBOX VALUE>>>>>>",value);
+  //   const fieldNames = fieldName.split(',');
 
-    //jppppppppppp
-    //console.log("fieldName=",fieldName);
-    //console.log("CHECKBOX VALUE>>>>>>",value);
-    const fieldNames = fieldName.split(',');
-
-    // Loop over each field name
-    for (let j = 0; j < fieldNames.length; j++) {
-        const currentFieldName = fieldNames[j].trim();
-    for (let i = 0; i < this.test.length; i++) {
+  //   // Loop over each field name
+  //   for (let j = 0; j < fieldNames.length; j++) {
+  //       const currentFieldName = fieldNames[j].trim();
+  //   for (let i = 0; i < this.test.length; i++) {
       
-      if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
-        localStorage.setItem("signatureImage",value);
-        this.oldsignature = value;
-        break;
-      }
-    }
-    let data = this.test.filter((el: any) => {
-      return el.name === currentFieldName;
-    });
+  //     if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+  //       localStorage.setItem("signatureImage",value);
+  //       this.oldsignature = value;
+  //       break;
+  //     }
+  //   }
+  //   let data = this.test.filter((el: any) => {
+  //     return el.name === currentFieldName;
+  //   });
 
-    //jp and charbel <3
+  //   //jp and charbel <3
 
-    // this.dynamicForm.controls[currentFieldName].setValue('');
-    if (this.dynamicForm.get(currentFieldName)) {
-      this.dynamicForm.removeControl(currentFieldName);
-      this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
+  //   // this.dynamicForm.controls[currentFieldName].setValue('');
+  //   if (this.dynamicForm.get(currentFieldName)) {
+  //     this.dynamicForm.removeControl(currentFieldName);
+  //     this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
 
-      if (value == null || value == 'null' || value == 'empty') {
-        value = '';
-      }
-      if(data[0] != undefined && data[0].columnType == "combo"){
-        let newQuery : any;
-        newQuery = data[0].query;
-        // change this code to a dynamic code
-        // if(newQuery = [0]){
-        //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
-        // }
-        //console.log("newQuery ===>",newQuery);
-        data[0].query = [];
-        this.cdr.detectChanges();
-        data[0].query = newQuery;
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-    } else if(data[0] != undefined && data[0].columnType == "checkbox"){
-      //console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
-        this.dynamicForm.controls[currentFieldName].setValue(value);
-    }
-      else {
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-      }
-      if (value != null) {
-        this.registerTouchedField(currentFieldName);
-      }
-      this.cdr.detectChanges();
-    }
-  }
-  }
+  //     if (value == null || value == 'null' || value == 'empty') {
+  //       value = '';
+  //     }
+  //     if(data[0] != undefined && data[0].columnType == "combo"){
+  //       let newQuery : any;
+  //       newQuery = data[0].query;
+  //       // change this code to a dynamic code
+  //       // if(newQuery = [0]){
+  //       //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+  //       // }
+  //       //console.log("newQuery ===>",newQuery);
+  //       data[0].query = [];
+  //       this.cdr.detectChanges();
+  //       data[0].query = newQuery;
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //   } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+  //     //console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
+  //       this.dynamicForm.controls[currentFieldName].setValue(value);
+  //   }
+  //     else {
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //     }
+  //     if (value != null) {
+  //       this.registerTouchedField(currentFieldName);
+  //     }
+  //     this.cdr.detectChanges();
+  //   }
+  // }
+  // }
 
   async loadFieldDependencyForForm() {
 //console.log('',this.objectId)
@@ -7381,9 +7449,15 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     }
 
     dialogTitle = dialogTitle.replace("//", "/");
-    this.informationservice.setPopupBreadcrumb(dialogTitle);
+    dialogTitle = dialogTitle;
 
-    $(".dialogTitle").html("<span>" + dialogTitle + "</span>")
+    this.informationservice.setPopupBreadcrumb(dialogTitle);
+    if(this.getFieldDynamicTitleValue != ""){
+      $(".dialogTitle").html("<span>" + dialogTitle +"/"+this.getFieldDynamicTitleValue + "</span>")
+
+    }else{
+      $(".dialogTitle").html("<span>" + dialogTitle + "</span>")
+    }
     $(".dialogTitle span").css({ "font-size": "15px", "letter-spacing": "1px", "color": "var(--popup-title-color)", "font-weight": "bold" });
   }
 
