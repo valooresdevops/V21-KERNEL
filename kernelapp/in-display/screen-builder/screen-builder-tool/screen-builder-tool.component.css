@@ -99,7 +99,7 @@ html, body {
     background: #fff;
     border: 1px solid #ccc;
     cursor: pointer;
-    z-index:99999999999999999;
+    z-index:9999999999999;
   }
   
   .arrow-button i {

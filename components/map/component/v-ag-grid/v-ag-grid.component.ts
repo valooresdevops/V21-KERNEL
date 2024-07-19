@@ -331,7 +331,7 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
     event.api.forEachNode((rowNode:any, index:any) => {
       let make = rowNode.selected;
       
-      //console.log("rowNode>>>",rowNode.selected);
+      console.log("rowNode>>>",rowNode);
       
      
 

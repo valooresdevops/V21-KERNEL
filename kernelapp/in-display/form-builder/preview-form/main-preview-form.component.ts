@@ -993,6 +993,11 @@ export class PreviewFormComponent implements OnInit {
 
 
 
+  closeDialog(): void {
+    this.dialog.closeAll();
+  }
+
+
 
 }
 

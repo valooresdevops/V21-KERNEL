@@ -641,13 +641,13 @@ async getchatbotrecords(){
 
 async displayTimelineDay(id:any){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.10.10.78:8111/kwg/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>('https://10.1.8.40:8111/kwg/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
    console.log('displayTimeline>>>>>>',response);
   return response; 
 }
 async DisplayTimelineYear(){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.10.10.78:8111/kwg/api/DisplayTimelineYear/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>('https://10.1.8.40:8111/kwg/api/DisplayTimelineYear/',{ headers }).toPromise();
    console.log('DisplayTimelineYear>>>>>>',response);
   return response; 
 }

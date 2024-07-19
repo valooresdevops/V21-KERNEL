@@ -57,7 +57,7 @@ export class InputComponent implements ControlValueAccessor {
   
 
   // Max Length for an input
-  @Input() public maxlength: number = 9999;
+  @Input() public maxlength: number = 999;
   @Input() public defaultValue: string = '';
 
   // Indisplay paramters

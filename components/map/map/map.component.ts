@@ -12,7 +12,8 @@ import {
   Input,
   Output,
   EventEmitter,
-  HostListener
+  HostListener,
+  Injector 
 } from "@angular/core";
 // import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
@@ -2583,7 +2584,8 @@ this.addnewSenario();
     //console.log('ImgFirstCoord',this.ImgFirstCoord);
     this.startLoop();
     $('#tabledatabtn').css('display', '');
-
+    this.ShowHeader=false;
+    this.showTextMenu=false;
   }
 
   ReverseTimeline() {
@@ -6203,7 +6205,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
 
 }
   breakProcess() {
-  window.location.href = 'https://'+window.location.hostname+':9999/index.html'; 
+  window.location.href = 'https://'+window.location.hostname+':999/index.html'; 
 }
 
   async test2() {
@@ -10987,7 +10989,6 @@ async displayClustersforfixedelements(object:any){
     // alert(111);
     //console.log("11111111111----",window.parent as any);
     //console.log("hideSimulation----",(window.parent as any).hideSimulation());
-    (window.parent as any).hideSimulation();
    
     this.displayedColumns = ['Time', 'event', 'Lng', 'lat'];
     // this.openTable = true;
@@ -10999,6 +11000,8 @@ if($('#tabletest').css('display') === 'block'){
   $('#tabletest').css('display','block');
 
 }
+this.ShowHeader=false;
+this.showTextMenu=false;
     // if ((this.openTable = true)) {
     //   this.openTable = true;
     // } else {
@@ -11952,12 +11955,13 @@ changebar(){
 
         this.TcdRowData = [];
         console.log('Azimuth >>>>>>', e.target.Azimuth ," lat--",e.target.lat,"   lng-------",e.target.lng);
+        console.log('Azimuth >>>>>>',typeof e.target.Azimuth ," lat--",typeof e.target.lat,"   lng-------",typeof e.target.lng);
 
         // this.datajson.markerPositions.forEach((element: any, key: any) => {
         let findedSectors: any = object.filter((element: any) => {
           return element[7] === e.target.Azimuth && element[4] === e.target.lat && element[5] === e.target.lng
         });
-        //console.log('findedSectors when right click', findedSectors)
+        console.log('findedSectors when right click', findedSectors)
 
         findedSectors.forEach((element: any, key: any) => {
           var jsonaggrid =
@@ -17345,9 +17349,8 @@ console.log("this.reportType  >>",typeof this.reportType)
 
 
     console.log("queryjson IIII  ",queryjson)
-if(this.reportType !=="11" && this.reportType!=="8" && this.reportType!=="9" && this.reportType!=="10" ){
+if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && this.reportType!="10" ){
     console.log('queryjson >>', queryjson);
-
 
 
     
@@ -17577,13 +17580,15 @@ if(this.reportType !=="11" && this.reportType!=="8" && this.reportType!=="9" && 
 
             const html2 = componentref.location.nativeElement;
             await html2;
+            
 
+        
             // $('#agGrid').css('height','10px');
             $('.ag-theme-balham').css('height', '130px');
 
 
             // /  e.target.openPopup(html2, e.target._latlng);
-            this.map.openPopup(html2, e.target._latlng);
+            this.map.openPopup(html2, e.target._latlng);  
 
 
           } else if (e.originalEvent.buttons == 1) {
@@ -18153,6 +18158,19 @@ convertArray(input: any[]): { id: number, name: string }[] {
       });
       return rowdata;
     }
+
+    openLoginUser(){
+      if(this.ShowHeader){
+        this.ShowHeader=!this.ShowHeader;
+
+      }
+      if(this.showTextMenu){
+        this.showTextMenu=!this.showTextMenu;
+
+      }
+  
+    }
+   
 }
 
 

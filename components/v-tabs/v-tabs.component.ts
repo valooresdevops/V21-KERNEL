@@ -129,7 +129,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
             "width": "100%",
             "top": "30px",
             "left": "0px",
-            "z-index": "9999999999999999",
+            "z-index": "999999999999",
             "border-radius": "1px",
             "border": "1px solid white",
             "height": "" + contextMenuHeight + ""
