@@ -11958,9 +11958,9 @@ changebar(){
         console.log('Azimuth >>>>>>',typeof e.target.Azimuth ," lat--",typeof e.target.lat,"   lng-------",typeof e.target.lng);
 
         // this.datajson.markerPositions.forEach((element: any, key: any) => {
-        let findedSectors: any = object.filter((element: any) => {
-          return element[7] === e.target.Azimuth && element[4] === e.target.lat && element[5] === e.target.lng
-        });
+          let findedSectors: any = object.filter((element: any) => {
+            return element[7] === e.target.Azimuth && Number(element[4]).toString() === e.target.lat && Number(element[5]).toString() === e.target.lng
+          });
         console.log('findedSectors when right click', findedSectors)
 
         findedSectors.forEach((element: any, key: any) => {
@@ -17734,13 +17734,14 @@ let obj22:any={
       console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
 
-if(data[0].COLNAME=="BTS_CELL_ID"){
+if(data[0].colName=="bts_cell_id"){
   console.log("data >>>>>>>>>>",data);
-  console.log("data z>>>>>>>>>>",[ parseInt(data[0].COLVALUE)]);
+  console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
+    )]);
 
 
   await this.datacrowdService
-  .getfixedelementsObject([ parseInt(data[0].COLVALUE)])
+  .getfixedelementsObject([ parseInt(data[0].colValue)])
   .then(async (res: any) => {
     console.log('res>>', res);
     this.displayFixedElements(res);
@@ -17748,8 +17749,8 @@ if(data[0].COLNAME=="BTS_CELL_ID"){
   });
 
 
-}else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
-  await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+}else if(data[0].colName=="LOC_REPORT_CONFIG_ID"){
+  await this.datacrowdService.getSimulationobject([data[0].colValue]).then((res:any)=>{
     console.log("res in getSimulationobject ",res);
     this.datajson=res;
     if (this.datajson !== null) {
@@ -17985,10 +17986,10 @@ if(data[0].COLNAME=="BTS_CELL_ID"){
   }
   
    });
-  this.displayShapes(data[0].COLVALUE);
+  this.displayShapes(data[0].colValue);
 
-  this.senarioParentName=data[0].COLVALUE;
-  this.simulationid=data[0].COLVALUE;
+  this.senarioParentName=data[0].colValue;
+  this.simulationid=data[0].colValue;
 
   let obj:any={
     senarioParentName:this.senarioParentName,
