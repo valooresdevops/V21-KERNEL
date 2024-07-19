@@ -211,6 +211,7 @@ export class GlobalConstants {
   public static deleteQbeAuthorizedUsers =  GlobalConstants.qbeGateway + 'api/deleteQbeAuthorizedUsers/';
   public static deleteQbeSecurityChanges =  GlobalConstants.qbeGateway + 'api/deleteQbeSecurityChanges';
   public static getQbeQueryCreatedBy =  GlobalConstants.qbeGateway + 'api/getQbeQueryCreatedBy/';
+  public static getQueryTypeApi =  GlobalConstants.qbeGateway + 'api/getQueryTypee/';
 
 
 
@@ -315,7 +316,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
   public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
-
+  
 
 
 

@@ -37,6 +37,7 @@ export class NewTabComponent implements OnInit {
   public menuName: any;
   public isMainTab: any;
   public test: any;
+  public isCql:any;
   dialogRef: any;
   showAddSearchProcedure:any;
   showQueryFormButtonCombo:any;
@@ -70,7 +71,7 @@ export class NewTabComponent implements OnInit {
     isDynamicTitleEnabled:new UntypedFormControl(''),
     dynamicTitleName:new UntypedFormControl(''),
     canImport: new UntypedFormControl(''),
-
+    isCql: new UntypedFormControl(''),
     callRestApi2:new UntypedFormControl(''),
   });
   agPrimaryKey: any;
@@ -137,7 +138,6 @@ export class NewTabComponent implements OnInit {
       }
     });
     this.getAllColumns= GlobalConstants.getAllColumnsTitle +this.objectId;
-    console.log('getAllColumns>>>>>>>',this.getAllColumns)
   }
   onAddClick() {
     let data = [{ objectId: this.objectId, actionType: 'saveNew', objectPId: this.objectPId }];
@@ -334,10 +334,10 @@ console.log('data--------->',data)
           isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
           dynamicTitleName: dynamicTitleName,
           canImport: canImport,
-          
-
+          isCql: this.newTabForm.controls['isCql']?.value,
         };
         List.push(jsonParams);
+        this.isCql = this.newTabForm.controls['isCql']?.value;
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
@@ -390,7 +390,8 @@ console.log('data--------->',data)
           dynamicTitleName: dynamicTitleName,
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
-          readOnlyQbeId: readOnlyQbeId
+          readOnlyQbeId: readOnlyQbeId,
+          isCql: this.newTabForm.controls['isCql']?.value,
         };
         updateList.push(jsonParams);
 
@@ -558,9 +559,7 @@ console.log('data--------->',data)
     }
   }
 
-  isDynamicReportChange(){
-    
-    
+  isDynamicReportChange(){ 
   }
 
   isCallApi(){
@@ -572,6 +571,13 @@ console.log('data--------->',data)
   }
   isTitleFieldChange(){
     console.log('<><><><> ',this.newTabForm.controls['isTitleField']?.value)
+  }
+  isCqlApi(){
+    if(this.newTabForm.get('isCql').value==true){
+      this.isCql=true;
+    }else{
+      this.isCql=false;
+    }
   }
 
 }

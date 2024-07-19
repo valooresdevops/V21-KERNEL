@@ -59,6 +59,7 @@ export class PreviewFormComponent implements OnInit {
   public objectMain: any;
   public testLinks: any[] = [];
   public isLink: any;
+  public queryType: any;
   public hiddenColumns: any[] = [];
   public datatobesent:any[]=[];
   public selectionType:any="single";
@@ -393,7 +394,16 @@ export class PreviewFormComponent implements OnInit {
 
             }
           );
-          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/1", jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+          
+         this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            if(data == 2){
+              this.queryType =3;
+            }else{
+              this.queryType =1;
+            }
+            console.log("queryType------> ",this.queryType);
+
+          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/"+this.queryType, jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             this.sourceQuery = data;
             if (this.sourceQuery != "-1") {
               this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
@@ -490,6 +500,7 @@ export class PreviewFormComponent implements OnInit {
               });
             }
           });
+        });
           // });
           // }
         });
