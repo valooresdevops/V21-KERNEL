@@ -921,14 +921,14 @@ export class MasterLinkFormComponent implements OnInit {
     this.jsonRes +="{\"masterLink\":"+ this.jsonMasterLink + "," + this.jsonNodes + "," + this.jsonLink + "," + this.jsonNodeInfo + "," + this.jsonLinkInfo + "}"
     console.log("this is final jsonResssssssss ::::::::", this.jsonRes);
     try {
-              const gridEventSaveApi = from(axios.post(GlobalConstants.masterLinkData, JSON.parse(this.jsonRes)));
-              const gridEventSave = await lastValueFrom(gridEventSaveApi);
-              this.commonFunctions.alert("alert", gridEventSave.data.description);
+               const gridEventSaveApi = from(axios.post(GlobalConstants.insertMasterLinkData+this.informationservice.getLogeduserId(), JSON.parse(this.jsonRes)));
+               const gridEventSave = await lastValueFrom(gridEventSaveApi);
+              this.commonFunctions.alert("alert", "Master Link Created");
           } catch (error) {
               console.log("gridEventSave error >>> ", error);
           }
   }
-  async save() {
+  async saveMasterLinkData() {
     let check : boolean;
     if(!this.isVisible) {
       check = false;

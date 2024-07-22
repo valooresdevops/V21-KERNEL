@@ -314,7 +314,6 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static insertLogsDataApi  = GlobalConstants.inDispGatewat + 'api/insertLogsData/';
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
-  public static masterLinkData = GlobalConstants.inDispGatewat + 'api/masterLinkData/';
   
   
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
@@ -406,7 +405,10 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getColNameAndColId =  GlobalConstants.inDispGatewat +'api/getColNameAndColId/';
   public static callingApi = GlobalConstants.inDispGatewat + 'api';
   public static getAllQueriesHeaderList =  GlobalConstants.inDispGatewat +'api/getAllQueriesHeaderList/';
+  public static getMasterLinks = GlobalConstants.inDispGatewat + 'api/getMasterLinks/';
+  public static insertMasterLinkData = GlobalConstants.inDispGatewat + 'api/insertMasterLinkData/';
 
+  
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
   public static getSearchType = GlobalConstants.inDispGatewat + 'api/getSearchType/';
