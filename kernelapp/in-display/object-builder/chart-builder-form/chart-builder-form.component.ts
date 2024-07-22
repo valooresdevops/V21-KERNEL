@@ -50,6 +50,7 @@ export class ChartBuilderFormComponent implements OnInit {
   is3d: number;
 
   ngOnInit(): void {
+    console.log('data-->: ',this.data)
     this.is3d = this.data.is3d;
     this.chartType = this.data.chartType;
     let ids = this.ids

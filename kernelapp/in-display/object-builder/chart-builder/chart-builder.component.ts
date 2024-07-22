@@ -115,11 +115,7 @@ export class ChartBuilderComponent implements OnInit {
       this.http.post<any>(GlobalConstants.getQueryData + selectedNodes, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res;
-        });
-
-
-      setTimeout(() => {
-
+          console.log('res--> ',res)
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
         dialogConfig.height = '70%';
@@ -129,8 +125,8 @@ export class ChartBuilderComponent implements OnInit {
           width: '45%',
           height: '70%',
         });
-      }, 1000);
-
+  
+      });
 
     }
   }

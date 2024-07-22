@@ -76,10 +76,9 @@ export class ChartPopupComponent implements OnInit {
       this.http.post<any>(GlobalConstants.getQueryData + selectedNodes, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res
-        }); 
+         
    
  
-      setTimeout(() => {
 
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
@@ -90,8 +89,8 @@ export class ChartPopupComponent implements OnInit {
           width: '50%',
           height: '60%',
         });
-      }, 1000);
-
+   
+    });
 
     }
   }
