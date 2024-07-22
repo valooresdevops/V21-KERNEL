@@ -115,24 +115,6 @@ export class MasterLinkFormComponent implements OnInit {
       buttonRenderer: ButtonRendererComponent,
     };
      }
-    //  public conditions = [
-    //   { id: '', name: '' },
-    //   { id: 1, name: '=' },
-    //   { id: 2, name: '<' },
-    //   { id: 3, name: '>' },
-    //   { id: 4, name: '<=' },
-    //   { id: 5, name: '>=' },
-    //   { id: 6, name: '< sysdate' },
-    //   { id: 7, name: '> sysdate' },
-    //   { id: 8, name: '!=' },
-    //   { id: 9, name: 'included' },
-    //   { id: 10, name: '!included' },
-    //   // { id: 8, name: 'Get sysdate (Year)' },
-    //   // { id: 8, name: 'Get sysdate (Month)' },
-    //   // { id: 8, name: 'Get sysdate (Day)' },
-  
-    // ];
-
   ngOnInit(): void 
   {
     this.actionType = this.dataservice.getactionType();
@@ -157,25 +139,6 @@ export class MasterLinkFormComponent implements OnInit {
         editable: true,
         // width: '20px',
       },
-      // {
-      //   headerName: 'Condition',
-      //   field: 'condition',
-      //   width: 110,
-      //   cellEditor: 'agRichSelectCellEditor',
-      //   cellRenderer: DropdownCellRenderer,
-      //   keyCreator: (params: any) => {
-      //     console.log("watchhhhhhhhhhhhhhh",params.value.name);
-      //     return params.value.name;
-          
-      //   },
-      //   cellEditorParams: {
-      //     cellRenderer: DropdownCellRenderer,
-      //         values: this.headerNames,
-      //     isSearchable: true,
-      //   },
-      //   editable: true,
-      //   cellDataType: true
-      // },
       {
         headerName: 'Field',
         field: 'field',
@@ -194,23 +157,7 @@ export class MasterLinkFormComponent implements OnInit {
         cellDataType: true,
         cellClass: 'ag-rich-select-list, ag-rich-select-list-item, ag-rich-select-list-item:hover'
       },
-      // {
-      //   headerName: 'Field',
-      //   field: 'field',
-      //   width: 110,
-      //   cellEditor: 'agRichSelectCellEditor',
-      //   cellRenderer: DropdownCellRenderer,
-      //   keyCreator: (params: any) => {
-      //     return params.value.name;
-      //   },
-      //   cellEditorParams: {
-      //     cellRenderer: DropdownCellRenderer,
-      //     values: this.allColumnsAr,
-      //     isSearchable: true,
-      //   },
-      //   editable: true,
-      //   cellDataType: true
-      // },
+  
       {
         headerName: 'Image',
         field: 'image',
@@ -709,80 +656,7 @@ export class MasterLinkFormComponent implements OnInit {
     // Handle any specific actions needed when the grid reloads
     console.log('Grid is reloading...');
   }
-  // getLastAccessedValue(): Number {
-  //   // Logic to find and return the last accessed value
-  //   // For example, searching for a key pattern like 'agGidSelectedLookup_..._id'
-  //   const keys = Object.keys(localStorage);
-  //   let lastValue = null;
-
-  //   keys.forEach(key => {
-  //     if (key.startsWith('agGidSelectedLookup_') && key.endsWith('_id')) {
-  //       // Assuming the value is a string, parse or use as needed
-  //       lastValue = localStorage.getItem(key);
-  //     }
-  //   });
-
-  //   return lastValue;
-  // }
-
-  // onSubmit(): void {
-  //   alert(1111111);
-  //   const queryControl = this.gridForm.get('query');
-  //   if (queryControl && queryControl.value) {
-  //     const selectedValue = queryControl.value; // get the selected value from the v-lookup
-  //    console.log("selected Value---->",selectedValue)
-  //     this.http.get<any>(GlobalConstants.getAllQueriesHeaderList + selectedValue, { headers: GlobalConstants.headers })
-  //       .subscribe(response => {
-  //         console.log(`We submitted: ${response}`);
-  //         // do something with the response data
-  //       });
-  //   }
-  // }
-  // onSubmit(): void {
-  //   const queryControl = this.gridForm.get('query');
-  //   if (queryControl && queryControl.value) {
-  //     const id = queryControl.value; // assuming the selected value is the ID
-  //     this.http.get<any>(GlobalConstants.getAllQueriesHeaderList + id, { headers: GlobalConstants.headers })
-  //      .subscribe(response => {
-  //         console.log(`We submitteddddddddd: ${response}`);
-  //         this.responseData = response;
-  //       });
-  //   }
-  // }
-
-  // openLookupDialog(): void {
-  //   const dialogRef = this.dialog.open(VLookupComponent, {
-  //     width: '700px',
-  //     data: [
-  //       {
-  //         label: 'Source Query',
-  //         lookupFieldName: 'query',
-  //         lookupDataId: 'getAllQueriesHeaderList',
-  //         lookupStaticData: '-1',
-  //         lookupSelection: 'ingle',
-  //         readonly: false
-  //       }
-  //     ]
-  //   });
-
-  //   dialogRef.afterClosed().subscribe(result => {
-  //     if (result === 'closed') {
-  //       this.onSubmit(); // Call the onSubmit function here
-  //     }
-  //   });
-  // }
-  
-  // responseData: any;
   onAddClickNodes() {
-    // const dialogConfig = new MatDialogConfig();
-    // dialogConfig.width = '700px';
-    // dialogConfig.height = '700px';
-
-    // const dialogRef = this.dialog.open(MasterLinkFormComponent, {
-    //   // data: info,
-    //   width: '70%',
-    //   height: '70%',
-    // });
   }
   onRunButtonClick(e: any) 
   {
@@ -930,14 +804,19 @@ export class MasterLinkFormComponent implements OnInit {
   }
   async saveMasterLinkData() {
     let check : boolean;
+    let eventCounter = 3;
+    if(this.isVisible) eventCounter = 5;
     if(!this.isVisible) {
       check = false;
     } else check=true;
     console.log('Save clicked');
     this.countEvent1 = this.countEvent2 = this.countEvent3 = this.countEvent4 = this.countEvent5 =0;
-    $('.defaultBtn').each(function() {
+    $('.defaultBtn').each(function(index) {
+
+      if (index >= eventCounter) return false; // Stop iteration after 5 buttons
       $(this).trigger('click');
     });
+    
     if(!check) this.isVisible = false;
 this.gridEventSave5();
 await this.jsonBuilder();
@@ -954,35 +833,6 @@ await this.jsonBuilder();
   {
 
   }
-  // submit() {
-  //   if (this.actionType == 'update') {
-  //     let allData = {
-  //       gridId: this.informationservice.getAgGidSelectedNode(),
-  //       userId: this.informationservice.getLogeduserId(),
-  //       gridName: this.gridForm.get("title").value,
-  //       query: localStorage.getItem('agGidSelectedLookup_(query)_id'),
-  //     }
-
-  //     this.http.post<any>(GlobalConstants.updateGrid, allData, { headers: GlobalConstants.headers }).subscribe(
-  //       (res: any) => {
-  //         this.commonFunctions.reloadPage("/dsp/gridBuilder");
-  //         this.commonFunctions.navigateToPage("/dsp/gridBuilder");
-  //       })
-  //   } else {
-  //     let allData = {
-  //       gridName: this.gridForm.get("title").value,
-  //       query: localStorage.getItem("agGidSelectedLookup_(query)_id"),
-  //       userId: this.informationservice.getLogeduserId(),
-  //     }
-
-  //     this.http.post<any>(GlobalConstants.addGridApi, allData, { headers: GlobalConstants.headers }).subscribe(
-  //       (res: any) => {
-  //         this.commonFunctions.reloadPage("/dsp/gridBuilder");
-  //         this.commonFunctions.navigateToPage("/dsp/gridBuilder");
-  //       })
-  //   }
-  //   this.closeDialog();
-  // }
   closeDialog() {
     this.dialog.closeAll();
   }
@@ -995,7 +845,15 @@ await this.jsonBuilder();
       console.log("updatedListtttttttttt", event[0].addList);
   
       let json: string = "\"nodes\":[";
-  
+      if(updatedData.length==0){ 
+        json += "{" +
+        "\"" + "nodeName" + "\"" + ":" + "\"" + "\"" + "," +
+        "\"" + "field" + "\"" + ":" + "\""  + "\"" + "," +
+        "\"" + "image" + "\"" + ":" + "\""  + "\"" + "," +
+        "\"" + "height" + "\"" + ":" + "\""  + "\"" + "," +
+        "\"" + "width" + "\"" + ":" + "\""  + "\"" + "}";
+      }
+      console.log("updatedData111111",updatedData);
       for (let i = 0; i < updatedData.length; i++) {
         if (updatedData[i].nodeName === undefined) {
           updatedData[i].nodeName = '';
@@ -1032,13 +890,7 @@ await this.jsonBuilder();
   }
   
 async gridEventSave3(event: any) {
-  if (!this.isVisible) {
-    let json: string = "\"nodeInfo\":[" +
-      "{" + "\"" + "infoName" + "\"" + ":" + "\"" + "" + "\"" + "," +
-      "\"" + "field" + "\"" + ":" + "\"" + "" + "\"" + "," +
-      "\"" + "linkedTo" + "\"" + ":" + "\"" + "" + "\"" + "}]";
-    this.jsonNodeInfo = json;
-  }
+
 
   if (this.countEvent3 == 0) {
     this.countEvent3++;
@@ -1047,6 +899,13 @@ async gridEventSave3(event: any) {
     console.log("updatedListtttttttttt", event[0].addList);
     let json: string = "\"nodeInfo\":[";
 
+    if(updatedData.length==0){
+      json += "{" +
+      "\"" + "infoName" + "\"" + ":" + "\"" + "\"" + "," +
+      "\"" + "field" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "linkedTo" + "\"" + ":" + "\""  + "\"" + "}";
+    }
+    console.log("updatedData3333",updatedData);
     for (let i = 0; i < updatedData.length; i++) {
       if (updatedData[i].infoName === undefined) {
         updatedData[i].infoName = '';
@@ -1082,6 +941,15 @@ async gridEventSave2(event: any) {
     console.log("updatedListtttttttttt", event[0].addList);
     let json: string = "\"link\":[";
 
+    if(updatedData.length==0){
+      json += "{" +
+      "\"" + "linkName" + "\"" + ":" + "\"" + "\"" + "," +
+      "\"" + "color" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "linkedFrom" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "linkedTo" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "label" + "\"" + ":" + "\""  + "\"" + "}";
+    }
+    console.log("updatedData22222",updatedData);
     for (let i = 0; i < updatedData.length; i++) {
       if (updatedData[i].linkName === undefined) {
         updatedData[i].linkName = '';
@@ -1122,15 +990,6 @@ async gridEventSave2(event: any) {
 }
 
 async gridEventSave4(event: any) {
-  if (!this.isVisible) {
-    let json: string = '';
-    json += "\"linkInfo\":[" +
-      "{" + "\"" + "infoName" + "\"" + ":" + "\"" + "" + "\"" + "," +
-      "\"" + "field" + "\"" + ":" + "\"" + "" + "\"" + "," +
-      "\"" + "source" + "\"" + ":" + "\"" + "" + "\"" + "," +
-      "\"" + "target" + "\"" + ":" + "\"" + "" + "\"" + "}" + "]";
-    this.jsonLinkInfo = json;
-  }
 
   if (this.countEvent4 == 0) {
     this.countEvent4++;
@@ -1139,6 +998,14 @@ async gridEventSave4(event: any) {
     console.log("updatedListtttttttttt", event[0].addList);
     let json: string = "\"linkInfo\":[";
 
+    if(updatedData.length == 0 ){
+      json += "{" +
+      "\"" + "infoName" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "field" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "source" + "\"" + ":" + "\""  + "\"" + "," +
+      "\"" + "target" + "\"" + ":" + "\""  + "\"" + "}";
+    }
+    console.log("updatedData4444",updatedData);
     for (let i = 0; i < updatedData.length; i++) {
       if (updatedData[i].infoName === undefined) {
         updatedData[i].infoName = '';
@@ -1179,81 +1046,12 @@ async gridEventSave5() {
   title: this.gridForm.get('title')?.value,
       query:this.gridForm.get('query')?.value,
     };
-  // if (this.titleInput.nativeElement) {
-  //   console.log('Value of #title input:', this.titleInput.nativeElement.value);
-  //   // Assign to a variable if needed
-  //   this.titleValue = this.titleInput.nativeElement.value;
-  // }
-  // else{this.titleValue="";}
     this.jsonMasterLink = JSON.stringify(jsonParams);
     
   console.log("jsonMasterLink :::::::",this.jsonMasterLink);
 
-      // if (updatedData.length > 0) {
-    //     try {
-    //         const gridEventSaveApi = from(axios.post(GlobalConstants.masterLinkData, JSON.parse(json)));
-    //         const gridEventSave = await lastValueFrom(gridEventSaveApi);
-    //         this.commonFunctions.alert("alert", gridEventSave.data.description);
-    //     } catch (error) {
-    //         console.log("gridEventSave error >>> ", error);
-    //     }
-    // } else {
-    //     this.commonFunctions.alert("alert", "No changes found");
-    //     return;
-    // }
-
   }}
 
-//   async gridEventSave(event: any) {
-//     console.log("event issssssssssss ::::::: ", event);
-//     let updatedData: any[] = event[0].addList;
-//     console.log("updatedListtttttttttt", event[0].addList);
-//     let json: string = '[';
-//     for (let i = 0; i < updatedData.length; i++) {
-//         if (updatedData[i].nodeName == undefined) {
-//             updatedData[i].nodeName = '';
-//         }
-//         if (updatedData[i].field == undefined) {
-//             updatedData[i].field = '';
-//         }
-//         if (updatedData[i].image == undefined) {
-//             updatedData[i].image = '';
-//         }
-//         if (updatedData[i].height == undefined) {
-//             updatedData[i].height = '';
-//         }
-//         if (updatedData[i].width == undefined) {
-//             updatedData[i].width = '';
-//         }
-//         if (i == updatedData.length - 1) {
-//             json += "{" + "\"" + "nodeName" + "\"" + ":" + "\"" + updatedData[i].nodeName + "\"" + "," +
-//                 "\"" + "field" + "\"" + ":" + "\"" + updatedData[i].field + "\"" + "," +
-//                 "\"" + "image" + "\"" + ":" + "\"" + updatedData[i].image + "\"" + "," +
-//                 "\"" + "height" + "\"" + ":" + "\"" + updatedData[i].height + "\"" + "," +
-//                 "\"" + "width" + "\"" + ":" + "\"" + updatedData[i].width + "\"" + "}";
-//             json += "]";
-//         } else {
-//             json += "{" + "\"" + "nodeName" + "\"" + ":" + "\"" + updatedData[i].nodeName + "\"" + "," +
-//                 "\"" + "field" + "\"" + ":" + "\"" + updatedData[i].field + "\"" + "," +
-//                 "\"" + "image" + "\"" + ":" + "\"" + updatedData[i].image + "\"" + "," +
-//                 "\"" + "height" + "\"" + ":" + "\"" + updatedData[i].height + "\"" + "," +
-//                 "\"" + "width" + "\"" + ":" + "\"" + updatedData[i].width + "\"" + "}" + ",";
-//         }
-//     }
-//     console.log("this is json data on save::::::::", json);
-//     if (updatedData.length > 0) {
-//         try {
-//             const gridEventSaveApi = from(axios.post(GlobalConstants.masterLinkData, JSON.parse(json)));
-//             const gridEventSave = await lastValueFrom(gridEventSaveApi);
-//             this.commonFunctions.alert("alert", gridEventSave.data.description);
-//         } catch (error) {
-//             console.log("gridEventSave error >>> ", error);
-//         }
-//     } else {
-//         this.commonFunctions.alert("alert", "No changes found");
-//         return;
-//     }
-// }
 
 
 }
