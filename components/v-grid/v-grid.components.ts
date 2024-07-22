@@ -212,7 +212,6 @@ export class AGGridComponent implements OnInit, OnChanges {
       // Uncheck if the row is selected
       if (node.isSelected()) {
         node.setSelected(false);
-        alert("Selected Checkbox Unchecked");
       }
     });
   }
@@ -927,8 +926,6 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
               console.log("LENGTH NAME>>>>",lenname);
               console.log("TESTT NAME>>>>>",llname[lenname-1]);
               console.log("LocalStorage>>>",localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id"));
-             // alert(event.data["name"]);
-             // alert(event.data["NAME"]);
 
              console.log("EVENT DATA>>>>>>>",event.data);
 
