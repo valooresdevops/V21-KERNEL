@@ -29,6 +29,7 @@ export class MasterLinkAnalysisComponent implements OnInit {
   public action: any;
   frameworkComponents: any;
   public getQbeQueryApi  = GlobalConstants.fetchQbeMappingApi;
+  public getMasterLinks  = GlobalConstants.getMasterLinks;
 
   public isQueryexecute: boolean;
   constructor(
@@ -53,17 +54,22 @@ export class MasterLinkAnalysisComponent implements OnInit {
     this.agColumnsJson = [
       {
         headerName: 'Master Link ID',
-        field: 'masterLinkId',
+        field: 'masterId',
         width: '25%',
       },
       {
         headerName: 'Master Link Name',
-        field: 'masterLinkName',
+        field: 'masterName',
         width: '30%',
       },
       {
+        headerName: 'Query Id',
+        field: 'masterQueryId',
+        width: '20%',
+      },
+      {
         headerName: 'Owner',
-        field: 'owner',
+        field: 'createdBy',
         width: '20%',
       },
       {

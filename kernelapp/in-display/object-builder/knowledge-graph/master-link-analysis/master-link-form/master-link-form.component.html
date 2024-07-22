@@ -5,10 +5,10 @@
   <hr>
 
   <div class="content">
-    <form [formGroup]="gridForm"  >
+    <form [formGroup]="gridForm" enctype="multipart/form-data">
       <div class="row">
         <div class="col-lg-5">
-          <v-input type="text" formControlName="title" [parentForm]="gridForm" label="Title" fieldName="title" required="true"></v-input>
+          <v-input formControlName="title" type="text" formControlName="title" [parentForm]="gridForm" label="Title" fieldName="title" required="true"></v-input>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
         <!-- (lookupDataSelected)="onLookupDataSelected($event)"--> 
         </div>
       </div>
-
+      <div *ngIf="isReload">
       <div class="hr-with-text">
         <span>Nodes</span>
       </div>
@@ -34,7 +34,11 @@
   agRowSelection="single"
   [agOnGridEvents]="true"
   (onGridDelete)="onDeleteClickNodes()" id="gridReload"
-  (reloadGrid)="onGridReload($event)">
+  (reloadGrid)="onGridReload($event)"
+  (onGridEventSave)="gridEventSave($event)"
+  [showOrHideButton]="true"
+  [hideBTN]="true">
+  <!-- <button class="defaultBtn" value="Submit" (click)="gridEventSave($event)">Submit</button> -->
 </v-grid>
 
 
@@ -43,8 +47,9 @@
         <span>Links</span>
       </div>
       <v-grid
+      
         allowSideBar="true"
-        [dataApi]=""
+        [dataApi]="test"
         [agColumns]="agColumns2"
         [pagination]="true"
         [paginationPageSize]="15"
@@ -52,13 +57,59 @@
         agRowSelection="single"
         [agOnGridEvents]="true"
         (onGridDelete)="onDeleteClickLinks()"
+        (onGridEventSave)="gridEventSave2($event)"
+        [showOrHideButton]="true"
+        [hideBTN]="true"
       ></v-grid>
 
+      <div id="addInfo" *ngIf="isVisible">
+        <div class="hr-with-text">
+        <span>Nodes Informations</span>
+      </div>
+      <v-grid 
+  allowSideBar="true"
+  [dataApi]="test"
+  [agColumns]="agColumns3"
+  [pagination]="true"
+  [paginationPageSize]="15"
+  agToolBar="ad"
+  agPrimaryKey="nodeName"
+  agRowSelection="single"
+  [agOnGridEvents]="true"
+  (onGridDelete)="onDeleteClickNodes()" 
+  (reloadGrid)="onGridReload($event)"
+  (onGridEventSave)="gridEventSave3($event)"
+  [showOrHideButton]="true"
+  [hideBTN]="true">
+</v-grid>
+
+<hr>
+      <div class="hr-with-text">
+        <span>Links Informations</span>
+      </div>
+      <v-grid
+      
+        allowSideBar="true"
+        [dataApi]="test"
+        [agColumns]="agColumns4"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        agToolBar="ad"
+        agRowSelection="single"
+        [agOnGridEvents]="true"
+        (onGridDelete)="onDeleteClickLinks()"
+        (onGridEventSave)="gridEventSave4($event)"
+        [showOrHideButton]="true"
+        [hideBTN]="true"
+      ></v-grid>
+
+</div>
+</div>
       <div class="button-container">
         <v-button value="Add Info" (click)="addInfo()"></v-button>
-        <v-button value="Save" (click)="save()"></v-button>
-        <v-button value="Submit" type="submit"></v-button>
+        <v-button value="Save" (click)="saveMasterLinkData()"></v-button>
       </div>
     </form>
   </div>
+
 </body>

@@ -11955,8 +11955,7 @@ changebar(){
 
         this.TcdRowData = [];
         console.log('Azimuth >>>>>>', e.target.Azimuth ," lat--",e.target.lat,"   lng-------",e.target.lng);
-        console.log('Azimuth >>>>>>',typeof e.target.Azimuth ," lat--",typeof e.target.lat,"   lng-------",typeof e.target.lng);
-
+ 
         // this.datajson.markerPositions.forEach((element: any, key: any) => {
           let findedSectors: any = object.filter((element: any) => {
             return element[7] === e.target.Azimuth && Number(element[4]).toString() === e.target.lat && Number(element[5]).toString() === e.target.lng
@@ -17734,7 +17733,7 @@ let obj22:any={
       console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
 
-if(data[0].colName=="bts_cell_id"){
+if(data[0].colName=="bts_cell_id" ){
   console.log("data >>>>>>>>>>",data);
   console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
     )]);
@@ -17749,8 +17748,8 @@ if(data[0].colName=="bts_cell_id"){
   });
 
 
-}else if(data[0].colName=="LOC_REPORT_CONFIG_ID"){
-  await this.datacrowdService.getSimulationobject([data[0].colValue]).then((res:any)=>{
+}else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
+  await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
     console.log("res in getSimulationobject ",res);
     this.datajson=res;
     if (this.datajson !== null) {
