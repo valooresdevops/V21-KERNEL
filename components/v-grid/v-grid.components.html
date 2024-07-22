@@ -118,6 +118,7 @@
                      [groupDisplayType]="groupDisplayType"
                      [autoGroupColumnDef]="autoGroupColumnDef"
                      [groupAllowUnbalanced]="true"
+                     (columnRowGroupChanged)="onColumnRowGroupChanged($event)"
                      >
     </ag-grid-angular>
     <form style="position: relative;" [formGroup]="paginationChange" *ngIf="allowPagination">
