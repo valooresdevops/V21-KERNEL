@@ -13,6 +13,8 @@
   (onGridEventSave)="gridEventSave($event)"
   [dataApi]="test"
   [showOrHideButton]="true"
-  [dataApiParam]="dataApiParam" >
+  [dataApiParam]="dataApiParam" 
+  [gridOptions]="gridOptions"
+      (gridReady)="onGridReady($event)">
 </v-grid>
 

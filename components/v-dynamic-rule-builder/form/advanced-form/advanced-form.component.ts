@@ -11,7 +11,7 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
 import { AgRendererComponent } from 'ag-grid-angular';
 import { InformationService } from 'src/app/Kernel/services/information.service';
-
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
   selector: 'advanced-form',
@@ -19,13 +19,26 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
   styleUrls: ['./advanced-form.component.css']
 })
 export class AdvancedFormComponent implements OnInit {
+
+  gridOptions: GridOptions;
+  rowData: any[] = [
+    { make: "Toyota", model: "Celica", price: 35000 },
+    { make: "Ford", model: "Mondeo", price: 32000 },
+    { make: "Porsche", model: "Boxster", price: 72000 }
+  ];
+
   @ViewChild('agGrid', { static: true }) agGrid!: AgGridAngular;
 
   constructor(@Inject(MAT_DIALOG_DATA) public lookupData: any,
     private dialogRef: MatDialogRef<AdvancedFormComponent>,
     private refreshService: RefreshDialogService,
     private http: HttpClient,
-    public informationservice: InformationService) { }
+    public informationservice: InformationService,
+  ) { this.gridOptions = {
+    rowData: this.rowData,
+    // Define columns here if needed
+  };}
+    
 
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
@@ -176,6 +189,19 @@ export class AdvancedFormComponent implements OnInit {
   }
 
 
+  onGridReady(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+  }
+
+  getAllRowsData(api : any) {
+    let allRowData : any[]= [];
+    api.forEachNode((node: any) => {
+      allRowData.push(node.data);
+    });
+    console.log('All Row Data:', allRowData);
+    // Now you can save allRowData
+  }
 
   CreateGridSaveNew() {
     this.agColumnsJson = [
@@ -291,7 +317,7 @@ export class AdvancedFormComponent implements OnInit {
   }
 
   async gridEventSave(event: any) {
-console.log("event >>>>>>> ",event);     
+  console.log("event >>>>>>> ",event);     
       const addList = event[0].addList;
       this.addList = JSON.stringify(addList);
       let Object = JSON.parse(this.addList);
@@ -360,6 +386,9 @@ console.log("event >>>>>>> ",event);
 
     this.closeDialog(event[0]);
   }
+
+  
+
 }
 
 // class DropdownCellRenderer {

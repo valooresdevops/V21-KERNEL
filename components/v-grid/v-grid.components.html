@@ -135,7 +135,7 @@
     </form>
 </div>
 
-<div *ngIf="showOrHideButton == true" class="agSubmitBtn p-3">
-    <v-button btnActionType="button" value="Submit" (click)="onGridEventSaveFn()"></v-button>
+<div id="submitBtn" *ngIf="showOrHideButton == true" class="agSubmitBtn p-3">
+    <v-button [ngStyle]="{'display': hideBTN ? 'none' : 'block'}" btnActionType="button" value="Submit" (click)="onGridEventSaveFn()"></v-button>
 </div>
 

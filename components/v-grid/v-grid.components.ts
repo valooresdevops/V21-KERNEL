@@ -109,6 +109,8 @@ export class AGGridComponent implements OnInit, OnChanges {
   @Input() public agOnGridEvents: boolean = false;
   //used to show or hide the submit button under the grid 
   @Input() public showOrHideButton: boolean = false;
+  //used in masterLinkForm to hide the buttons but the functionality still works
+  @Input() public hideBTN: boolean = false;
   // Used to specify the menuvariable of the grid
   @Input() public menuVariable: any;
   // Used as flag to show if the grid will allow grouping or no
