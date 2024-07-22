@@ -151,14 +151,12 @@
                 [fontawesome]="'fas fa-cogs'"
                 (click)="openParameterBuilder()">
               </v-button>
-              <v-button class=".right-buttons" [value]="'Link query'" [btnActionType]="'button'"
-                (click)="linkQuery()"
-                [fontawesome]="'fas fa-link'">
-              </v-button>
-              <v-button class=".right-buttons" [value]="'Link procedure'" [btnActionType]="'button'"
-                [fontawesome]="'fas fa-link'"
-                (click)="linkProcedure()">
-              </v-button>
+              <div *ngIf="isQueryValid">
+              <v-button class=".right-buttons" [value]="'Advanced'" [btnActionType]="'button'"
+              [fontawesome]="'fas fa-cogs'"
+              (click)="openAdvanceRowIdBuilder()">
+            </v-button>
+          </div>
             </div>
           </div>
         </div>

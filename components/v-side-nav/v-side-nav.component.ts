@@ -301,6 +301,9 @@ export class SideNavComponent implements OnInit {
   toggleUserProfileDropdown() {
     $("#myDropdown0").removeClass("show");
     $("#myDropdown1").toggleClass("show");
+
+    console.log("malekkk>>><<", $("#openLoginUser"))
+    $("#openLoginUser").click();
   }
   toggleSettingsDropdown() {
     $("#myDropdown0").removeClass("show");

@@ -109,11 +109,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
       // custom item
       name: 'Copy',
       action: () => {
-        //console.log('params>>>', params);
-        //console.log('params>>>', params.node.key);
-        // navigator.clipboard.writeText(params.value);
-        this.gridApi.copyToClipboard(params.value);
-
+         // Check if navigator.clipboard is available and we're in a secure context
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(params.node.key)
+        .then(() => console.log('Copying to clipboard was successful!'))
+        .catch(err => console.error('Failed to copy text: ', err));
+    } else {
+      console.warn('Clipboard API is not available in this context.');
+      // Inline fallback method if Clipboard API is not available
+      const textarea = document.createElement("textarea");
+      textarea.textContent = params.node.key;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        console.log('Copying to clipboard using fallback method.');
+      } catch (error) {
+        console.error("Fallback copy to clipboard failed.", error);
+      }
+    }
         
       },
       cssClasses: ['redFont', 'bold'],
@@ -139,11 +154,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
         // custom item
         name: 'Copy',
         action: () => {
-          //console.log('params>>>', params);
-          //console.log('params>>>', params.node.key);
-          // navigator.clipboard.writeText(params.value);
-          this.gridApi.copyToClipboard(params.value);
-
+          // Check if navigator.clipboard is available and we're in a secure context
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(params.node.key)
+              .then(() => console.log('Copying to clipboard was successful!'))
+              .catch(err => console.error('Failed to copy text: ', err));
+          } else {
+            console.warn('Clipboard API is not available in this context.');
+            // Inline fallback method if Clipboard API is not available
+            const textarea = document.createElement("textarea");
+            textarea.textContent = params.node.key;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+              document.execCommand("copy");
+              document.body.removeChild(textarea);
+              console.log('Copying to clipboard using fallback method.');
+            } catch (error) {
+              console.error("Fallback copy to clipboard failed.", error);
+            }
+          }
         },
         cssClasses: ['redFont', 'bold'],
       },
@@ -168,9 +198,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
           // custom item
           name: 'Copy',
           action: () => {
-            //console.log('params>>>', params);
-            //console.log('params>>>', params.node.key);
-            navigator.clipboard.writeText(params.node.key);
+            // Check if navigator.clipboard is available and we're in a secure context
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard.writeText(params.node.key)
+                .then(() => console.log('Copying to clipboard was successful!'))
+                .catch(err => console.error('Failed to copy text: ', err));
+            } else {
+              console.warn('Clipboard API is not available in this context.');
+              // Inline fallback method if Clipboard API is not available
+              const textarea = document.createElement("textarea");
+              textarea.textContent = params.node.key;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                console.log('Copying to clipboard using fallback method.');
+              } catch (error) {
+                console.error("Fallback copy to clipboard failed.", error);
+              }
+            }
           },
           cssClasses: ['redFont', 'bold'],
         },
@@ -284,7 +331,7 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
     event.api.forEachNode((rowNode:any, index:any) => {
       let make = rowNode.selected;
       
-      //console.log("rowNode>>>",rowNode.selected);
+      console.log("rowNode>>>",rowNode);
       
      
 

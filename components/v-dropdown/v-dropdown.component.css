@@ -59,7 +59,7 @@
 
 .v-dropdown-style .multiselect-dropdown .dropdown-list {
   position: absolute;
-  z-index: 9999;
+  z-index: 999;
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
@@ -87,7 +87,7 @@
 
 .v-dropdown-style .dropdown-list {
   position: absolute;
-  z-index: 9999;
+  z-index: 999;
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
@@ -173,7 +173,7 @@
 
 .phone-number-dropdown-style .multiselect-dropdown .dropdown-list {
   position: absolute;
-  z-index: 9999;
+  z-index: 999;
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;

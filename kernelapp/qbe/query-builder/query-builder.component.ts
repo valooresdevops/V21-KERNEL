@@ -215,6 +215,13 @@ if (JSON.parse(this.informationservice.getAgGidSelectedNode()).length>1 || this.
         this.commonFunctions.navigateToPage(
           "/qbe/queryBuilder/formQBE/update/-1");
         }
+        if(JSON.parse(this.informationservice.getAgGidSelectedNode())[0].import_flag=="CQL"){
+          console.log('CQL button clicked');
+    
+          this.showPopup = false;
+          this.commonFunctions.navigateToPage(
+            "/qbe/queryBuilder/formCQL/update/-1");
+          }
   }
 
   }

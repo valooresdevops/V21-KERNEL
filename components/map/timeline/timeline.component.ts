@@ -835,7 +835,7 @@ this.generateTimeline();
       $("#modal-content1").css("border-radius", "12px");
       $("#modal-content1").css("position", "absolute");
       $("#modal-content1").css("border", "2px solid");
-      $("#modal-content1").css("z-index", "99999999999");
+      $("#modal-content1").css("z-index", "999999999");
       $("#modal-content1").css("background-color", "white");
 
       $("#modal-content1").draggable({

@@ -150,7 +150,7 @@
   ></app-v-table>
  </div> -->
 
- <div id="tabletest" *ngIf="openTable===true">
+ <div id="tabletest" style="z-index: 99991;" *ngIf="openTable===true">
   <app-v-table  #childRef [tableData]="Datatable" [tablerow]="tablerow" [tableColumns]="displayedColumns"  [routeDevices]="routeDevicestable" [typeofdata]="typeofdata"  (clickedRow)="changeview($event)"  (clickedDeviceId)="clickedDeviceId($event)"
   ></app-v-table>
  </div>
@@ -226,7 +226,7 @@
 
 <!--test1-->
 
-<div id="controlbutton"  style="position: relative; height: 0px; top: 13px; left:204px; z-index: 9999;">
+<div id="controlbutton"  style="position: relative; height: 0px; top: 13px; left:204px; z-index: 999;">
 <div title="Controls" (click)="filterData22()"
 class="customButtons customButtons_Layout">
 <i class="fa-solid fa-layer-group"></i>
@@ -349,7 +349,7 @@ oncontextmenu="return false;"
   
   <button style="position: relative;
   width: 31px;
-  z-index: 99999;
+  z-index: 999;
   left: 121px;
     outline-color: transparent;
   border-radius: 2px;
@@ -647,7 +647,7 @@ displaysenario
 class="showMeasure showMeasure_Layout dropdown">
 <i class="fas fa-ruler-combined"></i>
 <!-- <img src="/src/assets/img/" alt="map" class="dropbtn"> -->
-<div   style="z-index: 999999999999999999 !important ;"  class="dropdown-content">
+<div   style="z-index: 999 !important ;"  class="dropdown-content">
   <a     id="Polygondraw" (click)="startDrawingPolygon()" title='Measure in meters square'>Polygon</a>
   <a     id="Linedraw" (click)="startDrawingPolyline()" title='Measure in meters'>Polyline</a>
 </div>
@@ -672,7 +672,7 @@ class="showMeasure showMeasure_Layout dropdown">
 </div> -->
 
 
-<div  id="search"  class="box" style="top: -14px;position: absolute; right: 6px; z-index: 99999; box-shadow: 0 1px 7px #999;" >
+<div  id="search"  class="box" style="top: -14px;position: absolute; right: 6px; z-index: 999; box-shadow: 0 1px 7px #9999;" >
   <i class="fa fa-search" aria-hidden="true" ></i>
   <input id="searchlocation" type="text" [(ngModel)]="locationName" placeholder="Search Location..." (window:keydown.enter)="search(locationName)"> 
 
@@ -682,7 +682,7 @@ class="showMeasure showMeasure_Layout dropdown">
 <button id="addnewSenario" style="display: none;"  (click)="addnewSenario()"></button>
 
 
-<div  id='routebar' style="display: none ;position: absolute;bottom: 0;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
+<div  id='routebar' style="display: none ;position: absolute;bottom: 0;z-index: 999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
   <button (click)="startRoute()" >Start</button>
   <button (click)="stopRoute()">Stop</button>
   <button (click)="opentimelineScreen()"> Display Data</button>
@@ -910,7 +910,7 @@ class="showMeasure showMeasure_Layout dropdown">
 </div>
 
 
-<div   *ngIf="ShowHeader" id="refresh" style=" position: absolute; z-index: 9999999999999 ; background-color:white;
+<div   *ngIf="ShowHeader" id="refresh" style=" position: absolute; z-index: 999 ; background-color:white;
 display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; ">
 <fieldset > 
    <legend id="legend">Simulation</legend>  
@@ -929,5 +929,10 @@ display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; "
 </div> -->
 
 
+<button id="openLoginUser"
 
-<!-- <button id="openproperties" style="display: none;" ></button> -->
+style="display:none;"
+(click)="openLoginUser()"
+>
+openLoginUser
+</button> 

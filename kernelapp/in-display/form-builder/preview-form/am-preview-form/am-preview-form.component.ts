@@ -136,6 +136,8 @@ export class AmPreviewFormComponent implements OnInit {
     { id: 3, name: 'Execute Query' }
   ];
   public ruleCallApiData:any=[];
+  public getFieldDynamicTitle:any;
+  public getFieldDynamicTitleValue: string = '';
 
   constructor(private dialogRef: MatDialogRef<AmPreviewFormComponent>,
     @Inject(MAT_DIALOG_DATA) public lookupData: any,
@@ -162,7 +164,7 @@ export class AmPreviewFormComponent implements OnInit {
     this.loaderService.isLoading.next(true);
     const allColumnsLibraryUrl = from(axios.get(GlobalConstants.getColumnsApi + objectId));
     const allColumns = await lastValueFrom(allColumnsLibraryUrl);
-    console.log('allcolumns>>>>>>>',allColumns)
+    //console.log('allcolumns>>>>>>>',allColumns)
     this.allColumnsLibrary = allColumns.data;
     this.loaderService.isLoading.next(false);
   }
@@ -230,7 +232,7 @@ export class AmPreviewFormComponent implements OnInit {
         returnedValue = moment(colVal).format('MM/DD/YYYY');
       } else if (colType.toUpperCase() == "DATE TIME") {
         let dateParts = colVal.split('T');
-        console.log("dateParts>>>>>>>>>>>>>>>>>>>> :", dateParts);
+        //console.log("dateParts>>>>>>>>>>>>>>>>>>>> :", dateParts);
         if(dateParts.length > 1){
         returnedValue = dateParts[0] + ' ' + dateParts[1].substring(0, 5);
         }else if(dateParts.length == 1 ){
@@ -556,9 +558,9 @@ export class AmPreviewFormComponent implements OnInit {
     let substring: string = 'Initiation';
     let mainString : string = this.informationservice.getPopupBreadcrumb();
     let checkExisting  = this.informationservice.getCheckExisting();
-    console.log("localStorage.getItem(closeTwice) =======>",localStorage.getItem("closeTwice"));
+    //console.log("localStorage.getItem(closeTwice) =======>",localStorage.getItem("closeTwice"));
     if(localStorage.getItem("closeTwice") == "true"){
-      console.log("heyyy should close another one")
+      //console.log("heyyy should close another one")
       localStorage.setItem("closeTwice","false");
       this.closeDialog(true);
      }
@@ -577,8 +579,8 @@ export class AmPreviewFormComponent implements OnInit {
     this.informationservice.getPopupBreadcrumb() == "Authorized Signature"){
       if(this.informationservice.getOpenLikeForm() == 'yes'){
         this.informationservice.setReopen('yes');
-        console.log("this.actionType >>>>>> ",this.actionType);
-        console.log("this.informationservice.getAgGidSelectedNode()=",this.informationservice.getAgGidSelectedNode())
+        //console.log("this.actionType >>>>>> ",this.actionType);
+        //console.log("this.informationservice.getAgGidSelectedNode()=",this.informationservice.getAgGidSelectedNode())
         this.closeDialog(true);
       }
       else if(this.informationservice.getReopen() == 'yes'){
@@ -1133,7 +1135,7 @@ export class AmPreviewFormComponent implements OnInit {
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnBeforeSave error >>> ", error)
+      //console.log("dynamicDRBOnBeforeSave error >>> ", error)
     }
   }
 
@@ -1195,7 +1197,7 @@ export class AmPreviewFormComponent implements OnInit {
                   endOfUrl = ruleData[i].data;
                 }
                 if (ruleData[i].step == 3) {
-                  console.log("ruleData>>>>>>>>",ruleData[i]);
+                  //console.log("ruleData>>>>>>>>",ruleData[i]);
                   Apiparams = ruleData[i].data;
                 }
                 if (ruleData[i].step == 21) {
@@ -1476,7 +1478,7 @@ export class AmPreviewFormComponent implements OnInit {
       }
 
     } catch (error) {
-      console.log("dynamicDRBOnAfterSave error >>> ", error)
+      //console.log("dynamicDRBOnAfterSave error >>> ", error)
     }
   }
 
@@ -1572,7 +1574,7 @@ export class AmPreviewFormComponent implements OnInit {
                     else if (action == "Show Button") {
                     ////elie///////
                     executeOnFieldAdv = ruleData[i].data;
-                    
+
                     }
                     //////////
                     else if (action == "Execute Query") {
@@ -1830,8 +1832,8 @@ export class AmPreviewFormComponent implements OnInit {
                 }
               }
               else {
-console.log("ruleID >>>>>>>>>",ruleId);
-console.log("ruleData >>>>",ruleData);
+//console.log("ruleID >>>>>>>>>",ruleId);
+//console.log("ruleData >>>>",ruleData);
 
                 TypeOfAction = ruleData[0].data;
                 for (let i = 0; i < ruleData.length; i++) {
@@ -1853,7 +1855,7 @@ console.log("ruleData >>>>",ruleData);
                           }
 
                       }
-                        console.log("choosenField=",choosenField)
+                        //console.log("choosenField=",choosenField)
                     } else if (ruleData[i].step == 10 && ruleData[i].data != '') {
                       let queryData = ruleData[i].data;
 
@@ -1967,7 +1969,7 @@ console.log("ruleData >>>>",ruleData);
                       }
                     } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
                       executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
-console.log("executeAction >>>>>>>>>>",executeAction);
+//console.log("executeAction >>>>>>>>>>",executeAction);
                     } else if (ruleData[i].step == 42) {
                       if (ruleData[i].data != "") {
                         // if ($("#field_" + ruleData[i].data)[0]) {
@@ -2200,7 +2202,7 @@ console.log("executeAction >>>>>>>>>>",executeAction);
                       if (executeAction == "Show Field" || executeAction == "Show Button") {
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Hide Field" || executeAction == "Hide Button") {
-console.log("Hide Button 1");
+//console.log("Hide Button 1");
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Show FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
@@ -2213,7 +2215,7 @@ console.log("Hide Button 1");
                       } else if (executeAction == "Read Only") {
                         if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
                           if (executeOnField.length >= 1) {
-console.log("executeOnField >>>>>>>>>>",executeOnField);
+//console.log("executeOnField >>>>>>>>>>",executeOnField);
                             for (let u = 0; u < executeOnField.length; u++) {
                               let fieldId: any;
                               if (executeOnField[u].id) {
@@ -2352,7 +2354,7 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnload error >>> ", error)
+      //console.log("dynamicDRBOnload error >>> ", error)
     }
   }
 
@@ -2772,7 +2774,7 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
                       this.dynamicForm.controls[listOfFields[i]].setValue('').change();
                     }
                   } else if (action == "Show Field" || action == "Hide Field" || action == "Hide Button" || action == "Show Button") {
-console.log("Hide Button 2");
+//console.log("Hide Button 2");
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                     this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
@@ -2795,7 +2797,7 @@ console.log("Hide Button 2");
                 }
               } else {
 
-console.log("ruleData >>>>>>>>",ruleData);
+//console.log("ruleData >>>>>>>>",ruleData);
                 for (let i = 0; i < ruleData.length; i++) {
                   if (ruleData[i].step == 0) {
                     if (ruleData[i].data != "") {
@@ -2817,12 +2819,12 @@ console.log("ruleData >>>>>>>>",ruleData);
                       }
 
                     }
-console.log("choosenField=",choosenField);
+//console.log("choosenField=",choosenField);
                   } else if (ruleData[i].step == 2) {
                     if (ruleData[i].data != "") {
                       condition = this.commonFunctions.filterArrayById(this.conditions, ruleData[i].data)[0].name;
                     }
-console.log("condition=",condition);
+//console.log("condition=",condition);
                   } else if (ruleData[i].step == 3) {
                     if (ruleData[i].data != "") {  // this.executionAction
                       actionDecisions = this.commonFunctions.filterArrayById(this.valueSource, ruleData[i].data)[0].name;
@@ -2831,7 +2833,7 @@ console.log("condition=",condition);
                     if (ruleData[i].data != "") {
                       dateTypes = this.commonFunctions.filterArrayById(this.dateTypes, ruleData[i].data)[0].name;
                     }
-console.log("dateTypes=",dateTypes);
+//console.log("dateTypes=",dateTypes);
                   } else if (ruleData[i].step == 200) {
                     if (ruleData[i].data != "") {
                       // fieldValue = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -2860,7 +2862,7 @@ console.log("dateTypes=",dateTypes);
                       //   comparedField = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       // }
                     }
-console.log("comparedField =",comparedField);
+//console.log("comparedField =",comparedField);
                   } else if (ruleData[i].step == 202) {
                     if (ruleData[i].data != "") {
                       // comparedToField = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -2962,7 +2964,7 @@ console.log("comparedField =",comparedField);
                       // fieldToFillIn = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
                       if ($("#field_" + ruleData[i].data)[0]) {
                         fieldToFillIn = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
-                        console.log("fieldToFillIn >>>",fieldToFillIn);
+                        //console.log("fieldToFillIn >>>",fieldToFillIn);
                       } else {
                         fieldToFillIn = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       }
@@ -3004,7 +3006,7 @@ console.log("comparedField =",comparedField);
                   } else if (ruleData[i].step == 31) {
                     if (ruleData[i].data != "") {
                       valueToOperate = ruleData[i].data;
-console.log("valueToOperate=",valueToOperate);
+//console.log("valueToOperate=",valueToOperate);
                     }
                   } else if (ruleData[i].step == 210) {
                     if (ruleData[i].data != "") {
@@ -3050,7 +3052,7 @@ console.log("valueToOperate=",valueToOperate);
                     } else {
                       conditionValue = ruleData[i].data;
                     }
-console.log("conditionValue=",conditionValue);
+//console.log("conditionValue=",conditionValue);
                   } else if (ruleData[i].step == 42) {
                     if (ruleData[i].data != "") {
                       // testId = ruleData[i].data;
@@ -3058,25 +3060,25 @@ console.log("conditionValue=",conditionValue);
                       //   return el.id === ruleData[i].data;
                       // });
                       // defaultField = data[0].name;
-                      // console.log("defaultField=",defaultField);
+                      // //console.log("defaultField=",defaultField);
 
 
                       //jppppppppppp
                       let testIds = Array.isArray(ruleData[i].data) ? ruleData[i].data : [ruleData[i].data];
-                    
+
                       let data = this.test.filter((el: any) => {
                         return testIds.includes(el.id);
                       });
-                    
+
                       let defaultFields = data.map(el => el.name);
-                    
+
                       defaultField = defaultFields.join(', ');
-                                        
+
                     }
                   } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
                   } else if (ruleData[i].step == 44) {
-console.log("executeAction=",executeAction);
+//console.log("executeAction=",executeAction);
                     if (ruleData[i].data != "") {
                       if (executeAction == "Show Field" || executeAction == "Hide Field" || executeAction == "Required" || executeAction == "Optional" || executeAction == "Read Only" || executeAction == "Remove Read Only" || executeAction == "Rename Field" || executeAction == "Hide Button" || executeAction == "Show Button") {
                         executeOnField = ruleData[i].data;
@@ -3180,7 +3182,7 @@ console.log("executeAction=",executeAction);
                         });
                         queryRes = modifiedData;
                       }
-console.log("queryRes ===",queryRes)
+//console.log("queryRes ===",queryRes)
                     }
                     if (executeAction == "Alert") {
                       alertValue = ruleData[i].data;
@@ -3198,7 +3200,7 @@ console.log("queryRes ===",queryRes)
                   }
                 }
               }
-console.log("ruleAction >>>>>>>=",ruleAction)
+//console.log("ruleAction >>>>>>>=",ruleAction)
               if (ruleAction == "On Change") {
                 if (condition == '=' || condition == '!=') {
                   if (dateTypes == 'Value' && condition != 'between') {
@@ -3212,7 +3214,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     }
                     else if (executeAction == 'Execute Query') {
                       for (let c = 0; c < this.test.length; c++) {
-                        console.log('default field -----123---->',defaultField);
+                        //console.log('default field -----123---->',defaultField);
                         // if (this.test[c].name == defaultField && this.test[c].columnType == "lookup") {
                         //   $('#' + this.test[c].name).val(queryRes);
                         //   $('#' + this.test[c].name + "_lookupName").val(queryRes);
@@ -3227,7 +3229,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       }
 
                       let choosenFieldValue: any = this.dynamicForm.controls[choosenField]?.value;
-                      console.log("choosenFieldValue----------->",choosenFieldValue)
+                      //console.log("choosenFieldValue----------->",choosenFieldValue)
                       //JANA AND RONY
                       if (this.dynamicIfCondition(conditionValue, choosenFieldValue, -1, condition)) {
                       //change here---> (change data of the dropdown):
@@ -3398,15 +3400,15 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     } else if (executeAction == "Optional") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Read Only") {
-                      console.log("readOnly>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                      console.log("choosenField>>>>>> :",choosenField);
-                      console.log("conditionValue>>>>>>>>>>",conditionValue)
-                      console.log("condition>>>>>>>>>>",condition)
+                      //console.log("readOnly>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+                      //console.log("choosenField>>>>>> :",choosenField);
+                      //console.log("conditionValue>>>>>>>>>>",conditionValue)
+                      //console.log("condition>>>>>>>>>>",condition)
 
 
 
                       if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
-                        console.log("executeOnField>>>>>>>>>>",executeOnField)
+                        //console.log("executeOnField>>>>>>>>>>",executeOnField)
 
                         if (executeOnField.length >= 1) {
                           for (let u = 0; u < executeOnField.length; u++) {
@@ -3421,7 +3423,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
                             if ($("#field_" + fieldId)[0]) {
                               for (let c = 0; c < this.test.length; c++) {
-                                console.log(this.test[c].columnType)
+                                //console.log(this.test[c].columnType)
 
                                 if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
                                   this.test[c].qbeReadOnly = true;
@@ -3431,7 +3433,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
                                   break;
                                 }else if(this.test[c].id === fieldId && this.test[c].columnType == "phone number"){
-                                  console.log("11111111111111111122222222221111111111111111111",this.test[c]);
+                                  //console.log("11111111111111111122222222221111111111111111111",this.test[c]);
                                   this.test[c].qbeReadOnly = true;
                                 }
                               }
@@ -3890,7 +3892,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     let comparedFieldValue = this.dynamicForm.controls[comparedField]?.value;
                      if(condition == 'Include'){
                       const include = choosenFieldValue.includes(comparedFieldValue);
-                      console.log("includeValue is =",include);
+                      //console.log("includeValue is =",include);
                       if(include == true){
                       this.commonFunctions.alert("alert", alertValue);
                       this.handleFormFieldValues(choosenField, "");
@@ -3906,7 +3908,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnchange error >>> ", error);
+      //console.log("dynamicDRBOnchange error >>> ", error);
     }
   }
 
@@ -4059,7 +4061,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
     }
 
     if (executeAction == "Read Only") {
-console.log('execution-----------> :',execution)
+//console.log('execution-----------> :',execution)
       if (execution.length >= 1) {
         for (let u = 0; u < execution.length; u++) {
           if ($("#field_" + execution[u])[0]) {
@@ -4271,7 +4273,7 @@ console.log('execution-----------> :',execution)
   }
 
   async loadAM(isFromDialogClose: boolean) {
-    console.log("this.amInfo======", this.amInfo);
+    //console.log("this.amInfo======", this.amInfo);
 
     try {
       this.ListToFillData = [{ 'fieldToFillIn': '', 'choosenValue': '', 'fieldToFillInOrder': '', 'choosenFielddd': '' }];
@@ -4325,13 +4327,13 @@ console.log('execution-----------> :',execution)
         // )
 
         let isGrid = 1;
-console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
+//console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == 1) {
           isGrid = 0;
         } else {
           isGrid = getAllTabs.data[i].isGrid;
         }
-console.log("isGrid ========",isGrid);
+//console.log("isGrid ========",isGrid);
         // If condition lookup to disable a tab on onload
         let conditionTest: any;
         let condition = getAllTabs.data[i].condition == null ? -1 : getAllTabs.data[i].condition;
@@ -4614,8 +4616,8 @@ console.log("isGrid ========",isGrid);
           "isSave": isSaveBtn,
           "isReadOnly": isReadOnlyB
         });
-        console.log("TEST>>>>>>>>>>>>",this.tableOptions1);
-        console.log("getAllTabs.data[i] >>>>",getAllTabs.data[i]);
+        //console.log("TEST>>>>>>>>>>>>",this.tableOptions1);
+        //console.log("getAllTabs.data[i] >>>>",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == "1") {
           //test2
           let previousTab = this.informationservice.getPreviousMainTab();
@@ -4628,7 +4630,7 @@ console.log("isGrid ========",isGrid);
             this.informationservice.setMainTab(previousTab);
           }
           if (!previousTab) {
-            console.log("previousTab wiiiiiiii=",getAllTabs.data[i].menuName);
+            //console.log("previousTab wiiiiiiii=",getAllTabs.data[i].menuName);
             // this.informationservice.setMainTab(getAllTabs.data[i].menuName);
             this.informationservice.setMainTab(this.informationservice.getPreviousMainTab());
           }
@@ -4646,7 +4648,7 @@ console.log("isGrid ========",isGrid);
       this.dialogRef.disableClose = true;
 
     } catch (error) {
-      console.log("Onload error >>> ", error);
+      //console.log("Onload error >>> ", error);
     }
   }
 
@@ -4713,7 +4715,7 @@ console.log("isGrid ========",isGrid);
   async getAllColums() {
     //SERVICE1998
 
-    console.log("number into this function >>>>>>>>>>>>>>>>>")
+    //console.log("number into this function >>>>>>>>>>>>>>>>>")
     this.informationservice.setDynamicService("~" + this.informationservice.getSelectedTabName() + "~", JSON.stringify(this.amInfo));
 
     this.loaderService.isLoading.next(true);
@@ -4733,7 +4735,7 @@ console.log("isGrid ========",isGrid);
     this.actionType = this.amInfo.actionType;
     objectId = this.amInfo.objectId;
 
-console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
+//console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
     const getMenuNameApiUrl = from(axios.get(GlobalConstants.getMenuNameApi + objectId));
     const getMenuNameApi = await lastValueFrom(getMenuNameApiUrl);
 
@@ -4768,7 +4770,7 @@ console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
     this.loadAllFormColumns(this.objectId);
 
     // Filter tableOptions on selected tab
-    console.log("ALL OPTIONS>>>>>>>>>>>>>",this.tableOptions1)
+    //console.log("ALL OPTIONS>>>>>>>>>>>>>",this.tableOptions1)
     let tableOptions: any = this.tableOptions1.filter((el: any) => {
       return Number(el.objectId) === Number(this.objectId);
     });
@@ -5021,31 +5023,90 @@ console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
       hasSourceQuery = 1;
     }
 
-    const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
+//     const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
+//     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
+//     isGrid = getTabConfigurationApi.data[0].isGrid;
+
+// //console.log("is grid ya  >>>>>>>>>>>>>>>>>>>>>>> : " , isGrid);
+// //console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
+//     ////////////////elie//////////////////////////////////
+//     //console.log("AMINFO>>>>>>>>>>>>",this.amInfo);
+//     //console.log("getTabConfigurationApi.data[0].isMain>>>>>>>>>>>>",getTabConfigurationApi.data[0].isMain);
+
+//     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
+//       //test2
+//       //console.log("this.informationservice.getPopupBreadcrumb():",this.informationservice.getPopupBreadcrumb());
+//       //console.log("this.informationservice.getPreviousMainTab():",this.informationservice.getPreviousMainTab());
+//       //console.log("getTabConfigurationApi.data[0].menuName:",getTabConfigurationApi.data[0].menuName);
+
+//       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
+//         isGrid = 0;
+//         //console.log("tes1");
+//       }
+//       //console.log("TABLE OPTIONS>>>>>>>>>>>>> " , this.tableOptions1);
+//       //console.log("ALL TABS TEMP>>>>>>>>>>",this.allTabsTemp);
+//       //console.log("ALL TABS TEMP LENGTH>>>>>>>>>>",this.allTabsTemp.length);
+
+//       //////for alert monitoring kyc general info////////////
+//       if(this.allTabsTemp.length>1){
+//       for(let i=0;i<this.allTabsTemp.length;i++){
+//         if(this.allTabsTemp[i].parentId==null && this.allTabsTemp[i].canModify!=null){
+//           isGrid=0;
+//           break;
+//         }
+
+//       }
+//       //console.log("IS GRID 1st LAST>>>>",isGrid);
+
+
+//     }
+//       /////////////////////////////////////////////////
+//       ///////////////////////////////////////////////
+//     }
+
+//     else
+//       if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick) {
+
+//         isGrid = getTabConfigurationApi.data[0].isGrid;
+
+//       } else {
+//         if (getTabConfigurationApi.data[0].isMain == "1" &&
+//             getTabConfigurationApi.data[0].isGrid == "1" &&
+//             this.amInfo.buttonClick == undefined) {
+//           isGrid = 0
+//         } else if (getTabConfigurationApi.data[0].isMain == "0" &&
+//                    getTabConfigurationApi.data[0].isGrid == "1" &&
+//                    this.isFromGridClick == 1) {
+//           isGrid = 0
+//         } else if (getTabConfigurationApi.data[0].isMain == "1" &&
+//                    getTabConfigurationApi.data[0].isGrid == "1" &&
+//                    this.amInfo.buttonClick == 14) {
+//           isGrid = getTabConfigurationApi.data[0].isGrid;
+//         } else {
+//           isGrid = getTabConfigurationApi.data[0].isGrid;
+//         }
+//       }
+//     if (this.amInfo.isFromButtonClick && this.amInfo.isFromButtonClick == 1) {
+//       isGrid = getTabConfigurationApi.data[0].isGrid;
+//     }
+
+//     if (getTabConfigurationApi.data[0].isMain == "1" && getTabConfigurationApi.data[0].isGrid == "0" && this.amInfo.buttonClick == 14) {
+//       this.actionType = 'update';
+//     }
+
+
+
+
+
+const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
     isGrid = getTabConfigurationApi.data[0].isGrid;
 
-console.log("is grid ya  >>>>>>>>>>>>>>>>>>>>>>> : " , isGrid);
-console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
-    ////////////////elie//////////////////////////////////
-    console.log("AMINFO>>>>>>>>>>>>",this.amInfo);
-    console.log("getTabConfigurationApi.data[0].isMain>>>>>>>>>>>>",getTabConfigurationApi.data[0].isMain);
 
     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
-      //test2
-      console.log("this.informationservice.getPopupBreadcrumb():",this.informationservice.getPopupBreadcrumb());
-      console.log("this.informationservice.getPreviousMainTab():",this.informationservice.getPreviousMainTab());
-      console.log("getTabConfigurationApi.data[0].menuName:",getTabConfigurationApi.data[0].menuName);
-
       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
         isGrid = 0;
-        console.log("tes1");
       }
-      console.log("TABLE OPTIONS>>>>>>>>>>>>> " , this.tableOptions1);
-      console.log("ALL TABS TEMP>>>>>>>>>>",this.allTabsTemp);
-      console.log("ALL TABS TEMP LENGTH>>>>>>>>>>",this.allTabsTemp.length);
-
-      //////for alert monitoring kyc general info////////////
       if(this.allTabsTemp.length>1){
       for(let i=0;i<this.allTabsTemp.length;i++){
         if(this.allTabsTemp[i].parentId==null && this.allTabsTemp[i].canModify!=null){
@@ -5056,10 +5117,7 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
       }
       console.log("IS GRID 1st LAST>>>>",isGrid);
 
-      
     }
-      /////////////////////////////////////////////////
-      ///////////////////////////////////////////////
     }
 
     else
@@ -5092,14 +5150,13 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
       this.actionType = 'update';
     }
 
-
-    console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
+    // //console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
     this.isPageGrid = isGrid == 1 ? true : false;
     //make buttons appear under a grid
     const getColumnsApiUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
     const getColumnsApi = await lastValueFrom(getColumnsApiUrl);
     let buttons: any = getColumnsApi.data.filter((el: any) => {
-      console.log("my val >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " ,el);
+      // //console.log("my val >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " ,el);
 
       return el.columnTypeCode === "14";
     });
@@ -5119,7 +5176,7 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
       this.agColumnsJson = "";
 
       let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi.data, 'select', this.amInfo));
-      console.log("TESTTABLE>>>>>>>>>>>",jsonData);
+      //console.log("TESTTABLE>>>>>>>>>>>",jsonData);
       let tableNames: string = '';
       for (let u = 0; u < jsonData.length; u++) {
         tableNames = tableNames + "," + jsonData[u].tableName;
@@ -5185,7 +5242,7 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
         const getButtonData = await lastValueFrom(getButtonDataUrl);
         let data1 = getButtonData.data;
 
-console.log("data1 ------->",data1);
+//console.log("data1 ------->",data1);
         if (data1.blobFile != null && data1.blobFile != undefined) {
           const base64EncodedString = data1.blobFile;
           const decodedString = atob(base64EncodedString);
@@ -5264,7 +5321,7 @@ console.log("data1 ------->",data1);
           }
 
           if (conditionQuery != "" && conditionQuery != null) {
-            console.log("test hahahahhahahaha ");
+            //console.log("test hahahahhahahaha ");
             const conditionUrl = from(axios.post(GlobalConstants.getQbeIdApi + conditionQuery + "/0", jsonCondition));
             const ConditionResult = await lastValueFrom(conditionUrl);
             if (ConditionResult.data[0] == 1) {
@@ -5447,9 +5504,9 @@ console.log("data1 ------->",data1);
         this.test.push({ fieldSetId: getAllFieldSetsApi.data[g].id, fieldSetName: getAllFieldSetsApi.data[g].name });
         for (let i = 0; i < data_0.length; i++) {
           this.loaderService.isLoading.next(true);
-          console.log("DATA>>>>>>>>>>>>",data_0[i].tableId);
+          // //console.log("DATA>>>>>>>>>>>>",data_0[i].tableId);
           if (data_0[i].tableId == -1) {
-console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
+// //console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
             this.columnTypeCode = data_0[i].columnTypeCode;
           }
           // Handle Mandatory Fields
@@ -5854,7 +5911,7 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
           const getDynamicReportData = await lastValueFrom(getDynamicReportDataUrl);
           dataa = getDynamicReportData.data;
         }else{
-          console.log("JSON VAL>>>>>>>>>>>>>>>>>>>>",jsonVal);
+          //console.log("JSON VAL>>>>>>>>>>>>>>>>>>>>",jsonVal);
           const getDynamicFormDataUrl = from(axios.post(GlobalConstants.getDynamicFormData, jsonVal));
           const getDynamicFormData = await lastValueFrom(getDynamicFormDataUrl);
           dataa = getDynamicFormData.data;
@@ -5889,16 +5946,16 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
           if (colType == "checkbox") {
             //test1
-            console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
+            //console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
             if(colValue=="true"){
 
               colValue=true;
-              console.log("TRUE CHECKBOX",colValue);
+              //console.log("TRUE CHECKBOX",colValue);
 
             }else{
 
               colValue=false;
-              console.log("FALSE CHECKBOX",colValue);
+              //console.log("FALSE CHECKBOX",colValue);
 
             }
           }
@@ -6016,7 +6073,7 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
       // Run Dynamic Rule Builder onLoad rules
       setTimeout(() => {
-console.log("befor calling the load rules");
+//console.log("befor calling the load rules");
         this.dynamicDRBOnload(this.objectId);
       }, 1200)
     }
@@ -6027,10 +6084,10 @@ console.log("befor calling the load rules");
     this.loaderService.isLoading.next(false);
     this.listOfData = undefined;
     //fill the form (after close a popup)
-    console.log("this.test >>>>>>>>><><><><>>>>>>>>>",this.test);
+    //console.log("this.test >>>>>>>>><><><><>>>>>>>>>",this.test);
     this.allData = this.test;
-    console.log("in the end of getAllColums ==",this.columnTypeCode);
-    console.log("this.amInfo=",this.amInfo)
+    //console.log("in the end of getAllColums ==",this.columnTypeCode);
+    //console.log("this.amInfo=",this.amInfo)
 
     //test2
     let selectedTabName = this.informationservice.getSelectedTabName();
@@ -6042,11 +6099,15 @@ console.log("befor calling the load rules");
         this.setFormValues();
       }
     }
+    setTimeout(() => {
+      this.handleDialogTitle();      
+    }, 100)
+
   }
 
 
   handleSaveButton() {
-    console.log("handleSaveButton()");
+    //console.log("handleSaveButton()");
     let groupId = '';
     for (let i = 0; i < this.testButtons.length; i++) {
       if (this.testButtons[i].name == 'Check Existing') {
@@ -6116,90 +6177,153 @@ console.log("befor calling the load rules");
       this.cdr.detectChanges();
     }
   }
+  async handleFormFieldValues(fieldName: string, value: any) {
+    const getFieldDynamicTitleUrl =await axios.post(GlobalConstants.getFieldDynamicTitle + this.objectId); 
+    const responseaxios =  getFieldDynamicTitleUrl.data;
+    
+        this.getFieldDynamicTitle = responseaxios;
+        const fieldNames = fieldName.split(',');
+       
+        // Loop over each field name
+        for (let j = 0; j < fieldNames.length; j++) {
+            const currentFieldName = fieldNames[j].trim();
+            if(this.getFieldDynamicTitle == currentFieldName){
+              this.getFieldDynamicTitleValue = value;
+             }
+        for (let i = 0; i < this.test.length; i++) {
+    
+          if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+            localStorage.setItem("signatureImage",value);
+            this.oldsignature = value;
+            break;
+          }
+        }
+        let data = this.test.filter((el: any) => {
+          return el.name === currentFieldName;
+        });
+    
+        //jp and charbel <3
+    
+        // this.dynamicForm.controls[currentFieldName].setValue('');
+    
+        if (this.dynamicForm.get(currentFieldName)) {
+          this.dynamicForm.removeControl(currentFieldName);
+          this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
+    
+          if (value == null || value == 'null' || value == 'empty') {
+            value = '';
+          }
+          if(data[0] != undefined && data[0].columnType == "combo"){
+            let newQuery : any;
+            newQuery = data[0].query;
+            // change this code to a dynamic code
+            // if(newQuery = [0]){
+            //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+            // }
+            data[0].query = [];
+            this.cdr.detectChanges();
+            data[0].query = newQuery;
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+            this.dynamicForm.controls[currentFieldName].setValue(value);
+        }else if(data[0] != undefined && data[0].columnType == "phone number"){
+          this.cdr.detectChanges();     
+          this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        }
+          else {
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+          }
+          if (value != null) {
+            this.registerTouchedField(currentFieldName);
+          }
+          this.cdr.detectChanges();
+        }
+      }
+      }
+  // handleFormFieldValues(fieldName: string, value: any) {
+  //   // for (let i = 0; i < this.test.length; i++) {
+  //   //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
+  //   //     localStorage.setItem("signatureImage",value);
+  //   //     this.oldsignature = value;
+  //   //     break;
+  //   //   }
+  //   // }
+  //   // let data = this.test.filter((el: any) => {
+  //   //   return el.name === fieldName;
+  //   // });
+  //   // this.dynamicForm.controls[fieldName].setValue('');
+  //   // if (this.dynamicForm.get(fieldName)) {
+  //   //   this.dynamicForm.removeControl(fieldName);
+  //   //   this.dynamicForm.addControl(fieldName, new FormControl(''));
 
-  handleFormFieldValues(fieldName: string, value: any) {
-    // for (let i = 0; i < this.test.length; i++) {
-    //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
-    //     localStorage.setItem("signatureImage",value);
-    //     this.oldsignature = value;
-    //     break;
-    //   }
-    // }
-    // let data = this.test.filter((el: any) => {
-    //   return el.name === fieldName;
-    // });
-    // this.dynamicForm.controls[fieldName].setValue('');
-    // if (this.dynamicForm.get(fieldName)) {
-    //   this.dynamicForm.removeControl(fieldName);
-    //   this.dynamicForm.addControl(fieldName, new FormControl(''));
+  //   //jppppppppppp
+  //   //console.log("fieldName=",fieldName);
+  //   //console.log("CHECKBOX VALUE>>>>>>",value);
+  //   const fieldNames = fieldName.split(',');
 
-    //jppppppppppp
-    console.log("fieldName=",fieldName);
-    console.log("CHECKBOX VALUE>>>>>>",value);
-    const fieldNames = fieldName.split(',');
-
-    // Loop over each field name
-    for (let j = 0; j < fieldNames.length; j++) {
-        const currentFieldName = fieldNames[j].trim();
-    for (let i = 0; i < this.test.length; i++) {
+  //   // Loop over each field name
+  //   for (let j = 0; j < fieldNames.length; j++) {
+  //       const currentFieldName = fieldNames[j].trim();
+  //   for (let i = 0; i < this.test.length; i++) {
       
-      if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
-        localStorage.setItem("signatureImage",value);
-        this.oldsignature = value;
-        break;
-      }
-    }
-    let data = this.test.filter((el: any) => {
-      return el.name === currentFieldName;
-    });
+  //     if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+  //       localStorage.setItem("signatureImage",value);
+  //       this.oldsignature = value;
+  //       break;
+  //     }
+  //   }
+  //   let data = this.test.filter((el: any) => {
+  //     return el.name === currentFieldName;
+  //   });
+  
+  //   //jp and charbel <3
 
-    //jp and charbel <3
+  //   // this.dynamicForm.controls[currentFieldName].setValue('');
+  //   if (this.dynamicForm.get(currentFieldName)) {
+  //     this.dynamicForm.removeControl(currentFieldName);
+  //     this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
 
-    // this.dynamicForm.controls[currentFieldName].setValue('');
-    if (this.dynamicForm.get(currentFieldName)) {
-      this.dynamicForm.removeControl(currentFieldName);
-      this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
-
-      if (value == null || value == 'null' || value == 'empty') {
-        value = '';
-      }
-      if(data[0] != undefined && data[0].columnType == "combo"){
-        let newQuery : any;
-        newQuery = data[0].query;
-        // change this code to a dynamic code
-        // if(newQuery = [0]){
-        //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
-        // }
-        console.log("newQuery ===>",newQuery);
-        data[0].query = [];
-        this.cdr.detectChanges();
-        data[0].query = newQuery;
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-    } else if(data[0] != undefined && data[0].columnType == "checkbox"){
-      console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
-        this.dynamicForm.controls[currentFieldName].setValue(value);
-    }
-      else {
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-      }
-      if (value != null) {
-        this.registerTouchedField(currentFieldName);
-      }
-      this.cdr.detectChanges();
-    }
-  }
-  }
+  //     if (value == null || value == 'null' || value == 'empty') {
+  //       value = '';
+  //     }
+  //     if(data[0] != undefined && data[0].columnType == "combo"){
+  //       let newQuery : any;
+  //       newQuery = data[0].query;
+  //       // change this code to a dynamic code
+  //       // if(newQuery = [0]){
+  //       //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+  //       // }
+  //       //console.log("newQuery ===>",newQuery);
+  //       data[0].query = [];
+  //       this.cdr.detectChanges();
+  //       data[0].query = newQuery;
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //   } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+  //     //console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
+  //       this.dynamicForm.controls[currentFieldName].setValue(value);
+  //   }
+  //     else {
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //     }
+  //     if (value != null) {
+  //       this.registerTouchedField(currentFieldName);
+  //     }
+  //     this.cdr.detectChanges();
+  //   }
+  // }
+  // }
 
   async loadFieldDependencyForForm() {
-
+console.log('objectId------>',this.objectId)
     const getFieldDependenciesUrl = from(axios.post(GlobalConstants.getFieldDependencies + this.objectId));
     const getFieldDependencies = await lastValueFrom(getFieldDependenciesUrl);
     let data = getFieldDependencies.data;
+    console.log('data---------->',data)
 
 
     let fieldName: string = '';
     for (let i = 0; i < data.length; i++) {
-
+console.log('COLUMN_ID---->',data[i].COLUMN_ID)
 
       if ($("#field_" + data[i].COLUMN_ID).length > 0) {
         fieldName = $("#field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
@@ -6582,7 +6706,7 @@ console.log("befor calling the load rules");
        if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
         params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
        }
-       console.log("params>>>>>>>>>>>",params);
+       //console.log("params>>>>>>>>>>>",params);
         let data = [{
           actionType: this.amInfo.actionType,
           objectId: this.buttonObjectId,
@@ -6592,7 +6716,7 @@ console.log("befor calling the load rules");
           selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
         }];
 
-console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+//console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
           width: "80%",
           height: "80%",
@@ -6670,7 +6794,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               jsonArr += "},";
             }
           }
-          console.log("hey 3333 >>>>>>>>>>>");
+          //console.log("hey 3333 >>>>>>>>>>>");
           // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
@@ -6720,7 +6844,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               JsonForDataWhenSkip += "},";
             }
           }
-          console.log("hrty213234562436244356");
+          //console.log("hrty213234562436244356");
           JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
           this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
@@ -6743,12 +6867,12 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               jsonArr += "},";
             }
           }
-          console.log("hommmmmmmmm2 >>>>>>");
+          //console.log("hommmmmmmmm2 >>>>>>");
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForApi = jsonArr;
         }
 
-        console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
+        //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
         let apiUrl = GlobalConstants.callingApi + url;
         const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
         const ResultOfCallingApi = await lastValueFrom(callingApi);
@@ -6804,14 +6928,14 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
           }
         }
 
-        console.log("this.listOfData ====",this.listOfData);
+        //console.log("this.listOfData ====",this.listOfData);
         this.informationservice.setListOFData(this.listOfData);
       }
       // Close Popup
       else if (buttonAction == "4") {
 
 
-        console.log("selectedTabName --->",this.informationservice.getChoosenTab())
+        //console.log("selectedTabName --->",this.informationservice.getChoosenTab())
         this.closeDialog(true);
       } else if (buttonAction == "5") {
         let customerId = -1;
@@ -6819,7 +6943,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         let params = this.informationservice.getAgGidSelectedNode();
         customerId = JSON.parse(params)[0].COLVALUE;
         let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
+        //console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
         let jsonArr: string = "{";
         jsonArr += "\"" + "columns" + "\" : [";
         jsonArr += "{";
@@ -6868,7 +6992,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       //  if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
       //   params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
       //  }
-       console.log("params>>>>>>>>>>>",params);
+       //console.log("params>>>>>>>>>>>",params);
         let data = [{
           actionType: this.amInfo.actionType,
           objectId: this.buttonObjectId,
@@ -6878,7 +7002,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
          // selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
         }];
 
-      console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+      //console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
           width: "80%",
           height: "80%",
@@ -7003,15 +7127,15 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       if (this.dynamicForm.status != 'INVALID' && ProbInGridIntoForm == 0) {
         this.actionType = this.amInfo.actionType;
         if (this.actionType == 'saveNew') {
-          console.log("TEST RUN>>>>>>>>",this.tableOptionTemp[0].isDynamicReport);
+          //console.log("TEST RUN>>>>>>>>",this.tableOptionTemp[0].isDynamicReport);
           if(this.tableOptionTemp[0].isDynamicReport=='1'){
             this.counterOfSave=0
           }
 
-          console.log("SAVE COUNTER>>>>>>>>>>",this.counterOfSave);
+          //console.log("SAVE COUNTER>>>>>>>>>>",this.counterOfSave);
 
           if (this.counterOfSave == 0) {
-            console.log("this.objectId ====",this.objectId);
+            //console.log("this.objectId ====",this.objectId);
             this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe(async (data: any) => {
               let jsonData = JSON.parse(this.dynamicFormQuering(data, 'saveNew', this.amInfo));
 
@@ -7032,7 +7156,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                 }];
 
                 this.ruleCallApiData=params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button"));
-                console.log("tableOptionTemp>>>>>>",this.tableOptionTemp);
+                //console.log("tableOptionTemp>>>>>>",this.tableOptionTemp);
 
 
 
@@ -7041,14 +7165,14 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
                 if(this.tableOptionTemp[0].isDynamicReport=='1'){
 
-                  console.log("IS A DYNAMIC REPORT");
-                  console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
+                  //console.log("IS A DYNAMIC REPORT");
+                  //console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
 
                   if(this.previewDynamicReportbool){
 
 
 
-                    console.log("PREVIEW DYNAMIC DATA");
+                    //console.log("PREVIEW DYNAMIC DATA");
                     let info = {
                       userId:localStorage.getItem('LogeduserId'),
                       isGrid:this.isPageGrid,
@@ -7074,7 +7198,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                   this.insertDynamicReport(jsonVal);
                   }
                   }else{
-                    console.log("IS IN DISPLAY INSERT");
+                    //console.log("IS IN DISPLAY INSERT");
                     this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
                       (res: any) => {
                         this.commonFunctions.alert("alert", res.description);
@@ -7098,11 +7222,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                   dynamicTable: jsonData
                 }];
 
-                console.log("EEEEEEEEEEEEEEEE>>>>>>>>>>>>>>",this.tableOptionTemp);
+                //console.log("EEEEEEEEEEEEEEEE>>>>>>>>>>>>>>",this.tableOptionTemp);
                 if(this.tableOptionTemp[0].isDynamicReport=='1'){
 
-                  console.log("IS A DYNAMIC REPORT");
-                  console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
+                  //console.log("IS A DYNAMIC REPORT");
+                  //console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
                   this.insertDynamicReport(jsonVal);
 
               }else{
@@ -7138,6 +7262,8 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               dynamicTable: jsonData
             }];
 
+            console.log("jsonData ------------ > " , jsonData);
+            console.log("jsonVal  ------------ > " , jsonVal);
             this.ruleCallApiData=JSON.stringify(this.handleSelectedRowIds(this.amInfo.selectedRowId, "form,button"));
 
             this.http.post<any>(GlobalConstants.updateDynForm, jsonVal, { headers: GlobalConstants.headers }).subscribe(
@@ -7210,7 +7336,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
     this.actionType = "saveNew";
     //test2
     // General Info
-    console.log("this.informationservice.getSelectedTabName()=", this.informationservice.getSelectedTabName());
+    //console.log("this.informationservice.getSelectedTabName()=", this.informationservice.getSelectedTabName());
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
 
     let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -7221,7 +7347,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       selectedRowId: this.handleSelectedRowIds(params, "gridlink,grid,form,combo,button"),
       isFromGridClick: 1
     }];
-    console.log("data =========", data);
+    //console.log("data =========", data);
     this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
       width: "80%",
       height: "80%",
@@ -7241,7 +7367,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName())
 
     //test2
-    console.log("this.informationservice.getAgGidSelectedNode()==============",this.informationservice.getAgGidSelectedNode());
+    //console.log("this.informationservice.getAgGidSelectedNode()==============",this.informationservice.getAgGidSelectedNode());
     let dd = JSON.parse(this.informationservice.getAgGidSelectedNode())
 
     let data = [{
@@ -7292,21 +7418,21 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         this.getAllColums();
       },
       error: (error: any) => {
-        console.log(error);
+        //console.log(error);
       }
     });
   }
 
   handleDialogTitle() {
     let previousMainTab = this.informationservice.getPreviousMainTab();
-    console.log("previousMainTab>>>>>>",previousMainTab);
+    //console.log("previousMainTab>>>>>>",previousMainTab);
     let previousMainHeader = this.informationservice.getPreviousMainTab2();
-    console.log("previousMainHeader>>>",previousMainHeader);
+    //console.log("previousMainHeader>>>",previousMainHeader);
     this.informationservice.setPreviousMainTab2(previousMainTab);
 
     let dialogTitle: string = this.informationservice.getPopupBreadcrumb() == null ? "-1" : this.informationservice.getPopupBreadcrumb();
-    console.log("dialogTitle>>>>>>>>>>",dialogTitle);
-    console.log("selectedTabName >>>>>>",this.selectedTabName)
+    //console.log("dialogTitle>>>>>>>>>>",dialogTitle);
+    //console.log("selectedTabName >>>>>>",this.selectedTabName)
     if (dialogTitle.indexOf(this.selectedTabName) == 0) {
       dialogTitle = this.selectedTabName;
     }
@@ -7326,9 +7452,15 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
     }
 
     dialogTitle = dialogTitle.replace("//", "/");
-    this.informationservice.setPopupBreadcrumb(dialogTitle);
+    dialogTitle = dialogTitle;
 
-    $(".dialogTitle").html("<span>" + dialogTitle + "</span>")
+    this.informationservice.setPopupBreadcrumb(dialogTitle);
+    if(this.getFieldDynamicTitleValue != ""){
+      $(".dialogTitle").html("<span>" + dialogTitle +"/"+this.getFieldDynamicTitleValue + "</span>")
+
+    }else{
+      $(".dialogTitle").html("<span>" + dialogTitle + "</span>")
+    }
     $(".dialogTitle span").css({ "font-size": "15px", "letter-spacing": "1px", "color": "var(--popup-title-color)", "font-weight": "bold" });
   }
 
@@ -7341,11 +7473,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
   //send data for the query(Ex: customer_id)
   handleSelectedRowIds(data: any, compare: string) {
-    console.log('data--------> ',data);
-    console.log('compare--------> ',compare);
+    //console.log('data--------> ',data);
+    //console.log('compare--------> ',compare);
 
     let newDD: any;
-console.log("data >>>>>>>>>>>>testing ids =",data);
+//console.log("data >>>>>>>>>>>>testing ids =",data);
     try {
       let dd: any;
       if (typeof (data) == "string") {
@@ -7367,7 +7499,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
         });
       }
     } catch (error) {
-      console.log("error on handleSelectedRowIds >>>> ", error)
+      //console.log("error on handleSelectedRowIds >>>> ", error)
       newDD = -1;
     }
     return newDD;
@@ -7516,7 +7648,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
     if(!this.isPageGrid){
       this.submitForm();
     }else{
-      console.log("GRID SELECTED DATA>>>>>>>>",this.informationservice.getAgGidSelectedNode());
+      //console.log("GRID SELECTED DATA>>>>>>>>",this.informationservice.getAgGidSelectedNode());
       this.insertDynamicReport(this.informationservice.getAgGidSelectedNode());
     }
 
@@ -7533,7 +7665,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
   }
 
   async insertDynamicReport(jsonVal:any){
-    console.log("IS PAGE GRID>>>>>>>>>>>>>>",this.isPageGrid);
+    //console.log("IS PAGE GRID>>>>>>>>>>>>>>",this.isPageGrid);
     if(this.isPageGrid){
       if(this.informationservice.getDynamicReportId()==''){
 

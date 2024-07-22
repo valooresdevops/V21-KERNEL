@@ -401,10 +401,10 @@ export class AdvancedFormComponent implements OnInit {
 //     if (params.value != undefined) {
 //       if (params.value.name != undefined) {
 //         this.eGui = document.createElement('div');
-//         this.eGui.innerHTML = `<span style="position:fixed;background-color: yellow; text-overflow: ellipsis; z-index: 9999999999999999999999999 !important;">${params.value.name}</span>`;
+//         this.eGui.innerHTML = `<span style="position:fixed;background-color: yellow; text-overflow: ellipsis; z-index: 9999999999999999999 !important;">${params.value.name}</span>`;
 //       } else {
 //         this.eGui = document.createElement('div');
-//         this.eGui.innerHTML = `<span style="overflow: hidden;background-color: yellow;position:fixed;top:0; text-overflow: ellipsis; z-index: 9999999999999999999999999 !important;">${params.value}</span>`;
+//         this.eGui.innerHTML = `<span style="overflow: hidden;background-color: yellow;position:fixed;top:0; text-overflow: ellipsis; z-index: 9999999999999999999 !important;">${params.value}</span>`;
 //       }
 //     }
 //   }

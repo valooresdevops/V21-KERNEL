@@ -132,7 +132,7 @@ export class GlobalConstants {
   public static getInDisplayLogs  = GlobalConstants.usmGateway + 'api/getInDisplayLogs/';
   public static getInDisplayLogsDetails  = GlobalConstants.usmGateway + 'api/getInDisplayLogsDetails/';
 
-  
+
   // --------------------------------------------------------------------------------
   // -- CDS APIs used in the application
   // --------------------------------------------------------------------------------
@@ -176,10 +176,12 @@ export class GlobalConstants {
   public static addQueryData = GlobalConstants.qbeGateway + 'api/addQueryData';
   public static deleteQueryData = GlobalConstants.qbeGateway + 'api/deleteQueryData/';
   public static validateQuery = GlobalConstants.qbeGateway + 'api/validateQuery/';
-  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery/';
+  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery';
 
   public static fetchDynamicData = GlobalConstants.qbeGateway + 'api/fetchDynamicData/';
   public static cqlFetchDynamicData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicData/';
+  public static cqlFetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicHeaderData/';
+
 
   public static fetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/fetchDynamicHeaderData/';
   public static addParamSession = GlobalConstants.qbeGateway + 'api/addParamSession/';
@@ -209,11 +211,12 @@ export class GlobalConstants {
   public static deleteQbeAuthorizedUsers =  GlobalConstants.qbeGateway + 'api/deleteQbeAuthorizedUsers/';
   public static deleteQbeSecurityChanges =  GlobalConstants.qbeGateway + 'api/deleteQbeSecurityChanges';
   public static getQbeQueryCreatedBy =  GlobalConstants.qbeGateway + 'api/getQbeQueryCreatedBy/';
+  public static getQueryTypeApi =  GlobalConstants.qbeGateway + 'api/getQueryTypee/';
 
-  
 
 
-  
+
+
   //---------REPORT BUILDER-----------////
   public static executeReport=GlobalConstants.qbeGateway + 'api/executeReport/';
   public static getReportsData=GlobalConstants.qbeGateway + 'api/getReportsData/';
@@ -226,6 +229,10 @@ export class GlobalConstants {
   public static updateReport=GlobalConstants.qbeGateway + 'api/updateReport/';
   public static checkParameters=GlobalConstants.qbeGateway + 'api/checkParameters/';
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
+  public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
+  public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+
+
 
 
   // --------------------------------------------------------------------------------
@@ -310,6 +317,12 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static masterLinkData = GlobalConstants.inDispGatewat + 'api/masterLinkData/';
   
   
+  public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
+  public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
+  
+
+
+
   // ----------------------IN DISPLAY: SCREEN BUILDER------------------------------------------------------------------------\
   public static getDBRGrid = GlobalConstants.inDispGatewat + 'api/getDBRGrid/';
   public static getDBRGridByRuleActionAndColumnId = GlobalConstants.inDispGatewat + 'api/getDBRGridByRuleActionAndObjectId/';

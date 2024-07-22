@@ -39,6 +39,7 @@ export class FormUpdateComponent implements OnInit {
     tables: new UntypedFormControl(''),
     columns: new UntypedFormControl(['']),
     order: new UntypedFormControl(''),
+    descriptionent: new UntypedFormControl(''),
   });
   ngOnInit(): void {
 
@@ -74,13 +75,16 @@ export class FormUpdateComponent implements OnInit {
         this.formUpdate.controls['order'].setValue(res[0].orderNo);
         this.LoadingOrder = res[0].orderNo;
         let columns: any[] = [];
+        console.log('res[0]------>:',res[0])
         this.GetColVal = GlobalConstants.GetColVal + "/" + res[0].tableOwner + "." + res[0].tableName;
         for (var i = 0; i < res.length; i++) {
+          console.log(res[i]);
           columns.push(res[i].columnName);
         }
         this.formUpdate.controls['tables'].setValue(res[0].tableOwner + "." + res[0].tableName);
         this.oldSelectedValues = columns;
         this.formUpdate.controls['columns'].setValue(columns);
+        console.log('columns--------->',columns);
       });
   }
 
