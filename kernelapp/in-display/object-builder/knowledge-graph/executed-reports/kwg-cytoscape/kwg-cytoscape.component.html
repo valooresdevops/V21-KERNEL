@@ -1,0 +1,157 @@
+<div id="graph-container">
+    <div id="graph-background"></div> <!-- Hidden element acting as the background -->
+    <div id="cy"></div> <!-- Cytoscape.js container -->
+    <div id="menu">
+      <ul>
+        <li>
+          <a >
+            <img src="/assets/assets/graphicons/search-2.svg" class="menuicons">
+            <span id="searchSpan"><input placeholder="Search" id="searchQuery" type="text" (input)="searchNodes($event)" ></span>
+          </a>
+        </li>
+        <li>
+          <a  id="switch-layout-btn">
+            <img src="/assets/assets/graphicons/layers-2.svg" class="menuicons">
+            <span>Switch Layout</span>
+          </a>
+        </li>
+        <li>
+          <a  (click)="switchmode()"id="darkmodeimage" >
+            <img src="/assets/assets/graphicons/lightbulb-1.svg" class="menuicons">
+            <span>Light</span>
+          </a>
+        </li>
+        <li>
+          <a  id="addNode">
+            <img src="/assets/assets/graphicons/story-plus.svg" class="menuicons">
+            <span>
+              <div id="nodeForm">
+                <label for="node-name">Node Name:</label>
+                <input type="text" id="node-name" required>
+  
+                <label for="node-type">Node Type:</label>
+                <select id="node-type" required>
+                  <option value="item">Item</option>
+                  <option value="store">Store</option>
+                  <!-- Add more options as needed -->
+                </select>
+  
+                <button type="button" (click)="createNode()">Create Node</button>
+                </div>
+            </span>
+          </a>
+        </li>
+        <li>
+          <a  (click)="exportNodesToExcel()">
+            <img src="/assets/assets/graphicons/layout-left.svg" class="menuicons">
+            <span>Grid</span>
+          </a>
+        </li>
+        <li>
+          <a >
+            <img src="/assets/assets/graphicons/filter.svg" class="menuicons">
+            <span>
+              <div id="nodeForm">
+                <label for="labelNumber">Filter by edge</label><input type="number" id="labelNumber" [(ngModel)]="inputValue" (input)="filterEdgesByLabelNumber()"/>
+                <label for="labelNumber">Filter by number of connections</label><input type="number" id="connectionNumber" [(ngModel)]="linkCountInput" (input)="filterEdgesByConnectionsNumber()"/>
+              </div>
+            </span>
+          </a>
+        </li>
+        <!-- <li>
+          <a >
+            <i class="ai-bell"></i>
+            <span>Notifications</span>
+          </a>
+        </li>
+        <li>
+          <a >
+            <i class="ai-gear"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+        <li>
+          <a >
+            <i class="ai-person"></i>
+            <span>Profile</span>
+          </a>
+        </li> -->
+      </ul>
+    </div>
+    <!-- <div class="legend">
+      <div class="legendItems" *ngFor="let item of legendItems">
+        <img [src]="item.imgSrc" alt="Image" />
+        <span>:</span>
+        <span>{{ item.title }}</span>
+      </div>
+    </div> -->
+    <!-- <div class="legend">
+      <div class="legendItems">
+        <img src="assets/Profile-PNG-File.png"/> <span>:</span> <span>Title</span>
+      </div>
+    </div> -->
+  
+  </div>
+  <app-popup #popup>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody *ngIf=graphData>
+        <tr *ngFor="let data of graphData">
+          <td>{{ data.title }}</td>
+          <td>{{ data.name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </app-popup>
+  <app-popup #createNodePopup>
+    <div id="nodeForm">
+    <label for="node-name">Node Name:</label>
+    <input type="text" id="node-name" required>
+  
+    <label for="node-type">Node Type:</label>
+    <select id="node-type" required>
+      <option value="item">Item</option>
+      <option value="store">Store</option>
+      <!-- Add more options as needed -->
+    </select>
+  
+    <button type="button" (click)="createNode()">Create Node</button>
+    </div>
+  </app-popup>
+  <app-popup #gridPopup>
+    <ag-grid-angular
+    style="width: 100%; height: 400px;"
+    class="ag-theme-alpine"
+    [rowSelection]="'multiple'"
+    [animateRows]="true"
+    [gridOptions]="gridOptions"
+    style="width: 100%;"
+    ></ag-grid-angular>
+    <button (click)="gridButton()">Execute Function with Selected Rows</button>
+    
+  </app-popup>
+  
+  
+  
+  <!-- <button id="switch-layout-btn">🔁</button> -->
+  <!-- <button id="dark-mode-toggle" (click)="switchmode()">🌙</button> -->
+  <!-- <button id="addNode">➕</button> -->
+  <!-- <input id="searchNode" type="text" placeholder="Search" (input)="searchNodes($event)" /> -->
+  <!-- <div id="filter-container">
+  
+  </div> -->
+  <button id="refreshJspGraph"
+    style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+    (click)="refreshsimualtionGraph()"
+  ></button>
+  
+  <button id="updateNodeId"
+    style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+    (click)="getUpdGraph()"
+  ></button>
+  

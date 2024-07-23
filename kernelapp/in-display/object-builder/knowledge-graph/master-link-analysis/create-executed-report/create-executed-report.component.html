@@ -1,0 +1,45 @@
+<form [formGroup]="reportNameForm">
+    <div class="row">
+        <div class="col-sm-8 mb-3" >
+          <v-input  formControlName="reportName" type="text"  label="Report Name" 
+                  [parentForm]="reportNameForm" fieldName="reportName"></v-input>
+          <div class="error-msg" *ngIf="reportNameForm.get('reportName').errors?.['required']"></div>
+
+        </div>
+      </div>
+</form>
+
+<form [formGroup]="paramValForm">
+    <div  class="form-group" *ngIf="showInput" >
+      <div class="form-group" *ngFor="let p of parameters">
+  
+        <div class="row">
+          <div class="col-sm-8 mb-3" >
+            <v-input *ngIf="p.paramType.toLowerCase()!='query'" [formControlName]="p.paramName" [type]="p.paramType.toLowerCase()"  [label]="p.paramName | titlecase" 
+                    [parentForm]="paramValForm" [fieldName]="p.paramName"></v-input>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-8 mb-3" >
+            <v-lookup-v2 *ngIf="p.paramType.toLowerCase()=='query'" id="p.paramId" 
+              label="{{p.paramName}}"
+              queryId="{{p.paramDefault}}" 
+              [formControlName]="p.paramName" 
+              [label]="p.paramName" 
+              [parentForm]="paramValForm" 
+              [fieldName]="p.paramName">
+            </v-lookup-v2>  
+  
+      </div>
+      </div>
+          </div>
+    </div>
+  
+  
+  
+    <div class="form-submit">
+      <v-button value="Execute" btnActionType="submit" (click)="execution()">
+          </v-button>
+  </div>
+  </form>
+  
