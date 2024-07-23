@@ -836,4 +836,22 @@ async getPropertiesObj(SimulID:any){
 
   return response; 
 }
+
+async getsimulation2(obj:any){
+  let response= this.httpClient.post<any>(this.ipAddress+"/api/getSimulation2/",obj).toPromise();
+  
+   console.log('getSimulation2>>>>>>',response);
+  return response; 
+   
+ }
+
+ async getmaptypesOffline(){
+  let response= await this.httpClient.get(this.ipAddress+"/api/getmaptypesOffline").toPromise();
+  
+   console.log('map types>>>>>>',response);
+  return response; 
+   
+ }
+
+ 
 }

@@ -13,6 +13,7 @@ import { DataService } from 'src/app/Kernel/services/data.service';
 import axios from 'axios';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
+import { FileDownloadService } from 'src/app/Kernel/components/map/Services/FileDownloadService.service';
 
 @Component({
   selector: 'main-preview-form',
@@ -82,7 +83,8 @@ export class PreviewFormComponent implements OnInit {
     private dialog: MatDialog,
     private dataservice: DataService,
     public informationservice: InformationService,
-    private refreshService: RefreshDialogService
+    private refreshService: RefreshDialogService,
+    private fileDownloadService:FileDownloadService
   ) { }
 
   onSearchSubmit(getWhereCond: any) {
@@ -960,8 +962,18 @@ export class PreviewFormComponent implements OnInit {
           }
         });
       }else if(buttonAction == "6"){
+        this.informationservice.setISExport(false);
+
         this.dialog.closeAll();
       
+      }
+      else if(buttonAction == "8"){
+let dataselected:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+console.log("dataselected>>>",dataselected)
+this.downloadHtmlFile(dataselected[0].COLVALUE);
+// this.dialog.closeAll();
+this.informationservice.setISExport(true);
+
       }
     }
   }
@@ -998,7 +1010,10 @@ export class PreviewFormComponent implements OnInit {
 
 
 
-
+  downloadHtmlFile(ID:any): void {
+    this.fileDownloadService.downloadFile('SimulationReport_'+ID+'.html');
+  }
+ 
 
 }
 

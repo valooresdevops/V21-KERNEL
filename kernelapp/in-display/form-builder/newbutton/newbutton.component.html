@@ -82,6 +82,11 @@
             [parentForm]="buttonForm" fieldName="alertMessage">
         </v-input>
         </div>
+        <div class="col-lg-12" *ngIf="exportSelected">
+            <v-input formControlName="Path" type="text" label="Path" placeholder=""
+            [parentForm]="buttonForm" fieldName="Path">
+        </v-input>
+        </div>
     </div>
     <div class="col-lg-12 form-submit text-center">
         <v-button btnActionType="submit" btnType="form" [parentForm]="buttonForm" value="Save"
