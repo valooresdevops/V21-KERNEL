@@ -441,5 +441,7 @@ public static  ipAddressDataCrowd = "http://"+ GlobalConstants.endPointAddress +
 public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
+public static ipAddressCassandraSpark = "http://"+ GlobalConstants.endPointAddress +":8092";
+
 
 }
