@@ -25,12 +25,15 @@
       <div class="col-lg-4">
           <v-toggle label="Is Query Form" formControlName="isQueryForm" [parentForm]="newTabForm" fieldName="isQueryForm" (toggleChange)="isQueryFormChange()"> </v-toggle>
       </div>
-
-
-
-      <!-- QUERY FORM BUTTON SELECTION -->
       <div class="col-lg-4">
-
+        <v-toggle label="Is Row Grouping" formControlName="isRowGroup" [parentForm]="newTabForm" fieldName="isRowGroup" (toggleChange)="isRowGroupChange()"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+    <v-dropdown *ngIf="showColumnRowGroup" formControlName="fieldGrouping"
+    label="Field Grouping" placeholder="" [parentForm]="newTabForm" [dataApi]="fieldGrouping"
+    fieldName="fieldGrouping" [multiple]="false"></v-dropdown>
+    </div>
+      <div class="col-lg-4">
           <v-dropdown *ngIf="showQueryFormButtonCombo" formControlName="isQueryFormSelectedButtons"
           label="Buttons" placeholder="" [parentForm]="newTabForm" [dataJSON]="queryFormpossibleButtons"
           fieldName="isQueryFormSelectedButtons" [multiple]="true"></v-dropdown>

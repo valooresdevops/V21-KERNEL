@@ -31,6 +31,7 @@ export class NewTabComponent implements OnInit {
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
   public isQueryForm: any;
+  public isRowGroup: any;
   public hasMultipleSelection: any;
   public isDynamicReport: any;
   public actionType: any;
@@ -40,7 +41,9 @@ export class NewTabComponent implements OnInit {
   dialogRef: any;
   showisTitle:any;
   showCallApi:any;
-
+  showColumnRowGroup:any;
+  public sourceQueryId:any;
+  fieldGrouping:any;
   showAddSearchProcedure:any;
   showQueryFormButtonCombo:any;
   public getAllProcAndPack: string = '';
@@ -72,6 +75,8 @@ export class NewTabComponent implements OnInit {
     dynamicTitleName:new UntypedFormControl(''),
     callRestApi:new UntypedFormControl(''),
     callRestApi2:new UntypedFormControl(''),
+    isRowGroup:new UntypedFormControl(''),
+    fieldGrouping:new UntypedFormControl(''),
   });
   agPrimaryKey: any;
 
@@ -86,10 +91,8 @@ export class NewTabComponent implements OnInit {
       this.objectPId = params.get('parentId');
       this.actionType = params.get('actionType');
 
-      // this.reloadUrl = "/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration";
-
+      this.fieldGrouping = GlobalConstants.getRowFieldGrouping +this.objectId;
       let url = "/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration";
-
       this.informationservice.setDynamicRuleBuilderReloadUrl(url);
 
       this.agColumnsJson = [
@@ -316,6 +319,8 @@ console.log('data--------->',data)
           isGrid: this.newTabForm.controls['isGrid']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
           //isHidden: this.newTabForm.controls['isHidden']?.value,
@@ -340,6 +345,7 @@ console.log('data--------->',data)
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
+        this.isRowGroup = this.newTabForm.controls['isRowGroup']?.value;
         this.isDynamicReport = this.newTabForm.controls['isDynamicReport']?.value;
 
         // }
@@ -369,6 +375,8 @@ console.log('data--------->',data)
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -387,7 +395,6 @@ console.log('data--------->',data)
           canImport: canImport,
           condition: condition,
           advancedSearchProcedureName:isAdvencedSearchProcedure,
-
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
           readOnlyQbeId: readOnlyQbeId
@@ -428,7 +435,7 @@ console.log('data--------->',data)
 
 
   fetchTabData() {
-
+    
     this.http.get<any>(GlobalConstants.getTabConfigurationApi + this.objectId, { headers: GlobalConstants.headers, }).subscribe(
       async (res: any) => {
         this.newTabForm.controls['tabName'].setValue(res[0].menuName);
@@ -445,8 +452,6 @@ console.log('data--------->',data)
         this.newTabForm.controls['isDynamicTitleEnabled'].setValue(res[0].isDynamicTitleEnabled);
         this.newTabForm.controls['canImport'].setValue(res[0].canImport);
         this.newTabForm.controls['callRestApi2'].setValue(res[0].apiFunctionName);
-
-
         if (res[0].isApiEnabled == "0") {
           this.newTabForm.controls['callRestApi'].setValue(false);
         } else {
@@ -478,6 +483,14 @@ console.log('data--------->',data)
           this.newTabForm.controls['hasMultipleSelection'].setValue(false);
         } else {
           this.newTabForm.controls['hasMultipleSelection'].setValue(true);
+        }
+        if (res[0].isRowGroup == "0") {
+          this.newTabForm.controls['isRowGroup'].setValue(false);
+          this.newTabForm.controls['fieldGrouping'].setValue('');
+
+        } else {
+          this.newTabForm.controls['isRowGroup'].setValue(true);
+          this.newTabForm.controls['fieldGrouping'].setValue(res[0].fieldGrouping);
         }
 
         if (res[0].isQueryForm == "0") {
@@ -546,6 +559,16 @@ console.log('data--------->',data)
       this.showQueryFormButtonCombo=false;
     }
   }
+
+  isRowGroupChange(){
+    
+    if(this.newTabForm.get('isRowGroup').value==true){
+      this.showColumnRowGroup=true;
+    }else{
+      this.showColumnRowGroup=false;
+    }
+  }
+
 
   isDynamicReportChange(){
 

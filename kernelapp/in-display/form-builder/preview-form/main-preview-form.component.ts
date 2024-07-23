@@ -358,7 +358,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: [],
               isHidden: [],
-
+              objectId: this.objectId,
               whereCond: this.getWhereCond
             }
           )
@@ -374,6 +374,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: this.testLinks,
               isHidden:[],
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
@@ -390,11 +391,12 @@ export class PreviewFormComponent implements OnInit {
               ],
               link:[],
               isHidden: this.hiddenColumns,
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
           );
-          
+         console.log('jsonQbe_sourceQuery--->: ',jsonQbe_sourceQuery)
          this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             if(data == 2){
               this.queryType =3;
@@ -408,11 +410,13 @@ export class PreviewFormComponent implements OnInit {
             if (this.sourceQuery != "-1") {
               this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
                 // let tableName = dataa[0].tableName;
+
                 let gridHeaders = data[0].headers[0];
                 let gridResults = data[0].result[0];
                 this.agColumns = [];
                 this.columnId = "ROW_ID";
                 this.agColumnsJson = gridHeaders;
+                console.log('gridHeaders----->',gridHeaders)
                 this.agColumns.push(this.agColumnsJson);
                 this.gridStaticData = gridResults;
 
@@ -489,6 +493,7 @@ export class PreviewFormComponent implements OnInit {
 
                     this.http.post<any>(GlobalConstants.getDynamicGridHeaders, jsonVal, { headers: GlobalConstants.headers }).subscribe((data: any) => {
                       this.agColumnsJson = data;
+                      console.log('jp>>>>>>>',this.agColumnsJson);
                       this.agColumns.push(this.agColumnsJson);
                       this.previewGridApi = GlobalConstants.getDynamicGridData;
                       this.previewGridApiParam = jsonVal;
@@ -538,7 +543,6 @@ export class PreviewFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
 
@@ -571,7 +575,8 @@ export class PreviewFormComponent implements OnInit {
             "isDynamicReport": res[i].isDynamicReport,
             "isReadOnly": res[i].isReadOnly,
             "objectId": res[i].objectId,
-            "isMain": res[i].isMain
+            "isMain": res[i].isMain,
+            "isRowGrouping": res[i].isRowGroup
           })
 
           if (res[i].isMain == 1) {
