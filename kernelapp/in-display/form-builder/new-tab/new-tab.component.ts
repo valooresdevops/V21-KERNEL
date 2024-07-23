@@ -31,20 +31,24 @@ export class NewTabComponent implements OnInit {
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
   public isQueryForm: any;
+  public isRowGroup: any;
   public hasMultipleSelection: any;
   public isDynamicReport: any;
   public actionType: any;
   public menuName: any;
   public isMainTab: any;
   public test: any;
-  public isCql:any;
   dialogRef: any;
+  showisTitle:any;
+  showCallApi:any;
+  showColumnRowGroup:any;
+  public sourceQueryId:any;
+  fieldGrouping:any;
   showAddSearchProcedure:any;
   showQueryFormButtonCombo:any;
   public getAllProcAndPack: string = '';
-  showCallApi:any;
-  showisTitle:any;
   public getAllColumns: any;
+
   queryFormpossibleButtons:any[]=[{id:'1',name:'Save'},{id:'2',name:'Execute'},{id:'3',name:'Rule'}];
 
   // public reloadUrl: string = '';
@@ -67,17 +71,17 @@ export class NewTabComponent implements OnInit {
     isSave: new UntypedFormControl(''),
     isQueryFormSelectedButtons: new UntypedFormControl(''),
     addSearchProcedure:new UntypedFormControl(''),
-    callRestApi:new UntypedFormControl(''),
     isDynamicTitleEnabled:new UntypedFormControl(''),
     dynamicTitleName:new UntypedFormControl(''),
-    canImport: new UntypedFormControl(''),
-    isCql: new UntypedFormControl(''),
+    callRestApi:new UntypedFormControl(''),
     callRestApi2:new UntypedFormControl(''),
+    isRowGroup:new UntypedFormControl(''),
+    fieldGrouping:new UntypedFormControl(''),
   });
   agPrimaryKey: any;
 
   constructor(private dialog: MatDialog, private http: HttpClient, private _Activatedroute: ActivatedRoute, private commonFunctions: CommonFunctions,
-    
+
     public informationservice: InformationService ) { }
 
   ngOnInit(): void {
@@ -87,10 +91,8 @@ export class NewTabComponent implements OnInit {
       this.objectPId = params.get('parentId');
       this.actionType = params.get('actionType');
 
-      // this.reloadUrl = "/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration";
-
+      this.fieldGrouping = GlobalConstants.getRowFieldGrouping +this.objectId;
       let url = "/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration";
-
       this.informationservice.setDynamicRuleBuilderReloadUrl(url);
 
       this.agColumnsJson = [
@@ -138,6 +140,7 @@ export class NewTabComponent implements OnInit {
       }
     });
     this.getAllColumns= GlobalConstants.getAllColumnsTitle +this.objectId;
+
   }
   onAddClick() {
     let data = [{ objectId: this.objectId, actionType: 'saveNew', objectPId: this.objectPId }];
@@ -151,7 +154,7 @@ export class NewTabComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       this.informationservice.setChoosenTab(this.objectId);
-      
+
       this.commonFunctions.reloadPage("/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration");
 
     });
@@ -181,7 +184,7 @@ console.log('data--------->',data)
   }
   onDeleteClick() {
     let NewArrayUpdateJson: any[] = []
-    
+
     let selectedRow = JSON.parse(this.informationservice.getAgGidSelectedNode());
     // let allColumns :any =  GlobalConstants.GetColVal+"/"+selectedRow[0].tableName;
     let tableId :any;
@@ -217,7 +220,7 @@ console.log('data--------->',data)
             {
               deleteJson += "{" + "\"" + "columnName" + "\"" + ":" + "\"" + res[i].columnName + "\"" + "}";
               deleteJson = "[" + deleteJson + "]";
-              arrayOfObject = 
+              arrayOfObject =
               {
                 "tableOwner":  res[i].tableOwner,
                 "tableName":  res[i].tableName,
@@ -276,7 +279,6 @@ console.log('data--------->',data)
         let isDynamicTitleEnabled =  this.newTabForm.controls['isDynamicTitleEnabled']?.value;
         let dynamicTitleName =  this.newTabForm.controls['dynamicTitleName']?.value;
         let canImport = this.newTabForm.controls['canImport']?.value;
-
         let callRestApi =  this.newTabForm.controls['callRestApi']?.value;
         let callRestApi2 =  this.newTabForm.controls['callRestApi2']?.value;
         if(condition == undefined){
@@ -291,6 +293,9 @@ console.log('data--------->',data)
         if(canDelete == undefined){
           canDelete = 0;
         }
+        if(canImport == undefined || canImport == ""){
+          canImport = 0;
+        }
         if(canModify == undefined){
           canModify = 0;
         }
@@ -299,9 +304,6 @@ console.log('data--------->',data)
         }
         if(readOnlyQbeId == undefined){
           readOnlyQbeId = 0;
-        }
-        if(canImport == undefined || canImport == ""){
-          canImport = 0;
         }
       if (this.actionType == 'saveNew') {
         let List = [];
@@ -317,6 +319,8 @@ console.log('data--------->',data)
           isGrid: this.newTabForm.controls['isGrid']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
           //isHidden: this.newTabForm.controls['isHidden']?.value,
@@ -330,19 +334,20 @@ console.log('data--------->',data)
           advancedSearchProcedureName:isAdvencedSearchProcedure,
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
-          callRestApi: false,
-          isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
           dynamicTitleName: dynamicTitleName,
+          isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
+          callRestApi: false,
           canImport: canImport,
-          isCql: this.newTabForm.controls['isCql']?.value,
+
+
         };
         List.push(jsonParams);
-        this.isCql = this.newTabForm.controls['isCql']?.value;
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
+        this.isRowGroup = this.newTabForm.controls['isRowGroup']?.value;
         this.isDynamicReport = this.newTabForm.controls['isDynamicReport']?.value;
-        
+
         // }
 
         this.http.post<any>(GlobalConstants.createTabApi, List, { headers: GlobalConstants.headers }).subscribe(
@@ -351,7 +356,7 @@ console.log('data--------->',data)
               this.commonFunctions.alert("alert", res.description);
             } else {
               this.commonFunctions.alert("alert", res.description);
-              
+
               // const insertQueryFormButton=from(axios.get(GlobalConstants.insertQueryFormButton))
               // const getQueryParams=await lastValueFrom(getQueryParamsApi);
 
@@ -363,13 +368,15 @@ console.log('data--------->',data)
 
       if (this.actionType == 'update') {
         let updateList = [];
-        
+
         const jsonParams = {
           menuName: this.newTabForm.controls['tabName']?.value,
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -378,20 +385,19 @@ console.log('data--------->',data)
           isReadOnly: isReadOnly,
           isAdvancedSearch: this.newTabForm.controls['isAdvancedSearch']?.value,
           sourceQuery: sourceQuery,
+          dynamicTitleName: dynamicTitleName,
           canAdd: canAdd,
           canDelete: canDelete,
           canModify: canModify,
-          condition: condition,
-          advancedSearchProcedureName:isAdvencedSearchProcedure,
-          canImport: canImport,
+          isDynamicTitleEnabled: isDynamicTitleEnabled,
           callRestApi:this.newTabForm.controls['callRestApi']?.value,
           callRestApi2:callRestApi2,
-          isDynamicTitleEnabled: isDynamicTitleEnabled,
-          dynamicTitleName: dynamicTitleName,
+          canImport: canImport,
+          condition: condition,
+          advancedSearchProcedureName:isAdvencedSearchProcedure,
           userId: this.informationservice.getLogeduserId(),
           isSave: this.newTabForm.controls['isSave']?.value,
-          readOnlyQbeId: readOnlyQbeId,
-          isCql: this.newTabForm.controls['isCql']?.value,
+          readOnlyQbeId: readOnlyQbeId
         };
         updateList.push(jsonParams);
 
@@ -402,16 +408,23 @@ console.log('data--------->',data)
             } else {
               this.commonFunctions.alert("alert", res.description);
               this.informationservice.setChoosenTab(this.objectId);
-              
+
               this.commonFunctions.navigateToPage("/dsp/augmentedConfig/form/update/" + this.objectPId);
             }
           });
       }
     }
   }
-
+  isTitleChange(){
+    if(this.newTabForm.get('isDynamicTitleEnabled').value==true){
+      this.showisTitle=true;
+    }else{
+      this.showisTitle=false;
+      // this.newTabForm.controls['isTitleField'].setValue('');
+    }
+  }
   getAllColums() {
-    
+
     let tableName = this.informationservice.getSelectedTabName();
     this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((data: any) => {
       for (let i = 0; i < data.length; i++) {
@@ -422,7 +435,7 @@ console.log('data--------->',data)
 
 
   fetchTabData() {
-
+    
     this.http.get<any>(GlobalConstants.getTabConfigurationApi + this.objectId, { headers: GlobalConstants.headers, }).subscribe(
       async (res: any) => {
         this.newTabForm.controls['tabName'].setValue(res[0].menuName);
@@ -435,32 +448,49 @@ console.log('data--------->',data)
         this.newTabForm.controls['isSave'].setValue(res[0].isSave);
         this.newTabForm.controls['readOnlyQbeId'].setValue(res[0].readOnlyQbeId);
         this.newTabForm.controls['addSearchProcedure'].setValue(res[0].advancedSearchProcedureName);
+        this.newTabForm.controls['dynamicTitleName'].setValue(res[0].dynamicTitleName);
         this.newTabForm.controls['isDynamicTitleEnabled'].setValue(res[0].isDynamicTitleEnabled);
         this.newTabForm.controls['canImport'].setValue(res[0].canImport);
         this.newTabForm.controls['callRestApi2'].setValue(res[0].apiFunctionName);
+        if (res[0].isApiEnabled == "0") {
+          this.newTabForm.controls['callRestApi'].setValue(false);
+        } else {
+          this.newTabForm.controls['callRestApi'].setValue(true);
+          this.showCallApi=true;
+        }
 
         if (res[0].isGrid == "0") {
           this.newTabForm.controls['isGrid'].setValue(false);
         } else {
           this.newTabForm.controls['isGrid'].setValue(true);
         }
-        if (res[0].isApiEnabled == "0") {
-          this.newTabForm.controls['callRestApi'].setValue(false);
 
-        } else {
-          this.newTabForm.controls['callRestApi'].setValue(true);
-          this.showCallApi=true;
-        }
         if (res[0].isDynamicReport == "0") {
           this.newTabForm.controls['isDynamicReport'].setValue(false);
         } else {
           this.newTabForm.controls['isDynamicReport'].setValue(true);
+        }
+        if (res[0].isDynamicTitleEnabled == "0") {
+          this.showisTitle = false;
+          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(false);
+        } else {
+          this.showisTitle = true;
+
+          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(true);
         }
 
         if (res[0].hasMultipleSelection == "0") {
           this.newTabForm.controls['hasMultipleSelection'].setValue(false);
         } else {
           this.newTabForm.controls['hasMultipleSelection'].setValue(true);
+        }
+        if (res[0].isRowGroup == "0") {
+          this.newTabForm.controls['isRowGroup'].setValue(false);
+          this.newTabForm.controls['fieldGrouping'].setValue('');
+
+        } else {
+          this.newTabForm.controls['isRowGroup'].setValue(true);
+          this.newTabForm.controls['fieldGrouping'].setValue(res[0].fieldGrouping);
         }
 
         if (res[0].isQueryForm == "0") {
@@ -496,15 +526,8 @@ console.log('data--------->',data)
           this.newTabForm.controls['isAdvancedSearch'].setValue(false);
         } else {
           this.showAddSearchProcedure = true;
-          this.newTabForm.controls['isAdvancedSearch'].setValue(true);
-        }
-        if (res[0].isDynamicTitleEnabled == "0") {
-          this.showisTitle = false;
-          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(false);
-        } else {
-          this.showisTitle = true;
 
-          this.newTabForm.controls['isDynamicTitleEnabled'].setValue(true);
+          this.newTabForm.controls['isAdvancedSearch'].setValue(true);
         }
         this.isMainTab = res[0].isMain;
 
@@ -515,7 +538,6 @@ console.log('data--------->',data)
         this.commonFunctions.handleLookupElem("canDelete", this.newTabForm);
         this.commonFunctions.handleLookupElem("sourceQuery", this.newTabForm);
         this.commonFunctions.handleLookupElem("readOnlyQbeId", this.newTabForm);
-        this.commonFunctions.handleLookupElem("canImport", this.newTabForm);
 
         res.objectId = this.objectId;
 
@@ -524,7 +546,7 @@ console.log('data--------->',data)
 
     this.http.get<any>(GlobalConstants.getSelectedRowsApi + this.objectId, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
-        
+
         this.informationservice.setAgGidSelectedNode(JSON.stringify(res));
       });
   }
@@ -536,30 +558,23 @@ console.log('data--------->',data)
     }else{
       this.showQueryFormButtonCombo=false;
     }
+  }
+
+  isRowGroupChange(){
     
-  }
-
-
-  isAdvancedSearchChange(){
-    if(this.newTabForm.get('isAdvancedSearch').value==true){
-      this.showAddSearchProcedure=true;
+    if(this.newTabForm.get('isRowGroup').value==true){
+      this.showColumnRowGroup=true;
     }else{
-      this.showAddSearchProcedure=false;
-      // this.newTabForm.controls['addSearchProcedure'].setValue('');    
+      this.showColumnRowGroup=false;
     }
   }
 
 
-  isTitleChange(){
-    if(this.newTabForm.get('isDynamicTitleEnabled').value==true){
-      this.showisTitle=true;
-    }else{
-      this.showisTitle=false;
-      // this.newTabForm.controls['isTitleField'].setValue('');    
-    }
-  }
+  isDynamicReportChange(){
 
-  isDynamicReportChange(){ 
+
+  }
+  isTitleFieldChange(){
   }
 
   isCallApi(){
@@ -569,14 +584,12 @@ console.log('data--------->',data)
       this.showCallApi=false;
     }
   }
-  isTitleFieldChange(){
-    console.log('<><><><> ',this.newTabForm.controls['isTitleField']?.value)
-  }
-  isCqlApi(){
-    if(this.newTabForm.get('isCql').value==true){
-      this.isCql=true;
+  isAdvancedSearchChange(){
+    if(this.newTabForm.get('isAdvancedSearch').value==true){
+      this.showAddSearchProcedure=true;
     }else{
-      this.isCql=false;
+      this.showAddSearchProcedure=false;
+      this.newTabForm.controls['addSearchProcedure'].setValue('');
     }
   }
 

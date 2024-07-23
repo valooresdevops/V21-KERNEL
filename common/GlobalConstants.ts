@@ -314,7 +314,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static insertLogsDataApi  = GlobalConstants.inDispGatewat + 'api/insertLogsData/';
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
-  
+  public static getRowFieldGrouping  = GlobalConstants.inDispGatewat + 'api/getRowFieldGrouping/';
+
   
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
   public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';

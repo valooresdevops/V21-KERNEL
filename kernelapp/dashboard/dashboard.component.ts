@@ -1017,10 +1017,10 @@ export class DashboardComponent implements OnInit {
       this.http.post<any>(GlobalConstants.getQueryData + data.ID, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res
-        });
+      
 
 
-      setTimeout(() => {
+     
 
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
@@ -1031,7 +1031,7 @@ export class DashboardComponent implements OnInit {
           width: '50%',
           height: '60%',
         });
-      }, 1000);
+      });
     } else if (data.type == 'Grid') {
       this.http.post<any>(GlobalConstants.decodeGridQuery + data.ID, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {

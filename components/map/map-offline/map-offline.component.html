@@ -1,0 +1,461 @@
+<app-navbar  [SimulID]="navbarSimulId" (displayclusters2)="getsenarioId($event)"></app-navbar>
+
+<div id="fullscreen" class="fullscreen" style="position:relative;">
+  <div #mapContainer id="mapContainer" class="map">
+  </div>
+
+  <div id="magnifying-glass1" class="magnifying-glass1"></div>
+
+  <!-- <div class="half">
+    <h4>Road</h4>
+    <div id="roadMap" class="map"></div>
+  </div>
+  <div class="half">
+    <h4>Aerial</h4>
+    <div id="aerialMap" class="map"></div>
+  </div> -->
+ 
+
+  <!-- <div id="magnifying-glass1" class="magnifying-glass1"></div> -->
+
+  <div id="MouseCoord" style="box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    position: absolute;
+    bottom: 10px;
+    left: 10px; width: fit-content;
+    background: #ffffffb3;
+    font-size: 14px;">
+  </div>
+  <div id="ref" style=" display: flex;position:absolute;right: 12px;top: 104px;" >
+    <app-textmenu *ngIf="showTextMenu"  [nextActionMenuList]="nextActionMenuList"></app-textmenu>
+    
+    </div>
+
+  <div  id="animatonbar" style=" display:none;position: absolute;bottom: 0;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
+    <input type="range" min="1" max="10" [(ngModel)]="animationSpeed"/>
+    <button (click)="startAnimation()">Start</button>
+    <button (click)="stopAnimation()">Stop</button>
+  </div>
+<div  class="timeline" style="display:none;position: absolute;bottom: 0;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
+  
+  <button (click)="startTimeline()" [disabled]="isRunning">Start</button>
+  <button (click)="ReverseTimeline()" [disabled]="isRunning">Reverse</button>
+  <button (click)="stopTimeline()" [disabled]="!isRunning">Stop</button>
+  <button (click)="restTimeline()">Reset</button>
+ 
+  <button (click)="opentimelineScreen()"  > Display Data</button>
+ <input type="range" [(ngModel)]="speedTime" min="1" max="100" step="1" value="5"  (click)="changebar()" >
+  <!-- <span *ngIf="ShowTimeline" style="background-color: white;color: black;">{{ dateTtoDate(selectedTime) }} </span> -->
+  <!-- <button id="tabledatabtn"  (click)="opentimelineScreen()"> Display Data</button> -->
+</div>
+
+<div id='routebar' class='routebar' style="display: none;">
+  <div class="controls">
+    <span (click)="startRoute()">Start</span>
+    <span (click)="stopRoute()">Stop</span>
+    <span (click)="resetbyDevice()">Reset</span>
+
+    <span (click)="opentimelineScreen()">Display Data</span>
+  </div>
+  <div class="speed-control">
+    <span (click)="decreaseSpeed()">&#60;</span> <!-- Left arrow symbol -->
+    <span>{{ speedTimeRoute }}x</span>
+    <span (click)="increaseSpeed()">&#62;</span> <!-- Right arrow symbol -->
+  </div>
+</div>
+
+<div id='routebar1' class='routebar' style="display: none;">
+  <div class="controls">
+    <span (click)="startRoute1()">Start</span>
+    <span (click)="stopRoute()">Stop</span>
+    <span (click)="resetbyRoute()">Reset</span>
+
+    <span (click)="opentimelineScreen()">Display Data</span>
+  </div>
+  <div class="speed-control">
+    <span (click)="decreaseSpeed1()">&#60;</span> <!-- Left arrow symbol -->
+    <span>{{ speedTimeRoute }}x</span>
+    <span (click)="increaseSpeed1()">&#62;</span> <!-- Right arrow symbol -->
+  </div>
+</div>
+  <div id="showMeasure" 
+  class="showMeasure showMeasure_Layout dropdown" (click)="showMeasurepopup()">
+  <img src="../../../../../assets/assetsOffline/img/measure.png" alt="map" class="dropbtn">
+  <div class="dropdown-content" id="measurecontent" *ngIf="measurepopup===true">
+    <a href="#" (click)="measure('LineString')" title='Measure in meters'>Polyline</a>
+    <a href="#" (click)="measure('Polygon')" title='Measure in meters square'>Polygon</a>
+  </div>
+</div>
+
+<div  id="search"  class="box" style="position: absolute; top: 6px; right: 6px; z-index: 99999;  box-shadow: 0 1px 7px #999;" >
+  <img src="../../../../../assets/assetsOffline/img/Search.PNG" alt="search" class="searchbtn">
+  <input type="text" [(ngModel)]="locationName" placeholder="Search Location..." (window:keydown.enter)="search(locationName)">
+  
+</div>
+
+
+<!-- popup for naming shape -->
+
+<div id="popup11111"  class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer" (click)="closepopupnameshapeCancel()"></button>
+  <div ><app-popup-name-shape  *ngIf="nameshapevalue===true" [Title]="titlepopupname" [value]="valuepopupname"></app-popup-name-shape></div>
+</div>
+
+<!-- popup for shape name after calling fct-->
+<div id="popup22222"  class="ol-popupnameshape" *ngIf="afternameshapevalue===true">
+  <div ><p *ngIf="afternameshapevalue===true">{{shapeNamepopup}}</p></div>
+</div>
+
+  
+<div id="tabletest" *ngIf="openTable===true">
+  <app-v-table  #childRef [tableData]="Datatable" [tablerow]="tablerow" [tableColumns]="displayedColumns"  [routeDevices]="routeDevicestable" [typeofdata]="typeofdata"  (clickedRow)="changeview($event)"  (clickedDeviceId)="clickedDeviceId($event)"
+  ></app-v-table>
+ </div>
+
+
+<div id="popupGrid"  >
+  <button  *ngIf="value===true" id="popup-closer" class="ol-popup-closer"  (click)="closeGridPopup();"></button>
+
+    <app-v-ag-grid *ngIf="value===true"  [headerHeight]="20" [columnDefs]="columnDefs2"  [rowData]="rowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" [GridID]="GridID" ></app-v-ag-grid>
+  
+</div> 
+
+<div id="popup2" class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer" (click)="closeGridPopup();" ></button>
+  <div>
+    <app-v-ag-grid *ngIf="value===true"   [headerHeight]="0"    [autoGroupColumnDef]="autoGroupColumnDef"  [columnDefs]="columnDefs"  [rowData]="rowData" [distinct]="true"  [pagination]="false" [contextmenu]="false"  [title]="title" [rowGrouping]="true"  >  </app-v-ag-grid>
+  </div>
+</div> 
+
+<div id="TCDContent" class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer" (click)="closeTCDPopup();" ></button>
+  <div>
+    <app-v-ag-grid  [headerHeight]="20" [autoGroupColumnDef]="autoGroupColumnDeftcd" [columnDefs]="columnDefsTcd"  [rowData]="TcdRowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" >  </app-v-ag-grid>
+  </div>
+</div>
+
+
+<div id="fixedelementsPopup" class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer"  (click)="closeFixedElementsPopup();"></button>
+  <div  *ngIf="FixedElementsPopup===true" >
+   
+    <p>Name: <span>{{F_name}}</span></p>
+    <p>Type: <span>{{F_Type}}</span></p>
+
+  </div>
+</div> 
+
+<div id="datepicker" class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer" (click)="closepopup();" ></button>
+  <div id="datepickerconatiner" *ngIf="isdatepicker===true" >
+    <app-datepicker [coordinatesArray]="coordinatesArray" *ngIf="isdatepicker===true"  id="datepickerComp"></app-datepicker>  
+  </div>
+</div> 
+
+
+
+<button id="btn-54"
+style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+(click)="openPopup2()"
+>
+openPopup
+</button>
+<button id="opentcd"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="opentcdGrid()"
+>
+opentcd
+</button>
+
+<button id="closepopup"
+style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+(click)="closepopup()"
+>
+openPopup
+</button>
+
+<div class="toggle_container">
+  <button class="toggle-button" (click)="clickEvent()" title="Maping tools"><img src="../../../../../assets/assetsOffline/img/tools.png" alt="Tools"></button>
+</div>
+
+
+<!-- <div id="ShowSenarioTimeline"   class="ShowSenarioTimeline"  title="Drawing" (click)="OpenSenarioAlert()"
+class="customButtons customButtons_Layout" style="display: none;"> 
+<img src="./assets/icons/menu.png" alt="polyline" style="padding-left: 7px;">
+</div> -->
+
+<div class="mouseover1" (mouseover)="onMouseOver()"> 
+<div class="button-container" id="button-container" [class.hidetools]="status" [class.showtools]="!status"  [class.dimmed]="isDimmed">
+  <button (click)="drawLineString()" title='Draw a Polyline'><img src="../../../../../assets/assetsOffline/img/Polyline.PNG" alt="polyline"></button>
+  <button (click)="drawPolygon()" title='Draw a Polygon'><img src="../../../../../assets/assetsOffline/img/Polygon.PNG" alt="Polygon"></button>
+  <button (click)="drawCircle()" title='Draw a Circle'><img src="../../../../../assets/assetsOffline/img/Circle.PNG" alt="Circle"></button>
+  <button (click)="drawPoint()" title='Draw a Point'><img src="../../../../../assets/assetsOffline/img/Point.PNG" alt="Point"></button>
+  <!-- <button (click)="addMarker()" title='Draw a Point'><img src="./assets/img/Point.PNG" alt="Point"></button> -->
+  
+</div>
+<div class="button-container2" [class.hidetools]="status" [class.showtools]="!status" [class.dimmed]="isDimmed"> 
+  <!-- <button (click)="EditShapes()" title='Edit layers' ><img src="./assets/img/Edit.PNG" alt="edit"></button> -->
+  <!-- <div *ngIf="editMode===true" class="editMode">
+    <button id="saveButton" (click)="saveChanges()" title="Save changes">Save</button>
+    <button id="cancelButton"  (click)="cancelEdit()"  title="Cancel edit">Cancel</button>
+  </div> -->
+  <button (click)="deleteFeature()" title='Delete layers'><img src="../../../../../assets/assetsOffline/img/trash.png" alt="trash"></button>
+  <!-- <div class="editMode"   *ngIf="deleteMode"  id="deleteMode">
+    <button (click)="savedelete()" title="Save changes">Save</button>
+    <button id="cancelButton"  (click)="canceldelete()" title="Cancel edit">Cancel</button>
+  </div> -->
+</div>
+
+  <div class="button-container3" [class.hidetools]="status" [class.showtools]="!status" [class.dimmed]="isDimmed">
+    <button *ngFor="let item of moretools"  title="{{item[0]}}" (click)="CallFunctions(item[3])"><img src="{{item[4]}}" alt="{{item[0]}}"></button>
+  </div>
+
+  <div class="button-container4" [class.hidetools]="status" [class.showtools]="!status" [class.dimmed]="isDimmed">
+    <button *ngFor="let item of graphtools"  title="{{item[0]}}" (click)="CallFunctions(item[3])"><img src="{{item[4]}}" alt="{{item[0]}}"></button>
+    <!-- <button id="deleteMeasurebtn" (click)="drawarc2()" title='arc'><img src="./assets/img/trash.png" alt="trash"></button>   -->
+    <!-- <button id="start-animation" (click)="displayCoTravelers()" title='findCoTraveler'>cotrav</button>-->
+    <!-- <button id="start-animation" (click)="chooseelementpopup()" title='markers'>markers</button>  -->
+    <!-- <button id="start-animation" (click)="hide()" title='markers'>clusters</button>  -->
+    <button title="Routing" (click)="toggleDropdown()" >
+      <img src="../../../../../assets/assetsOffline/icons/route.png" alt="route"> 
+     </button>
+    
+     
+     <div id="dropdownContent1" class="dropdown-content1">
+       <!-- Your dropdown content goes here -->
+       <button (click)="bydevice()">By Devices</button>
+       <button (click)="byroute()">By routes</button>
+       <button (click)="getallroute1()">All Routes</button>
+       <!-- <button (click)="getallroute1()">Display Routes</button> -->
+       <button (click)="clearRoutes()">Clear</button>
+     </div>
+
+  </div>
+
+  <div class="button-container5" [class.hidetools]="status" [class.showtools]="!status" >
+    <button title="loop" (click)="looplens($event)" >
+      <img src="../../../../../assets/assetsOffline/icons/searchIcon.png" alt="loop"> 
+     </button>
+  </div>
+</div>
+
+<div   *ngIf="ShowHeader" id="refresh" style=" position: absolute; z-index: 9999999999999 ; background-color:white;
+display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; ">
+<fieldset > 
+   <legend id="legend">Simulation</legend>  
+
+<app-header id="Header" [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
+</fieldset>
+</div>
+  
+  <button id="refreshJsp"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="refreshSimulation()"
+  >
+  saveshapes
+</button>
+
+
+<button id="findCoTraveler"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="findCoTraveler()"
+></button>
+<button id="findCoRelation"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="findCoRelation()"
+></button>
+
+
+<button id="executeAOIActivity"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none; "
+  (click)="executeAOIActivity()"
+></button>
+<button id="displayAOIPolygonData"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="displayAOIPolygonData()"
+></button>
+<button id="displayAOIResultData"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="displayAOIResultData()"
+></button>
+<button id="displayAOIActivitytData"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="displayAOIActivitytData()"
+></button>
+ 
+
+
+
+<button id="displayCoTravelers"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="displayCoTravelers()"
+></button>
+
+<button id="DisplayCdr"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="DisplayCdr()"
+>
+DisplayCdr
+</button>
+<button id="displayTimelineSimul"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="displayTimelineSimul()"
+>
+refreshJsp
+</button>
+
+<button id="RunDeviceHistory1"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="RunDeviceHistory()"
+></button>
+
+<button id="addnewSenario" style="display: none;"  (click)="addnewSenario()"></button>
+
+<button id="showMeasure2" class="showMeasure2 showMeasure2_Layout"  (click)="filterData2()" style="display: none;">
+  <img src="../../../../../assets/assetsOffline/img/Layer.PNG" alt="map" class="dropbtn"></button>
+
+  <div *ngIf="display"> 
+
+<app-layer-control 
+(tooltipChange)="controlTooltip($event)"
+(datetooltipChange)="controldateTooltip($event)"
+  (activityDensityChange)="controlHeats($event)"
+  (activityHotspotChange)="controlClusters($event)"
+  (areaDemographicsChange)="controlArea($event)"
+  (deviceClustersChange)="deviceClusters($event)"
+  (filterData2change)="filterData2()"
+  (sectorchange)="clearsectors($event)"
+  (sectorTechnologychange)="clearTechnology($event)"
+  (sectorCellIdchange)="sectorCellIdchange($event)"
+  [Names]="uniqueNames"
+  [display]="display"
+  [displaysectors]="displaysectors"
+  [displayclusters]="displayclusters"
+  >
+</app-layer-control> 
+ </div>
+
+
+ <button *ngIf="drawShape===true">
+  Cancel
+ </button>
+ 
+ <div id="menu" class="menu d-flex flex-row justify-content-start gap-4" >
+  <select  id="mapType"  class="form-select form-select-sm customButtons_Layout" aria-label=".form-select-sm example"
+  (change)="changeMap($event)">
+    <option  selected="" disabled="">Map Options</option>
+  <!-- <option *ngFor="let z of maptypes" value="{{z[1]}}"  id="{{z[3]}}" >{{z[2]}}</option> -->
+  <!-- <option id="Satelitte">Satelitte </option>
+  <option id="OpenStreet"> OpenStreet</option> -->
+  <option *ngFor="let z of maptypes" value="{{z[1]}}"  id="{{z[2]}}" >{{z[2]}}</option>
+</select>
+</div>
+<button style="position: absolute;
+width: 31px;  
+top: 6px;
+z-index: 2147483647;
+left: 182px;
+outline-color: transparent;
+border-radius: 2px;
+padding: 6px;
+cursor: pointer;
+box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 5px !important;
+border: 0px !important;
+background-color: white;
+color: rgb(0, 0, 0) !important;
+ 
+height: 30px;
+color: #000 !important;" id="toggleColor"     (click)="createnewSenario()" [style.background-color]="isGreen ? 'white' : 'green'"><img src='../../../../../assets/assetsOffline/icons/plus.png'></button>
+
+
+
+<!-- <div id="cotravelerpopup" class="ol-popupcotraveler" >
+  <a href="#" id="cotravelerpopup-closer" class="ol-popup-closercotraveler" (click)="closecotravelerpopup()"></a>
+  <div id="cotravelerpopup-content" *ngIf="cotraveler===true">
+    <app-v-ag-grid *ngIf="cotraveler===true"   [headerHeight]="20" [columnDefs]="columnDefs2"  [rowData]="rowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" >  </app-v-ag-grid>
+
+  </div>
+</div> -->
+
+<div id="cotravelerpopup"  class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer"  (click)="closecotravelerpopup();"></button>
+
+    <app-v-ag-grid *ngIf="cotraveler===true" [headerHeight]="20" [columnDefs]="columnDefs2"  [rowData]="rowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" >  </app-v-ag-grid>
+</div>
+
+<div id="btspopup"  class="ol-popup">
+  <button id="popup-closer" class="ol-popup-closer"  (click)="closebtspopup();"></button>
+    <app-v-ag-grid *ngIf="bts===true" [headerHeight]="20" [columnDefs]="columnDefsBts"  [rowData]="rowDatabts" [distinct]="false"  [pagination]="true" [contextmenu]="false" >  </app-v-ag-grid>
+  </div>
+
+ 
+ 
+  <div id="fixedelementpopup" class="ol-popup" >
+    <button id="popup-closer" class="ol-popup-closer" (click)="closefixedelementpopup();" ></button>
+    <p *ngIf="fixedelementpopup===true" style="    text-align: center; margin: -2px;"> {{fixedelementname}}</p>
+  </div> 
+
+  <button id="displayManySimulation"
+  style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
+  (click)="displayManySimulation()"
+></button>
+
+<ng-template #saveMarker>
+  <div id="elementpopup" class="ol-popup">
+    <button id="popup-closer" class="ol-popup-closer" (click)="closeelementpopup();" ></button>
+    <div *ngIf="searchelement===true">
+  <table>
+    <tr> 
+      <td> <label for="type">Type: &emsp;&emsp;&emsp;</label></td>
+      <td>
+        <select id="type"   (change)="changeElemnt($event)">
+        <option value="BTS" id="BTS">BTS</option>
+        <option value="FixedElement" id="FixedElement">Fixed Element</option>
+      </select>
+    </td>
+    </tr>
+    <tr>
+      <td><label>lng : </label></td>
+      <td>{{searchlng}}</td>
+  </tr>
+    <tr>
+      <td>lat :</td>
+      <td>{{searchlat}}</td>
+    </tr>
+    <tr>
+      <td><label>Name : </label></td>
+      <td><input type="text" style="width: 113px; margin:5px"  [(ngModel)]="elementName"/></td>
+    </tr>
+  </table>
+  <nav class="alertify-buttons">
+    <button type="button" class="alertify-button normaleColor alertify-button-cancel">Save</button>
+    <button class="alertify-button normaleColor alertify-button-cancel" (click)="closedialogall()">Cancel</button>
+  </nav> 
+</div>
+</div>
+</ng-template>
+
+<ng-template #locationMarker>
+  <nav class="alertify-buttons">
+    <button type="button" class="alertify-button normaleColor alertify-button-cancel" (click)="onSaveMarker($event)" >Save</button>
+    <button type="button" class="alertify-button normaleColor alertify-button-cancel" (click)="bullseye()">Execute</button>
+  </nav> 
+</ng-template>
+
+
+  <!-- <div class="modal-header">
+   <button type="button" class="btn-close" aria-label="Close" (click)="closemodalservice();" ></button>
+ </div>  -->
+ 
+ <div class="ag-grid-container" id="SenarioContentdiv" *ngIf="SenarioContentdiv===true">
+  <!-- <div class="ag-grid-container" id="SenarioContentdiv" > -->
+ <app-v-ag-grid id="SenarioContent" class="Senariogrid" [headerHeight]="0" [columnDefs]="SenariocolumnDefs"
+  [rowData]="SenarioRowData" [treeData]="true" [Title]="Devices"  [distinct]="false" 
+   [pagination]="false" [autoGroupColumnDef]="autoGroupColumnDefsSenario"  [contextmenu]="false" [rowGrouping]="false" [Grid2Type]="GridType1" 
+    [GridID]="'Senariogrid2'"   (displayclusters2)="displaysenario($event)">   </app-v-ag-grid>
+  </div>
+
+<!--  -->
+<button id="devaddgroup" style="display: none;"  (click)="devaddgroup()"></button>
+<button id="openaddgrpscreen" style="display: none;"  (click)="openaddgrpscreen()"></button>
+
+</div>

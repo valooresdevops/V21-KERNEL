@@ -385,11 +385,6 @@ export class ScreenBuilderToolComponent implements OnInit {
       this.http.post<any>(GlobalConstants.getQueryData + this.informationservice.getAgGidSelectedNode(), { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res
-        });
-
-
-      setTimeout(() => {
-
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
         dialogConfig.height = '700px';
@@ -399,8 +394,7 @@ export class ScreenBuilderToolComponent implements OnInit {
           width: '50%',
           height: '60%',
         });
-      }, 1000);
-
+    });
 
     }
   }

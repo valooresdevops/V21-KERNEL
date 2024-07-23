@@ -79,6 +79,7 @@ import { DatacrowdService } from "../Services/datacrowd.service";
 import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
 import { InformationService } from "src/app/Kernel/services/information.service";
+import { FileDownloadService } from "../Services/FileDownloadService.service";
 
 declare let alertify: any;
 
@@ -1311,6 +1312,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
     // public chatService: ChatService,
     private http:HttpClient,
     public informationservice: InformationService,
+    private fileDownloadService: FileDownloadService
 
   ) { }
   @ViewChild('popup') popup: any;
@@ -6897,7 +6899,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
       var thisCenter = this.globalCoord;
       object.forEach((element: any, key: any) => {
         //console.log('elementfixed >>>>>>', element)
-        if (element[4].replace(/[^.]/g, "").length == 1) {
+        if (element[4].toString().replace(/[^.]/g, "").length == 1) {
           thisCenter = [element[4], element[3]];
           //var iconVar = "/assets/img/icons/"+element[2]+".png";
           var iconVar = "/assets/assets/img/icons/" + element[2] + ".png";
@@ -6906,7 +6908,6 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
 
 
           if (!this.imageExists(iconVar)) {
-            alert("image exists >>> ")
             iconVar = "/assets/assets/img/icons/percentage.png";
             
           }
@@ -7010,7 +7011,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
 
     var fixedElementIcon = L.icon({
       iconUrl: ICON,
-      iconSize: this.getIconSize(this.map.getZoom()),
+      iconSize: [32,32],
     });
     var marker = L.marker([LAT, LNG], {
       icon: fixedElementIcon,
@@ -7029,7 +7030,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
   
       var fixedElementIcon = L.icon({
         iconUrl: ICON,
-        iconSize: this.getIconSize(this.magnifiedMap.getZoom()),
+        iconSize: [32,32],
       });
       var marker = L.marker([LAT, LNG], {
         icon: fixedElementIcon,
@@ -17330,8 +17331,20 @@ else if(this.reportType=="3"){
 
   }else{
    
-    this.displayFixedElements(this.datajson.fixedelements);
-    this.displayClustersforfixedelements(this.datajson.geo);
+    if(this.reportType=="8" ){
+      this.displayFixedElements(this.datajson);
+    }else{
+      if(this.datajson.fixedelements){
+        this.displayFixedElements(this.datajson.fixedelements);
+
+      }
+      if(this.datajson.geo){
+        this.displayClustersforfixedelements(this.datajson.geo);
+
+      }
+    
+    }
+  
      
   }
   
@@ -17730,6 +17743,13 @@ let obj22:any={
     }
     
     async DisplayFromSenario(){
+let ISExport:boolean=this.informationservice.getISExport();
+
+console.log('ISExport:',ISExport); // Debugging log
+
+if(ISExport==false){
+
+
       console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
 
@@ -18007,7 +18027,7 @@ if(data[0].colName=="bts_cell_id" ){
 
 
 // }); 
-
+}
     }
 
     getsenarioId(obj:any){
@@ -18169,6 +18189,10 @@ convertArray(input: any[]): { id: number, name: string }[] {
 
       }
   
+    }
+
+    downloadHtmlFile(): void {
+      this.fileDownloadService.downloadFile('SimulationReport_6298.html');
     }
    
 }

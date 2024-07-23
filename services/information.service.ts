@@ -53,6 +53,7 @@ export class InformationService {
   public selectMonths : any = '';
   public customScreenBuilderPath : string = '';
   public lookUpSubmitValue : any = '';
+  public ISExport : boolean =false;
 
   
   
@@ -512,5 +513,13 @@ export class InformationService {
 
   getCustomScreenBuilderPath(){
       return this.customScreenBuilderPath;
+  }
+
+  setISExport(ISExport: any) {
+    this.ISExport = ISExport;
+  }
+
+  getISExport(){
+      return this.ISExport;
   }
 }
