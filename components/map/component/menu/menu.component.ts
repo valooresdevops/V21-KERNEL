@@ -619,14 +619,14 @@ if(typeof this.SimulName=="undefined"){
 
   //  await this.datacrowdservice.SaveSimul(obj);
 
-   var button = $('.menu-item').filter(function() {
+   var button :any= $('.menu-item').filter(function() {
     return $(this).find('span:contains('+firstValue+')').length > 0;
 });
 console.log('firstValue',firstValue)
 console.log('SimulationID',this.SimulationID)
 
 console.log("buttonzzz",button);
-if(button.length > 0) {
+if(button.prevObject.length > 0) {
   button.find('span:contains('+firstValue+')').text(finalvalue); // Change 'new text value' to your desired text
   console.log('updateSimulNameById>>>>>',this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue));
   this.hierarchyData=this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue);

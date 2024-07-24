@@ -969,7 +969,13 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
       else if(buttonAction == "8"){
 let dataselected:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
 console.log("dataselected>>>",dataselected)
-this.downloadHtmlFile(dataselected[0].COLVALUE);
+for(let i=0;i<dataselected.length;i++)
+  {
+    console.log("dataselected>>>",dataselected)
+
+    this.downloadHtmlFile(dataselected[i].ROW_ID[0].COLVALUE);
+
+  }
 // this.dialog.closeAll();
 this.informationservice.setISExport(true);
 
