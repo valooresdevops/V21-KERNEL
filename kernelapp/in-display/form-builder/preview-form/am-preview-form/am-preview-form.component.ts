@@ -1541,8 +1541,7 @@ export class AmPreviewFormComponent implements OnInit {
             }
           }
           let actionType;
-
-
+console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data[j] );
           if (JSON.parse(dynamicDRBOnload.data[j].actionType) == 1) {
             actionType = "saveNew";
           }
@@ -1560,11 +1559,13 @@ export class AmPreviewFormComponent implements OnInit {
                   if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     action = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
                   }
+
                   if (ruleData[i].step == 44) {
                     if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field") {
                       executeOnFieldAdv = ruleData[i].data;
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
                     else if (action == "Execute Rule Business") {
@@ -6100,7 +6101,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
       }
     }
     setTimeout(() => {
-      this.handleDialogTitle();      
+      this.handleDialogTitle();
     }, 100)
 
   }
@@ -6178,12 +6179,12 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     }
   }
   async handleFormFieldValues(fieldName: string, value: any) {
-    const getFieldDynamicTitleUrl =await axios.post(GlobalConstants.getFieldDynamicTitle + this.objectId); 
+    const getFieldDynamicTitleUrl =await axios.post(GlobalConstants.getFieldDynamicTitle + this.objectId);
     const responseaxios =  getFieldDynamicTitleUrl.data;
-    
+
         this.getFieldDynamicTitle = responseaxios;
         const fieldNames = fieldName.split(',');
-       
+
         // Loop over each field name
         for (let j = 0; j < fieldNames.length; j++) {
             const currentFieldName = fieldNames[j].trim();
@@ -6191,7 +6192,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
               this.getFieldDynamicTitleValue = value;
              }
         for (let i = 0; i < this.test.length; i++) {
-    
+
           if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
             localStorage.setItem("signatureImage",value);
             this.oldsignature = value;
@@ -6201,15 +6202,15 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
         let data = this.test.filter((el: any) => {
           return el.name === currentFieldName;
         });
-    
+
         //jp and charbel <3
-    
+
         // this.dynamicForm.controls[currentFieldName].setValue('');
-    
+
         if (this.dynamicForm.get(currentFieldName)) {
           this.dynamicForm.removeControl(currentFieldName);
           this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
-    
+
           if (value == null || value == 'null' || value == 'empty') {
             value = '';
           }
@@ -6227,7 +6228,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
         } else if(data[0] != undefined && data[0].columnType == "checkbox"){
             this.dynamicForm.controls[currentFieldName].setValue(value);
         }else if(data[0] != undefined && data[0].columnType == "phone number"){
-          this.cdr.detectChanges();     
+          this.cdr.detectChanges();
           this.dynamicForm.controls[currentFieldName].setValue(value.toString());
         }
           else {
@@ -6265,7 +6266,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
   //   for (let j = 0; j < fieldNames.length; j++) {
   //       const currentFieldName = fieldNames[j].trim();
   //   for (let i = 0; i < this.test.length; i++) {
-      
+
   //     if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
   //       localStorage.setItem("signatureImage",value);
   //       this.oldsignature = value;
@@ -6275,7 +6276,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
   //   let data = this.test.filter((el: any) => {
   //     return el.name === currentFieldName;
   //   });
-  
+
   //   //jp and charbel <3
 
   //   // this.dynamicForm.controls[currentFieldName].setValue('');
@@ -6323,16 +6324,16 @@ console.log('objectId------>',this.objectId)
 
     let fieldName: string = '';
     for (let i = 0; i < data.length; i++) {
-console.log('COLUMN_ID---->',data[i].COLUMN_ID)
+console.log('COLUMN_ID--------------------->',data[i])
 
-      if ($("#field_" + data[i].COLUMN_ID).length > 0) {
-        fieldName = $("#field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
+      if ($("#field_" + data[i].column_id).length > 0) {
+        fieldName = $("#field_" + data[i].column_id).attr("class").split(" ")[0];
       } else {
-        fieldName = $(".field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
+        fieldName = $(".field_" + data[i].column_id).attr("class").split(" ")[0];
       }
 
 
-      const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + data[i].DEPENDENT_QBE_ID));
+      const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + data[i].dependent_qbe_id));
       const paramNames = await lastValueFrom(paramNamesUrl);
       let dataa = paramNames.data;
       // this.jsonQbe = [];
@@ -6340,7 +6341,7 @@ console.log('COLUMN_ID---->',data[i].COLUMN_ID)
       let jsonQbe: any[] = [];
       jsonQbe.push(
         {
-          queryId: data[i].DEPENDENT_QBE_ID,
+          queryId: data[i].dependent_qbe_id,
           parameters: [
             {
               paramName: 'actionType',
@@ -6381,7 +6382,7 @@ console.log('COLUMN_ID---->',data[i].COLUMN_ID)
       }
 
       if (hasEmptyValues == 0) {
-        const dependentDefaultValUrl = from(axios.post(GlobalConstants.getQbeIdApi + data[i].DEPENDENT_QBE_ID + "/0", jsonQbe));
+        const dependentDefaultValUrl = from(axios.post(GlobalConstants.getQbeIdApi + data[i].dependent_qbe_id + "/0", jsonQbe));
         const dependentDefaultVal = await lastValueFrom(dependentDefaultValUrl);
         let b = false;
         let colId = '';
