@@ -562,7 +562,7 @@ export class PreviewFormComponent implements OnInit {
     this.tableOptions1 = [];
     this._Activatedroute.paramMap.subscribe((params) => {
       this.objectId = this.fromScreenBuilder == "1" ? this.screenBuilderObjId : params.get('parentId');
-
+      console.log("OBJECT ID FROM SCREENBUILDER>>>>>>>>>>>>",this.objectId);
       this.http.get<any>(GlobalConstants.getAllTabs + this.objectId, { headers: GlobalConstants.headers }).subscribe((res: any) => {
         for (let i = 0; i < res.length; i++) {
           this.tableOptions1.push({
