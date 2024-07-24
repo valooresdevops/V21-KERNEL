@@ -21,7 +21,7 @@ export class DynamicScreenComponent implements OnInit {
     this._Activatedroute.paramMap.subscribe((params:any) => {
       this.menuVariable = params.get('menuVariable');
     });
-    
+    console.log("menu variable>>>>>>>>>",this.menuVariable);
     this.http.get<any>(GlobalConstants.getScreenPreviewData+this.menuVariable, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => { 
     });    
