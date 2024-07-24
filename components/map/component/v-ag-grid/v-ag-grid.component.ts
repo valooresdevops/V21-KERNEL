@@ -307,80 +307,83 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
 
 
   onSelectionChanged(event:any) {
+    
+    //if is distinct
+    // let outputArray : String[]=[];
+    // let uniqueMakes = new Set();
 
- 
     if(this.distinct==true){
+    //console.log("event>>>>",event.api.getRenderedNodes());
     let renderedNodes= event.api.getRenderedNodes()
+    //console.log("getSelectedNodes()>>>>",event.api.getSelectedNodes());
 
     this.selectedarray=event.api.getSelectedNodes();
     this.sendDataToParent();
-  
+    
+
+
+   
     const selectedRows = event.api.getSelectedRows();
- 
+    //console.log("selectedRows>>>>",selectedRows);
+    // const deviceid = selectedRows[0].Device_id;
+    // this.multiselection.push(deviceid);
+    // //console.log("multiselection>>>>", this.multiselection);
     event.api.forEachNode((rowNode:any, index:any) => {
       let make = rowNode.selected;
+      
+      console.log("rowNode>>>",rowNode);
+      
+     
 
       if(make==true){
+        //console.log("this is>>>",rowNode.key);
         const deviceid = rowNode.key;
-        if (!this.multiselection.includes(deviceid)) {
-            if (deviceid != null) {
-                this.multiselection.push(deviceid);
-            }
-            localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
-            const coordSelected = rowNode.allLeafChildren[0].data.Coord;
-            let json = {
-                deviceid: deviceid,
-                coordSelected: coordSelected
-            };
-        
-            let existingCoords = [];
-            try {
-                existingCoords = JSON.parse(localStorage.getItem("jsonCoords")) || [];
-                if (!Array.isArray(existingCoords)) {
-                    existingCoords = [];
-                }
-            } catch (e) {
-                existingCoords = [];
-            }
-            existingCoords.push(json);
-            localStorage.setItem("jsonCoords", JSON.stringify(existingCoords));
+    
+
+        //console.log("multiselection>>>>333", this.multiselection);
+        if(!this.multiselection.includes(deviceid)){
+          // this.json.device=rowNode.key;
+          // this.json.count=rowNode.allChildrenCount;
+          // //console.log("json>>>>", this.json);
+          // this.arrayofdevices.push(this.json);
+          // //console.log("arrayofdevices>>>>", this.arrayofdevices);
+          if(deviceid !=null){
+            this.multiselection.push(deviceid);
+          }
+         
+          //console.log("multiselection>>>>4444", this.multiselection);
+          localStorage.setItem("multiselection", JSON.stringify(this.multiselection))
+
+          const coordSelected=rowNode.allLeafChildren[0].data.Coord;
+          let json={
+            deviceid:deviceid,
+            coordSelected:coordSelected
+          }
+          
+          this.arrayCoords.push(json);
+          localStorage.setItem("arrayCoords", JSON.stringify(this.arrayCoords))
+
         }
+      }else{
+        const deviceid = rowNode.key;
+        const index = this.multiselection.indexOf(deviceid);
+        //console.log("index>>>>", index);
+      for(let i=0;i<this.arrayCoords.length;i++){
+        const index2 = this.arrayCoords[i].deviceid.indexOf(deviceid);
+        //console.log("index2>>>>", index2);
+        if (index2 > -1) {
+          this.arrayCoords.splice(index2, 1);
+          //console.log("multiselection>>>>5555", this.multiselection);
+          localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+        }
+      }
+            
         
-        console.log("jsonCoords________     ", localStorage.getItem("jsonCoords") )
-
-
-        //old mechye
-      //   const deviceid = rowNode.key;
-      //   if(!this.multiselection.includes(deviceid)){
-      //     if(deviceid !=null){
-      //       this.multiselection.push(deviceid);
-      //     }
-      //              localStorage.setItem("multiselection", JSON.stringify(this.multiselection))
-      //     const coordSelected=rowNode.allLeafChildren[0].data.Coord;
-      //       let json={
-      //         deviceid:deviceid,
-      //         coordSelected:coordSelected
-      //       }
-      //     this.arrayCoords.push(json);
-      //     localStorage.setItem("jsonCoords", JSON.stringify(json))
-      //     localStorage.setItem("arrayCoords", JSON.stringify(this.arrayCoords))
-      //   }
-      // }else{
-      //   const deviceid = rowNode.key;
-      //   const index = this.multiselection.indexOf(deviceid);
-      // for(let i=0;i<this.arrayCoords.length;i++){
-      //   const index2 = this.arrayCoords[i].deviceid.indexOf(deviceid);
-      //   if (index2 > -1) {
-      //     this.arrayCoords.splice(index2, 1);
-      //     localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
-      //   }
-      // }
-        
-      //   if (index > -1) {
-      //     this.multiselection.splice(index, 1);
-      //     //console.log("multiselection>>>>5555", this.multiselection);
-      //     localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
-      //   }
+        if (index > -1) {
+          this.multiselection.splice(index, 1);
+          //console.log("multiselection>>>>5555", this.multiselection);
+          localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+        }
       }
     });
     }else{

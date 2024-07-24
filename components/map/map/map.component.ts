@@ -1341,6 +1341,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
 
   
   async ngOnInit(): Promise<void> {
+    this.usercode=localStorage.getItem("LogeduserId");
     $('.breadcrumb').css('display', 'none');
     $('#refresh').css('display', 'none');
     $('.magnifying-glass1').css('display', 'none');
@@ -1418,6 +1419,12 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
 
 
     });
+
+    if(localStorage.getItem("jsonCoords")){
+      localStorage.removeItem('jsonCoords');
+      
+    }
+
 
 
     // await  this.httpClient.get('/assets/custom.geo.json').subscribe((geojsonData: any) => {
@@ -6695,16 +6702,16 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
 
     if (object.TYPE == "percentage") {
 
-      this.fixedElementMarker = this.binddataforfixedElements(Number(object.LATITUDE), Number(object.LONGITUDE), object.TYPE + "  " + object.TYPE + " %", iconVar).on('click', e => e.target.remove());
+      this.fixedElementMarker = this.binddataforfixedElements(object.LATITUDE, object.LONGITUDE, object.TYPE + "  " + object.TYPE + " %", iconVar).on('click', e => e.target.remove());
       console.log("fixedElementMarker===",this.fixedElementMarker);
-      this.fixedElementMarkerLoop = this.binddataforfixedElementsLoop(Number(object.LATITUDE), Number(object.LONGITUDE), object.TYPE + "  " + object.TYPE + " %", iconVar).on('click', e => e.target.remove());
+      this.fixedElementMarkerLoop = this.binddataforfixedElementsLoop(object.LATITUDE, object.LONGITUDE, object.TYPE + "  " + object.TYPE + " %", iconVar).on('click', e => e.target.remove());
       console.log("fixedElementMarkerLoop===",this.fixedElementMarkerLoop);
     }
 
     else {
-      this.fixedElementMarker = this.binddataforfixedElements(Number(object.LATITUDE), Number(object.LONGITUDE), object.TYPE, iconVar).on('click', e => e.target.remove());
+      this.fixedElementMarker = this.binddataforfixedElements(object.LATITUDE, object.LONGITUDE, object.TYPE, iconVar).on('click', e => e.target.remove());
       console.log("fixedElementMarker===",this.fixedElementMarker);
-      this.fixedElementMarkerLoop = this.binddataforfixedElementsLoop(Number(object.LATITUDE), Number(object.LONGITUDE), object.TYPE, iconVar).on('click', e => e.target.remove());
+      this.fixedElementMarkerLoop = this.binddataforfixedElementsLoop(object.LATITUDE, object.LONGITUDE, object.TYPE, iconVar).on('click', e => e.target.remove());
       console.log("fixedElementMarkerLoop===",this.fixedElementMarkerLoop);
     }
     // this.fixedElementMarker.time=112213232213;
@@ -7008,6 +7015,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
   binddataforfixedElements(LAT: any, LNG: any, NAME: any, ICON: any) {
   console.log("getZoom",this.map.getZoom())
   console.log("iconzise",this.getIconSize(this.map.getZoom()))
+  console.log("LAT",LAT,"LNG",LNG)
 
     var fixedElementIcon = L.icon({
       iconUrl: ICON,
@@ -7405,19 +7413,33 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
     this.shapeName = "";
     this.datingModeEnabled = false;
   };
+
+
   direction() {
-
-
     if (this.reportType == 6||this.reportType == 2) {
-      //console.log("multiselection>>>", this.multiselection)
-
-      this.datacrowdService.getdirection(this.simulationid, JSON.parse(localStorage.getItem("multiselection"))).then((res: any) => {
-        //console.log('data>><<', res);
-
+      
+      const jsonCoord = JSON.parse(localStorage.getItem("jsonCoords"));
+  this.datacrowdService.getdirection(this.simulationid,jsonCoord).then((res: any) => {
         let data: any = res;
-        for (var i = 0; i < data.length; i++) {
-
-          this.polyline = new L.Polyline(data[i].Bounds, {
+  
+        for (var d = 0; d < data.length; d++) {
+  
+          const firstCoord = jsonCoord[d];
+          const coords     = firstCoord.coordSelected.split(',');
+          const lat        = parseFloat(coords[0]);
+          const long       = parseFloat(coords[1]);     
+          const deviceId   = firstCoord.deviceid;
+  
+  const latlong =  [data[d][4], data[d][3]];
+      const firstlatlong =  [lat,long];
+   
+      let polylineData = [
+        [latlong[0], latlong[1]],
+        [firstlatlong[0], firstlatlong[1]]
+      ];
+  
+         for (var i = 0; i < data.length; i++) {
+          this.polyline = new L.Polyline(polylineData, {
             color: "#0c1a10",
             fillColor: "#0c1a10",
             fillOpacity: 0.5,
@@ -7425,6 +7447,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
             opacity: 0.5,
             smoothFactor: 1
           });
+  
           this.polylinearray.push(this.polyline);
           this.layerGroup.addLayer(this.polyline);
           this.drawnItems.addLayer(this.polyline);
@@ -7432,69 +7455,85 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
           this.polyline.on('click', (event: any) => {
             this.selectedPolyline = this.polyline;
           });
+  
         }
+        }
+  
+      
       });
-
-
+  
     }
     else {
-      //console.log("report type", this.reportType);
-      //console.log("report type222", (window.parent.parent.parent[7] as any));
-
       const dialogConfig = new MatDialogConfig();
       dialogConfig.data = {
         content: 'The type must be Device History Or Device History Pattern!',
       };
-
+  
       this.dialog.open(ContentmodalComponent, dialogConfig);
     }
-
+  
   }
-
-  getdirectionByTime() {
-
-
-    if (this.reportType == 6||this.reportType == 2) {
-      //console.log("multiselection>>>", this.multiselection)
-
-      this.datacrowdService.getdirectionByTime(this.simulationid, JSON.parse(localStorage.getItem("multiselection"))).then((res: any) => {
-        //console.log('getdirectionByTime>><<', res);
-
-        let data: any = res;
-        for (var i = 0; i < data.length; i++) {
-
-          this.polyline = new L.Polyline(data[i].Bounds, {
-            color: "#3388ff",
-            fillColor: "#3388ff",
-            fillOpacity: 0.5,
-            weight: 3,
-            opacity: 0.5,
-            smoothFactor: 1
-          });
-          this.polylinearray.push(this.polyline);
-          this.drawnItems.addLayer(this.polyline);
-
-          this.layerGroup.addLayer(this.polyline);
-          this.map.addLayer(this.polyline);
-
-        }
-      });
-
-
+  
+  
+    getdirectionByTime() {
+  
+      if (this.reportType == 6 || this.reportType == 2) {
+        const jsonCoord = JSON.parse(localStorage.getItem("jsonCoords"));
+  
+        this.datacrowdService.getdirectionByTime(this.simulationid, jsonCoord ).then((res: any) => {
+  
+          let data: any = res;
+          for (var d = 0; d < data.length; d++) {
+    
+            const firstCoord = jsonCoord[d];
+            const coords     = firstCoord.coordSelected.split(',');
+            const lat        = parseFloat(coords[0]);
+            const long       = parseFloat(coords[1]);     
+            const deviceId   = firstCoord.deviceid;
+    
+    const latlong =  [data[d][4], data[d][3]];
+        const firstlatlong =  [lat,long];
+     
+        let polylineData = [
+          [latlong[0], latlong[1]],
+          [firstlatlong[0], firstlatlong[1]]
+        ];
+    
+           for (var i = 0; i < data.length; i++) {
+            this.polyline = new L.Polyline(polylineData, {
+              color: "#0c1a10",
+              fillColor: "#0c1a10",
+              fillOpacity: 0.5,
+              weight: 3,
+              opacity: 0.5,
+              smoothFactor: 1
+            });
+    
+            this.polylinearray.push(this.polyline);
+            this.layerGroup.addLayer(this.polyline);
+            this.drawnItems.addLayer(this.polyline);
+            this.map.addLayer(this.polyline);
+            this.polyline.on('click', (event: any) => {
+              this.selectedPolyline = this.polyline;
+            });
+    
+          }
+          }
+        });
+  
+  
+      }
+      else {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.data = {
+          content: 'The type must be Device History Or Device History Pattern!',
+        };
+  
+        this.dialog.open(ContentmodalComponent, dialogConfig);
+      }
+  
     }
-    else {
-      //console.log("report type", this.reportType);
-      //console.log("report type222", (window.parent.parent.parent[7] as any));
-
-      const dialogConfig = new MatDialogConfig();
-      dialogConfig.data = {
-        content: 'The type must be Device History Or Device History Pattern!',
-      };
-
-      this.dialog.open(ContentmodalComponent, dialogConfig);
-    }
-
-  }
+  
 
 
   public sayHello() {
@@ -15386,288 +15425,298 @@ toggleColor(){ this.isGreen = !this.isGreen;
 
 
 
-    async displayClusters(AlocSimulId:any){
-      //console.log('AlocSimulId>>>>>>>',AlocSimulId);
-  
-  
-  
-      this.displayclusters=true;
-      const responsesArray: any[] = [];
-      if(AlocSimulId.toString().indexOf(',') != -1){
-          const idsArray = AlocSimulId.split(',');
-          this.marker = L.markerClusterGroup({
-            spiderfyOnMaxZoom: false,
-            animate: true,
-            singleMarkerMode: true,
-          });
-          this.markerLoop = L.markerClusterGroup({
-            spiderfyOnMaxZoom: false,
-            animate: true,
-            singleMarkerMode: true,
-          });
-          for (const id of idsArray) {
-            await this.datacrowdService.getsimualtion(id, '8758').then((res: any) => {
-              // responsesArray.push(res);
-              //console.log("jp>>>>>>>>>>>>>> response >>>>",res);
-              this.datajson=res;
-  
-              //console.log("this.datajson.markerPositions1111>>>>", this.datajson.markerPositions);
-              if (this.datajson.markerPositions !== null) {
-                //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-         
-                let lastMarkerLat = 0;
-                let lastMarkerLng = 0;
-          
-                for (var j = 0; j < 1; j++) {
-                  for (var i = 0; i < this.datajson.markerPositions.length; i++) {
-                    this.markers = L.marker([
-                      Number(this.datajson.markerPositions[i][0]),
-                      Number(this.datajson.markerPositions[i][1]),
-                    ]);
-                    this.markers.off("click");
-                    this.markers.on("mousedown", (e: any) => {
-                      if (e.originalEvent.buttons == 2) {
-                        e.target.openPopup();
-          
-                      }
-                      if (e.originalEvent.buttons == 1) {
-                        //  alert(1);
-                      }
-                    });
-                    this.markersArray.push(this.markers)
-                    
-            lastMarkerLat = this.datajson.markerPositions[i][0];
-            lastMarkerLng = this.datajson.markerPositions[i][1];
-                  }
-                }
-          
-           
-          
-                //       markersBatch.push(marker);
-                //     }
-          
-                //     // Apply event listeners to the batch of markers
-                //     markersBatch.forEach(marker => {
-                //       marker.off("click");
-                //       marker.on("mousedown", (e: any) => {
-                //         if (e.originalEvent.buttons == 2) {
-                //           e.target.openPopup();
-                //         }
-                //         if (e.originalEvent.buttons == 1) {
-                //           // alert(1);
-                //         }
-                //       });
-          
-                //       this.markersArray.push(marker);
-                //     });
-          
-                //     // Clear markersBatch to free up memory
-                //     markersBatch.length = 0;
-                //   }
-                // }
-                // // End the timer and log the elapsed time
-                // //console.timeEnd('loopTime');
-          
-                //     //  this.marker.openPopup(
-                //     //  html11
-                //     //  );
-          
-          
-                this.map.setView([lastMarkerLat, lastMarkerLng],12);
-          
-                this.rowData = [];
-                this.datajson.markerPositions.forEach((element: any, key: any) => {
-                  this.myMarker = this.binddata(
-                    element[0],
-                    element[1],
-                    element[2],
-                    element[3],
-                    element[4],
-                    element[5],
-                    ""
-                  );
-          
-                  this.myMarker.lat = element[0];
-                  this.myMarker.lng = element[1];
-                  this.myMarker.timestamp = element[3];
-                  this.myMarker.tel = element[2];
-                  this.myMarker.name = element[4];
-                  this.marker.addLayer(this.myMarker);
-                  this.markerLoop.addLayer(this.myMarker);
-                  this.myMarker.off("click");
-                  this.myMarker.on("mousedown", async (e: any) => {
-                    if (e.originalEvent.buttons == 2) {
-                      //console.log("markerChildrensssssss", e.target)
-                      this.rowData = [];
-                      var jsonaggrid = {
-                        Device_id: e.target.tel,
-                        Tel: e.target.name,
-                        Date: e.target.timestamp,
-                        Hits: "1",
-                        Coord: e.target.lat + ',' + e.target.lng,
-                        //Lat:e.target.lat
-                      };
-                      this.rowData.push(jsonaggrid);
-          
-          
-                      const componentfactory =
-                        this.componentFactoryResolver.resolveComponentFactory(
-                          VAgGridComponent
-                        );
-                      const componentref =
-                        this.viewContainerRef.createComponent(componentfactory);
-                      componentref.instance.rowData = this.rowData;
-                      componentref.instance.columnDefs = this.columnDefs;
-                      componentref.instance.headerHeight = 0;
-                      // componentref.instance.selectdevices = true;
-                      componentref.instance.Title = "Here On";
-                      componentref.instance.distinct = true;
-                      componentref.changeDetectorRef.detectChanges();
-                      componentref.instance.Grid2Type = 'btn-54';
-                      componentref.instance.GridID = 'GeoGrid1';
-          
-                      const html2 = componentref.location.nativeElement;
-                      await html2;
-          
-                      // $('#agGrid').css('height','10px');
-                      $('.ag-theme-balham').css('height', '130px');
-          
-          
-                      // /  e.target.openPopup(html2, e.target._latlng);
-                      this.map.openPopup(html2, e.target._latlng);
-          
-          
-                    } else if (e.originalEvent.buttons == 1) {
-          
-                    }
-          
-                  });
-                });
-          
-                const componentfactory =
-                  this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-                const componentref =
-                  this.viewContainerRef.createComponent(componentfactory);
-                const html1 = (componentref.location.nativeElement.style.display = "none");
-                componentref.instance.columnDefs = this.columnDefs;
-                componentref.changeDetectorRef.detectChanges();
-                this.marker.off("click");
-                this.marker.on("clustermousedown", async (e: any) => {
+    
+async displayClusters(AlocSimulId:any){
+  //console.log('AlocSimulId>>>>>>>',AlocSimulId);
+
+
+
+  this.displayclusters=true;
+  const responsesArray: any[] = [];
+  if(AlocSimulId.toString().indexOf(',') != -1){
+      const idsArray = AlocSimulId.split(',');
+      this.marker = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      this.markerLoop = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      for (const id of idsArray) {
+        await this.datacrowdService.getSimulationobject(id).then((res:any)=>{
+          console.log("res in getSimulationobject ",res);
+          this.datajson=res;
+          if (this.datajson !== null) {
+            //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+            this.marker = L.markerClusterGroup({
+              spiderfyOnMaxZoom: false,
+              animate: true,
+              singleMarkerMode: true,
+            });
+            this.markerLoop = L.markerClusterGroup({
+              spiderfyOnMaxZoom: false,
+              animate: true,
+              singleMarkerMode: true,
+            });
+            let lastMarkerLat:any;
+            let lastMarkerLng:any;
+        
+            for (var j = 0; j < 1; j++) {
+              for (var i = 0; i < this.datajson; i++) {
+                this.markers = L.marker([
+                  Number(this.datajson[i].location_latitude),
+                  Number(this.datajson[i].location_longitude)
+               
+                ]);
+                this.markers.off("click");
+                this.markers.on("mousedown", (e: any) => {
                   if (e.originalEvent.buttons == 2) {
-                    var markerChildrens = e.layer.getAllChildMarkers();
-          
-          
-          
-          
-          
-                    this.rowData = [];
-          
-                    for (var j = 0; j < markerChildrens.length; j++) {
-                      var jsonaggrid = {
-                        Device_id: markerChildrens[j].tel,
-                        Tel: markerChildrens[j].name,
-                        Date: markerChildrens[j].timestamp,
-                        Hits: "1",
-                        Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-                        // Lat:markerChildrens[j].lat
-                      };
-                      this.rowData.push(jsonaggrid);
-                    }
-          
-                    //console.log("markerChildrens>>>>>", markerChildrens);
-          
-                    const componentfactory =
-                      this.componentFactoryResolver.resolveComponentFactory(
-                        VAgGridComponent
-                      );
-                    const componentref =
-                      this.viewContainerRef.createComponent(componentfactory);
-                    componentref.instance.rowData = this.rowData;
-                    componentref.instance.columnDefs = this.columnDefs;
-                    componentref.instance.headerHeight = 0;
-                    // componentref.instance.selectdevices = true;
-                    componentref.instance.Title = "Here On";
-                    componentref.instance.distinct = true;
-                    componentref.changeDetectorRef.detectChanges();
-                    componentref.instance.pagination = false;
-                    componentref.instance.rowGrouping = true;
-                    componentref.instance.contextmenu = false;
-                    componentref.instance.Grid2Type = 'btn-54';
-                    componentref.instance.GridID = 'GeoGrid1';
-                    const html1 = componentref.location.nativeElement;
-                    await html1;
-                    //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-                    if (markerChildrens.length < 3) {
-                      // $('#agGrid').css('height','10px');
-                      $('.ag-theme-balham').css('height', '130px');
-          
-                    } else {
-                      $('.ag-theme-balham').css('height', ' 250px ');
-          
-                    }
-          
-          
-                    this.map.openPopup(html1, e.layer.getLatLng());
-          
-                    // $(".modal-content").css("width","650px");
-                    // $(".modal-content").css("right","200px");
-                    // $(".modal-content").css("padding","10px");
-                    // $(".modal-content").css("top","85px");
-                    // $(".modal-content").draggable({
-                    //   axis: "both",
-                    //   cursor: "move"
-                    // });
-                    //  this.modalRef =this.modalService.open(this.popupContent1);
-          
+                    e.target.openPopup();
+        
                   }
                   if (e.originalEvent.buttons == 1) {
-                    // alert(4);
-          
+                    //  alert(1);
                   }
-          
-                  //open popup;
                 });
-          
-                this.map.addLayer(this.marker);
+                this.markersArray.push(this.markers)
                 
-                this.magnifiedMap.addLayer(this.markerLoop);
-                this.layerGroup.addLayer(this.marker);
-                this.layerGroup.addLayer(this.markers);
-          }
-  
+        lastMarkerLat = this.datajson[i][4];
+        lastMarkerLng = this.datajson[i][3];
+              }
+            }
+        
+        
+            //       markersBatch.push(marker);
+            //     }
+        
+            //     // Apply event listeners to the batch of markers
+            //     markersBatch.forEach(marker => {
+            //       marker.off("click");
+            //       marker.on("mousedown", (e: any) => {
+            //         if (e.originalEvent.buttons == 2) {
+            //           e.target.openPopup();
+            //         }
+            //         if (e.originalEvent.buttons == 1) {
+            //           // alert(1);
+            //         }
+            //       });
+        
+            //       this.markersArray.push(marker);
+            //     });
+        
+            //     // Clear markersBatch to free up memory
+            //     markersBatch.length = 0;
+            //   }
+            // }
+            // // End the timer and log the elapsed time
+            // //console.timeEnd('loopTime');
+        
+            //     //  this.marker.openPopup(
+            //     //  html11
+            //     //  );
+        
+        
+        
+            this.rowData = [];
+            this.datajson.forEach((element: any, key: any) => {
+              this.myMarker = this.binddata(
+                element[4],
+                element[3],
+                element[1],
+                element[0],
+                element[2],
+                element[5],
+                ""
+              );
+        
+              this.myMarker.lat = element[4];
+              this.myMarker.lng = element[3]
+              this.myMarker.timestamp = element[1]
+              this.myMarker.tel = element[0];
+              this.myMarker.name = element[2];
+              this.marker.addLayer(this.myMarker);
+              this.markerLoop.addLayer(this.myMarker);
+              this.myMarker.off("click");
+              this.myMarker.on("mousedown", async (e: any) => {
+                if (e.originalEvent.buttons == 2) {
+                  //console.log("markerChildrensssssss", e.target)
+                  this.rowData = [];
+                  var jsonaggrid = {
+                    Device_id: e.target.tel,
+                    Tel: e.target.name,
+                    Date: e.target.timestamp,
+                    Hits: "1",
+                    Coord: e.target.lat + ',' + e.target.lng,
+                    //Lat:e.target.lat
+                  };
+                  this.rowData.push(jsonaggrid);
+        
+        
+                  const componentfactory =
+                    this.componentFactoryResolver.resolveComponentFactory(
+                      VAgGridComponent
+                    );
+                  const componentref =
+                    this.viewContainerRef.createComponent(componentfactory);
+                  componentref.instance.rowData = this.rowData;
+                  componentref.instance.columnDefs = this.columnDefs;
+                  componentref.instance.headerHeight = 0;
+                  // componentref.instance.selectdevices = true;
+                  componentref.instance.Title = "Here On";
+                  componentref.instance.distinct = true;
+                  componentref.changeDetectorRef.detectChanges();
+                  componentref.instance.Grid2Type = 'btn-54';
+                  componentref.instance.GridID = 'GeoGrid1';
+        
+                  const html2 = componentref.location.nativeElement;
+                  await html2;
+        
+                  // $('#agGrid').css('height','10px');
+                  $('.ag-theme-balham').css('height', '130px');
+        
+        
+                  // /  e.target.openPopup(html2, e.target._latlng);
+                  this.map.openPopup(html2, e.target._latlng);
+        
+        
+                } else if (e.originalEvent.buttons == 1) {
+        
+                }
+        
+              });
             });
-          }
-  
-     
-      }else{
-      await this.datacrowdService.getsimualtion(AlocSimulId, this.usercode).then((res: any) => {
-        this.datajson = res;
-        //console.log("getsimultion response >>>>", this.datajson);
-      });
-  
-      //console.log("this.datajson.markerPositions>>>>", this.datajson.markerPositions);
-  
-      if (this.datajson.markerPositions !== null) {
+        
+            const componentfactory =
+              this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+            const componentref =
+              this.viewContainerRef.createComponent(componentfactory);
+            const html1 = (componentref.location.nativeElement.style.display = "none");
+            componentref.instance.columnDefs = this.columnDefs;
+            componentref.changeDetectorRef.detectChanges();
+            this.marker.off("click");
+            this.marker.on("clustermousedown", async (e: any) => {
+              if (e.originalEvent.buttons == 2) {
+                var markerChildrens = e.layer.getAllChildMarkers();
+        
+        
+        
+        
+        
+                this.rowData = [];
+        
+                for (var j = 0; j < markerChildrens.length; j++) {
+                  var jsonaggrid = {
+                    Device_id: markerChildrens[j].tel,
+                    Tel: markerChildrens[j].name,
+                    Date: markerChildrens[j].timestamp,
+                    Hits: "1",
+                    Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+                    // Lat:markerChildrens[j].lat
+                  };
+                  this.rowData.push(jsonaggrid);
+                }
+        
+                //console.log("markerChildrens>>>>>", markerChildrens);
+        
+                const componentfactory =
+                  this.componentFactoryResolver.resolveComponentFactory(
+                    VAgGridComponent
+                  );
+                const componentref =
+                  this.viewContainerRef.createComponent(componentfactory);
+                componentref.instance.rowData = this.rowData;
+                componentref.instance.columnDefs = this.columnDefs;
+                componentref.instance.headerHeight = 0;
+                // componentref.instance.selectdevices = true;
+                componentref.instance.Title = "Here On";
+                componentref.instance.distinct = true;
+                componentref.changeDetectorRef.detectChanges();
+                componentref.instance.pagination = false;
+                componentref.instance.rowGrouping = true;
+                componentref.instance.contextmenu = false;
+                componentref.instance.Grid2Type = 'btn-54';
+                componentref.instance.GridID = 'GeoGrid1';
+                const html1 = componentref.location.nativeElement;
+                await html1;
+                //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+                if (markerChildrens.length < 3) {
+                  // $('#agGrid').css('height','10px');
+                  $('.ag-theme-balham').css('height', '130px');
+        
+                } else {
+                  $('.ag-theme-balham').css('height', ' 250px ');
+        
+                }
+        
+        
+                this.map.openPopup(html1, e.layer.getLatLng());
+        
+                // $(".modal-content").css("width","650px");
+                // $(".modal-content").css("right","200px");
+                // $(".modal-content").css("padding","10px");
+                // $(".modal-content").css("top","85px");
+                // $(".modal-content").draggable({
+                //   axis: "both",
+                //   cursor: "move"
+                // });
+                //  this.modalRef =this.modalService.open(this.popupContent1);
+        
+              }
+              if (e.originalEvent.buttons == 1) {
+                // alert(4);
+        
+              }
+        
+              //open popup;
+            });
+        
+            this.map.addLayer(this.marker);
+            // this.map.setView([lastMarkerLat, lastMarkerLng],12);
+            
+            this.magnifiedMap.addLayer(this.markerLoop);
+            this.layerGroup.addLayer(this.marker);
+         
+        }
+        
+         });
+        this.displayShapes(id);
+      }
+
+ 
+  }else{
+    await this.datacrowdService.getSimulationobject(AlocSimulId).then((res:any)=>{
+      console.log("res in getSimulationobject ",res);
+      this.datajson=res;
+      if (this.datajson !== null) {
         //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
         this.marker = L.markerClusterGroup({
           spiderfyOnMaxZoom: false,
           animate: true,
           singleMarkerMode: true,
         });
-        let lastMarkerLat = 0;
-        let lastMarkerLng = 0;
-  
+        this.markerLoop = L.markerClusterGroup({
+          spiderfyOnMaxZoom: false,
+          animate: true,
+          singleMarkerMode: true,
+        });
+        let lastMarkerLat:any;
+        let lastMarkerLng:any;
+    
         for (var j = 0; j < 1; j++) {
-          for (var i = 0; i < this.datajson.markerPositions.length; i++) {
+          for (var i = 0; i < this.datajson; i++) {
             this.markers = L.marker([
-              Number(this.datajson.markerPositions[i][0]),
-              Number(this.datajson.markerPositions[i][1]),
+              Number(this.datajson[i].location_latitude),
+              Number(this.datajson[i].location_longitude)
+           
             ]);
             this.markers.off("click");
             this.markers.on("mousedown", (e: any) => {
               if (e.originalEvent.buttons == 2) {
                 e.target.openPopup();
-  
+    
               }
               if (e.originalEvent.buttons == 1) {
                 //  alert(1);
@@ -15675,16 +15724,15 @@ toggleColor(){ this.isGreen = !this.isGreen;
             });
             this.markersArray.push(this.markers)
             
-    lastMarkerLat = this.datajson.markerPositions[i][0];
-    lastMarkerLng = this.datajson.markerPositions[i][1];
+    lastMarkerLat = this.datajson[i][4];
+    lastMarkerLng = this.datajson[i][3];
           }
         }
-  
-   
-  
+    
+    
         //       markersBatch.push(marker);
         //     }
-  
+    
         //     // Apply event listeners to the batch of markers
         //     markersBatch.forEach(marker => {
         //       marker.off("click");
@@ -15696,42 +15744,42 @@ toggleColor(){ this.isGreen = !this.isGreen;
         //           // alert(1);
         //         }
         //       });
-  
+    
         //       this.markersArray.push(marker);
         //     });
-  
+    
         //     // Clear markersBatch to free up memory
         //     markersBatch.length = 0;
         //   }
         // }
         // // End the timer and log the elapsed time
         // //console.timeEnd('loopTime');
-  
+    
         //     //  this.marker.openPopup(
         //     //  html11
         //     //  );
-  
-  
-        this.map.setView([lastMarkerLat, lastMarkerLng],12);
-  
+    
+    
+    
         this.rowData = [];
-        this.datajson.markerPositions.forEach((element: any, key: any) => {
+        this.datajson.forEach((element: any, key: any) => {
           this.myMarker = this.binddata(
-            element[0],
-            element[1],
-            element[2],
-            element[3],
             element[4],
+            element[3],
+            element[1],
+            element[0],
+            element[2],
             element[5],
             ""
           );
-  
-          this.myMarker.lat = element[0];
-          this.myMarker.lng = element[1];
-          this.myMarker.timestamp = element[3];
-          this.myMarker.tel = element[2];
-          this.myMarker.name = element[4];
+    
+          this.myMarker.lat = element[4];
+          this.myMarker.lng = element[3]
+          this.myMarker.timestamp = element[1]
+          this.myMarker.tel = element[0];
+          this.myMarker.name = element[2];
           this.marker.addLayer(this.myMarker);
+          this.markerLoop.addLayer(this.myMarker);
           this.myMarker.off("click");
           this.myMarker.on("mousedown", async (e: any) => {
             if (e.originalEvent.buttons == 2) {
@@ -15746,8 +15794,8 @@ toggleColor(){ this.isGreen = !this.isGreen;
                 //Lat:e.target.lat
               };
               this.rowData.push(jsonaggrid);
-  
-  
+    
+    
               const componentfactory =
                 this.componentFactoryResolver.resolveComponentFactory(
                   VAgGridComponent
@@ -15763,25 +15811,25 @@ toggleColor(){ this.isGreen = !this.isGreen;
               componentref.changeDetectorRef.detectChanges();
               componentref.instance.Grid2Type = 'btn-54';
               componentref.instance.GridID = 'GeoGrid1';
-  
+    
               const html2 = componentref.location.nativeElement;
               await html2;
-  
+    
               // $('#agGrid').css('height','10px');
               $('.ag-theme-balham').css('height', '130px');
-  
-  
+    
+    
               // /  e.target.openPopup(html2, e.target._latlng);
               this.map.openPopup(html2, e.target._latlng);
-  
-  
+    
+    
             } else if (e.originalEvent.buttons == 1) {
-  
+    
             }
-  
+    
           });
         });
-  
+    
         const componentfactory =
           this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
         const componentref =
@@ -15793,13 +15841,13 @@ toggleColor(){ this.isGreen = !this.isGreen;
         this.marker.on("clustermousedown", async (e: any) => {
           if (e.originalEvent.buttons == 2) {
             var markerChildrens = e.layer.getAllChildMarkers();
-  
-  
-  
-  
-  
+    
+    
+    
+    
+    
             this.rowData = [];
-  
+    
             for (var j = 0; j < markerChildrens.length; j++) {
               var jsonaggrid = {
                 Device_id: markerChildrens[j].tel,
@@ -15811,9 +15859,9 @@ toggleColor(){ this.isGreen = !this.isGreen;
               };
               this.rowData.push(jsonaggrid);
             }
-  
+    
             //console.log("markerChildrens>>>>>", markerChildrens);
-  
+    
             const componentfactory =
               this.componentFactoryResolver.resolveComponentFactory(
                 VAgGridComponent
@@ -15838,15 +15886,15 @@ toggleColor(){ this.isGreen = !this.isGreen;
             if (markerChildrens.length < 3) {
               // $('#agGrid').css('height','10px');
               $('.ag-theme-balham').css('height', '130px');
-  
+    
             } else {
               $('.ag-theme-balham').css('height', ' 250px ');
-  
+    
             }
-  
-  
+    
+    
             this.map.openPopup(html1, e.layer.getLatLng());
-  
+    
             // $(".modal-content").css("width","650px");
             // $(".modal-content").css("right","200px");
             // $(".modal-content").css("padding","10px");
@@ -15856,29 +15904,33 @@ toggleColor(){ this.isGreen = !this.isGreen;
             //   cursor: "move"
             // });
             //  this.modalRef =this.modalService.open(this.popupContent1);
-  
+    
           }
           if (e.originalEvent.buttons == 1) {
             // alert(4);
-  
+    
           }
-  
+    
           //open popup;
         });
-  
+    
         this.map.addLayer(this.marker);
+        // this.map.setView([lastMarkerLat, lastMarkerLng],12);
         
         this.magnifiedMap.addLayer(this.markerLoop);
         this.layerGroup.addLayer(this.marker);
-        this.layerGroup.addLayer(this.markers);
-  }
+     
     }
-  
-  
-  
-  
-  
-  }
+    
+     });
+    this.displayShapes(AlocSimulId);
+}
+
+
+
+
+
+}
   displayTimelineCoTraveler(){
     this.DisplayCoTravelerflag = 2;
     this.displayCoTravelers();
@@ -17324,10 +17376,88 @@ else if(this.reportType=="3"){
       }
     };
         
-  this.datajson = await this.getSimulationData(queryjson);
-  console.log('datajson>', this.datajson);
+  this.CdrData = await this.getSimulationData(queryjson);
+  console.log('CdrData>', this.CdrData);
+  
   console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
   if(this.BtsTypeSlected=="BTS"){
+
+
+    this.fixedMarkersGroup = new L.MarkerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      animate: true,
+      singleMarkerMode: false,
+      zoomToBoundsOnClick: false,
+      maxClusterRadius: function (zoom) {
+        if (zoom >= 12) {
+          //console.log('innnnnnnnnnnnnnnnnn')
+          return 0;
+        } else {
+          //console.log('innnnnnnnnnnnnnnnnn')
+
+          return 50 / zoom;
+        }
+      },
+      iconCreateFunction: function (cluster) {
+        var markers = cluster.getAllChildMarkers();
+        var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+
+        return L.divIcon({
+          html: html,
+          className: 'mycluster',
+          iconSize: L.point(32, 32)
+        });
+      },
+    });
+
+    this.fixedMarkersGroupLoop = new L.MarkerClusterGroup({
+      spiderfyOnMaxZoom: true,
+      animate: true,
+      singleMarkerMode: false,
+      zoomToBoundsOnClick: false,
+      maxClusterRadius: function (zoom) {
+        if (zoom >= 12) {
+          //console.log('innnnnnnnnnnnnnnnnn')
+          return 0;
+        } else {
+          //console.log('innnnnnnnnnnnnnnnnn')
+
+          return 50 / zoom;
+        }
+      },
+      iconCreateFunction: function (cluster) {
+        var markers = cluster.getAllChildMarkers();
+        var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+
+        return L.divIcon({
+          html: html,
+          className: 'mycluster',
+          iconSize: L.point(32, 32)
+        });
+      },
+    });
+// Call the function to get the IDs as numbers
+const result :any= this.CdrData.map((item:any) => parseInt(item[0])); 
+
+console.log("result>>>",result);
+await this.datacrowdService.getScanBts(result).then((res:any)=>{
+  console.log("res>>>",res);
+  for (let i = 0; i < res.length; i++) {
+    console.log("res[0][i]>>>",res[i]);
+
+    this.displayBTS(res[i].BTS);
+    //console.log('this.CdrData[0][i]>>>', this.CdrData[0][i].BTS);
+
+
+    for (let j = 0; j < res[i].SECTORS.length; j++) {
+      // //console.log('this.CdrData[1]>>>',this.CdrData[1]);
+      ////console.log('this.CdrData[1][i][j]>>>',this.CdrData[1][i][j]);
+      this.drawarc(Number(res[i].BTS.LATITUDE), Number(res[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(res[i].SECTORS[j]) - 22.5, 90 + Number(res[i].SECTORS[j]) + 22.5, this.SectorColor, '', '');
+
+    }
+  }
+
+})
 
   }else{
    
