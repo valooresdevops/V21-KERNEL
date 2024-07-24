@@ -42,7 +42,9 @@ import { CustomFieldComponent } from './form-builder/custom-field/custom-field.c
 import { MasterLinkAnalysisComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-analysis.component';
 import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
 import { ExecutedReportsComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports.component';
-import { ExecutedReportsFormComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports-form/executed-reports-form.component';
+import { CreateExecutedReportComponent } from './object-builder/knowledge-graph/master-link-analysis/create-executed-report/create-executed-report.component';
+import { KwgCytoscapeComponent } from './object-builder/knowledge-graph/executed-reports/kwg-cytoscape/kwg-cytoscape.component';
+import { PopupComponent } from './object-builder/knowledge-graph/popup/popup.component';
 
 @NgModule({
     declarations: [
@@ -83,7 +85,9 @@ import { ExecutedReportsFormComponent } from './object-builder/knowledge-graph/e
         MasterLinkAnalysisComponent, 
         MasterLinkFormComponent,
         ExecutedReportsComponent,
-        ExecutedReportsFormComponent,
+        CreateExecutedReportComponent,
+        KwgCytoscapeComponent,
+        PopupComponent
     ],
     imports: [
         InDisplayRoutingModule,
@@ -101,4 +105,5 @@ import { ExecutedReportsFormComponent } from './object-builder/knowledge-graph/e
     exports: [MasterLinkFormComponent, 
     ],
 })
+
 export class InDisplayModule { }

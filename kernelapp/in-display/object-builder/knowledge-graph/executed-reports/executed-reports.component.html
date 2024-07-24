@@ -1,20 +1,11 @@
-
-<!-- <v-grid allowSideBar="true"
- sizeColumnsToFit="true"
-     agToolBar="amd" 
-    agPrimaryKey="gridId" 
-    (onGridAdd)="onAddClick()" 
-    (onGridDelete)="onDeleteClick()"
-    (onGridUpdate)="onUpdateClick()">
-</v-grid> -->
 <v-grid
 allowSideBar="true"
-[dataApi]=""
+[dataApi]="getExecutedReports"
 [agColumns]="agColumns"
 [pagination]="true"
 [paginationPageSize]="15"
 agToolBar="d"
-agPrimaryKey="QBE_ID,import_flag"
+agPrimaryKey="executedReportId"
 agRowSelection="single"
 (onGridDelete)="onDeleteClick()"
 ></v-grid>

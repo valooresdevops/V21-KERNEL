@@ -440,7 +440,7 @@ this.generateTimeline();
     const testDiv = this.elementRef.nativeElement.querySelector('#report-container');
     if (testDiv) {
       const iframe = document.createElement('iframe');
-      iframe.src = '/cybercrowd/angular/assets/report_' + this.markerids.data.text.id + '.html';
+      iframe.src = '/assets/report_' + this.markerids.data.text.id + '.html';
       iframe.width = '100%';
       iframe.height = '1800';
       testDiv.appendChild(iframe);

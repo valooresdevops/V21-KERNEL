@@ -8,6 +8,7 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
   providedIn: 'root'
 })
 export class DatacrowdService {
+  directionObject: { device: any; simulationId: any; directionByTime: string; };
 
   constructor(private httpClient: HttpClient) {
 
@@ -17,6 +18,8 @@ export class DatacrowdService {
   ipAddressKYG:any = GlobalConstants.ipAddressKYG;
   urlCassandraServer:string=this.ipAddress;
   ipAddressDataCrowd :any =GlobalConstants.ipAddressDataCrowd;
+  ipAddressCassandraSpark :any =GlobalConstants.ipAddressCassandraSpark;
+
   ip:any = GlobalConstants.ip;
 
 
@@ -364,19 +367,6 @@ async getShapelimit(){
 }
 
 
-async getdirection(v_method_log:any,devices:any){
-  console.log("devices>>>",devices)
-  let response=  this.httpClient.get(this.ipAddress+"/api/getdirection/"+v_method_log+"/"+devices, {headers: GlobalConstants.headers}).toPromise();
-  console.log('getdirection>>>>>>',response);
-  return response; 
-}
-
-async getdirectionByTime(v_method_log:any,devices:any){
-  console.log("devices>>>",devices)
-  let response=  this.httpClient.get(this.ipAddress+"/api/getdirectionByTime/"+v_method_log+"/"+devices, {headers: GlobalConstants.headers}).toPromise();
-  console.log('getdirectionByTime>>>>>>',response);
-  return response; 
-}
 
 getData() {
 
@@ -836,4 +826,49 @@ async getPropertiesObj(SimulID:any){
 
   return response; 
 }
+
+async getsimulation2(obj:any){
+  let response= this.httpClient.post<any>(this.ipAddress+"/api/getSimulation2/",obj).toPromise();
+  
+   console.log('getSimulation2>>>>>>',response);
+  return response; 
+   
+ }
+
+ async getmaptypesOffline(){
+  let response= await this.httpClient.get(this.ipAddress+"/api/getmaptypesOffline").toPromise();
+  
+   console.log('map types>>>>>>',response);
+  return response; 
+   
+ }
+ async getdirection(v_method_log:any,devices:any ){
+  this.directionObject = {
+    device: devices,
+    simulationId: v_method_log,
+    directionByTime: "0"
+  };
+  let response=  this.httpClient.post(this.ipAddressCassandraSpark+"/api/getLongestDistance",this.directionObject, {headers: GlobalConstants.headers}).toPromise();
+
+  return response; 
+}
+
+
+async getdirectionByTime(v_method_log:any,devices:any){
+
+  this.directionObject = {
+    device: devices,
+    simulationId: v_method_log,
+    directionByTime: "1"
+  };
+
+  let response=  this.httpClient.post(this.ipAddressCassandraSpark+"/api/getLongestDistance",this.directionObject, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+async getScanBts(object :any){
+  let response= await this.httpClient.post<any>(this.ipAddressDataCrowd+"/api/getScanBts/",object, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+ 
 }

@@ -314,7 +314,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static insertLogsDataApi  = GlobalConstants.inDispGatewat + 'api/insertLogsData/';
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
-  
+  public static getRowFieldGrouping  = GlobalConstants.inDispGatewat + 'api/getRowFieldGrouping/';
+
   
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
   public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
@@ -407,6 +408,10 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getAllQueriesHeaderList =  GlobalConstants.inDispGatewat +'api/getAllQueriesHeaderList/';
   public static getMasterLinks = GlobalConstants.inDispGatewat + 'api/getMasterLinks/';
   public static insertMasterLinkData = GlobalConstants.inDispGatewat + 'api/insertMasterLinkData/';
+  public static executeMasterLink = GlobalConstants.inDispGatewat + 'api/executeMasterLink/';
+  public static getExecutedReports = GlobalConstants.inDispGatewat + 'api/getExecutedReports/';
+  public static getExecutedReportData = GlobalConstants.inDispGatewat + 'api/getExecutedReportData/';
+  public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';
 
   
   // Dynamic Search
@@ -436,5 +441,7 @@ public static  ipAddressDataCrowd = "http://"+ GlobalConstants.endPointAddress +
 public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
+public static ipAddressCassandraSpark = "http://"+ GlobalConstants.endPointAddress +":8092";
+
 
 }

@@ -81,6 +81,7 @@ import { TextmenuComponent } from './map/component/textmenu/textmenu.component';
 import { HeaderComponent } from './map/component/header/header.component';
 import { PropertiesComponent } from './map/component/properties/properties.component';
 import { TimelineComponent } from './map/timeline/timeline.component';
+import { MapOfflineComponent } from './map/map-offline/map-offline.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -141,7 +142,8 @@ import { TimelineComponent } from './map/timeline/timeline.component';
         TextmenuComponent,
         HeaderComponent,
         PropertiesComponent,
-        TimelineComponent
+        TimelineComponent,
+        MapOfflineComponent
 
     ],
     imports: [
@@ -210,7 +212,8 @@ import { TimelineComponent } from './map/timeline/timeline.component';
         TextmenuComponent,
         HeaderComponent,
         PropertiesComponent,
-        TimelineComponent
+        TimelineComponent,
+        MapOfflineComponent
 
     ],
     schemas: [
@@ -220,6 +223,7 @@ import { TimelineComponent } from './map/timeline/timeline.component';
         PopupComponent,
         MapComponent,
         TimelineComponent,
+        MapOfflineComponent,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: Http_Interceptor,

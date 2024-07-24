@@ -20,10 +20,12 @@ export class NewbuttonComponent implements OnInit {
   public AllFieldSet: any;
   public actionType: string = '';
   public buttonId: number;
-  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'}];
+  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'}];
   public FormOpeningSelected: boolean = false;
   public ApiSelected: boolean = false;
   public ApiSelected1: boolean = false;
+  public exportSelected: boolean = false;
+
   public AllMenus: any;
   public objectButtonId: any;
   public ALLcol : any;
@@ -54,6 +56,8 @@ export class NewbuttonComponent implements OnInit {
     isMainPreview: new UntypedFormControl(''),
     thirdCondition: new UntypedFormControl(''),
     alertMessage : new UntypedFormControl(''),
+    Path : new UntypedFormControl(''),
+
 
   });
 
@@ -160,6 +164,15 @@ export class NewbuttonComponent implements OnInit {
             this.ApiSelected1 = false;
             this.Condition = true;
           } 
+
+          if (ButtonAction == 8) {
+            this.ApiSelected = false;
+            this.ApiSelected1 = false;
+            this.FormOpeningSelected = false;
+            this.Condition = false;
+            this.exportSelected=true;
+
+          } 
       
         // });
     }
@@ -181,6 +194,8 @@ export class NewbuttonComponent implements OnInit {
         let alertValue;
         let thirdCondition;
         let alertMessage;
+        let PATH;
+
         if(buttonAction == 1){
           objectButtonId = this.buttonForm.controls['Menus']?.value;
           selectedCols = '';
@@ -243,6 +258,13 @@ export class NewbuttonComponent implements OnInit {
           alertValue = this.buttonForm.controls['alertValue']?.value;
           thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
           alertMessage = this.buttonForm.controls['alertMessage']?.value;
+        }
+        if(buttonAction == 8){
+          PATH= this.buttonForm.controls['Path']?.value;
+          console.log("pathh>>",PATH);
+          if(PATH==""){
+            
+          }
         }
         let object = {
           "buttonName": buttonName,
@@ -387,6 +409,12 @@ console.log("object ===",object);
     if(ButtonAction == 4){
       this.ApiSelected = false;
       this.ApiSelected1 = false;
+      this.FormOpeningSelected = false;
+    }
+    if(ButtonAction == 8){
+      this.ApiSelected = false;
+      this.ApiSelected1 = false;
+      this.exportSelected=true;
       this.FormOpeningSelected = false;
     }
   }

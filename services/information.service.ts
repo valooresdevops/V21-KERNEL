@@ -53,6 +53,9 @@ export class InformationService {
   public selectMonths : any = '';
   public customScreenBuilderPath : string = '';
   public lookUpSubmitValue : any = '';
+  public ISExport : boolean =false;
+  public isRowGroup : any = '';
+
 
   
   
@@ -68,7 +71,13 @@ export class InformationService {
   getLogeduserId() {
     return this.logeduserId;
   }
-
+  setIsRowGroup(isRowGroup: String) {
+    this.isRowGroup = isRowGroup;
+  }
+  
+  getIsRowGroup() {
+    return this.isRowGroup;
+  }
   setLookUpSubmitValue(lookUpSubmitValue: string) {
     this.lookUpSubmitValue = lookUpSubmitValue;
   }
@@ -512,5 +521,13 @@ export class InformationService {
 
   getCustomScreenBuilderPath(){
       return this.customScreenBuilderPath;
+  }
+
+  setISExport(ISExport: any) {
+    this.ISExport = ISExport;
+  }
+
+  getISExport(){
+      return this.ISExport;
   }
 }

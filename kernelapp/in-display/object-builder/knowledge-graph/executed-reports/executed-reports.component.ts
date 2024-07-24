@@ -12,7 +12,9 @@ import { ButtonRendererComponent } from './buttonRenderer.component';
 import { GridBuilderPreviewComponent } from '../../grid-builder-preview/grid-builder-preview.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { Router } from '@angular/router';
-import { ExecutedReportsFormComponent } from './executed-reports-form/executed-reports-form.component';
+import { KwgCytoscapeComponent } from './kwg-cytoscape/kwg-cytoscape.component';
+import axios from 'axios';
+import { from, lastValueFrom } from 'rxjs';
 // import { MasterLinkFormComponent } from './master-link-form/master-link-form.component';
 
 @Component({
@@ -25,10 +27,9 @@ export class ExecutedReportsComponent {
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
   public agGridSelectedNodes: any = '';
-  public getGridData = GlobalConstants.getGridDataApi;
+  public getExecutedReports = GlobalConstants.getExecutedReports;
   public action: any;
   frameworkComponents: any;
-  public getQbeQueryApi  = GlobalConstants.fetchQbeMappingApi;
 
   public isQueryexecute: boolean;
   constructor(
@@ -58,17 +59,17 @@ export class ExecutedReportsComponent {
       },
       {
         headerName: 'Executed Report Name',
-        field: 'ExecutedReportName',
+        field: 'executedReportName',
         width: '30%',
       },
       {
         headerName: 'Master Name',
-        field: 'masterName',
+        field: 'executedreportMaster',
         width: '20%',
       },
       {
         headerName: 'Owner',
-        field: 'owner',
+        field: 'createdBy',
         width: '25%',
       },
       {
@@ -90,63 +91,38 @@ export class ExecutedReportsComponent {
 
     this.agColumns.push(this.agColumnsJson);
   }
-  // onAddClick() {
-  //   const dialogConfig = new MatDialogConfig();
-  //   dialogConfig.width = '700px';
-  //   dialogConfig.height = '700px';
-
-  //   const dialogRef = this.dialog.open(MasterLinkFormComponent, {
-  //     // data: info,
-  //     width: '70%',
-  //     height: '70%',
-  //   });
-  // }
+  
 
 
-  onRunButtonClick(e: any) {
-    const dialogConfig = new MatDialogConfig();
-    dialogConfig.width = '700px';
-    dialogConfig.height = '700px';
 
-    const dialogRef = this.dialog.open(ExecutedReportsFormComponent, {
-      // data: info,
-      width: '70%',
-      height: '70%',
-    });
-    // let info = {};
-    // let type = {};
-    
-    // this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
-    // let selectedNodes = this.agGridSelectedNodes;
-    // if (this.informationservice.getAgGidSelectedNode().includes(",") || this.informationservice.getAgGidSelectedNode() == "") {
+  async onRunButtonClick(e: any) {
 
-    // } else {
+    // const getExecutedReportDataApi = from(axios.get(GlobalConstants.getExecutedReportData+this.informationservice.getAgGidSelectedNode()));
+    // const getExecutedReportData = await lastValueFrom(getExecutedReportDataApi);
 
-    //   this.http.post<any>(GlobalConstants.decodeGridQuery + selectedNodes, { headers: GlobalConstants.headers }).subscribe(
-    //     (res: any) => {
-    //       info = {
-    //         data: res,
-            
-    //         id: this.informationservice.getAgGidSelectedNode(),
-    //         flag: 0
-    //       };
-    //     });
+    //console.log("EXECUTED REPORT DATA>>>>>>>>",getExecutedReportData.data);
 
-    //   setTimeout(() => {
+    // const displayGraphApi = from(axios.get(GlobalConstants.displayGraph+this.informationservice.getAgGidSelectedNode()));
+    // const displayGraph = await lastValueFrom(displayGraphApi);
+    // console.log("DISPLAY GRAPH DATA>>>>>>>>",displayGraph.data);
 
-    //     const dialogConfig = new MatDialogConfig();
-    //     dialogConfig.width = '700px';
-    //     dialogConfig.height = '700px';
+    let info = {};
 
-    //     const dialogRef = this.dialog.open(GridBuilderPreviewComponent, {
-    //       data: info,
-    //       width: '50%',
-    //       height: '60%',
-    //     });
-    //   }, 1000);
+    this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
+    let selectedNodes = this.agGridSelectedNodes;
+    if (this.informationservice.getAgGidSelectedNode().includes(",") || this.informationservice.getAgGidSelectedNode() == "") {
 
-
-    // }
+    }else{
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = '700px';
+      dialogConfig.height = '700px';
+  
+      const dialogRef = this.dialog.open(KwgCytoscapeComponent, {
+         data: info,
+        width: '80%',
+        height: '80%',
+      });
+    }
   }
 
 

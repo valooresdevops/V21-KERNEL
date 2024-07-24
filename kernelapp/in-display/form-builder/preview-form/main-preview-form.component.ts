@@ -13,6 +13,7 @@ import { DataService } from 'src/app/Kernel/services/data.service';
 import axios from 'axios';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
+import { FileDownloadService } from 'src/app/Kernel/components/map/Services/FileDownloadService.service';
 
 @Component({
   selector: 'main-preview-form',
@@ -82,7 +83,8 @@ export class PreviewFormComponent implements OnInit {
     private dialog: MatDialog,
     private dataservice: DataService,
     public informationservice: InformationService,
-    private refreshService: RefreshDialogService
+    private refreshService: RefreshDialogService,
+    private fileDownloadService:FileDownloadService
   ) { }
 
   onSearchSubmit(getWhereCond: any) {
@@ -358,7 +360,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: [],
               isHidden: [],
-
+              objectId: this.objectId,
               whereCond: this.getWhereCond
             }
           )
@@ -374,6 +376,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: this.testLinks,
               isHidden:[],
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
@@ -390,11 +393,12 @@ export class PreviewFormComponent implements OnInit {
               ],
               link:[],
               isHidden: this.hiddenColumns,
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
           );
-          
+         console.log('jsonQbe_sourceQuery--->: ',jsonQbe_sourceQuery)
          this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             if(data == 2){
               this.queryType =3;
@@ -408,11 +412,13 @@ export class PreviewFormComponent implements OnInit {
             if (this.sourceQuery != "-1") {
               this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
                 // let tableName = dataa[0].tableName;
+
                 let gridHeaders = data[0].headers[0];
                 let gridResults = data[0].result[0];
                 this.agColumns = [];
                 this.columnId = "ROW_ID";
                 this.agColumnsJson = gridHeaders;
+                console.log('gridHeaders----->',gridHeaders)
                 this.agColumns.push(this.agColumnsJson);
                 this.gridStaticData = gridResults;
 
@@ -489,6 +495,7 @@ export class PreviewFormComponent implements OnInit {
 
                     this.http.post<any>(GlobalConstants.getDynamicGridHeaders, jsonVal, { headers: GlobalConstants.headers }).subscribe((data: any) => {
                       this.agColumnsJson = data;
+                      console.log('jp>>>>>>>',this.agColumnsJson);
                       this.agColumns.push(this.agColumnsJson);
                       this.previewGridApi = GlobalConstants.getDynamicGridData;
                       this.previewGridApiParam = jsonVal;
@@ -538,7 +545,6 @@ export class PreviewFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
 
@@ -554,7 +560,6 @@ export class PreviewFormComponent implements OnInit {
     this.informationservice.removeTabpath();
 
     this.tableOptions1 = [];
-
     this._Activatedroute.paramMap.subscribe((params) => {
       this.objectId = this.fromScreenBuilder == "1" ? this.screenBuilderObjId : params.get('parentId');
 
@@ -571,9 +576,10 @@ export class PreviewFormComponent implements OnInit {
             "isDynamicReport": res[i].isDynamicReport,
             "isReadOnly": res[i].isReadOnly,
             "objectId": res[i].objectId,
-            "isMain": res[i].isMain
+            "isMain": res[i].isMain,
+            "isRowGrouping": res[i].isRowGroup
           })
-
+this.informationservice.setIsRowGroup(res[i].isRowGroup);
           if (res[i].isMain == 1) {
             this.objectMain = res[i].objectId;
           }
@@ -955,8 +961,18 @@ export class PreviewFormComponent implements OnInit {
           }
         });
       }else if(buttonAction == "6"){
+        this.informationservice.setISExport(false);
+
         this.dialog.closeAll();
       
+      }
+      else if(buttonAction == "8"){
+let dataselected:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+console.log("dataselected>>>",dataselected)
+this.downloadHtmlFile(dataselected[0].COLVALUE);
+// this.dialog.closeAll();
+this.informationservice.setISExport(true);
+
       }
     }
   }
@@ -993,7 +1009,10 @@ export class PreviewFormComponent implements OnInit {
 
 
 
-
+  downloadHtmlFile(ID:any): void {
+    this.fileDownloadService.downloadFile('SimulationReport_'+ID+'.html');
+  }
+ 
 
 }
 

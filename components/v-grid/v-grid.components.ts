@@ -463,7 +463,7 @@ setTimeout(() => {
     this.selectedNodesAr += ",{";
     if (selectionType != "unselected")
     {
-      if(this.isGrouped == true)
+      if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
         {
           for(let q = 0; q < event.node.allLeafChildren.length; q++)
           {  
@@ -471,9 +471,10 @@ setTimeout(() => {
             {
               let columnName: String = primaryKey.split(",")[i];
     
-                if(this.isGrouped == true)
+                if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
                   {  
                       columnVal = event.node.allLeafChildren[q].data[primaryKey.split(",")[i]] || "0";
+                      console.log('columnVal>>>>>>>>>>>>>>>>>',columnVal)
                       this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
                   }
     
@@ -521,6 +522,7 @@ setTimeout(() => {
     {
       this.selectedNodesAr = this.selectedNodesAr.replace(", }]", "}]");
     }
+
     this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
     this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
     this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
@@ -529,7 +531,7 @@ setTimeout(() => {
     this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
     this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
 
-    if(this.isGrouped == true)
+    if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
     {
       for (let i = 0; i < event.node.allLeafChildren.length; i++)
       {
@@ -573,7 +575,7 @@ setTimeout(() => {
       this.informationservice.getAgGidSelectedNode();
      let commonKeys: { [x: string]: any; };
    
-    if (this.isGrouped == true) {
+    if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1') {
       if (event.node.data == '' || event.node.data == null || event.node.data == undefined) {
         
         for (let q = 0; q < event.node.allLeafChildren.length; q++) {
@@ -618,14 +620,10 @@ setTimeout(() => {
      }, {});
     }
 
-    console.log("selectedNodesJson = ", selectedNodesJson)
-    console.log("this.isGrouped = ", this.isGrouped)
       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
-      if (this.isGrouped == true)
+      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
       {
         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(this.commonKeysArray),"");
-        console.log("this.commonKeysArray = ", this.commonKeysArray)
-        console.log("this.selectedNodesAr = ", this.selectedNodesAr)
 
         let valuesOfPrimaryKeys = primaryKey.split(",");
         this.value1 = valuesOfPrimaryKeys[0];
@@ -664,7 +662,7 @@ setTimeout(() => {
 
       console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
 
-      if (this.isGrouped == true)
+      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
       {
         this.commonKeysArray = [];
       }
@@ -672,7 +670,6 @@ setTimeout(() => {
     }
  //   console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
 console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
-
 
  //////////////////////////////////////////////////////////////HAYA START Access Rights (USM)
  if (this.isAccessRightsGrid){
@@ -696,6 +693,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END  
+
+this.informationservice.setAgGidSelectedNode(this.selectedNodesAr)
+console.log('jp------->: ',this.informationservice.getAgGidSelectedNode());
   }
 
 
@@ -719,6 +719,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
         // this.gatherAllSelectedRowNodes.push(event.node);
         if (primaryKey != "" && primaryKey != undefined) {
           if (primaryKey.indexOf(",") != -1 && !this.isGridInLookup) {
+            console.log('111111111111')
             this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
             
             ///elie///////////////
@@ -797,11 +798,13 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
-            console.log("FETET LA HON");
-            
-            if(this.isGrouped == true)
+            console.log("FETET LA HON",primaryKey);
+            console.log("event-->",event);
+            this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
+
+            if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
             {
-              // this.selectedNodes = '';
+              this.selectedNodes = '';
               this.selectedNodes = this.selectedNodes + "," + event.node.key;
             }
             else
@@ -821,7 +824,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
             } else {
                
-              this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+              // this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+             // this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
+
               console.log("this.informationservice.setAgGidSelectedNode else :", this.informationservice.getAgGidSelectedNode())
 
 
@@ -831,6 +836,8 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
       } else {
         if (primaryKey != "" && primaryKey != undefined) {
           if (primaryKey.indexOf(",") != -1 && !this.isGridInLookup) {
+
+console.log('22222222222222222')
             this.handleAggridJSONRowSelection(primaryKey, event, 'unselected');
 
              ///elie///////////////
@@ -960,7 +967,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
            // localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
             
-            if(this.isGrouped == true)
+            if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
               {
 
                 this.selectedNodes = this.selectedNodes.replace("," + event.node.key, "");
@@ -983,7 +990,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
             }
             
             
-            this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+          //  this.informationservice.setAgGidSelectedNode(this.selectedNodes);
             console.log("this.informationservice.setAgGidSelectedNode , :", this.informationservice.getAgGidSelectedNode())
 
           }
@@ -995,13 +1002,15 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
       this.informationservice.setDynamicService('agGidSelectedQueryForm_('+this.lookupFieldName+')',this.informationservice.getAgGidSelectedNode());
     }else if(this.isForQueryForm==false && this.isGridInLookup==false){
       
-      this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
+      // this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
       console.log("this.selectedNodes :", this.selectedNodes);
       console.log("this.informationservice.setAgGidSelectedNode false :", this.informationservice.getAgGidSelectedNode());
 
 
     }
 ////////////////////////////////////////////////////
+console.log("this.informationservice.setAgGidSelectedNode", this.informationservice.getAgGidSelectedNode());
+
   }
 onCellEditingStopped(event: any) {
   let primaryKey = this.agPrimaryKey.toLowerCase();

@@ -672,7 +672,7 @@ class="showMeasure showMeasure_Layout dropdown">
 </div> -->
 
 
-<div  id="search"  class="box" style="top: -14px;position: absolute; right: 6px; z-index: 999; box-shadow: 0 1px 7px #9999;" >
+<div  id="search"  class="box" style="top: 0px;position: absolute; right: 6px; z-index: 999; box-shadow: 0 1px 7px #9999;" >
   <i class="fa fa-search" aria-hidden="true" ></i>
   <input id="searchlocation" type="text" [(ngModel)]="locationName" placeholder="Search Location..." (window:keydown.enter)="search(locationName)"> 
 
@@ -890,7 +890,7 @@ class="showMeasure showMeasure_Layout dropdown">
   </button>   
   </div>
 
-  <div class="menuButtons">
+  <!-- <div class="menuButtons">
     <div id="showMap" 
      (click)="showMap(true)"
     class="showMap showMap_Layout" title="Map">
@@ -907,7 +907,7 @@ class="showMeasure showMeasure_Layout dropdown">
      class="showTimeline showTimeline_Layout" title="Timeline">
      <i class="fa-solid fa-timeline"></i>
 </div>
-</div>
+</div> -->
 
 
 <div   *ngIf="ShowHeader" id="refresh" style=" position: absolute; z-index: 999 ; background-color:white;
