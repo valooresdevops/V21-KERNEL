@@ -463,7 +463,7 @@ setTimeout(() => {
     this.selectedNodesAr += ",{";
     if (selectionType != "unselected")
     {
-      if(this.isGrouped == true)
+      if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
         {
           for(let q = 0; q < event.node.allLeafChildren.length; q++)
           {  
@@ -471,7 +471,7 @@ setTimeout(() => {
             {
               let columnName: String = primaryKey.split(",")[i];
     
-                if(this.isGrouped == true)
+                if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
                   {  
                       columnVal = event.node.allLeafChildren[q].data[primaryKey.split(",")[i]] || "0";
                       this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
@@ -529,7 +529,7 @@ setTimeout(() => {
     this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
     this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
 
-    if(this.isGrouped == true)
+    if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
     {
       for (let i = 0; i < event.node.allLeafChildren.length; i++)
       {
@@ -573,7 +573,7 @@ setTimeout(() => {
       this.informationservice.getAgGidSelectedNode();
      let commonKeys: { [x: string]: any; };
    
-    if (this.isGrouped == true) {
+    if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1') {
       if (event.node.data == '' || event.node.data == null || event.node.data == undefined) {
         
         for (let q = 0; q < event.node.allLeafChildren.length; q++) {
@@ -618,14 +618,10 @@ setTimeout(() => {
      }, {});
     }
 
-    console.log("selectedNodesJson = ", selectedNodesJson)
-    console.log("this.isGrouped = ", this.isGrouped)
       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
-      if (this.isGrouped == true)
+      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
       {
         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(this.commonKeysArray),"");
-        console.log("this.commonKeysArray = ", this.commonKeysArray)
-        console.log("this.selectedNodesAr = ", this.selectedNodesAr)
 
         let valuesOfPrimaryKeys = primaryKey.split(",");
         this.value1 = valuesOfPrimaryKeys[0];
@@ -664,7 +660,7 @@ setTimeout(() => {
 
       console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
 
-      if (this.isGrouped == true)
+      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
       {
         this.commonKeysArray = [];
       }
@@ -798,10 +794,10 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
             console.log("FETET LA HON");
-            
-            if(this.isGrouped == true)
+            console.log("event-->",event)
+            if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
             {
-              // this.selectedNodes = '';
+              this.selectedNodes = '';
               this.selectedNodes = this.selectedNodes + "," + event.node.key;
             }
             else
@@ -960,7 +956,7 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
            // localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
             
-            if(this.isGrouped == true)
+            if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
               {
 
                 this.selectedNodes = this.selectedNodes.replace("," + event.node.key, "");

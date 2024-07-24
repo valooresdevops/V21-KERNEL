@@ -36,7 +36,7 @@ objid:number;
       }];
       const dialogRef = this.dialog.open(DynamicScreenComponent, {
      data: menucode,
-      width: '58%',
+      width: '70%',
       height: '60%',
     });
 

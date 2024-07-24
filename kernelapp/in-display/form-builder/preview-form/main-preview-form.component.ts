@@ -560,7 +560,6 @@ export class PreviewFormComponent implements OnInit {
     this.informationservice.removeTabpath();
 
     this.tableOptions1 = [];
-
     this._Activatedroute.paramMap.subscribe((params) => {
       this.objectId = this.fromScreenBuilder == "1" ? this.screenBuilderObjId : params.get('parentId');
 
@@ -580,7 +579,7 @@ export class PreviewFormComponent implements OnInit {
             "isMain": res[i].isMain,
             "isRowGrouping": res[i].isRowGroup
           })
-
+this.informationservice.setIsRowGroup(res[i].isRowGroup);
           if (res[i].isMain == 1) {
             this.objectMain = res[i].objectId;
           }
