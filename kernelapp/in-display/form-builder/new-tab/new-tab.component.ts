@@ -307,12 +307,7 @@ console.log('data--------->',data)
         }
       if (this.actionType == 'saveNew') {
         let List = [];
-        // let NewArray = this.informationservice.getAgGidSelectedNode().split(',');
-        // console.log("NewArray for aggrid selected node is <<<<<<<<<<<< ", NewArray);
-        // for (let i = 0; i < NewArray.length; i++) {
         const jsonParams = {
-          // ownerName: NewArray[i].split(".")[0],
-          // tableName: NewArray[i].split(".")[1],
           menuName: this.newTabForm.controls['tabName']?.value,
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
@@ -367,6 +362,7 @@ console.log('data--------->',data)
       }
 
       if (this.actionType == 'update') {
+       console.log('jp------>',this.newTabForm.controls['fieldGrouping']?.value)
         let updateList = [];
 
         const jsonParams = {
@@ -376,7 +372,7 @@ console.log('data--------->',data)
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
-          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value.toString(),
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
