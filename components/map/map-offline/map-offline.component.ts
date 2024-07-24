@@ -79,10 +79,12 @@ import {getWidth} from 'ol/extent.js';
 // import { AnimationStyleMetadata } from '@angular/animations';
 import { LayerControlComponent } from '../component/layer-control/layer-control.component';
 import { DataService } from 'src/app/Kernel/services/data.service';
+// import { DataService } from '../Services/data.service';
 import { LoaderService } from 'src/app/Kernel/services/loader.service';
 import { OfflinedataService } from '../Services/offlinedata.service';
 import { VAgGridComponent } from '../component/v-ag-grid/v-ag-grid.component';
- 
+import { InformationService } from "src/app/Kernel/services/information.service";
+
 
 
 useGeographic();
@@ -131,7 +133,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   @Output() senarioIdOutput:any= new EventEmitter<any>();
   @Input() changes:any;
   navbarSimulId:any;
-
+  
   // Coord: Array<Coords> = [];
   reportType: any;
   reportTypeId: any;
@@ -460,7 +462,11 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   deviceValue: string = '';
   IMSI_IDValue: string = '';
   records: any;
-
+  bydeviceValue:boolean=false;
+  byrouteValue:boolean=false;
+  tcdValue:boolean=false;
+  showroutedicv:boolean=false;
+  
    constructor(
     private datacrowdService: DatacrowdService,
     private httpClient: HttpClient,
@@ -473,7 +479,8 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     public loaderService: LoaderService,
     public data: OfflinedataService,
     private renderer: Renderer2,
-    private el: ElementRef
+    private el: ElementRef,
+    public informationservice: InformationService,
   ) {
     this.vectorSource4 = new VectorSource();
     this.vectorLayer4 = new VectorLayer({
@@ -1387,6 +1394,8 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   });
 
   async ngOnInit() {
+    this.usercode=localStorage.getItem("LogeduserId");
+    $('.dropdown-content1').css('display', 'none');
     $('#popup11111').css('display', 'none');
     $('#popup2').css('display', 'none');
     $('#popupGrid').css('display', 'none');
@@ -1517,7 +1526,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     minZoom: 2,
     maxZoom: 20
   });
-  let magnifiedMap:any = document.getElementById('magnifying-glass1');
+  let magnifiedMap:any = document.getElementById('magnifying-glass1Offline');
 
    let container:any = document.getElementById('mapContainer');
     this.map = new Map({
@@ -1532,31 +1541,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
       view: this.view,
 
     });
-    // const offlineSourceLoop = new XYZ({
-    //   url:"https://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
-    //     minZoom: 0,
-    //     maxZoom:20,
-    //   });
-
-    //    let mapLayerLoop = new TileLayer({
-    //     source: offlineSourceLoop,
-    //   });
-
-    // var map1 = new ol.Map({
-    //   layers: [ mapLayerLoop  ],
-    //   target: 'magnifying-glass1',
-    //   view: new ol.View({
-    //     center:  transform([10, 45], 'EPSG:4326', 'EPSG:3857'),
-    //     zoom: 22
-    //   })
-    // });
-
-
-    // console.log(' map1.getTarget()---', map1.getTarget())
-    // map1.setTarget( map1.getTarget());
-    // map1.on(('click'),()=>{
-    //   alert('click');
-    // })
+    
 
 
     const roadLayer = new TileLayer({
@@ -1575,17 +1560,17 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     });
     
    this.magnifiedMap = new Map({
-      target: 'magnifying-glass1',
+      target: 'magnifying-glass1Offline',
       layers: [roadLayer],
       view: view,
     });
     
    
   
-    console.log("magnnnnnn", $(".magnifying-glass1 .ol-viewport"));
-    $(".magnifying-glass1 .ol-viewport").css('border-radius', '50%' );
+    console.log("magnnnnnn", $(".magnifying-glass1Offline .ol-viewport"));
+    $(".magnifying-glass1Offline .ol-viewport").css('border-radius', '50%' );
   
-    $('.magnifying-glass1').css('display', 'none');
+    $('.magnifying-glass1Offline').css('display', 'none');
 
     this.map.on('pointermove', (event) => {
 //  console.log("event===",event.coordinate);
@@ -1682,6 +1667,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
           }
 
           var coord = this.map.getCoordinateFromPixel(evt.pixel);
+          console.log("coord=======",coord)
           this.createOverlayNamingShape(coord);
           let intid =
             parseInt(foundfeature.getProperties().geometry.ol_uid) + 1;
@@ -1731,9 +1717,16 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     };
 
     this.map.on('dblclick', dblClickHandler);
+    let pixel:any;
+    let feature:any;
 
-    //// to handle the click of each shape(open the datepicker popup)
+ 
+
+    
+  
     this.map.getViewport().addEventListener('contextmenu', (evt: any) => {
+       let pixel = this.map.getEventPixel(evt);
+      this.map.forEachFeatureAtPixel(pixel, (feature:any) => {
       if (this.isdatepicker === true) {
       } else {
         let foundShape = false;
@@ -1749,14 +1742,14 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
 
         const pixel = [evt.clientX, evt.clientY];
         const coordinate = this.map.getCoordinateFromPixel(pixel);
-        let features: any = this.map.getFeaturesAtPixel(pixel);
+        // let features: any = this.map.getFeaturesAtPixel(pixel);
 
-        console.log('features in right click -----', features);
+        // console.log('features in right click -----', features);
 
         console.log('evt in right click -----', evt);
-        if (features.length > 0) {
+        // if (features.length > 0) {
           // Assuming you only have one feature at this pixel
-          let feature = features[0];
+          // let feature = features[0];
           console.log('feature[0]-----', feature);
           console.log('values_-----', feature['values_']);
           console.log('values_-----', feature['values_'].geometry.flatCoordinates);
@@ -1786,11 +1779,12 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
             // Check if the geometry is a circle
             if (this.coordinatesArray.find((a) => a.ID === id)) {
               // Check if the clicked feature is the circle
-              if (features && features.length > 0) {
+              // if (features && features.length > 0) {
                 if (this.deleteMode === false) {
                   this.isdatepicker = true;
                   foundShape = true;
-                  this.featuretarget = features[0].geometryChangeKey_.target;
+                  // this.featuretarget = features[0].geometryChangeKey_.target;
+                  this.featuretarget = feature.geometryChangeKey_.target;
                   const result = this.findDataById(
                     parseInt(this.featuretarget.ol_uid) + 1
                   );
@@ -1831,31 +1825,31 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                   $(document).ready(() => {
                     $('#alertify-ok').click(async () => {
                       if (foundShape) {
-                        console.log(
-                          '>>>>>>>>><<<<<<<<<<<<<getdtaaaaaaaaaaaaaaaaaaaa',
-                          this.dataservice1.getData()
-                        );
-
+                        
                         let data = await this.dataservice1.getData();
                         this.selectedStartDate = data.selectedStartDate;
                         this.selectedEndDate = data.selectedEndDate;
+ 
 
                         let dateshapename =
                           'Begin Operation:' +
                           this.selectedStartDate +
                           '<br>End Operation:' +
                           this.selectedEndDate;
+                           
                         let x = {
                           id: parseInt(this.featuretarget.ol_uid) + 1,
                           selectedStartDate: this.selectedStartDate,
                           selectedEndDate: this.selectedEndDate,
                         };
+                         
                         if (
                           typeof this.selectedStartDate == 'undefined' ||
                           this.selectedStartDate === '' ||
                           this.selectedEndDate === '' ||
                           typeof this.selectedEndDate == 'undefined'
                         ) {
+                          alert("in iffffffff")
                           // this.DatingObj.push(x);
                           let selectedStartDate = (this.coordinatesArray.find(
                             (a) => a.ID === this.shapeIdDate
@@ -1877,6 +1871,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                           );
                           this.dataservice1.setendDate(this.selectedEndDate);
                         } else {
+ 
                           this.DatingObj.push(x);
                           this.dataservice1.setStartDate(
                             this.selectedStartDate
@@ -1889,27 +1884,40 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                             parseInt(this.featuretarget.ol_uid) + 1,
                             'dateTooltip'
                           );
-                          const itemToEdit = this.coordinatesArray.find(
-                            (item) =>
-                              parseInt(item.ol_uid) ===
-                              parseInt(this.featuretarget.ol_uid) + 1
-                          );
+                       
+
+                          let itemToEdit: any = this.coordinatesArray.find((item) => {
+                            const itemUid = parseInt(item.ol_uid);
+                            const targetUid = parseInt(this.featuretarget.ol_uid) + 1;
+                       
+                        
+                            return itemUid === targetUid;
+                        });
+
+                
+
                           if (itemToEdit) {
                             itemToEdit.selectedStartDate =
                               this.selectedStartDate;
                             itemToEdit.selectedEndDate = this.selectedEndDate;
                           } else {
                           }
+                       
+
+
                         }
                       }
                       foundShape = false;
+                      this.closepopup();
                     });
                     $('#alertify-cancel').click(async () => {
+                    
                       this.closepopup();
                     });
                   });
 
                   popup_closer.onclick = () => {
+                     
                     olpopup.setPosition(undefined);
 
                     return false;
@@ -1917,7 +1925,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                   $('#popupGrid').css('display', 'none');
                   $('#popup2').css('display', 'none');
                 }
-              }
+              // }
             } else {
               console.log('cannot click on this feauture .');
             }
@@ -2533,25 +2541,14 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
               $('#popup2').css('display', '');
               this.value = true;
 
-              // popup_closer.onclick = () => {
-              //   olpopup.setPosition(undefined);
-
-              //   //  $("#popup2").hide();
-              //   return false;
-              // };
-              console.log(`22222222222 >>>>>>>>>>>>>>>>`);
-
-              // this.openPopupp(event, olpopup);
-              console.log(`333333333333333 >>>>>>>>>>>>>>>>`);
-
               $('#popupGrid').css('display', 'none');
             }
           }
-        }
+        // }
       }
+    })
     });
   
-
       this.map.on('click', (event) => {
 
       let i = 0;
@@ -2597,8 +2594,8 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
       }
       if (this.openMagnifier) {
         
-        $('.magnifying-glass1').css('display', '');
-         let magnifyingGlass:any = document.getElementById('magnifying-glass1');
+        $('.magnifying-glass1Offline').css('display', '');
+         let magnifyingGlass:any = document.getElementById('magnifying-glass1Offline');
 
         const currentWidth = parseFloat(window.getComputedStyle(magnifyingGlass).width);
         const currentHeight = parseFloat(window.getComputedStyle(magnifyingGlass).height);
@@ -3595,6 +3592,9 @@ this.regiondata=res;
     this.index=0;
     this.displaysectors=false;
     this.displayclusters=false;
+    this.tcdValue=false;
+    
+
     $('.timeline').css('display', 'none');
     this.openTable = false;
     $('#tabletest').css('display', 'none');
@@ -4793,6 +4793,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
   }
 
   tcd() {
+    this.tcdValue=true;
     this.displaysectors=true;
     $('.timeline').css('display', 'flex');
 
@@ -5096,6 +5097,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
 }
 
   displayClusters(datajs: any) {
+   
     console.log("11111111111111---------",datajs);
     datajs={
       markerPositions:datajs
@@ -5926,8 +5928,14 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
   }
 
   createshapeNameTooltip(name: any, position: any, id: any, idtooltip: any) {
+    console.log("name------",name);
+    console.log("position------",position);
+    console.log("id------",id);
+    console.log("idtooltip------",idtooltip);
     let newshapeNameTooltipElement = document.createElement('div');
     newshapeNameTooltipElement.className = 'ol-tooltip ol-tooltip-measure';
+    newshapeNameTooltipElement.style.backgroundColor = 'white';
+
     newshapeNameTooltipElement.innerHTML = name;
     newshapeNameTooltipElement.id = idtooltip;
     let newshapeNameTooltip = new Overlay({
@@ -5938,6 +5946,9 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
       insertFirst: false,
     });
     newshapeNameTooltip.setPosition(position);
+
+    console.log("newshapeNameTooltip------",newshapeNameTooltip);
+
     this.map.addOverlay(newshapeNameTooltip);
 
     this.nameshapeparameters.push({
@@ -7157,12 +7168,12 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
           if (size === 1) {
             
             src =
-            '/cybercrowd/angular-offline/assets/icons/' +
-            cluster.get('features')[0].A_Type +
+            '../../../../../assets/assetsOffline/icons/assets/img/icons' +
+             cluster.get('features')[0].A_Type +
             '.png'; // Access A_Type directly from the feature
     
           } else if (size > 1) {
-            src = '/cybercrowd/angular-offline/assets/icons/elementGroup.png';
+            src = '../../../../../assets/assetsOffline/icons/elementGroup.png';
           }
           styleCache[size] = style;
         }
@@ -7847,8 +7858,20 @@ this.GridID='popupGrid';
 
   findDataById(
     idToFind: number
-  ): { selectedStartDate: string; selectedEndDate: string } | null {
-    const foundData = this.DatingObj.find((item) => item.id === idToFind);
+  ):
+
+   { selectedStartDate: string; selectedEndDate: string } | null {
+    console.log("idToFind===",idToFind);
+    console.log("this.DatingObj===",this.DatingObj);
+    
+
+    const foundData = this.DatingObj.find((item) =>
+      {
+    console.log("item===",item);
+
+         item.id === idToFind});
+    console.log("foundData===",foundData);
+
     return foundData
       ? {
           selectedStartDate: foundData.selectedStartDate,
@@ -12946,12 +12969,18 @@ this.displayPolyline(x,"bts")
 
  
   toggleDropdown() {
-    var dropdownContent:any = document.getElementById("dropdownContent1");
-    if (dropdownContent.style.display === "block") {
-      dropdownContent.style.display = "none";
-    } else {
-      dropdownContent.style.display = "block";
+    if(this.showroutedicv==false){
+      $('.dropdown-content1').css('display', '');
+
+      this.showroutedicv=true;
+    
+    }else{
+      $('.dropdown-content1').css('display', 'none');
+
+      this.showroutedicv=false;
     }
+  
+ 
   }
 
   changebarRoute(){
@@ -12968,11 +12997,16 @@ this.displayPolyline(x,"bts")
 
   startRoute(){
     this.isRunningRoute = true;
+    this.bydeviceValue=true;
+    this.byrouteValue=false;
+
     this.getrouteLine();
   }
 
   startRoute1(){
     this.isRunningRoute = true;
+    this.byrouteValue=true;
+    this.bydeviceValue=false;
     this.displaybyroute();
   }
 
@@ -12996,7 +13030,8 @@ this.displayPolyline(x,"bts")
   
     // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
         
-    routeDevices = this.dataservice1.getroutedevices().split(',');
+    // routeDevices = this.dataservice1.getroutedevices().split(',');
+      routeDevices = this.Devices.split(',');
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
     let colorarray:any[]=['green','red','blue','yellow','purpule'];
@@ -13019,7 +13054,8 @@ this.displayPolyline(x,"bts")
       // datajson=this.datajson;
        this.routedatajson=datajson;
 
-       let markerPositions = datajson['markerPositions'];
+      //  let markerPositions = datajson['markerPositions'];
+       let markerPositions = datajson;
        console.log("markerPositions-----------",markerPositions)
        this.routedatajson=this.routedatajson;
        this.displayRoute=true;
@@ -13031,10 +13067,9 @@ this.displayPolyline(x,"bts")
 
     let color;
     let x1:any=[{'deviceid':'','color':''}];
-    let data11:any=this.routedatajson.markerPositions;
-    // console.log("data11----",data11);
-    // console.log("animatedmarker1----",this.animatedmarker1);
-    // console.log("route[route.length-1]----",route[route.length-1]);
+    // let data11:any=this.routedatajson.markerPositions;
+    let data11:any=this.routedatajson;
+ 
     let arrayfortable:any[]=[];
     
       console.log("speedTimeRoute1111111----",this.speedTimeRoute);
@@ -13047,14 +13082,14 @@ this.displayPolyline(x,"bts")
         let elt1=data11[this.indexRoute+1];
         x1 =  routeDevices1.find((a:any)=>{
         // console.log("aaaaaa----",a);
-        return  a.deviceid==elt[2]
+        return  a.deviceid==elt[0]
       });
 
  color=x1.color;
 
 
 
-var endMarker = new ol.Feature({geometry:  new Point([parseFloat(elt[1]),parseFloat(elt[0])]), color: color});
+var endMarker = new ol.Feature({geometry:  new Point([parseFloat(elt[3]),parseFloat(elt[4])]), color: color});
   
 var routepoint = new VectorLayer({
   source: new VectorSource({
@@ -13113,15 +13148,15 @@ this.animatedmarker1Loop=routepointLoop;
 
 this.animatedmarker1.deviceid=x1.deviceid;
 
-if(this.routingMarkerArr[elt[2]]){
-   this.map.removeLayer(this.routingMarkerArr[elt[2]]);
+if(this.routingMarkerArr[elt[0]]){
+   this.map.removeLayer(this.routingMarkerArr[elt[0]]);
 }
-if(this.routingMarkerArrLoop[elt[2]]){
-  this.magnifiedMap.removeLayer(this.routingMarkerArrLoop[elt[2]]);
+if(this.routingMarkerArrLoop[elt[0]]){
+  this.magnifiedMap.removeLayer(this.routingMarkerArrLoop[elt[0]]);
 }
 
-this.routingMarkerArr[elt[2]]=this.animatedmarker1;
-this.routingMarkerArrLoop[elt[2]]=this.animatedmarker1Loop;
+this.routingMarkerArr[elt[0]]=this.animatedmarker1;
+this.routingMarkerArrLoop[elt[0]]=this.animatedmarker1Loop;
 
 route.push(this.animatedmarker1);
 routeLoop.push(this.animatedmarker1Loop);
@@ -13166,7 +13201,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
   // }
     // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
     
-    routeDevices = this.dataservice1.getroutedevices().split(',');
+    // routeDevices = this.dataservice1.getroutedevices().split(',');
+    routeDevices = this.Devices.split(',');
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
     let colorarray:any[]=['green','red','blue','yellow','purpule'];
@@ -13190,10 +13226,11 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
       datajson=this.datajson;
       this.routedatajson=datajson;
   
-      let markerPositions = datajson['markerPositions'];
+      // let markerPositions = datajson['markerPositions'];
+      let markerPositions = datajson;
       routeDevices1.forEach((a:any)=> { 
       let deviceArray=  markerPositions.filter((elt:any)=>{
-          return  a.deviceid===elt[2]
+          return  a.deviceid===elt[0]
             
           });
           objcolor.push({color:a.color,data:deviceArray,deviceId:a.deviceid,index:0});
@@ -13214,7 +13251,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           return;
         }
     
-        let currentDevice= markerPositions[this.currentIndex][2];
+        let currentDevice= markerPositions[this.currentIndex][0];
         console.log("currentDevice-----------",currentDevice);
     
       let x=  objcolor.find((elt:any)=>{
@@ -13253,7 +13290,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           ];
 
           this.sourcePolyline = new VectorSource({
-            features: [new Feature(new LineString([[x.data[x.index][1],x.data[x.index][0]],[x.data[x.index+1][1],x.data[x.index+1][0]]]))],
+            features: [new Feature(new LineString([[x.data[x.index][3],x.data[x.index][4]],[x.data[x.index+1][3],x.data[x.index+1][4]]]))],
           });
           this.layerPolyline = new VectorLayer({
             source: this.sourcePolyline,
@@ -13343,7 +13380,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         this.fixedbtsGroupArrayLoop=[];
         this.FixedsectorarrayLoopLayer=[];
         this.FixedsectorarrayLoop=[];
-       
+        this.bydeviceValue=false;
+        this.byrouteValue=false;
     
       }
 
@@ -13356,10 +13394,10 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
       
           array.forEach((elt:any)=>{
             let x:any = {
-              deviceid: elt[2],
-              Time: this.dateTtoDate(elt[3]),
-              Lng: elt[1],
-              lat: elt[0],
+              deviceid: elt[0],
+              Time: this.dateTtoDate(elt[1]),
+              Lng: elt[3],
+              lat: elt[4],
             }
             this.Datatable1.unshift(x);
             this.Datatable=this.Datatable1;
@@ -13534,7 +13572,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         let  mapContainer: any = document.querySelector('.map');
          // let mapContainer = document.getElementById('map');
         this.isDimmed = true;
-        const magnifyingGlass = document.getElementById('magnifying-glass1');
+        const magnifyingGlass = document.getElementById('magnifying-glass1Offline');
 
         // const elements = this.el.nativeElement.querySelectorAll('.leaflet-bar');
 
@@ -13542,8 +13580,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         this.openMagnifier=!this.openMagnifier;
 
         if(this.openMagnifier==true){
-         $('.magnifying-glass1').css('display','none');
-        // $('.magnifying-glass1').css('display','');
+         $('.magnifying-glass1Offline').css('display','none');
+        // $('.magnifying-glass1Offline').css('display','');
         mapContainer.classList.toggle('custom-cursor');
         // // Disable map interactions
         
@@ -13576,7 +13614,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           
         }else{
           mapContainer.classList.toggle('custom-cursor');
-        //   $('.magnifying-glass1').css('display','none')
+        //   $('.magnifying-glass1Offline').css('display','none')
         //   // Enable map interactions
         // $('.leaflet-bar').css('opacity','1');
         // $('.leaflet-bar').css('pointer-events','');
@@ -13605,7 +13643,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
 
               @HostListener('document:keydown', ['$event'])
               handlekeybordEvent(event: KeyboardEvent) {
-                  const magnifyingGlass:any = document.getElementById('magnifying-glass1');
+                  const magnifyingGlass:any = document.getElementById('magnifying-glass1Offline');
               
                   if (event.ctrlKey && event.key === 'ArrowUp') {
                       if(this.openMagnifier) {
@@ -13637,7 +13675,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
                           $('.moretools').css('opacity','1');
                           $('.moretools').css('pointer-events','');
 
-                          $('.magnifying-glass1').css('display', 'none');
+                          $('.magnifying-glass1Offline').css('display', 'none');
                           this.openMagnifier = false;
                           this.isDimmed=false;
                     
@@ -13699,7 +13737,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
 
               // updateMagnifyingGlass(event: any): void {
               //   console.log('event=------',event);
-              //   let magnifyingGlass: any = document.getElementById('magnifying-glass1');
+              //   let magnifyingGlass: any = document.getElementById('magnifying-glass1Offline');
               //   let mapContainer: any = document.querySelector('.map');
               //   console.log('mapContainer=------',mapContainer);
               //   console.log('magnifyingGlass=------',magnifyingGlass);
@@ -13724,7 +13762,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
 
               updateMagnifyingGlass(event: any): void {
                 console.log('event=------', event);
-                let magnifyingGlass: any = document.getElementById('magnifying-glass1');
+                let magnifyingGlass: any = document.getElementById('magnifying-glass1Offline');
                 let mapContainer: any = document.querySelector('.map');
      
             
@@ -13748,7 +13786,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
             }
             
               updateMagnifyingGlassSize() {
-                let magnifyingGlass :any= document.getElementById('magnifying-glass1');
+                let magnifyingGlass :any= document.getElementById('magnifying-glass1Offline');
                 let currentWidth = parseFloat(window.getComputedStyle(magnifyingGlass).width);
                 let currentHeight = parseFloat(window.getComputedStyle(magnifyingGlass).height);
             
@@ -13769,7 +13807,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
               //   // $('.leaflet-bar').css('opacity', '1');
               //   // $('.leaflet-bar').css('pointer-events', '');
     
-                $('.magnifying-glass1').css('display', 'none');
+                $('.magnifying-glass1Offline').css('display', 'none');
               //   // this.openMagnifier = false;
               //   // this.map.dragging.enable();
               //   // this.map.scrollWheelZoom.enable();
@@ -14069,6 +14107,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     }
   }
   bydevice(){
+ 
     this.speedTimeRoute=0;
     this.increaseSpeed();
   }
@@ -14155,8 +14194,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
       queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom":  this.DateTimeFrom,
@@ -14202,8 +14241,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
       
        queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom":this.DateTimeFrom,
@@ -14217,7 +14256,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "telephoneNumber": "",
         "EDGEHEIGHT": "10",
         "simulationId": this.simulationid.toString(),
-        "userCode": "8158 ",
+        "userCode": this.usercode,
         "imsiId": this.IMSI_IDValue,
         "countryCode": this.countrycode,
         "senario": "-1",
@@ -14230,8 +14269,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
       queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom":  this.DateTimeFrom,
@@ -14245,7 +14284,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "telephoneNumber": "",
         "EDGEHEIGHT": "10",
         "simulationId": this.simulationid.toString(),
-        "userCode": "8158 ",
+        "userCode": this.usercode,
         "imsiId": this.IMSI_IDValue,
         "countryCode": "",
         "senario": "-1",
@@ -14275,8 +14314,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
       }
          queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom":  this.DateTimeFrom,
@@ -14296,6 +14335,10 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "senario": "-1",
         "BtsTypeSlected": ""
       };
+
+    
+       
+      
     
       
     }else if(this.reportType=="10"){
@@ -14303,8 +14346,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
      
       queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom":  this.DateTimeFrom,
@@ -14318,7 +14361,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "telephoneNumber": "",
         "EDGEHEIGHT": "10",
         "simulationId": this.simulationid.toString(),
-        "userCode": "8158 ",
+        "userCode": this.usercode,
         "imsiId": this.IMSI_IDValue,
         "countryCode": "",
         "senario": "-1",
@@ -14336,8 +14379,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
       //let device = localStorage.getItem('deviceselected');
       queryjson={
         "reportName": "No Name",
-        "reportType": this.selectedType.toString(),
-        "reportTypeId": this.selectedType.toString(),
+        "reportType": this.reportType.toString(),
+        "reportTypeId": this.reportType.toString(),
         "TimeZone": "",
         "RecipientUser": "",
         "DateTimeFrom": this.DateTimeFrom,
@@ -14351,7 +14394,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "telephoneNumber": "",
         "EDGEHEIGHT": "10",
         "simulationId": this.simulationid.toString(),
-        "userCode": "8158 ",
+        "userCode": this.usercode,
         "imsiId": this.ImsiID,
         "countryCode": "",
         "senario": "-1",
@@ -14374,11 +14417,35 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
       //  dialogRef.afterClosed().subscribe(async result => {
     
-        console.log("BtsTypeSlected>>>>",this.BtsTypeSlected)
+        
+    
+       
+            
+   
+      // if(this.BtsTypeSlected=="BTS"){
+    
+      // }else{
+       
+      //   this.displayFixedElements(this.datajson.fixedelements);
+      //   this.displayClusters(this.datajson.geo);
+         
+      // }
+      let numArr2: any = [];
+      Swal.fire({
+        text: 'Please Choose Fixed Element Type',
+        showCancelButton: true,
+        backdrop: false,
+        confirmButtonText: 'BTS',
+        cancelButtonText: 'Fixed Element',
+      }).then(async (result) => {
+
+        if (result.isConfirmed) {
+          this.BtsTypeSlected='BTS';
+          console.log("BtsTypeSlected>>>>",this.BtsTypeSlected)
         queryjson={
           "reportName": "No Name",
-          "reportType": this.selectedType.toString(),
-          "reportTypeId": this.selectedType.toString(),
+          "reportType": this.reportType.toString(),
+          "reportTypeId": this.reportType.toString(),
           "TimeZone": "",
           "RecipientUser": "",
           "DateTimeFrom":  this.DateTimeFrom,
@@ -14392,7 +14459,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           "telephoneNumber": "",
           "EDGEHEIGHT": "10",
           "simulationId": this.simulationid.toString(),
-          "userCode": "8158 ",
+          "userCode": this.usercode,
           "imsiId": this.IMSI_IDValue,
           "countryCode": "",
           "senario": "-1",
@@ -14401,23 +14468,130 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
     
         console.log('queryjson >>', queryjson);
-    
+          queryjson.BtsTypeSlected=this.BtsTypeSlected;
+
+                
+          console.log('queryjson>', queryjson);
+
+    this.datajson = await this.getSimulationData(queryjson);
+console.log('datajson>', this.datajson);
+console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
+
+//zaherrr
+let src: any;
+
+console.log('datajson>>>', this.datajson);
+
+this.CdrData = this.datajson;
+
+console.log('x', this.CdrData);
+
+this.CdrRowData = [];
+this.CdrRowData = [];
+
+for (let i = 0; i < this.CdrData.length; i++) {
+  this.displayBTS(this.CdrData[i].BTS, this.CdrData[i].INFO);
+
+  for (let j = 0; j < this.CdrData[i].SECTORS.length; j++) {
+    this.drawarc(
+      Number(this.CdrData[i].BTS.LATITUDE),
+      Number(this.CdrData[i].BTS.LONGITUDE),
+      this.SectorMeter,
+      Number(this.CdrData[i].SECTORS[j]),
+      Number(this.CdrData[i].SECTORS[j]),
+      this.SectorColor,
+      '',
+      this.CdrData[i].INFO
+    );
+  }
+}
+this.sourcebts = new VectorSource({
+  features: this.fixedBtsArray,
+});
+
+this.clusterSourcebts = new Cluster({
+  minDistance: 100,
+  source: this.sourcebts,
+});
+
+const styleCache: { [key: number]: Style } = {};
+
+this.fixedbtsGroup = new VectorLayer({
+  source: this.clusterSourcebts,
+  zIndex: 9999,
+  style: function (bts) {
+    const size = bts.get('features').length;
+    let style = styleCache[size];
+    if (!style) {
+      src = '../../../../../assets/assetsOffline/icons/BTS.png';
+
+      styleCache[size] = style;
+    }
+
+    return new Style({
+      image: new Icon({
+        src: src,
+        scale: 0.8,
+      }),
+      text: new Text({
+        text: size.toString(),
+        fill: new Fill({ color: '#fff' }),
+      }),
+    });
+  },
+});
+
+this.fixedbtsGroup.set('A_Type', 'tcd');
+this.fixedbtsGroupArray.push(this.fixedbtsGroup);
+this.map.addLayer(this.fixedbtsGroup);
+this.displayBtsOnMap();
+this.displayarc();
+this.isTcd = false;
+
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          this.BtsTypeSlected='FixedElements';
+
        
-            
-      this.datajson = await this.getSimulationData(queryjson);
-      console.log('datajson>', this.datajson);
-      console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
-      if(this.BtsTypeSlected=="BTS"){
+          console.log("BtsTypeSlected>>>>",this.BtsTypeSlected)
+        queryjson={
+          "reportName": "No Name",
+          "reportType": this.reportType.toString(),
+          "reportTypeId": this.reportType.toString(),
+          "TimeZone": "",
+          "RecipientUser": "",
+          "DateTimeFrom":  this.DateTimeFrom,
+          "RecipientEmail": "",
+          "DateTimeTo": this.DateTimeTo,
+          "Coordinates":this.coordinatesArray,
+          "meter": "",
+          "Devices": this.deviceValue,
+          "isCSVAttached": "",
+          "dataType": "",
+          "telephoneNumber": "",
+          "EDGEHEIGHT": "10",
+          "simulationId": this.simulationid.toString(),
+          "userCode": this.usercode,
+          "imsiId": this.IMSI_IDValue,
+          "countryCode": "",
+          "senario": "-1",
+          "BtsTypeSlected": this.BtsTypeSlected
+        };
     
-      }else{
-       
-        this.displayFixedElements(this.datajson.fixedelements);
-        this.displayClusters(this.datajson.geo);
-         
-      }
+    
       
-    
-    
+          console.log('queryjson>', queryjson);
+
+    this.datajson = await this.getSimulationData(queryjson);
+console.log('datajson>', this.datajson);
+console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
+
+this.displayFixedElements(this.datajson);
+        }
+
+
+
+      });
+ 
       // });
     
     }
@@ -14428,355 +14602,64 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     console.log("this.reportType  >>",typeof this.reportType)
     
     
-        console.log("queryjson IIII  ",queryjson)
+        console.log("queryjson IIII  ",queryjson);
+          if (this.reportType=="3"){
+   
+    
+          if (!this.coordinatesArray || this.coordinatesArray.length < 2) {
+      
+          
+                  
+            Swal.fire({
+                     text: 'Select more than one Area',
+                     backdrop: false,
+                     // showCancelButton: true,
+                   });
+         localStorage.clear();
+          
+        } else {
+        
+    
+         let shouldExecuteTest = true; // Flag variable
+        
+         await this.coordinatesArray.forEach((obj : any) => {
+           //console.log('obj>>>>>>>>', obj);
+           if (
+             obj.selectedStartDate === '' ||
+             obj.selectedEndDate === '' ||
+             typeof obj.selectedStartDate === 'undefined' ||
+             typeof obj.selectedEndDate === 'undefined'
+           ) {
+           
+        
+             Swal.fire({
+               text: 'Date each Shape!!!',
+               backdrop: false,
+               // showCancelButton: true,
+             });
+              shouldExecuteTest = false; // Set the flag to false if any object meets the condition
+           
+           }
+         });    
+     
+        }
+    
+      }
+
     if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && this.reportType!="10" ){
         console.log('queryjson >>', queryjson);
-    
-    
-    
-        
-      //   for (const elt of queryjson.Coordinates) {
-      //     if(elt.Type==='Circle'){
-      //       let turfshape:any = turf.circle([elt.center.lng, elt.center.lat], elt.radius / 1000, { units: 'kilometers' });
-    
-      //       const intersectingRegions:any = [];
-       
-      //       //console.log("geoJsonData ",this.geojsonData);
-      //       // Iterate through each feature in the GeoJSON data
-            
-      //       this.geojsonData.features.forEach((feature: any) => {
-     
-      //         // Check if the circle intersects with the feature
-      //        const doesIntersect = turf.booleanOverlap(turf.simplify(feature),turf.simplify(turfshape));
-      //         //console.log('doesIntersect' ,doesIntersect)
-          
-      //         // //console.log('doesIntersect2', doesIntersect2);
-              
-          
-      //         if (doesIntersect) {
-      //           intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
-      //          }else{
-      //          const doesIntersect2 = turf.booleanPointInPolygon(
-      //            turf.point([elt.center.lng, elt.center.lat]), // Create a Turf.js Point from circle center
-      //            feature // Assuming the GeoJSON feature is a Polygon
-      //          );
-      //           if (doesIntersect2) {
-      //             intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
-      //           }
-      //         }
-     
-     
-     
-             
-      //       });
-        
-      //       console.log('zz circle>>>>',intersectingRegions);
-    
-    
-      //       ///
-      //       let  C_countryCodes:any
-          
-     
-     
-      //   await this.datacrowdService.getcountry(intersectingRegions).then((ress:any)=>{
-      //    console.log('getcountry>>>>',ress);
-      //    // C_subregion=ress[0];
-      //    // C_region=ress[1];
-      //    // C_Country=ress[2];
-      //    C_countryCodes=ress;
-       
-      //  }) 
-     
-    
-      //  elt.countrycodes=this.convertCountryCode(C_countryCodes);
-      //     }
-      //   };
-        
-    
-        // if(this.reportType =="3"){
-        //   if (!this.Coord || this.Coord.length < 2) {
-    
-        //     const dialogConfig = new MatDialogConfig();
-        //     dialogConfig.data = {
-        //       content: 'Select more than one Area',
-        //     };
-    
-        //     this.dialog.open(ContentmodalComponent, dialogConfig);
-    
-        //     localStorage.clear();
-        //   } else {
-        //     let shouldExecuteTest = true; // Flag variable
-    
-        //     await this.Coord.forEach((obj : any) => {
-        //       //console.log('obj>>>>>>>>', obj);
-        //       if (
-        //         obj.selectedStartDate === '' ||
-        //         obj.selectedEndDate === '' ||
-        //         typeof obj.selectedStartDate === 'undefined' ||
-        //         typeof obj.selectedEndDate === 'undefined'
-        //       ) {
-        //         const dialogConfig = new MatDialogConfig();
-        //         dialogConfig.data = {
-        //           content: 'Date each Shape!!!',
-        //         };
-    
-        //         this.dialog.open(ContentmodalComponent, dialogConfig);
-        //         shouldExecuteTest = false; // Set the flag to false if any object meets the condition
-        //       }
-        //     });
-    
-        //     if (shouldExecuteTest) {
-        //       this.datajson = await this.getSimulationData(queryjson);
-        //       console.log('datajson>', this.datajson);        }
-    
-        //   }
-        // }
-        // else{
+
           this.datajson = await this.getSimulationData(queryjson);
           console.log('datajson>', this.datajson);
-        // }
-        
-    //////////display clusters
-    //return this.datajson;
-    //     if (this.datajson !== null) {
-    //       //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-    //       this.marker = L.markerClusterGroup({
-    //         spiderfyOnMaxZoom: false,
-    //         animate: true,
-    //         singleMarkerMode: true,
-    //       });
-    //       this.markerLoop = L.markerClusterGroup({
-    //         spiderfyOnMaxZoom: false,
-    //         animate: true,
-    //         singleMarkerMode: true,
-    //       });
-    //       let lastMarkerLat:any;
-    //       let lastMarkerLng:any;
-    
-    //       for (var j = 0; j < 1; j++) {
-    //         for (var i = 0; i < this.datajson; i++) {
-    //           this.markers = L.marker([
-    //             Number(this.datajson[i].location_latitude),
-    //             Number(this.datajson[i].location_longitude)
-             
-    //           ]);
-    //           this.markers.off("click");
-    //           this.markers.on("mousedown", (e: any) => {
-    //             if (e.originalEvent.buttons == 2) {
-    //               e.target.openPopup();
-    
-    //             }
-    //             if (e.originalEvent.buttons == 1) {
-    //               //  alert(1);
-    //             }
-    //           });
-    //           this.markersArray.push(this.markers)
-              
-    //   lastMarkerLat = this.datajson[i][4];
-    //   lastMarkerLng = this.datajson[i][3];
-    //         }
-    //       }
-     
-    
-    //       //       markersBatch.push(marker);
-    //       //     }
-    
-    //       //     // Apply event listeners to the batch of markers
-    //       //     markersBatch.forEach(marker => {
-    //       //       marker.off("click");
-    //       //       marker.on("mousedown", (e: any) => {
-    //       //         if (e.originalEvent.buttons == 2) {
-    //       //           e.target.openPopup();
-    //       //         }
-    //       //         if (e.originalEvent.buttons == 1) {
-    //       //           // alert(1);
-    //       //         }
-    //       //       });
-    
-    //       //       this.markersArray.push(marker);
-    //       //     });
-    
-    //       //     // Clear markersBatch to free up memory
-    //       //     markersBatch.length = 0;
-    //       //   }
-    //       // }
-    //       // // End the timer and log the elapsed time
-    //       // //console.timeEnd('loopTime');
-    
-    //       //     //  this.marker.openPopup(
-    //       //     //  html11
-    //       //     //  );
-    
-    
-    
-    //       this.rowData = [];
-    //       this.datajson.forEach((element: any, key: any) => {
-    //         this.myMarker = this.binddata(
-    //           element[4],
-    //           element[3],
-    //           element[1],
-    //           element[0],
-    //           element[2],
-    //           element[5],
-    //           ""
-    //         );
-    
-    //         this.myMarker.lat = element[4];
-    //         this.myMarker.lng = element[3]
-    //         this.myMarker.timestamp = element[1]
-    //         this.myMarker.tel = element[0];
-    //         this.myMarker.name = element[2];
-    //         this.marker.addLayer(this.myMarker);
-    //         this.markerLoop.addLayer(this.myMarker);
-    //         this.myMarker.off("click");
-    //         this.myMarker.on("mousedown", async (e: any) => {
-    //           if (e.originalEvent.buttons == 2) {
-    //             //console.log("markerChildrensssssss", e.target)
-    //             this.rowData = [];
-    //             var jsonaggrid = {
-    //               Device_id: e.target.tel,
-    //               Tel: e.target.name,
-    //               Date: e.target.timestamp,
-    //               Hits: "1",
-    //               Coord: e.target.lat + ',' + e.target.lng,
-    //               //Lat:e.target.lat
-    //             };
-    //             this.rowData.push(jsonaggrid);
-    
-    
-    //             const componentfactory =
-    //               this.componentFactoryResolver.resolveComponentFactory(
-    //                 VAgGridComponent
-    //               );
-    //             const componentref =
-    //               this.viewContainerRef.createComponent(componentfactory);
-    //             componentref.instance.rowData = this.rowData;
-    //             componentref.instance.columnDefs = this.columnDefs;
-    //             componentref.instance.headerHeight = 0;
-    //             // componentref.instance.selectdevices = true;
-    //             componentref.instance.Title = "Here On";
-    //             componentref.instance.distinct = true;
-    //             componentref.changeDetectorRef.detectChanges();
-    //             componentref.instance.Grid2Type = 'btn-54';
-    //             componentref.instance.GridID = 'GeoGrid1';
-    
-    //             const html2 = componentref.location.nativeElement;
-    //             await html2;
-    
-    //             // $('#agGrid').css('height','10px');
-    //             $('.ag-theme-balham').css('height', '130px');
-    
-    
-    //             // /  e.target.openPopup(html2, e.target._latlng);
-    //             this.map.openPopup(html2, e.target._latlng);
-    
-    
-    //           } else if (e.originalEvent.buttons == 1) {
-    
-    //           }
-    
-    //         });
-    //       });
-    
-    //       const componentfactory =
-    //         this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-    //       const componentref =
-    //         this.viewContainerRef.createComponent(componentfactory);
-    //       const html1 = (componentref.location.nativeElement.style.display = "none");
-    //       componentref.instance.columnDefs = this.columnDefs;
-    //       componentref.changeDetectorRef.detectChanges();
-    //       this.marker.off("click");
-    //       this.marker.on("clustermousedown", async (e: any) => {
-    //         if (e.originalEvent.buttons == 2) {
-    
-    //           var markerChildrens = e.layer.getAllChildMarkers();
-    
-    
-    
-    
-    
-    //           this.rowData = [];
-    
-    //           for (var j = 0; j < markerChildrens.length; j++) {
-    //             var jsonaggrid = {
-    //               Device_id: markerChildrens[j].tel,
-    //               Tel: markerChildrens[j].name,
-    //               Date: markerChildrens[j].timestamp,
-    //               Hits: "1",
-    //               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-    //               // Lat:markerChildrens[j].lat
-    //             };
-    //             this.rowData.push(jsonaggrid);
-    //           }
-    
-    //           //console.log("markerChildrens>>>>>", markerChildrens);
-    
-    //           const componentfactory =
-    //             this.componentFactoryResolver.resolveComponentFactory(
-    //               VAgGridComponent
-    //             );
-    //           const componentref =
-    //             this.viewContainerRef.createComponent(componentfactory);
-    //           componentref.instance.rowData = this.rowData;
-    //           componentref.instance.columnDefs = this.columnDefs;
-    //           componentref.instance.headerHeight = 0;
-    //           // componentref.instance.selectdevices = true;
-    //           componentref.instance.Title = "Here On";
-    //           componentref.instance.distinct = true;
-    //           componentref.changeDetectorRef.detectChanges();
-    //           componentref.instance.pagination = false;
-    //           componentref.instance.rowGrouping = true;
-    //           componentref.instance.contextmenu = false;
-    //           componentref.instance.Grid2Type = 'btn-54';
-    //           componentref.instance.GridID = 'GeoGrid1';
-    //           const html1 = componentref.location.nativeElement;
-        
-    //           await html1;
-    //           //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-    //           if (markerChildrens.length < 3) {
-    //             // $('#agGrid').css('height','10px');
-    //             $('.ag-theme-balham').css('height', '130px');
-    
-    //           } else {
-    //             $('.ag-theme-balham').css('height', ' 250px ');
-    
-    //           }
-    
-    
-    //           this.map.openPopup(html1, e.layer.getLatLng());
-    
-    //           // $(".modal-content").css("width","650px");
-    //           // $(".modal-content").css("right","200px");
-    //           // $(".modal-content").css("padding","10px");
-    //           // $(".modal-content").css("top","85px");
-    //           // $(".modal-content").draggable({
-    //           //   axis: "both",
-    //           //   cursor: "move"
-    //           // });
-    //           //  this.modalRef =this.modalService.open(this.popupContent1);
-    
-    //         }
-    //         if (e.originalEvent.buttons == 1) {
-    //           // alert(4);
-    
-    //         }
-    
-    //         //open popup;
-    //       });
-    
-    //       this.map.addLayer(this.marker);
-    //       //  this.map.setView([lastMarkerLat, lastMarkerLng],12);
-          
-    //       this.magnifiedMap.addLayer(this.markerLoop);
-    //       this.layerGroup.addLayer(this.marker);
-       
-    // }
+      
+   
   if(this.datajson !== null){
     this.displayClusters(this.datajson);
     this.clustersZoom(this.datajson);
   }
   
   }
+ 
     
     if(this.senarioFlag==true){
       this.senariocount++;
@@ -14800,6 +14683,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
         await this.datacrowdService.SaveSimul(obj);
      } 
+
 
 
      
@@ -14903,5 +14787,95 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
                 return stringtojson;
     }
 
+    async DisplayFromSenarioOffline(){
+      let ISExport:boolean=this.informationservice.getISExport();
+      
+      console.log('ISExport:',ISExport); // Debugging log
+      
+      if(ISExport==false){
+      
+      
+            console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+      let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+      
+      if(data[0].colName=="bts_cell_id" ){
+        console.log("data >>>>>>>>>>",data);
+        console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
+          )]);
+      
+      
+        await this.datacrowdService
+        .getfixedelementsObject([ parseInt(data[0].colValue)])
+        .then(async (res: any) => {
+          console.log('res>>', res);
+          this.displayFixedElements(res);
+      
+        });
+      
+      
+      }else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
+        await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+          console.log("res in getSimulationobject ",res);
+          this.datajson=res;
+          if (this.datajson !== null) {
+           
+            this.displayClusters(this.datajson);
+        }
+        
+         });
+         console.log("data in display from senario============",data);
+        // this.displayShapes(data[0].colValue);
+
+        await this.datacrowdService
+        .getExecutionParam(data[0].colValue)
+        .then((res) => {
+          this.ExecutionParam = res;
+          console.log(
+            'getExecutionParam response >>>>',
+            this.ExecutionParam.Coordinates
+          );
+          let shapecoord = this.ExecutionParam.Coordinates;
+
+          localStorage.setItem('coordsimul', JSON.stringify(shapecoord));
+          var shapeId = 0;
+
+          for (var j = 0; j < shapecoord.length; j++) {
+            if (shapecoord[j].Type == 'Circle') {
+              this.displayCircle(
+                shapecoord[j].center.lng,
+                shapecoord[j].center.lat,
+                shapecoord[j].radius,
+                shapecoord[j].leafletid
+              );
+            } else if (shapecoord[j].Type == 'Polygon') {
+              this.displayPolygon(shapecoord[j]);
+            } else if (shapecoord[j].Type == 'Polygon') {
+              this.displayPolyline(shapecoord[j], 'simulation');
+            }
+          }
+        });
+      
+        this.senarioParentName=data[0].colValue;
+        this.simulationid=data[0].colValue;
+      
+        let obj:any={
+          senarioParentName:this.senarioParentName,
+          simulationid:this.simulationid,
+          Action:"DisplayFromSenario",
+          senariocount:this.senariocount,
+          senarioFlag:this.senarioFlag,
+          reportType:this.reportType
+      
+      
+        }
+        // this.senarioIdOutput.emit(this.senarioParentName);
+        this.navbarSimulId=obj;
+      }
+      // data.forEach(async (element: any, key: any) => {
+      
+      
+      // }); 
+      }
+          }
 }
 

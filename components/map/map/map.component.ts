@@ -2780,6 +2780,7 @@ if(this.indexTimeline==1){
 
 
   startLoop() {
+    console.log("sectorarray------------",this.sectorarray)
 
     let imsilocation:any=this.GroupIMSI(this.CdrData.CDR[0].IMSILocation)
  
@@ -2799,12 +2800,12 @@ if(this.indexTimeline==1){
     }
 
     let xElement = imsilocation[this.indexTimeline];
-    //console.log("xElement------------",xElement)
+    console.log("xElement------------",xElement)
     let findedSector2: any = this.sectorarray.filter((sector: any) => {
-      return sector.Azimuth == xElement[0][2] && sector.lng === xElement[0][1] && sector.lat === xElement[0][0];
+      return sector.Azimuth == xElement[0][2] && sector.lng == Number(xElement[0][1]).toString() && sector.lat == Number(xElement[0][0]).toString();
     });
 
-    //console.log('findedSector2', findedSector2);
+    console.log('findedSector2', findedSector2);
 
     for(let i =0;i<xElement[1].length;i++){
 
@@ -3093,7 +3094,7 @@ if(this.indexTimeline==1){
       this.map.removeLayer(this.thisshape);
     }
 
-    localStorage.clear();
+    this.clearlocalStorage();
     //console.log('ang isMapAngular  7 >>', (window.parent.parent.parent[7] as any));
     $('#controlbutton').css('display', 'none');
 
@@ -3704,7 +3705,7 @@ this.reportType=1;
       //   leafletid: x[0].leafletid,
       //   PolyBoundsCoords: "",
       // });
-      // localStorage.clear();
+      // this.clearlocalStorage();
       //     }
 
       //     //console.log('after',this.Coord)
@@ -5203,7 +5204,7 @@ console.log('iiiiiii>>>>>> 0', this.records)
 
         this.dialog.open(ContentmodalComponent, dialogConfig);
 
-        localStorage.clear();
+        this.clearlocalStorage();
       } else {
         let shouldExecuteTest = true; // Flag variable
 
@@ -5836,7 +5837,7 @@ console.log('iiiiiii>>>>>> 0', this.records)
     (window.parent.parent.parent[7] as any).CopyMultiselection(this.multiselection);
 
     this.Devices = [];
-    localStorage.clear();
+    this.clearlocalStorage();
 
 
 
@@ -8359,7 +8360,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
  
       } else {
 
-        localStorage.clear();
+        this.clearlocalStorage();
       }
 
 
@@ -8429,7 +8430,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
     // Call your desired function or perform any action here
     (window.parent.parent.parent[7] as any).openkyc(rowData);
     //because one each click we add teh device to the multislection
-    localStorage.clear();
+    this.clearlocalStorage();
   }
 
   async displaycaseSimulation() { 
@@ -8706,7 +8707,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
 
           }
           //if you want to make on each display the displayed case to be earased  
-          //localStorage.clear();
+          //this.clearlocalStorage();
 
           // (window.parent.parent.parent[7] as any).changesimulationId(simulId);
         });
@@ -17006,9 +17007,21 @@ if (typeof this.DateTimeTo === 'undefined' || this.DateTimeTo === null || this.D
     let today = new Date();
     this.DateTimeTo = this.convertDate2(today.toISOString()); // Convert to ISO string format
 }
+let SenariObj:any;
+if(this.senarioFlag==true){
+  SenariObj={parent:this.senarioParentName.toString(),
+    internalcode:this.internalcode.toString(),
+   senariocount: this.senariocount.toString()
+  }
+
+}else{
+  SenariObj="-1"
+}
 
 if(this.reportType=="1" ){
 
+
+  console.log("SenariObj",SenariObj);
   queryjson={
     "reportName": "No Name",
     "reportType": this.selectedType.toString(),
@@ -17029,7 +17042,7 @@ if(this.reportType=="1" ){
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
 }else if(this.reportType=="2"){
@@ -17084,13 +17097,13 @@ if(this.reportType=="1" ){
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": this.countrycode,
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
 
 }
 
-if(this.reportType=="1" ||this.reportType=="6"){
+if(this.reportType=="6"){
 
   queryjson={
     "reportName": "No Name",
@@ -17112,7 +17125,7 @@ if(this.reportType=="1" ||this.reportType=="6"){
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
 }
@@ -17157,7 +17170,7 @@ else if(this.reportType=="3"){
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
 
@@ -17185,7 +17198,7 @@ else if(this.reportType=="3"){
     "userCode": "8158 ",
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
   for (const elt of queryjson.Coordinates) {
@@ -17273,7 +17286,7 @@ else if(this.reportType=="3"){
     "userCode": "8158 ",
     "imsiId": this.ImsiID,
     "countryCode": "",
-    "senario": "-1",
+    "senario": SenariObj,
     "BtsTypeSlected": ""
   };
   await this.datacrowdService.getTCDSimulationObject(this.ImsiID).then((res:any)=>{
@@ -17312,7 +17325,7 @@ else if(this.reportType=="3"){
       "userCode": "8158 ",
       "imsiId": this.IMSI_IDValue,
       "countryCode": "",
-      "senario": "-1",
+      "senario": SenariObj,
       "BtsTypeSlected": this.BtsTypeSlected
     };
 
@@ -17378,86 +17391,170 @@ else if(this.reportType=="3"){
         
   this.CdrData = await this.getSimulationData(queryjson);
   console.log('CdrData>', this.CdrData);
+  this.datajson=this.CdrData;
   
   console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
   if(this.BtsTypeSlected=="BTS"){
 
+    if(this.reportType=="8" ){
 
-    this.fixedMarkersGroup = new L.MarkerClusterGroup({
-      spiderfyOnMaxZoom: true,
-      animate: true,
-      singleMarkerMode: false,
-      zoomToBoundsOnClick: false,
-      maxClusterRadius: function (zoom) {
-        if (zoom >= 12) {
-          //console.log('innnnnnnnnnnnnnnnnn')
-          return 0;
-        } else {
-          //console.log('innnnnnnnnnnnnnnnnn')
+      this.fixedMarkersGroup = new L.MarkerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        animate: true,
+        singleMarkerMode: false,
+        zoomToBoundsOnClick: false,
+        maxClusterRadius: function (zoom) {
+          if (zoom >= 12) {
+            //console.log('innnnnnnnnnnnnnnnnn')
+            return 0;
+          } else {
+            //console.log('innnnnnnnnnnnnnnnnn')
+  
+            return 50 / zoom;
+          }
+        },
+        iconCreateFunction: function (cluster) {
+          var markers = cluster.getAllChildMarkers();
+          var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+  
+          return L.divIcon({
+            html: html,
+            className: 'mycluster',
+            iconSize: L.point(32, 32)
+          });
+        },
+      });
+  
+      this.fixedMarkersGroupLoop = new L.MarkerClusterGroup({
+        spiderfyOnMaxZoom: true,
+        animate: true,
+        singleMarkerMode: false,
+        zoomToBoundsOnClick: false,
+        maxClusterRadius: function (zoom) {
+          if (zoom >= 12) {
+            //console.log('innnnnnnnnnnnnnnnnn')
+            return 0;
+          } else {
+            //console.log('innnnnnnnnnnnnnnnnn')
+  
+            return 50 / zoom;
+          }
+        },
+        iconCreateFunction: function (cluster) {
+          var markers = cluster.getAllChildMarkers();
+          var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+  
+          return L.divIcon({
+            html: html,
+            className: 'mycluster',
+            iconSize: L.point(32, 32)
+          });
+        },
+      });
 
-          return 50 / zoom;
+      let res:any=this.datajson;
+      for (let i = 0; i < res.length; i++) {
+        console.log("res[i]>>>",res[i]);
+    
+        this.displayBTS(res[i].BTS);
+        //console.log('this.CdrData[0][i]>>>', this.CdrData[0][i].BTS);
+    
+    
+        for (let j = 0; j < res[i].SECTORS.length; j++) {
+          // //console.log('this.CdrData[1]>>>',this.CdrData[1]);
+          ////console.log('this.CdrData[1][i][j]>>>',this.CdrData[1][i][j]);
+          this.drawarc(Number(res[i].BTS.LATITUDE), Number(res[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(res[i].SECTORS[j]) - 22.5, 90 + Number(res[i].SECTORS[j]) + 22.5, this.SectorColor, '', '');
+    
         }
-      },
-      iconCreateFunction: function (cluster) {
-        var markers = cluster.getAllChildMarkers();
-        var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+      }
 
-        return L.divIcon({
-          html: html,
-          className: 'mycluster',
-          iconSize: L.point(32, 32)
+
+  
+    }else{
+
+      if(this.datajson.BTS){
+        this.fixedMarkersGroup = new L.MarkerClusterGroup({
+          spiderfyOnMaxZoom: true,
+          animate: true,
+          singleMarkerMode: false,
+          zoomToBoundsOnClick: false,
+          maxClusterRadius: function (zoom) {
+            if (zoom >= 12) {
+              //console.log('innnnnnnnnnnnnnnnnn')
+              return 0;
+            } else {
+              //console.log('innnnnnnnnnnnnnnnnn')
+    
+              return 50 / zoom;
+            }
+          },
+          iconCreateFunction: function (cluster) {
+            var markers = cluster.getAllChildMarkers();
+            var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+    
+            return L.divIcon({
+              html: html,
+              className: 'mycluster',
+              iconSize: L.point(32, 32)
+            });
+          },
         });
-      },
-    });
 
-    this.fixedMarkersGroupLoop = new L.MarkerClusterGroup({
-      spiderfyOnMaxZoom: true,
-      animate: true,
-      singleMarkerMode: false,
-      zoomToBoundsOnClick: false,
-      maxClusterRadius: function (zoom) {
-        if (zoom >= 12) {
-          //console.log('innnnnnnnnnnnnnnnnn')
-          return 0;
-        } else {
-          //console.log('innnnnnnnnnnnnnnnnn')
 
-          return 50 / zoom;
+        this.fixedMarkersGroupLoop = new L.MarkerClusterGroup({
+          spiderfyOnMaxZoom: true,
+          animate: true,
+          singleMarkerMode: false,
+          zoomToBoundsOnClick: false,
+          maxClusterRadius: function (zoom) {
+            if (zoom >= 12) {
+              //console.log('innnnnnnnnnnnnnnnnn')
+              return 0;
+            } else {
+              //console.log('innnnnnnnnnnnnnnnnn')
+    
+              return 50 / zoom;
+            }
+          },
+          iconCreateFunction: function (cluster) {
+            var markers = cluster.getAllChildMarkers();
+            var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+    
+            return L.divIcon({
+              html: html,
+              className: 'mycluster',
+              iconSize: L.point(32, 32)
+            });
+          },
+        });
+
+      let res:any=this.datajson.BTS;
+      for (let i = 0; i < res.length; i++) {
+        console.log("res[i]>>>",res[i]);
+    
+        this.displayBTS(res[i].BTS);
+        //console.log('this.CdrData[0][i]>>>', this.CdrData[0][i].BTS);
+    
+    
+        for (let j = 0; j < res[i].SECTORS.length; j++) {
+          // //console.log('this.CdrData[1]>>>',this.CdrData[1]);
+          ////console.log('this.CdrData[1][i][j]>>>',this.CdrData[1][i][j]);
+          this.drawarc(Number(res[i].BTS.LATITUDE), Number(res[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(res[i].SECTORS[j]) - 22.5, 90 + Number(res[i].SECTORS[j]) + 22.5, this.SectorColor, '', '');
+    
         }
-      },
-      iconCreateFunction: function (cluster) {
-        var markers = cluster.getAllChildMarkers();
-        var html = '<div  class="elementGroup" >' + markers.length + '</div>';
+      }
+    
+    
 
-        return L.divIcon({
-          html: html,
-          className: 'mycluster',
-          iconSize: L.point(32, 32)
-        });
-      },
-    });
-// Call the function to get the IDs as numbers
-const result :any= this.CdrData.map((item:any) => parseInt(item[0])); 
+      }
 
-console.log("result>>>",result);
-await this.datacrowdService.getScanBts(result).then((res:any)=>{
-  console.log("res>>>",res);
-  for (let i = 0; i < res.length; i++) {
-    console.log("res[0][i]>>>",res[i]);
+      if(this.datajson.geo){
+        this.displayClustersforfixedelements(this.datajson.geo);
 
-    this.displayBTS(res[i].BTS);
-    //console.log('this.CdrData[0][i]>>>', this.CdrData[0][i].BTS);
-
-
-    for (let j = 0; j < res[i].SECTORS.length; j++) {
-      // //console.log('this.CdrData[1]>>>',this.CdrData[1]);
-      ////console.log('this.CdrData[1][i][j]>>>',this.CdrData[1][i][j]);
-      this.drawarc(Number(res[i].BTS.LATITUDE), Number(res[i].BTS.LONGITUDE), this.SectorMeter, 90 + Number(res[i].SECTORS[j]) - 22.5, 90 + Number(res[i].SECTORS[j]) + 22.5, this.SectorColor, '', '');
+      }
 
     }
-  }
 
-})
 
   }else{
    
@@ -17564,7 +17661,7 @@ if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && thi
 
         this.dialog.open(ContentmodalComponent, dialogConfig);
 
-        localStorage.clear();
+        this.clearlocalStorage();
       } else {
         let shouldExecuteTest = true; // Flag variable
 
@@ -17854,7 +17951,7 @@ let obj22:any={
     }
     let obj:any={"table_id": this.simulationid }
 
-    await this.datacrowdService.SaveSimul(obj);
+     this.datacrowdService.SaveSimul(obj);
  } 
  async bars(){
   await this.datacrowdService.getNextActionMenuList().then((response:any)=>{
@@ -17879,6 +17976,7 @@ console.log('ISExport:',ISExport); // Debugging log
 
 if(ISExport==false){
 
+      console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
 
       console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
@@ -18135,10 +18233,10 @@ if(data[0].colName=="bts_cell_id" ){
   }
   
    });
-  this.displayShapes(data[0].colValue);
+  this.displayShapes(data[0].COLVALUE);
 
-  this.senarioParentName=data[0].colValue;
-  this.simulationid=data[0].colValue;
+  this.senarioParentName=data[0].COLVALUE;
+  this.simulationid=data[0].COLVALUE;
 
   let obj:any={
     senarioParentName:this.senarioParentName,
@@ -18325,6 +18423,15 @@ convertArray(input: any[]): { id: number, name: string }[] {
       this.fileDownloadService.downloadFile('SimulationReport_6298.html');
     }
    
+
+    clearlocalStorage(){
+     localStorage.removeItem("multiselection");
+     localStorage.removeItem("deviceselected");
+     localStorage.removeItem("locSimulId");
+     localStorage.removeItem("userCode");
+     localStorage.removeItem("locSimulId");
+
+    }
 }
 
 
