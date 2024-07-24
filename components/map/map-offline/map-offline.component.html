@@ -4,7 +4,7 @@
   <div #mapContainer id="mapContainer" class="map">
   </div>
 
-  <div id="magnifying-glass1" class="magnifying-glass1"></div>
+  <div id="magnifying-glass1Offline" class="magnifying-glass1Offline"></div>
 
   <!-- <div class="half">
     <h4>Road</h4>
@@ -25,8 +25,8 @@
     background: #ffffffb3;
     font-size: 14px;">
   </div>
-  <div id="ref" style=" display: flex;position:absolute;right: 12px;top: 104px;" >
-    <app-textmenu *ngIf="showTextMenu"  [nextActionMenuList]="nextActionMenuList"></app-textmenu>
+  <div id="ref" style=" display: flex;position:absolute;right: 12px;top: 6px;" >
+    <app-textmenu *ngIf="showTextMenu"  [nextActionMenuList]="nextActionMenuList" [maptype]="'offline'"></app-textmenu>
     
     </div>
 
@@ -35,7 +35,7 @@
     <button (click)="startAnimation()">Start</button>
     <button (click)="stopAnimation()">Stop</button>
   </div>
-<div  class="timeline" style="display:none;position: absolute;bottom: 0;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;">
+<div  class="timeline" style="position: absolute;bottom: 0;z-index: 999999999999;left: 300px;border-radius: 10px;background-color: white;padding: 5px;" *ngIf="tcdValue===true">
   
   <button (click)="startTimeline()" [disabled]="isRunning">Start</button>
   <button (click)="ReverseTimeline()" [disabled]="isRunning">Reverse</button>
@@ -48,7 +48,7 @@
   <!-- <button id="tabledatabtn"  (click)="opentimelineScreen()"> Display Data</button> -->
 </div>
 
-<div id='routebar' class='routebar' style="display: none;">
+<div id='routebar' class='routebar'  *ngIf="bydeviceValue===true">
   <div class="controls">
     <span (click)="startRoute()">Start</span>
     <span (click)="stopRoute()">Stop</span>
@@ -63,7 +63,7 @@
   </div>
 </div>
 
-<div id='routebar1' class='routebar' style="display: none;">
+<div id='routebar1' class='routebar'  *ngIf="byrouteValue===true">
   <div class="controls">
     <span (click)="startRoute1()">Start</span>
     <span (click)="stopRoute()">Stop</span>
@@ -86,7 +86,7 @@
   </div>
 </div>
 
-<div  id="search"  class="box" style="position: absolute; top: 6px; right: 6px; z-index: 99999;  box-shadow: 0 1px 7px #999;" >
+<div  id="search"  class="box" style="position: absolute; top: 14px; right: 6px; z-index: 99999;  box-shadow: 0 1px 7px #999;" >
   <img src="../../../../../assets/assetsOffline/img/Search.PNG" alt="search" class="searchbtn">
   <input type="text" [(ngModel)]="locationName" placeholder="Search Location..." (window:keydown.enter)="search(locationName)">
   
@@ -95,9 +95,9 @@
 
 <!-- popup for naming shape -->
 
-<div id="popup11111"  class="ol-popup">
+<div id="popup11111"  class="ol-popup" *ngIf="nameshapevalue===true">
   <button id="popup-closer" class="ol-popup-closer" (click)="closepopupnameshapeCancel()"></button>
-  <div ><app-popup-name-shape  *ngIf="nameshapevalue===true" [Title]="titlepopupname" [value]="valuepopupname"></app-popup-name-shape></div>
+  <div ><app-popup-name-shape   [Title]="titlepopupname" [value]="valuepopupname"></app-popup-name-shape></div>
 </div>
 
 <!-- popup for shape name after calling fct-->
@@ -105,7 +105,7 @@
   <div ><p *ngIf="afternameshapevalue===true">{{shapeNamepopup}}</p></div>
 </div>
 
-  
+
 <div id="tabletest" *ngIf="openTable===true">
   <app-v-table  #childRef [tableData]="Datatable" [tablerow]="tablerow" [tableColumns]="displayedColumns"  [routeDevices]="routeDevicestable" [typeofdata]="typeofdata"  (clickedRow)="changeview($event)"  (clickedDeviceId)="clickedDeviceId($event)"
   ></app-v-table>
@@ -220,7 +220,7 @@ class="customButtons customButtons_Layout" style="display: none;">
      </button>
     
      
-     <div id="dropdownContent1" class="dropdown-content1">
+     <div id="dropdownContent1" class="dropdown-content1" *ngIf="showroutedicv===true">
        <!-- Your dropdown content goes here -->
        <button (click)="bydevice()">By Devices</button>
        <button (click)="byroute()">By routes</button>
@@ -351,7 +351,7 @@ refreshJsp
 </div>
 <button style="position: absolute;
 width: 31px;  
-top: 6px;
+top: 14px;
 z-index: 2147483647;
 left: 182px;
 outline-color: transparent;
@@ -458,4 +458,10 @@ color: #000 !important;" id="toggleColor"     (click)="createnewSenario()" [styl
 <button id="devaddgroup" style="display: none;"  (click)="devaddgroup()"></button>
 <button id="openaddgrpscreen" style="display: none;"  (click)="openaddgrpscreen()"></button>
 
+<button id="DisplayFromSenarioOffline"
+  style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
+  (click)="DisplayFromSenarioOffline()"
+>
+refreshJsp
+</button>
 </div>

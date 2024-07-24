@@ -12,14 +12,15 @@ import { DynamicScreenComponent } from 'src/app/Kernel/kernelapp/in-display/scre
 })
 export class TextmenuComponent implements OnInit {
   @Input() nextActionMenuList: any[]=[] ;
-simulationtype:any;
-objid:number;
+  @Input() maptype:String ;
+    simulationtype:any;
+    objid:number;
   constructor( private dialog: MatDialog,
            private datacrowdservice:DatacrowdService
   ) { }
 
   ngOnInit(): void {
-  console.log("nextActionMenuList in child comp:",this.nextActionMenuList);
+   console.log("nextActionMenuList in child comp:",this.nextActionMenuList);
    }
   async CallFunctions(menucode:any){
     console.log("menucode====",menucode);
@@ -36,13 +37,20 @@ objid:number;
       }];
       const dialogRef = this.dialog.open(DynamicScreenComponent, {
      data: menucode,
-      width: '70%',
+      width: '58%',
       height: '60%',
     });
 
 
     dialogRef.afterClosed().subscribe((res)=>{
-      $("#DisplayFromSenario").click();
+      console.log("maptyp------0",this.maptype);
+      if(this.maptype=="online"){
+        $("#DisplayFromSenario").click();
+
+      }else{
+        $("#DisplayFromSenarioOffline").click();
+
+      }
 
     });
    }

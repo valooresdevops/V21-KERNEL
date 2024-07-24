@@ -78,12 +78,13 @@ import {getWidth} from 'ol/extent.js';
   import DragAndDrop from 'ol/interaction/DragAndDrop.js';
 // import { AnimationStyleMetadata } from '@angular/animations';
 import { LayerControlComponent } from '../component/layer-control/layer-control.component';
-// import { DataService } from 'src/app/Kernel/services/data.service';
-import { DataService } from '../Services/data.service';
+import { DataService } from 'src/app/Kernel/services/data.service';
+// import { DataService } from '../Services/data.service';
 import { LoaderService } from 'src/app/Kernel/services/loader.service';
 import { OfflinedataService } from '../Services/offlinedata.service';
 import { VAgGridComponent } from '../component/v-ag-grid/v-ag-grid.component';
- 
+import { InformationService } from "src/app/Kernel/services/information.service";
+
 
 
 useGeographic();
@@ -132,7 +133,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   @Output() senarioIdOutput:any= new EventEmitter<any>();
   @Input() changes:any;
   navbarSimulId:any;
-
+  
   // Coord: Array<Coords> = [];
   reportType: any;
   reportTypeId: any;
@@ -464,7 +465,8 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   bydeviceValue:boolean=false;
   byrouteValue:boolean=false;
   tcdValue:boolean=false;
-
+  showroutedicv:boolean=false;
+  
    constructor(
     private datacrowdService: DatacrowdService,
     private httpClient: HttpClient,
@@ -477,7 +479,8 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     public loaderService: LoaderService,
     public data: OfflinedataService,
     private renderer: Renderer2,
-    private el: ElementRef
+    private el: ElementRef,
+    public informationservice: InformationService,
   ) {
     this.vectorSource4 = new VectorSource();
     this.vectorLayer4 = new VectorLayer({
@@ -1392,7 +1395,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
 
   async ngOnInit() {
     this.usercode=localStorage.getItem("LogeduserId");
-
+    $('.dropdown-content1').css('display', 'none');
     $('#popup11111').css('display', 'none');
     $('#popup2').css('display', 'none');
     $('#popupGrid').css('display', 'none');
@@ -1788,7 +1791,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                   this.shapeIdDate = (
                     parseInt(this.featuretarget.ol_uid) + 1
                   ).toString();
-                  // this.dataservice1.setshapeIdDate(this.shapeIdDate);
+                  this.dataservice1.setshapeIdDate(this.shapeIdDate);
 
                   this.value = false;
                   $('#datepicker').css('display', '');
@@ -1874,7 +1877,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
                             this.selectedStartDate
                           );
                           this.dataservice1.setendDate(this.selectedEndDate);
-                          // this.dataservice1.setvaluedate(0);
+                          this.dataservice1.setvaluedate(0);
                           this.createshapeNameTooltip(
                             dateshapename,
                             coord,
@@ -7165,8 +7168,8 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
           if (size === 1) {
             
             src =
-            '../../../../../assets/assetsOffline/icons/' +
-            cluster.get('features')[0].A_Type +
+            '../../../../../assets/assetsOffline/icons/assets/img/icons' +
+             cluster.get('features')[0].A_Type +
             '.png'; // Access A_Type directly from the feature
     
           } else if (size > 1) {
@@ -8777,7 +8780,7 @@ displayBtsOnMap(){
       // console.log('size::::',size);
       let style = styleCache[size];
       if (!style) {
-        src = '../../../../../assets/assetsOffline/icons/BTS.png';
+        src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
 
         styleCache[size] = style;
       }
@@ -9112,7 +9115,7 @@ this.displayarcLoop();
               const size = bts.get('features').length;
               let style = styleCache[size];
               if (!style) {
-                src = '../../../../../assets/assetsOffline/icons/BTS.png';
+                src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
 
                 styleCache[size] = style;
               }
@@ -9998,7 +10001,7 @@ if($('#tabletest').css('display') === 'block'){
             // console.log('size::::',size);
             let style = styleCache[size];
             if (!style) {
-              src = '../../../../../assets/assetsOffline/icons/BTS.png';
+              src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
 
               styleCache[size] = style;
             }
@@ -11916,10 +11919,10 @@ this.displayPolyline(x,"bts")
                     if (size === 1) {
                       for (let i = 0; i < this.deviceCoordinatesArr.length; i++) {
                         src =
-                          '../../../../../assets/assetsOffline/icons/singleperson.png';
+                          '/cybercrowd/angular-offline/assets/icons/singleperson.png';
                       }
                     } else if (size > 1) {
-                      src = '../../../../../assets/assetsOffline/icons/group.png';
+                      src = '/cybercrowd/angular-offline/assets/icons/group.png';
                     }
                     styleCache[size] = style;
                   }
@@ -11995,10 +11998,10 @@ this.displayPolyline(x,"bts")
                       if (size === 1) {
                         for (let i = 0; i < parsedJson.length; i++) {
                           src =
-                            '../../../../../assets/assetsOffline/icons/singleperson.png';
+                            '/cybercrowd/angular-offline/assets/icons/singleperson.png';
                         }
                       } else if (size > 1) {
-                        src = '../../../../../assets/assetsOffline/icons/group.png';
+                        src = '/cybercrowd/angular-offline/assets/icons/group.png';
                       }
                       styleCache[size] = style;
                     }
@@ -12966,12 +12969,18 @@ this.displayPolyline(x,"bts")
 
  
   toggleDropdown() {
-    var dropdownContent:any = document.getElementById("dropdownContent1");
-    if (dropdownContent.style.display === "block") {
-      dropdownContent.style.display = "none";
-    } else {
-      dropdownContent.style.display = "block";
+    if(this.showroutedicv==false){
+      $('.dropdown-content1').css('display', '');
+
+      this.showroutedicv=true;
+    
+    }else{
+      $('.dropdown-content1').css('display', 'none');
+
+      this.showroutedicv=false;
     }
+  
+ 
   }
 
   changebarRoute(){
@@ -14676,6 +14685,7 @@ this.displayFixedElements(this.datajson);
      } 
 
 
+
      
      async bars(){
       await this.datacrowdService.getNextActionMenuList().then((response:any)=>{
@@ -14777,5 +14787,95 @@ this.displayFixedElements(this.datajson);
                 return stringtojson;
     }
 
+    async DisplayFromSenarioOffline(){
+      let ISExport:boolean=this.informationservice.getISExport();
+      
+      console.log('ISExport:',ISExport); // Debugging log
+      
+      if(ISExport==false){
+      
+      
+            console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+      let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+      
+      if(data[0].colName=="bts_cell_id" ){
+        console.log("data >>>>>>>>>>",data);
+        console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
+          )]);
+      
+      
+        await this.datacrowdService
+        .getfixedelementsObject([ parseInt(data[0].colValue)])
+        .then(async (res: any) => {
+          console.log('res>>', res);
+          this.displayFixedElements(res);
+      
+        });
+      
+      
+      }else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
+        await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+          console.log("res in getSimulationobject ",res);
+          this.datajson=res;
+          if (this.datajson !== null) {
+           
+            this.displayClusters(this.datajson);
+        }
+        
+         });
+         console.log("data in display from senario============",data);
+        // this.displayShapes(data[0].colValue);
+
+        await this.datacrowdService
+        .getExecutionParam(data[0].colValue)
+        .then((res) => {
+          this.ExecutionParam = res;
+          console.log(
+            'getExecutionParam response >>>>',
+            this.ExecutionParam.Coordinates
+          );
+          let shapecoord = this.ExecutionParam.Coordinates;
+
+          localStorage.setItem('coordsimul', JSON.stringify(shapecoord));
+          var shapeId = 0;
+
+          for (var j = 0; j < shapecoord.length; j++) {
+            if (shapecoord[j].Type == 'Circle') {
+              this.displayCircle(
+                shapecoord[j].center.lng,
+                shapecoord[j].center.lat,
+                shapecoord[j].radius,
+                shapecoord[j].leafletid
+              );
+            } else if (shapecoord[j].Type == 'Polygon') {
+              this.displayPolygon(shapecoord[j]);
+            } else if (shapecoord[j].Type == 'Polygon') {
+              this.displayPolyline(shapecoord[j], 'simulation');
+            }
+          }
+        });
+      
+        this.senarioParentName=data[0].colValue;
+        this.simulationid=data[0].colValue;
+      
+        let obj:any={
+          senarioParentName:this.senarioParentName,
+          simulationid:this.simulationid,
+          Action:"DisplayFromSenario",
+          senariocount:this.senariocount,
+          senarioFlag:this.senarioFlag,
+          reportType:this.reportType
+      
+      
+        }
+        // this.senarioIdOutput.emit(this.senarioParentName);
+        this.navbarSimulId=obj;
+      }
+      // data.forEach(async (element: any, key: any) => {
+      
+      
+      // }); 
+      }
+          }
 }
 
