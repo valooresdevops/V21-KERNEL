@@ -278,7 +278,7 @@ console.log('data--------->',data)
         let isAdvencedSearchProcedure = this.newTabForm.controls['addSearchProcedure']?.value;
         let isDynamicTitleEnabled =  this.newTabForm.controls['isDynamicTitleEnabled']?.value;
         let dynamicTitleName =  this.newTabForm.controls['dynamicTitleName']?.value;
-        let canImport = this.newTabForm.controls['canImport']?.value;
+        //let canImport = this.newTabForm.controls['canImport']?.value;
         let callRestApi =  this.newTabForm.controls['callRestApi']?.value;
         let callRestApi2 =  this.newTabForm.controls['callRestApi2']?.value;
         if(condition == undefined){
@@ -293,9 +293,9 @@ console.log('data--------->',data)
         if(canDelete == undefined){
           canDelete = 0;
         }
-        if(canImport == undefined || canImport == ""){
-          canImport = 0;
-        }
+        // if(canImport == undefined || canImport == ""){
+        //   canImport = 0;
+        // }
         if(canModify == undefined){
           canModify = 0;
         }
@@ -332,7 +332,7 @@ console.log('data--------->',data)
           dynamicTitleName: dynamicTitleName,
           isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
           callRestApi: false,
-          canImport: canImport,
+          //canImport: canImport,
 
 
         };
@@ -388,7 +388,7 @@ console.log('data--------->',data)
           isDynamicTitleEnabled: isDynamicTitleEnabled,
           callRestApi:this.newTabForm.controls['callRestApi']?.value,
           callRestApi2:callRestApi2,
-          canImport: canImport,
+          //canImport: canImport,
           condition: condition,
           advancedSearchProcedureName:isAdvencedSearchProcedure,
           userId: this.informationservice.getLogeduserId(),
@@ -434,19 +434,33 @@ console.log('data--------->',data)
     
     this.http.get<any>(GlobalConstants.getTabConfigurationApi + this.objectId, { headers: GlobalConstants.headers, }).subscribe(
       async (res: any) => {
+        //console.log("TAB DATA>>>>>>>>>>",res);
         this.newTabForm.controls['tabName'].setValue(res[0].menuName);
+
         this.newTabForm.controls['orderField'].setValue(res[0].orderNo);
+
         this.newTabForm.controls['sourceQuery'].setValue(res[0].sourceQuery);
+
         this.newTabForm.controls['canAdd'].setValue(res[0].canAdd);
+
         this.newTabForm.controls['canDelete'].setValue(res[0].canDelete);
+
         this.newTabForm.controls['canModify'].setValue(res[0].canModify);
+
         this.newTabForm.controls['condition'].setValue(res[0].condition);
+
         this.newTabForm.controls['isSave'].setValue(res[0].isSave);
+
         this.newTabForm.controls['readOnlyQbeId'].setValue(res[0].readOnlyQbeId);
+
         this.newTabForm.controls['addSearchProcedure'].setValue(res[0].advancedSearchProcedureName);
+
         this.newTabForm.controls['dynamicTitleName'].setValue(res[0].dynamicTitleName);
+
         this.newTabForm.controls['isDynamicTitleEnabled'].setValue(res[0].isDynamicTitleEnabled);
-        this.newTabForm.controls['canImport'].setValue(res[0].canImport);
+
+        // this.newTabForm.controls['canImport'].setValue(res[0].canImport);
+
         this.newTabForm.controls['callRestApi2'].setValue(res[0].apiFunctionName);
         if (res[0].isApiEnabled == "0") {
           this.newTabForm.controls['callRestApi'].setValue(false);
@@ -458,6 +472,7 @@ console.log('data--------->',data)
         if (res[0].isGrid == "0") {
           this.newTabForm.controls['isGrid'].setValue(false);
         } else {
+          console.log("IS GRID IS TRUE");
           this.newTabForm.controls['isGrid'].setValue(true);
         }
 
