@@ -522,6 +522,7 @@ setTimeout(() => {
     {
       this.selectedNodesAr = this.selectedNodesAr.replace(", }]", "}]");
     }
+
     this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
     this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
     this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
@@ -670,7 +671,6 @@ setTimeout(() => {
  //   console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
 console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
 
-
  //////////////////////////////////////////////////////////////HAYA START Access Rights (USM)
  if (this.isAccessRightsGrid){
   // Remove duplicates based on first primary key only in USM
@@ -693,6 +693,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END  
+
+this.informationservice.setAgGidSelectedNode(this.selectedNodesAr)
+console.log('jp------->: ',this.informationservice.getAgGidSelectedNode());
   }
 
 
@@ -821,7 +824,9 @@ console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesA
 
             } else {
                
-            //  this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+              // this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+             // this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
+
               console.log("this.informationservice.setAgGidSelectedNode else :", this.informationservice.getAgGidSelectedNode())
 
 
@@ -985,7 +990,7 @@ console.log('22222222222222222')
             }
             
             
-            this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+          //  this.informationservice.setAgGidSelectedNode(this.selectedNodes);
             console.log("this.informationservice.setAgGidSelectedNode , :", this.informationservice.getAgGidSelectedNode())
 
           }
@@ -997,13 +1002,15 @@ console.log('22222222222222222')
       this.informationservice.setDynamicService('agGidSelectedQueryForm_('+this.lookupFieldName+')',this.informationservice.getAgGidSelectedNode());
     }else if(this.isForQueryForm==false && this.isGridInLookup==false){
       
-      this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
+      // this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
       console.log("this.selectedNodes :", this.selectedNodes);
       console.log("this.informationservice.setAgGidSelectedNode false :", this.informationservice.getAgGidSelectedNode());
 
 
     }
 ////////////////////////////////////////////////////
+console.log("this.informationservice.setAgGidSelectedNode", this.informationservice.getAgGidSelectedNode());
+
   }
 onCellEditingStopped(event: any) {
   let primaryKey = this.agPrimaryKey.toLowerCase();
