@@ -69,10 +69,15 @@ export class KpiRatioPopupComponent implements OnInit {
     
     let selectedNodes = this.agGridSelectedNodes;
 
-    if (localStorage.getItem("agGidSelectedNode").includes(",") || localStorage.getItem("agGidSelectedNode") == "") {
+    // if (localStorage.getItem("agGidSelectedNode").includes(",") || localStorage.getItem("agGidSelectedNode") == "") {
 
-    } else {
+    // }
+    const agGidSelectedNode = localStorage.getItem("agGidSelectedNode");
 
+    if (agGidSelectedNode && (agGidSelectedNode.includes(",") || agGidSelectedNode === ""))
+    {}
+    else
+    {
       this.http.post<any>(GlobalConstants.decodeKpiQuery + selectedNodes, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = {
@@ -89,8 +94,8 @@ export class KpiRatioPopupComponent implements OnInit {
 
         const dialogRef = this.dialog.open(KpiBuilderPreviewComponent, {
           data: info,
-          width: '50%',
-          height: '60%',
+          width: '30%',
+          height: '30%',
         });
 
 

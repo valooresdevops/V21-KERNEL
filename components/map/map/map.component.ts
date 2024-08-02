@@ -154,6 +154,7 @@ export class MapComponent implements OnInit {
   layerControl: L.Control;
   tileLayer: L.TileLayer;
   semiCircle: L.Path; // Manually declare semiCircle as L.Path
+  IsClear:boolean=false;
 
 
   heat: any;
@@ -456,6 +457,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   simulationData: any;
   records: any;
   PropertiesSimulID: any;
+  circleDisplay: any;
 
   countryCellRenderer(params: ICellRendererParams) {
     const flag =
@@ -1290,6 +1292,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   Convertedsimulationtype:any;
   dateTimeFrom:any;
   dateTimeTo:any;
+  headerchangeCounter:number=0;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -1756,7 +1759,6 @@ this.addnewSenario();
     //center: L.latLng(parseFloat(localStorage.getItem('globalCoord lat')),parseFloat(localStorage.getItem('globalCoord lng'))),
 
   };
-
 
 
   initMarkers() {
@@ -3243,6 +3245,8 @@ this.routedatajson=[];
     this.datajson=[];
 // this.dataService.setroutedevices("");
 this.reportType=1;
+this.headerchangeCounter++;
+
   }
 
 
@@ -6307,25 +6311,9 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
 
   openPopup2() {
 
-
+ 
     if (this.popupContent) {
-      const componentfactory =
-        this.componentFactoryResolver.resolveComponentFactory(
-          VAgGridComponent
-        );
-      const componentref =
-        this.viewContainerRef.createComponent(componentfactory);
-      componentref.instance.rowData = this.rowData;
-      componentref.instance.columnDefs = this.columnDefs2;
-      componentref.instance.headerHeight = 30;
-      // componentref.instance.selectdevices = true;
-      componentref.instance.Title = "";
-      componentref.instance.distinct = true;
-      componentref.instance.rowGrouping = false;
-      componentref.changeDetectorRef.detectChanges();
-      const html1 = componentref.location.nativeElement;
-
-      this.map.closePopup()
+    
 
       this.modalRef = this.modalService.open(this.popupContent);
 
@@ -6487,7 +6475,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
       this.map.addLayer(googleLayer);
     } else if (id == "googleStreets1") {
 
-  // Clean up the map when the component is destroyed
+  // Clean up the map when the component is destroyedd
     if (this.map3d) {
       this.map3d.remove(); // This removes the map instance and its event listeners
     }
@@ -8428,7 +8416,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
     const rowData = params.data.Device_id;
 
     // Call your desired function or perform any action here
-    (window.parent.parent.parent[7] as any).openkyc(rowData);
+    // (window.parent.parent.parent[7] as any).openkyc(rowData);
     //because one each click we add teh device to the multislection
     this.clearlocalStorage();
   }
@@ -8852,6 +8840,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
 
 
   startDrawingPolygon(): void {
+    this.ShowHeader=false;
     // Disable any existing drawing mode (e.g., polyline or other)
     this.map.pm.disableDraw();
 
@@ -8913,6 +8902,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
 
 
   startDrawingPolyline(): void {
+    this.ShowHeader=false;
     // Disable any existing drawing mode (e.g., polyline or other)
     this.map.pm.disableDraw();
 
@@ -16952,6 +16942,11 @@ private handleRouteData(data: any, deviceArray?: any[]) {
 
 
   async test33(){
+
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+
+    }
 console.log("thiscoord",this.Coord);
 console.log("deviceValue",this.deviceValue) 
 console.log("selectedType",this.selectedType) 
@@ -17976,553 +17971,26 @@ let obj22:any={
       //console.log('ISExport:',ISExport); // Debugging log
       
       if(ISExport==false){
+
+           console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
       
-          //  console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
-      
-            console.log("data>>>111111>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
       let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
-      for(let i=0;i<data.length;i++)
-        {
-          if(data[i].ROW_ID[0].COLNAME=="bts_cell_id" ){
-            // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].ROW_ID[0].colValue
-            //   )]);
-          
-          
-            await this.datacrowdService
-            .getfixedelementsObject([ parseInt(data[i].ROW_ID[0].colValue)])
-            .then(async (res: any) => {
-              //console.log('res>>', res);
-              this.displayFixedElements(res);
-          
-            });
-          
-          
-          }else if(data[i].ROW_ID[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
-            await this.datacrowdService.getSimulationobject([data[i].ROW_ID[0].COLVALUE]).then((res:any)=>{
-              //console.log("res in getSimulationobject ",res);
-              this.datajson=res;
-              if (this.datajson !== null) {
-                ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-                this.marker = L.markerClusterGroup({
-                  spiderfyOnMaxZoom: false,
-                  animate: true,
-                  singleMarkerMode: true,
-                });
-                this.markerLoop = L.markerClusterGroup({
-                  spiderfyOnMaxZoom: false,
-                  animate: true,
-                  singleMarkerMode: true,
-                });
-                let lastMarkerLat:any;
-                let lastMarkerLng:any;
-            
-                for (var j = 0; j < 1; j++) {
-                  for (var i = 0; i < this.datajson; i++) {
-                    this.markers = L.marker([
-                      Number(this.datajson[i].location_latitude),
-                      Number(this.datajson[i].location_longitude)
-                   
-                    ]);
-                    this.markers.off("click");
-                    this.markers.on("mousedown", (e: any) => {
-                      if (e.originalEvent.buttons == 2) {
-                        e.target.openPopup();
-            
-                      }
-                      if (e.originalEvent.buttons == 1) {
-                        //  alert(1);
-                      }
-                    });
-                    this.markersArray.push(this.markers)
-                    
-            lastMarkerLat = this.datajson[i][4];
-            lastMarkerLng = this.datajson[i][3];
-                  }
-                }
-            
-            
-                //       markersBatch.push(marker);
-                //     }
-            
-                //     // Apply event listeners to the batch of markers
-                //     markersBatch.forEach(marker => {
-                //       marker.off("click");
-                //       marker.on("mousedown", (e: any) => {
-                //         if (e.originalEvent.buttons == 2) {
-                //           e.target.openPopup();
-                //         }
-                //         if (e.originalEvent.buttons == 1) {
-                //           // alert(1);
-                //         }
-                //       });
-            
-                //       this.markersArray.push(marker);
-                //     });
-            
-                //     // Clear markersBatch to free up memory
-                //     markersBatch.length = 0;
-                //   }
-                // }
-                // // End the timer and log the elapsed time
-                // //console.timeEnd('loopTime');
-            
-                //     //  this.marker.openPopup(
-                //     //  html11
-                //     //  );
-            
-            
-            
-                this.rowData = [];
-                this.datajson.forEach((element: any, key: any) => {
-                  this.myMarker = this.binddata(
-                    element[4],
-                    element[3],
-                    element[1],
-                    element[0],
-                    element[2],
-                    element[5],
-                    ""
-                  );
-            
-                  this.myMarker.lat = element[4];
-                  this.myMarker.lng = element[3]
-                  this.myMarker.timestamp = element[1]
-                  this.myMarker.tel = element[0];
-                  this.myMarker.name = element[2];
-                  this.marker.addLayer(this.myMarker);
-                  this.markerLoop.addLayer(this.myMarker);
-                  this.myMarker.off("click");
-                  this.myMarker.on("mousedown", async (e: any) => {
-                    if (e.originalEvent.buttons == 2) {
-                      ////console.log("markerChildrensssssss", e.target)
-                      this.rowData = [];
-                      var jsonaggrid = {
-                        Device_id: e.target.tel,
-                        Tel: e.target.name,
-                        Date: e.target.timestamp,
-                        Hits: "1",
-                        Coord: e.target.lat + ',' + e.target.lng,
-                        //Lat:e.target.lat
-                      };
-                      this.rowData.push(jsonaggrid);
-            
-            
-                      const componentfactory =
-                        this.componentFactoryResolver.resolveComponentFactory(
-                          VAgGridComponent
-                        );
-                      const componentref =
-                        this.viewContainerRef.createComponent(componentfactory);
-                      componentref.instance.rowData = this.rowData;
-                      componentref.instance.columnDefs = this.columnDefs;
-                      componentref.instance.headerHeight = 0;
-                      // componentref.instance.selectdevices = true;
-                      componentref.instance.Title = "Here On";
-                      componentref.instance.distinct = true;
-                      componentref.changeDetectorRef.detectChanges();
-                      componentref.instance.Grid2Type = 'btn-54';
-                      componentref.instance.GridID = 'GeoGrid1';
-            
-                      const html2 = componentref.location.nativeElement;
-                      await html2;
-            
-                      // $('#agGrid').css('height','10px');
-                      $('.ag-theme-balham').css('height', '130px');
-            
-            
-                      // /  e.target.openPopup(html2, e.target._latlng);
-                      this.map.openPopup(html2, e.target._latlng);
-            
-            
-                    } else if (e.originalEvent.buttons == 1) {
-            
-                    }
-            
-                  });
-                });
-            
-                const componentfactory =
-                  this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-                const componentref =
-                  this.viewContainerRef.createComponent(componentfactory);
-                const html1 = (componentref.location.nativeElement.style.display = "none");
-                componentref.instance.columnDefs = this.columnDefs;
-                componentref.changeDetectorRef.detectChanges();
-                this.marker.off("click");
-                this.marker.on("clustermousedown", async (e: any) => {
-                  if (e.originalEvent.buttons == 2) {
-                    var markerChildrens = e.layer.getAllChildMarkers();
-            
-            
-            
-            
-            
-                    this.rowData = [];
-            
-                    for (var j = 0; j < markerChildrens.length; j++) {
-                      var jsonaggrid = {
-                        Device_id: markerChildrens[j].tel,
-                        Tel: markerChildrens[j].name,
-                        Date: markerChildrens[j].timestamp,
-                        Hits: "1",
-                        Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-                        // Lat:markerChildrens[j].lat
-                      };
-                      this.rowData.push(jsonaggrid);
-                    }
-            
-                    ////console.log("markerChildrens>>>>>", markerChildrens);
-            
-                    const componentfactory =
-                      this.componentFactoryResolver.resolveComponentFactory(
-                        VAgGridComponent
-                      );
-                    const componentref =
-                      this.viewContainerRef.createComponent(componentfactory);
-                    componentref.instance.rowData = this.rowData;
-                    componentref.instance.columnDefs = this.columnDefs;
-                    componentref.instance.headerHeight = 0;
-                    // componentref.instance.selectdevices = true;
-                    componentref.instance.Title = "Here On";
-                    componentref.instance.distinct = true;
-                    componentref.changeDetectorRef.detectChanges();
-                    componentref.instance.pagination = false;
-                    componentref.instance.rowGrouping = true;
-                    componentref.instance.contextmenu = false;
-                    componentref.instance.Grid2Type = 'btn-54';
-                    componentref.instance.GridID = 'GeoGrid1';
-                    const html1 = componentref.location.nativeElement;
-                    await html1;
-                    ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-                    if (markerChildrens.length < 3) {
-                      // $('#agGrid').css('height','10px');
-                      $('.ag-theme-balham').css('height', '130px');
-            
-                    } else {
-                      $('.ag-theme-balham').css('height', ' 250px ');
-            
-                    }
-            
-            
-                    this.map.openPopup(html1, e.layer.getLatLng());
-            
-                    // $(".modal-content").css("width","650px");
-                    // $(".modal-content").css("right","200px");
-                    // $(".modal-content").css("padding","10px");
-                    // $(".modal-content").css("top","85px");
-                    // $(".modal-content").draggable({
-                    //   axis: "both",
-                    //   cursor: "move"
-                    // });
-                    //  this.modalRef =this.modalService.open(this.popupContent1);
-            
-                  }
-                  if (e.originalEvent.buttons == 1) {
-                    // alert(4);
-            
-                  }
-            
-                  //open popup;
-                });
-            
-                this.map.addLayer(this.marker);
-                // this.map.setView([lastMarkerLat, lastMarkerLng],12);
-                
-                this.magnifiedMap.addLayer(this.markerLoop);
-                this.layerGroup.addLayer(this.marker);
-             
-            }
-            
-             });
-            this.displayShapes(data[i].ROW_ID[0].COLVALUE);
-          
-            this.senarioParentName=data[i].ROW_ID[0].COLVALUE;
-            this.simulationid=data[i].ROW_ID[0].COLVALUE;
-          
-            let obj:any={
-              senarioParentName:this.senarioParentName,
-              simulationid:this.simulationid,
-              Action:"DisplayFromSenario",
-              senariocount:this.senariocount,
-              senarioFlag:this.senarioFlag,
-              reportType:this.reportType
-          
-          
-            }
-            // this.senarioIdOutput.emit(this.senarioParentName);
-            this.navbarSimulId=obj;
-          }
-        }
-      }}
-//     async DisplayFromSenario(){
-// let ISExport:boolean=this.informationservice.getISExport();
+       console.log("data>>>111111>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 
-// console.log('ISExport:',ISExport); // Debugging log
+       if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[0].TYPE=="GRID"){
+        console.log('VcisrowData>>>>',this.informationservice.getVcisrowData());
+let vcisrowData:any=this.informationservice.getVcisrowData();
 
-// if(ISExport==false){
+if(vcisrowData.issenario=="1"){
+alert(111);
+// if(A_isSenarioFromcase==true){
+  if(this.senarioFlag==true){
 
-//       console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
+  }else{
+    $("#toggleColor").click();
 
-//       console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
-// let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
-
-// if(data[0].colName=="bts_cell_id" ){
-//   console.log("data >>>>>>>>>>",data);
-//   console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
-//     )]);
-
-
-//   await this.datacrowdService
-//   .getfixedelementsObject([ parseInt(data[0].colValue)])
-//   .then(async (res: any) => {
-//     console.log('res>>', res);
-//     this.displayFixedElements(res);
-
-//   });
-
-
-// }else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
-//   await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
-//     console.log("res in getSimulationobject ",res);
-//     this.datajson=res;
-//     if (this.datajson !== null) {
-//       //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-//       this.marker = L.markerClusterGroup({
-//         spiderfyOnMaxZoom: false,
-//         animate: true,
-//         singleMarkerMode: true,
-//       });
-//       this.markerLoop = L.markerClusterGroup({
-//         spiderfyOnMaxZoom: false,
-//         animate: true,
-//         singleMarkerMode: true,
-//       });
-//       let lastMarkerLat:any;
-//       let lastMarkerLng:any;
-  
-//       for (var j = 0; j < 1; j++) {
-//         for (var i = 0; i < this.datajson; i++) {
-//           this.markers = L.marker([
-//             Number(this.datajson[i].location_latitude),
-//             Number(this.datajson[i].location_longitude)
-         
-//           ]);
-//           this.markers.off("click");
-//           this.markers.on("mousedown", (e: any) => {
-//             if (e.originalEvent.buttons == 2) {
-//               e.target.openPopup();
-  
-//             }
-//             if (e.originalEvent.buttons == 1) {
-//               //  alert(1);
-//             }
-//           });
-//           this.markersArray.push(this.markers)
-          
-//   lastMarkerLat = this.datajson[i][4];
-//   lastMarkerLng = this.datajson[i][3];
-//         }
-//       }
-  
-  
-//       //       markersBatch.push(marker);
-//       //     }
-  
-//       //     // Apply event listeners to the batch of markers
-//       //     markersBatch.forEach(marker => {
-//       //       marker.off("click");
-//       //       marker.on("mousedown", (e: any) => {
-//       //         if (e.originalEvent.buttons == 2) {
-//       //           e.target.openPopup();
-//       //         }
-//       //         if (e.originalEvent.buttons == 1) {
-//       //           // alert(1);
-//       //         }
-//       //       });
-  
-//       //       this.markersArray.push(marker);
-//       //     });
-  
-//       //     // Clear markersBatch to free up memory
-//       //     markersBatch.length = 0;
-//       //   }
-//       // }
-//       // // End the timer and log the elapsed time
-//       // //console.timeEnd('loopTime');
-  
-//       //     //  this.marker.openPopup(
-//       //     //  html11
-//       //     //  );
-  
-  
-  
-//       this.rowData = [];
-//       this.datajson.forEach((element: any, key: any) => {
-//         this.myMarker = this.binddata(
-//           element[4],
-//           element[3],
-//           element[1],
-//           element[0],
-//           element[2],
-//           element[5],
-//           ""
-//         );
-  
-//         this.myMarker.lat = element[4];
-//         this.myMarker.lng = element[3]
-//         this.myMarker.timestamp = element[1]
-//         this.myMarker.tel = element[0];
-//         this.myMarker.name = element[2];
-//         this.marker.addLayer(this.myMarker);
-//         this.markerLoop.addLayer(this.myMarker);
-//         this.myMarker.off("click");
-//         this.myMarker.on("mousedown", async (e: any) => {
-//           if (e.originalEvent.buttons == 2) {
-//             //console.log("markerChildrensssssss", e.target)
-//             this.rowData = [];
-//             var jsonaggrid = {
-//               Device_id: e.target.tel,
-//               Tel: e.target.name,
-//               Date: e.target.timestamp,
-//               Hits: "1",
-//               Coord: e.target.lat + ',' + e.target.lng,
-//               //Lat:e.target.lat
-//             };
-//             this.rowData.push(jsonaggrid);
-  
-  
-//             const componentfactory =
-//               this.componentFactoryResolver.resolveComponentFactory(
-//                 VAgGridComponent
-//               );
-//             const componentref =
-//               this.viewContainerRef.createComponent(componentfactory);
-//             componentref.instance.rowData = this.rowData;
-//             componentref.instance.columnDefs = this.columnDefs;
-//             componentref.instance.headerHeight = 0;
-//             // componentref.instance.selectdevices = true;
-//             componentref.instance.Title = "Here On";
-//             componentref.instance.distinct = true;
-//             componentref.changeDetectorRef.detectChanges();
-//             componentref.instance.Grid2Type = 'btn-54';
-//             componentref.instance.GridID = 'GeoGrid1';
-  
-//             const html2 = componentref.location.nativeElement;
-//             await html2;
-  
-//             // $('#agGrid').css('height','10px');
-//             $('.ag-theme-balham').css('height', '130px');
-  
-  
-//             // /  e.target.openPopup(html2, e.target._latlng);
-//             this.map.openPopup(html2, e.target._latlng);
-  
-  
-//           } else if (e.originalEvent.buttons == 1) {
-  
-//           }
-  
-//         });
-//       });
-  
-//       const componentfactory =
-//         this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-//       const componentref =
-//         this.viewContainerRef.createComponent(componentfactory);
-//       const html1 = (componentref.location.nativeElement.style.display = "none");
-//       componentref.instance.columnDefs = this.columnDefs;
-//       componentref.changeDetectorRef.detectChanges();
-//       this.marker.off("click");
-//       this.marker.on("clustermousedown", async (e: any) => {
-//         if (e.originalEvent.buttons == 2) {
-//           var markerChildrens = e.layer.getAllChildMarkers();
-  
-  
-  
-  
-  
-//           this.rowData = [];
-  
-//           for (var j = 0; j < markerChildrens.length; j++) {
-//             var jsonaggrid = {
-//               Device_id: markerChildrens[j].tel,
-//               Tel: markerChildrens[j].name,
-//               Date: markerChildrens[j].timestamp,
-//               Hits: "1",
-//               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-//               // Lat:markerChildrens[j].lat
-//             };
-//             this.rowData.push(jsonaggrid);
-//           }
-  
-//           //console.log("markerChildrens>>>>>", markerChildrens);
-  
-//           const componentfactory =
-//             this.componentFactoryResolver.resolveComponentFactory(
-//               VAgGridComponent
-//             );
-//           const componentref =
-//             this.viewContainerRef.createComponent(componentfactory);
-//           componentref.instance.rowData = this.rowData;
-//           componentref.instance.columnDefs = this.columnDefs;
-//           componentref.instance.headerHeight = 0;
-//           // componentref.instance.selectdevices = true;
-//           componentref.instance.Title = "Here On";
-//           componentref.instance.distinct = true;
-//           componentref.changeDetectorRef.detectChanges();
-//           componentref.instance.pagination = false;
-//           componentref.instance.rowGrouping = true;
-//           componentref.instance.contextmenu = false;
-//           componentref.instance.Grid2Type = 'btn-54';
-//           componentref.instance.GridID = 'GeoGrid1';
-//           const html1 = componentref.location.nativeElement;
-//           await html1;
-//           //console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-//           if (markerChildrens.length < 3) {
-//             // $('#agGrid').css('height','10px');
-//             $('.ag-theme-balham').css('height', '130px');
-  
-//           } else {
-//             $('.ag-theme-balham').css('height', ' 250px ');
-  
-//           }
-  
-  
-//           this.map.openPopup(html1, e.layer.getLatLng());
-  
-//           // $(".modal-content").css("width","650px");
-//           // $(".modal-content").css("right","200px");
-//           // $(".modal-content").css("padding","10px");
-//           // $(".modal-content").css("top","85px");
-//           // $(".modal-content").draggable({
-//           //   axis: "both",
-//           //   cursor: "move"
-//           // });
-//           //  this.modalRef =this.modalService.open(this.popupContent1);
-  
-//         }
-//         if (e.originalEvent.buttons == 1) {
-//           // alert(4);
-  
-//         }
-  
-//         //open popup;
-//       });
-  
-//       this.map.addLayer(this.marker);
-//       // this.map.setView([lastMarkerLat, lastMarkerLng],12);
-      
-//       this.magnifiedMap.addLayer(this.markerLoop);
-//       this.layerGroup.addLayer(this.marker);
-   
-//   }
-  
-//    });
-//   this.displayShapes(data[0].COLVALUE);
-
-//   this.senarioParentName=data[0].COLVALUE;
-//   this.simulationid=data[0].COLVALUE;
-
+  }
+//   this.senarioParentName=this.simulationid;
 //   let obj:any={
 //     senarioParentName:this.senarioParentName,
 //     simulationid:this.simulationid,
@@ -18535,13 +18003,603 @@ let obj22:any={
 //   }
 //   // this.senarioIdOutput.emit(this.senarioParentName);
 //   this.navbarSimulId=obj;
-// }
-// // data.forEach(async (element: any, key: any) => {
+
+}
+        await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+          console.log("res in getSimulationobject ",res);
+          this.datajson=res;
+          if (this.datajson !== null) {
+            ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+            this.marker = L.markerClusterGroup({
+              spiderfyOnMaxZoom: false,
+              animate: true,
+              singleMarkerMode: true,
+            });
+            this.markerLoop = L.markerClusterGroup({
+              spiderfyOnMaxZoom: false,
+              animate: true,
+              singleMarkerMode: true,
+            });
+            let lastMarkerLat:any;
+            let lastMarkerLng:any;
+        
+            for (var j = 0; j < 1; j++) {
+              for (var i = 0; i < this.datajson; i++) {
+                this.markers = L.marker([
+                  Number(this.datajson[i].location_latitude),
+                  Number(this.datajson[i].location_longitude)
+               
+                ]);
+                this.markers.off("click");
+                this.markers.on("mousedown", (e: any) => {
+                  if (e.originalEvent.buttons == 2) {
+                    e.target.openPopup();
+        
+                  }
+                  if (e.originalEvent.buttons == 1) {
+                    //  alert(1);
+                  }
+                });
+                this.markersArray.push(this.markers)
+                console.log("lastMarkerLat datajson",this.datajson[i])
+        lastMarkerLat = this.datajson[i][4];
+        lastMarkerLng = this.datajson[i][3];
+              }
+            }
+        
+        
+            //       markersBatch.push(marker);
+            //     }
+        
+            //     // Apply event listeners to the batch of markers
+            //     markersBatch.forEach(marker => {
+            //       marker.off("click");
+            //       marker.on("mousedown", (e: any) => {
+            //         if (e.originalEvent.buttons == 2) {
+            //           e.target.openPopup();
+            //         }
+            //         if (e.originalEvent.buttons == 1) {
+            //           // alert(1);
+            //         }
+            //       });
+        
+            //       this.markersArray.push(marker);
+            //     });
+        
+            //     // Clear markersBatch to free up memory
+            //     markersBatch.length = 0;
+            //   }
+            // }
+            // // End the timer and log the elapsed time
+            // //console.timeEnd('loopTime');
+        
+            //     //  this.marker.openPopup(
+            //     //  html11
+            //     //  );
+        
+        
+        
+            this.rowData = [];
+            this.datajson.forEach((element: any, key: any) => {
+              this.myMarker = this.binddata(
+                element[4],
+                element[3],
+                element[1],
+                element[0],
+                element[2],
+                element[5],
+                ""
+              );
+        
+              this.myMarker.lat = element[4];
+              this.myMarker.lng = element[3]
+              this.myMarker.timestamp = element[1]
+              this.myMarker.tel = element[0];
+              this.myMarker.name = element[2];
+              this.marker.addLayer(this.myMarker);
+              this.markerLoop.addLayer(this.myMarker);
+              this.myMarker.off("click");
+              this.myMarker.on("mousedown", async (e: any) => {
+                if (e.originalEvent.buttons == 2) {
+                  ////console.log("markerChildrensssssss", e.target)
+                  this.rowData = [];
+                  var jsonaggrid = {
+                    Device_id: e.target.tel,
+                    Tel: e.target.name,
+                    Date: e.target.timestamp,
+                    Hits: "1",
+                    Coord: e.target.lat + ',' + e.target.lng,
+                    //Lat:e.target.lat
+                  };
+                  this.rowData.push(jsonaggrid);
+        
+        
+                  const componentfactory =
+                    this.componentFactoryResolver.resolveComponentFactory(
+                      VAgGridComponent
+                    );
+                  const componentref =
+                    this.viewContainerRef.createComponent(componentfactory);
+                  componentref.instance.rowData = this.rowData;
+                  componentref.instance.columnDefs = this.columnDefs;
+                  componentref.instance.headerHeight = 0;
+                  // componentref.instance.selectdevices = true;
+                  componentref.instance.Title = "Here On";
+                  componentref.instance.distinct = true;
+                  componentref.changeDetectorRef.detectChanges();
+                  componentref.instance.Grid2Type = 'btn-54';
+                  componentref.instance.GridID = 'GeoGrid1';
+        
+                  const html2 = componentref.location.nativeElement;
+                  await html2;
+        
+                  // $('#agGrid').css('height','10px');
+                  $('.ag-theme-balham').css('height', '130px');
+        
+        
+                  // /  e.target.openPopup(html2, e.target._latlng);
+                  this.map.openPopup(html2, e.target._latlng);
+        
+        
+                } else if (e.originalEvent.buttons == 1) {
+        
+                }
+        
+              });
+            });
+        
+            const componentfactory =
+              this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+            const componentref =
+              this.viewContainerRef.createComponent(componentfactory);
+            const html1 = (componentref.location.nativeElement.style.display = "none");
+            componentref.instance.columnDefs = this.columnDefs;
+            componentref.changeDetectorRef.detectChanges();
+            this.marker.off("click");
+            this.marker.on("clustermousedown", async (e: any) => {
+              if (e.originalEvent.buttons == 2) {
+                var markerChildrens = e.layer.getAllChildMarkers();
+        
+        
+        
+        
+        
+                this.rowData = [];
+        
+                for (var j = 0; j < markerChildrens.length; j++) {
+                  var jsonaggrid = {
+                    Device_id: markerChildrens[j].tel,
+                    Tel: markerChildrens[j].name,
+                    Date: markerChildrens[j].timestamp,
+                    Hits: "1",
+                    Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+                    // Lat:markerChildrens[j].lat
+                  };
+                  this.rowData.push(jsonaggrid);
+                }
+        
+                ////console.log("markerChildrens>>>>>", markerChildrens);
+        
+                const componentfactory =
+                  this.componentFactoryResolver.resolveComponentFactory(
+                    VAgGridComponent
+                  );
+                const componentref =
+                  this.viewContainerRef.createComponent(componentfactory);
+                componentref.instance.rowData = this.rowData;
+                componentref.instance.columnDefs = this.columnDefs;
+                componentref.instance.headerHeight = 0;
+                // componentref.instance.selectdevices = true;
+                componentref.instance.Title = "Here On";
+                componentref.instance.distinct = true;
+                componentref.changeDetectorRef.detectChanges();
+                componentref.instance.pagination = false;
+                componentref.instance.rowGrouping = true;
+                componentref.instance.contextmenu = false;
+                componentref.instance.Grid2Type = 'btn-54';
+                componentref.instance.GridID = 'GeoGrid1';
+                const html1 = componentref.location.nativeElement;
+                await html1;
+                ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+                if (markerChildrens.length < 3) {
+                  // $('#agGrid').css('height','10px');
+                  $('.ag-theme-balham').css('height', '130px');
+        
+                } else {
+                  $('.ag-theme-balham').css('height', ' 250px ');
+        
+                }
+        
+        
+                this.map.openPopup(html1, e.layer.getLatLng());
+        
+                // $(".modal-content").css("width","650px");
+                // $(".modal-content").css("right","200px");
+                // $(".modal-content").css("padding","10px");
+                // $(".modal-content").css("top","85px");
+                // $(".modal-content").draggable({
+                //   axis: "both",
+                //   cursor: "move"
+                // });
+                //  this.modalRef =this.modalService.open(this.popupContent1);
+        
+              }
+              if (e.originalEvent.buttons == 1) {
+                // alert(4);
+        
+              }
+        
+              //open popup;
+            });
+            lastMarkerLat = this.datajson[0][4];
+            lastMarkerLng = this.datajson[0][3];
+            this.map.addLayer(this.marker);
+            this.map.setView([lastMarkerLat, lastMarkerLng],12);
+            
+            this.magnifiedMap.addLayer(this.markerLoop);
+            this.layerGroup.addLayer(this.marker);
+         
+        }
+        
+         });
+        this.displayShapes(data[0].COLVALUE);
+      
+        this.senarioParentName=data[0].COLVALUE;
+        this.simulationid=data[0].COLVALUE;
+      
+        let obj:any={
+          senarioParentName:this.senarioParentName,
+          simulationid:this.simulationid,
+          Action:"DisplayFromSenario",
+          senariocount:this.senariocount,
+          senarioFlag:this.senarioFlag,
+          reportType:this.reportType
+      
+      
+        }
+        // this.senarioIdOutput.emit(this.senarioParentName);
+        this.navbarSimulId=obj;
+console.log("zaherr",obj)
 
 
-// // }); 
-// }
-//     }
+
+      }else{
+
+
+        for(let i=0;i<data.length;i++)
+          {
+            if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
+              // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
+              //   )]);
+            
+            
+              await this.datacrowdService
+              .getfixedelementsObject([ parseInt(data[i].colValue)])
+              .then(async (res: any) => {
+                //console.log('res>>', res);
+                this.displayFixedElements(res);
+            
+              });
+            
+            
+            }
+            // else if(data[i].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[i].TYPE=="GRID"){
+            //   await this.datacrowdService.getSimulationobject([data[i].COLVALUE]).then((res:any)=>{
+            //     console.log("res in getSimulationobject ",res);
+            //     this.datajson=res;
+            //     if (this.datajson !== null) {
+            //       ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+            //       this.marker = L.markerClusterGroup({
+            //         spiderfyOnMaxZoom: false,
+            //         animate: true,
+            //         singleMarkerMode: true,
+            //       });
+            //       this.markerLoop = L.markerClusterGroup({
+            //         spiderfyOnMaxZoom: false,
+            //         animate: true,
+            //         singleMarkerMode: true,
+            //       });
+            //       let lastMarkerLat:any;
+            //       let lastMarkerLng:any;
+              
+            //       for (var j = 0; j < 1; j++) {
+            //         for (var i = 0; i < this.datajson; i++) {
+            //           this.markers = L.marker([
+            //             Number(this.datajson[i].location_latitude),
+            //             Number(this.datajson[i].location_longitude)
+                     
+            //           ]);
+            //           this.markers.off("click");
+            //           this.markers.on("mousedown", (e: any) => {
+            //             if (e.originalEvent.buttons == 2) {
+            //               e.target.openPopup();
+              
+            //             }
+            //             if (e.originalEvent.buttons == 1) {
+            //               //  alert(1);
+            //             }
+            //           });
+            //           this.markersArray.push(this.markers)
+            //           console.log("lastMarkerLat datajson",this.datajson[i])
+            //   lastMarkerLat = this.datajson[i][4];
+            //   lastMarkerLng = this.datajson[i][3];
+            //         }
+            //       }
+              
+              
+            //       //       markersBatch.push(marker);
+            //       //     }
+              
+            //       //     // Apply event listeners to the batch of markers
+            //       //     markersBatch.forEach(marker => {
+            //       //       marker.off("click");
+            //       //       marker.on("mousedown", (e: any) => {
+            //       //         if (e.originalEvent.buttons == 2) {
+            //       //           e.target.openPopup();
+            //       //         }
+            //       //         if (e.originalEvent.buttons == 1) {
+            //       //           // alert(1);
+            //       //         }
+            //       //       });
+              
+            //       //       this.markersArray.push(marker);
+            //       //     });
+              
+            //       //     // Clear markersBatch to free up memory
+            //       //     markersBatch.length = 0;
+            //       //   }
+            //       // }
+            //       // // End the timer and log the elapsed time
+            //       // //console.timeEnd('loopTime');
+              
+            //       //     //  this.marker.openPopup(
+            //       //     //  html11
+            //       //     //  );
+              
+              
+              
+            //       this.rowData = [];
+            //       this.datajson.forEach((element: any, key: any) => {
+            //         this.myMarker = this.binddata(
+            //           element[4],
+            //           element[3],
+            //           element[1],
+            //           element[0],
+            //           element[2],
+            //           element[5],
+            //           ""
+            //         );
+              
+            //         this.myMarker.lat = element[4];
+            //         this.myMarker.lng = element[3]
+            //         this.myMarker.timestamp = element[1]
+            //         this.myMarker.tel = element[0];
+            //         this.myMarker.name = element[2];
+            //         this.marker.addLayer(this.myMarker);
+            //         this.markerLoop.addLayer(this.myMarker);
+            //         this.myMarker.off("click");
+            //         this.myMarker.on("mousedown", async (e: any) => {
+            //           if (e.originalEvent.buttons == 2) {
+            //             ////console.log("markerChildrensssssss", e.target)
+            //             this.rowData = [];
+            //             var jsonaggrid = {
+            //               Device_id: e.target.tel,
+            //               Tel: e.target.name,
+            //               Date: e.target.timestamp,
+            //               Hits: "1",
+            //               Coord: e.target.lat + ',' + e.target.lng,
+            //               //Lat:e.target.lat
+            //             };
+            //             this.rowData.push(jsonaggrid);
+              
+              
+            //             const componentfactory =
+            //               this.componentFactoryResolver.resolveComponentFactory(
+            //                 VAgGridComponent
+            //               );
+            //             const componentref =
+            //               this.viewContainerRef.createComponent(componentfactory);
+            //             componentref.instance.rowData = this.rowData;
+            //             componentref.instance.columnDefs = this.columnDefs;
+            //             componentref.instance.headerHeight = 0;
+            //             // componentref.instance.selectdevices = true;
+            //             componentref.instance.Title = "Here On";
+            //             componentref.instance.distinct = true;
+            //             componentref.changeDetectorRef.detectChanges();
+            //             componentref.instance.Grid2Type = 'btn-54';
+            //             componentref.instance.GridID = 'GeoGrid1';
+              
+            //             const html2 = componentref.location.nativeElement;
+            //             await html2;
+              
+            //             // $('#agGrid').css('height','10px');
+            //             $('.ag-theme-balham').css('height', '130px');
+              
+              
+            //             // /  e.target.openPopup(html2, e.target._latlng);
+            //             this.map.openPopup(html2, e.target._latlng);
+              
+              
+            //           } else if (e.originalEvent.buttons == 1) {
+              
+            //           }
+              
+            //         });
+            //       });
+              
+            //       const componentfactory =
+            //         this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+            //       const componentref =
+            //         this.viewContainerRef.createComponent(componentfactory);
+            //       const html1 = (componentref.location.nativeElement.style.display = "none");
+            //       componentref.instance.columnDefs = this.columnDefs;
+            //       componentref.changeDetectorRef.detectChanges();
+            //       this.marker.off("click");
+            //       this.marker.on("clustermousedown", async (e: any) => {
+            //         if (e.originalEvent.buttons == 2) {
+            //           var markerChildrens = e.layer.getAllChildMarkers();
+              
+              
+              
+              
+              
+            //           this.rowData = [];
+              
+            //           for (var j = 0; j < markerChildrens.length; j++) {
+            //             var jsonaggrid = {
+            //               Device_id: markerChildrens[j].tel,
+            //               Tel: markerChildrens[j].name,
+            //               Date: markerChildrens[j].timestamp,
+            //               Hits: "1",
+            //               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+            //               // Lat:markerChildrens[j].lat
+            //             };
+            //             this.rowData.push(jsonaggrid);
+            //           }
+              
+            //           ////console.log("markerChildrens>>>>>", markerChildrens);
+              
+            //           const componentfactory =
+            //             this.componentFactoryResolver.resolveComponentFactory(
+            //               VAgGridComponent
+            //             );
+            //           const componentref =
+            //             this.viewContainerRef.createComponent(componentfactory);
+            //           componentref.instance.rowData = this.rowData;
+            //           componentref.instance.columnDefs = this.columnDefs;
+            //           componentref.instance.headerHeight = 0;
+            //           // componentref.instance.selectdevices = true;
+            //           componentref.instance.Title = "Here On";
+            //           componentref.instance.distinct = true;
+            //           componentref.changeDetectorRef.detectChanges();
+            //           componentref.instance.pagination = false;
+            //           componentref.instance.rowGrouping = true;
+            //           componentref.instance.contextmenu = false;
+            //           componentref.instance.Grid2Type = 'btn-54';
+            //           componentref.instance.GridID = 'GeoGrid1';
+            //           const html1 = componentref.location.nativeElement;
+            //           await html1;
+            //           ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+            //           if (markerChildrens.length < 3) {
+            //             // $('#agGrid').css('height','10px');
+            //             $('.ag-theme-balham').css('height', '130px');
+              
+            //           } else {
+            //             $('.ag-theme-balham').css('height', ' 250px ');
+              
+            //           }
+              
+              
+            //           this.map.openPopup(html1, e.layer.getLatLng());
+              
+            //           // $(".modal-content").css("width","650px");
+            //           // $(".modal-content").css("right","200px");
+            //           // $(".modal-content").css("padding","10px");
+            //           // $(".modal-content").css("top","85px");
+            //           // $(".modal-content").draggable({
+            //           //   axis: "both",
+            //           //   cursor: "move"
+            //           // });
+            //           //  this.modalRef =this.modalService.open(this.popupContent1);
+              
+            //         }
+            //         if (e.originalEvent.buttons == 1) {
+            //           // alert(4);
+              
+            //         }
+              
+            //         //open popup;
+            //       });
+            //       lastMarkerLat = this.datajson[0][4];
+            //       lastMarkerLng = this.datajson[0][3];
+            //       this.map.addLayer(this.marker);
+            //       this.map.setView([lastMarkerLat, lastMarkerLng],12);
+                  
+            //       this.magnifiedMap.addLayer(this.markerLoop);
+            //       this.layerGroup.addLayer(this.marker);
+               
+            //   }
+              
+            //    });
+            //   this.displayShapes(data[i].COLVALUE);
+            
+            //   this.senarioParentName=data[i].COLVALUE;
+            //   this.simulationid=data[i].COLVALUE;
+            
+            //   let obj:any={
+            //     senarioParentName:this.senarioParentName,
+            //     simulationid:this.simulationid,
+            //     Action:"DisplayFromSenario",
+            //     senariocount:this.senariocount,
+            //     senarioFlag:this.senarioFlag,
+            //     reportType:this.reportType
+            
+            
+            //   }
+            //   // this.senarioIdOutput.emit(this.senarioParentName);
+            //   this.navbarSimulId=obj;
+            // }
+            else if(data[0].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID" && data[i].TYPE=="GRID"){
+              console.log(" inn AOI Library Display ");
+              console.log("entered ++++++++++++++++++++++++++"+data[0].COLNAME);
+              console.log("the valueeeeeeeeeeeeeeeee"+data[0].COLVALUE);
+              await this.datacrowdService.getSelectedShape(data[0].COLVALUE).then((res:any)=>{
+                console.log("res in getSimulationobject ",res);
+                this.datajson=res;
+              });
+            
+              if (this.datajson !== null) {
+            
+            if (this.map) {
+              const centerLatLng = [this.datajson.center.lat, this.datajson.center.lng];
+              const radius = this.datajson.radius;
+              const circle = L.circle([this.datajson.center.lat, this.datajson.center.lng], {
+                  color: "#6e83f0",
+                  fillOpacity: 0.7,
+                  radius: radius
+              }).addTo(this.map);
+            this.circleDisplay=circle;
+              const paddingRatio = 6; 
+              const bounds = L.latLngBounds(
+                  L.latLng(centerLatLng[0] - (radius / 111320) * paddingRatio, centerLatLng[1] - (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio),
+                  L.latLng(centerLatLng[0] + (radius / 111320) * paddingRatio, centerLatLng[1] + (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio)
+              );
+            
+  
+                 
+  circle.bindTooltip(`${this.datajson.Name}`, {
+    permanent: true,
+    interactive: true,
+  
+    opacity: 0.9,
+    direction: "center"
+  }).openTooltip();
+  
+  
+  this.map.fitBounds(bounds);
+  
+  
+              //     circle.bindTooltip(`
+              //       <div class="custom-popup">
+              //           ${this.datajson.Name}
+              //       </div>`, {
+              //       offset: L.point(0, 0) 
+              //   });
+                
+              // this.map.fitBounds(bounds);
+            }
+            
+            }
+            }
+            
+          }
+
+
+       }
+
+
+
+      }}
 
     getsenarioId(obj:any){
       console.log("obj><><><<>",obj);

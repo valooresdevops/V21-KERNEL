@@ -139,6 +139,8 @@ if(this.sourceQuery == null){
   }
 
   async onDropdownChange(selectedValue: any, fields: any, DropDownChange: any, index: number): Promise<void> {
+    console.log("selectedValue----->",selectedValue);
+    console.log("fields----->: ",fields);
     fields.selectedValue = selectedValue;
     let keyArray = Object.keys(this.fieldsCombo);
   
@@ -150,7 +152,7 @@ if(this.sourceQuery == null){
     if (this.fieldsCombo[index]) {
       for (let i = 0; i < keyArray.length; i++) {
         if (selectedValue == this.fieldsCombo[i].id) {
-
+console.log('this.fieldCombo----->',this.fieldsCombo[i])
           if (this.fieldsCombo[i].queryId != undefined && this.fieldsCombo[i].code == 'COMBO') {
 
             this.isDropdownStatus[index] = true;
@@ -191,7 +193,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
               // this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));;
               // this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
-          } else if (this.fieldsCombo[i].code == 'VARCHAR2') {
+          } else if (this.fieldsCombo[i].code == 'VARCHAR2' || this.fieldsCombo[i].code == 'varchar' ) {
               this.isDate[index] = false;
               this.isDropdownStatus[index] = false;
               this.isNumber[index] = false;
@@ -291,49 +293,44 @@ fields.thirdDropdownOptions=this.thirdCombo ;
 console.log("MyList   >>>>  ",MyList)
     const getWhereCondUrl = from(axios.post( GlobalConstants.getWhereCondition + "/" +  elementSize   ,  MyList  )  );
     let getWhereCond1 = await lastValueFrom(getWhereCondUrl);
-    let result :any;
-
-    let getWhereCondNew: any ="-1" ;
-    if(getWhereCond1 != undefined){
+    console.log('getWhereCond1----->',getWhereCond1)
+    let result: any;
+    let getWhereCondNew: any = "-1";
+  
+    if (getWhereCond1 !== undefined) {
       this.getWhereCond = getWhereCond1.data;
-      getWhereCondNew =this.getWhereCond ;
-
+      getWhereCondNew = this.getWhereCond;
     }
-    if(getWhereCondNew.indexOf(' ')!==-1){
-      //   if(getWhereCondNew.includes('=')){
-      // const parts = getWhereCondNew.split("=");
-      // const fieldName = `"${parts[0].trim()}"`;
-      // const fieldValue = parts[1].trim();
-      // getWhereCondNew = `${fieldName}=${fieldValue}`;
-      // }else if(getWhereCondNew.includes('like')){
-      //   const parts = getWhereCondNew.split("like");
-      //   let fieldName = parts[0].trim();
-      //   const modifiedFieldName = `upper("${fieldName.substring(fieldName.indexOf('(') + 1, fieldName.lastIndexOf(')'))}")`;
-      //   const modifiedValue = `${parts[1].trim()}`;
-      //   getWhereCondNew = `${modifiedFieldName} like ${modifiedValue}`;
   
-      //  }
-      // else if(getWhereCondNew.includes('<')){
-      //   const parts = getWhereCondNew.split("<");
-      //   const fieldName = `"${parts[0].trim()}"`;
-      //   const fieldValue = parts[1].trim();
-      //   getWhereCondNew = `${fieldName}<TO_DATE(${fieldValue}, 'DD/MM/YYYY')`;
-      // }else if(getWhereCondNew.includes('>')){
-      //   const parts = getWhereCondNew.split(">");
-      //   const fieldName = `"${parts[0].trim()}"`;
-      //   const fieldValue = parts[1].trim();
-      //   getWhereCondNew = `${fieldName}>TO_DATE(${fieldValue}, 'DD/MM/YYYY')`;
+    console.log("getWhereCondNew----->", getWhereCondNew);
   
-      // }
+    let functionName: string | any;
+    let condition: string | any;
   
-      result = this.transformCondition(getWhereCondNew)
+    // Check if 'Function Name:' and 'Condition:' are in the string
+    if (getWhereCondNew.indexOf('Function Name:') !== -1 && getWhereCondNew.indexOf('Condition:') !== -1) {
+      const functionNameMatch = getWhereCondNew.match(/Function Name:\s*([^,]*)/);
+      const conditionMatch = getWhereCondNew.match(/Condition:\s*(.*)/);
+  
+      if (functionNameMatch && functionNameMatch[1]) {
+        functionName = functionNameMatch[1].trim();
+      }
+  
+      if (conditionMatch && conditionMatch[1]) {
+        condition = conditionMatch[1].trim();
+      }
     }
-      console.log('result---------->',result)
-      this.onSearchSubmit.emit(result);
   
-  
-      
+    if (condition && condition.indexOf(' ') !== -1) {
+      result = this.transformCondition(condition);
     }
+    if (functionName) {
+      from(axios.post( GlobalConstants.callApi +functionName )  );  }
+  
+    console.log("Condition:", condition);
+  
+    this.onSearchSubmit.emit(result);
+  }
  
   filterData(data: any[], searchCriteria: any[]): any[] {
 

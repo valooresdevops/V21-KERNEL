@@ -31,14 +31,12 @@
   [paginationPageSize]="15"
   agToolBar="ad"
   agPrimaryKey="nodeName"
-  agRowSelection="single"
   [agOnGridEvents]="true"
-  (onGridDelete)="onDeleteClickNodes()" id="gridReload"
-  (reloadGrid)="onGridReload($event)"
   (onGridEventSave)="gridEventSave($event)"
   [showOrHideButton]="true"
-  [hideBTN]="true">
-  <!-- <button class="defaultBtn" value="Submit" (click)="gridEventSave($event)">Submit</button> -->
+  [hideBTN]="true"
+  (gridReady)="onGridReady($event)"
+  >
 </v-grid>
 
 
@@ -54,12 +52,12 @@
         [pagination]="true"
         [paginationPageSize]="15"
         agToolBar="ad"
-        agRowSelection="single"
+
         [agOnGridEvents]="true"
-        (onGridDelete)="onDeleteClickLinks()"
         (onGridEventSave)="gridEventSave2($event)"
         [showOrHideButton]="true"
         [hideBTN]="true"
+        (gridReady)="onGridReady2($event)"
       ></v-grid>
 
       <div id="addInfo" *ngIf="isVisible">
@@ -74,13 +72,11 @@
   [paginationPageSize]="15"
   agToolBar="ad"
   agPrimaryKey="nodeName"
-  agRowSelection="single"
   [agOnGridEvents]="true"
-  (onGridDelete)="onDeleteClickNodes()" 
-  (reloadGrid)="onGridReload($event)"
   (onGridEventSave)="gridEventSave3($event)"
   [showOrHideButton]="true"
-  [hideBTN]="true">
+  [hideBTN]="true"
+  (gridReady)="onGridReady3($event)">
 </v-grid>
 
 <hr>
@@ -95,12 +91,12 @@
         [pagination]="true"
         [paginationPageSize]="15"
         agToolBar="ad"
-        agRowSelection="single"
+
         [agOnGridEvents]="true"
-        (onGridDelete)="onDeleteClickLinks()"
         (onGridEventSave)="gridEventSave4($event)"
         [showOrHideButton]="true"
         [hideBTN]="true"
+        (gridReady)="onGridReady4($event)"
       ></v-grid>
 
 </div>

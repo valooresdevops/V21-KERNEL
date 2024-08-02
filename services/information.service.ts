@@ -55,22 +55,35 @@ export class InformationService {
   public lookUpSubmitValue : any = '';
   public ISExport : boolean =false;
   public isRowGroup : any = '';
+  public selectedChart : any = '';
+  public navBreadCrumb : any[] =[];
+  public vcisrowData : any ;
 
-
-  
   
   constructor() { }
 
- 
-  
   //authentication still has a localstorage
   setLogeduserId(logeduserIdVal: string) {
     this.logeduserId = logeduserIdVal;
+  }  
+  getSelectedChart(){
+    return this.selectedChart;
   }
-  
+  setSelectedChart(selectedChart : any){
+    this.selectedChart = selectedChart;
+  }
   getLogeduserId() {
     return this.logeduserId;
   }
+
+  setNavBreadCrumb(navBreadCrumb: any[]) {
+    this.navBreadCrumb = navBreadCrumb;
+  }
+  
+  getNavBreadCrumb() {
+    return this.navBreadCrumb;
+  }
+
   setIsRowGroup(isRowGroup: String) {
     this.isRowGroup = isRowGroup;
   }
@@ -529,5 +542,13 @@ export class InformationService {
 
   getISExport(){
       return this.ISExport;
+  }
+
+  setVcisrowData(vcisrowData: any) {
+    this.vcisrowData = vcisrowData;
+  }
+
+  getVcisrowData(){
+      return this.vcisrowData;
   }
 }

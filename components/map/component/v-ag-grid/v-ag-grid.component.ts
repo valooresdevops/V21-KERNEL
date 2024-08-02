@@ -75,6 +75,7 @@ public groupDefaultExpanded = -1;
   gridOptions: GridOptions;
   selectedarray:any[]=[];
   dataselected:any[]=[];
+  mapType:any;
   constructor(private dataservice:DataService ) {
   }
   @ViewChild('popup') popup: any;
@@ -92,7 +93,10 @@ console.log("rowData-------",this.rowData);
         this.groupDefaultExpanded=0;
       
       }
+      this.mapType=this.dataservice.getmapType();
+      localStorage.setItem('mapType',  this.mapType);
 
+    console.log("this.mapType in aggrid----------",this.mapType);
   }
   frameworkComponents = {
     btnCellRenderer: GenderRenderer,
@@ -190,7 +194,12 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
             let deviceselected = params.node.key;
             // this.dataservice.setDHselectedDevice(deviceselected);
             localStorage.setItem('deviceselected', deviceselected);
-            $('#RunDeviceHistory1').click();
+            if(localStorage.getItem('mapType')=='online'){
+              $('#RunDeviceHistory1').click();
+
+            }else if(localStorage.getItem('mapType')=='offline'){
+            $('#RunDeviceHistoryOffline').click();
+            }
           },
           cssClasses: ['redFont', 'bold'],
         },
@@ -554,7 +563,7 @@ autoGroupColumnDef = {
 // ];
 openpopup() {
   //console.log('rowdata>>>',this.rowData)
-  //console.log('Grid2Type>>>',this.Grid2Type)
+  console.log('Grid2Type>>>',this.Grid2Type)
  $('#'+this.Grid2Type).click();
 }
 selectShapes(params:any){

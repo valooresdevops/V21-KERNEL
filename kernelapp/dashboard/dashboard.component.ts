@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation , ChangeDetectorRef, HostListener    } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { GlobalConstants } from '../../common/GlobalConstants';
 import { HttpClient } from '@angular/common/http';
@@ -22,18 +22,24 @@ Highcharts3D(Highcharts);
   styleUrls: ['./dashboard.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit  {
   Highcharts: typeof Highcharts = Highcharts;
-
+  checkVisibiltyDashboard : boolean = false;
   public subsVar: Subscription;
   public showDashboard: boolean;
   constructor(private http: HttpClient,
     private eventEmitterService: EventEmitterService,
     public commonFunctions: CommonFunctions,
     private dialog: MatDialog,
-    public informationservice: InformationService) { }
+    public informationservice: InformationService,
+    private cdr: ChangeDetectorRef,
+  ) {document.addEventListener('click', this.onGlobalClick.bind(this));
+    document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
+
+   }
   public agColumns: AgColumns[] = [];
-  public agColumnsJson: any;
+  public agColumnsJson: any[] = [];
+  public agColumnsJson1: any[] = [];
   Labels: any[];
   Datasets: any[];
   Type: any[];
@@ -59,19 +65,43 @@ export class DashboardComponent implements OnInit {
   public gridData: any;
   public isChart: number = 0;
   public isStockChart: number = 0;
-
-
+  tabName : string = "";
   transformedData: { NAME: string, Y: number }[] = [];
 
   newChartObject:any;
   stockObject: any;
+public data : any;
+allDataa : any[] = [];
+public gridIndexes :number[]= [];
+gridIndexesMapping :Map<number, number> = new Map();
+ gridCounter : number = 0;
 
 
+
+  // ngOnInit(): void {
+  //   this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
+  //     (res: any) => {
+  //       this.tabs = res;
+  //     })
+
+  //   this.subsVar = this.eventEmitterService.onTabActionClick.subscribe(() => {
+  //     this.showDashboard = false;
+  //     this.onSelectTab();
+  //     setTimeout(() => {
+  //       this.showDashboard = true;
+  //     }, 1000);
+  //   });
+  // }
+
+  valueFromSecondObject: string;
 
   ngOnInit(): void {
     this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.tabs = res;
+        console.log("this.info = ", JSON.stringify(this.tabs));
+
+        
       })
 
     this.subsVar = this.eventEmitterService.onTabActionClick.subscribe(() => {
@@ -82,31 +112,103 @@ export class DashboardComponent implements OnInit {
       }, 1000);
     });
   }
+
+  
+  currentIndexGrid : number = 0;
+  conditionalIncrement() : number{
+    // console.log("----Miky:::", this.currentIndexGrid);
+    this.currentIndexGrid++;
+  return this.currentIndexGrid-1;
+  }
+ 
+  
+
+//  getGridIndex(index : number):number | undefined{
+//   let value = this.gridIndexesMapping.get(index);
+//     return value;
+//  }
+
+  // conditionalIncrement() :number
+  // {
+  //   // this.cdr.detach();
+  //  this.currentIndexGrid++;
+  //  return this.currentIndexGrid - 1;
+  //   // this.cdr.detectChanges();
+  //   // console.log("hhhhhhhhhhh_____",this.gridCounter);
+  //   //   this.gridCounter++;
+  //   //   this.cdr.detach();
+  //   //   return this.gridCounter;
+    
+  //   // else if(!this.gridIndexes.includes(index) ){
+  //   //   return index -1 ;
+  //   // }
+  //   // else{console.log("else---------->"); return index;}
+  //   // this.currentIndexGrid++;
+  //   // // if(this.currentIndexGrid== this.gridCounter) this.cdr.detach();
+  //   // return this.currentIndexGrid-1;
+  // }
+
+  // triggerChangeDetection(){
+  //   alert('hey')
+  //   this.cdr.detectChanges();
+  // }
+  setupGridIndexes(): void {
+    this.gridValue.forEach((data, index) => {
+      this.gridIndexesMapping.set(data.ID, index);
+      this.gridCounter++;
+    });
+    console.log("maps", this.gridIndexesMapping);
+  }
+   gridIndexMapping(id: number): number | undefined {
+    return this.gridIndexesMapping.get(id);
+  }
   onSelectTab() {
+    this.checkVisibiltyDashboard = false;
+    this.gridCounter=0;
+    this.gridIndexesMapping.clear();
     this.ids = [];
     this.names = [];
     this.newChartObject = [];
     this.allData = this.newChartObject;
-    this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers }).subscribe(
+    this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers });
+    
+    this.data.subscribe(
       (res: any) => {
+        // console.log("res---->",res)
         this.allData = res;
-
-        for (let i = 0; i < this.allData.length; i++) {
-          if (this.allData[i].type == 'Chart') {
+        // this.allDataa = this.allData;
+        this.tabName = this.informationservice.getSelectedTabName();
+        console.log("allData::::: ", this.allData );
+        this.gridValue = [];
+        for (let i = 0; i < this.allData.length; i++)
+        {
+          if (this.allData[i].type == 'Chart')
+          {
             this.chartValue.push(this.allData[i]);
           }
+          // console.log("7imarrrr ", this.chartValue.length); 
+          
           if (this.allData[i].type == 'Grid') {
             this.gridValue.push(this.allData[i]);
+            this.gridIndexes.push(i);
+            // console.log("this.allData[i] ===== ", this.allData[i]);
           }
-
         }
-
-        for (let i = 0; i < this.gridValue.length; i++) {
-          this.gridHeader.push(this.gridValue[i].Header);
+        this.setupGridIndexes();
+        console.log("grid valueeeee:",this.gridValue);
+        this.gridCounter = this.gridIndexes.length;
+    
+        this.gridHeader = [];
+        for (let i = 0; i < this.gridValue.length; i++)
+        {
           this.gridRecords.push(this.gridValue[i].Records);
-        }
-        this.agColumnsJson = this.gridHeader;
+          this.gridHeader.push(this.gridValue[i].Header);
 
+          this.agColumnsJson[i] = this.gridValue[i].Header;
+          this.agColumns=[];
+          this.agColumns.push(this.agColumnsJson[i]);
+          this.agColumnsJson1.push(this.agColumns);
+        }
 
         for (let i = 0; i < this.allData.length; i++)
         {
@@ -192,8 +294,20 @@ export class DashboardComponent implements OnInit {
                               text: 'Value'
                             }
                           },
+                          plotOptions: {
+                            series: {
+                              pointPadding: 1, // Adjust the spacing between bars
+                              groupPadding: 0.8, // Adjust the spacing between groups
+                              borderWidth: 0,
+                            }
+                          },
+                          tooltip: {
+                            headerFormat: '',
+                            pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                            // pointFormat: '<b>{point.x}</b>: {point.y}' // Changed from {point.name} to {point.x}
+                          },
                           series: [{
-                            name: 'Series 1',
+                            name: this.allData[i].data.records[0].TITLE,
                             data: this.names,
                           }]
                         }
@@ -211,8 +325,19 @@ export class DashboardComponent implements OnInit {
                               text: 'Value'
                             }
                           },
+                          plotOptions: {
+                            series: {
+                              pointPadding: 1, // Adjust the spacing between bars
+                              groupPadding: 0.2, // Adjust the spacing between groups
+                              borderWidth: 0,
+                            }
+                          },
+                          tooltip: {
+                            headerFormat: '',
+                            pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                          },
                           series: [{
-                            name: 'Series 1',
+                            name: this.allData[i].data.records[0].TITLE,
                             data: this.names,
                           }]
                         }
@@ -223,7 +348,7 @@ export class DashboardComponent implements OnInit {
                 this.newChartObject = [{
                   chart: {
                       type: this.chartType,
-                      marginTop: 40,
+                      marginTop: 60,
                       marginBottom: 80,
                       plotBorderWidth: 1
                   },
@@ -232,7 +357,7 @@ export class DashboardComponent implements OnInit {
                   title: {
                       text: 'Sales per employee per weekday',
                       style: {
-                          fontSize: '1em'
+                          fontSize: '1em',
                       }
                   },
               
@@ -383,61 +508,82 @@ export class DashboardComponent implements OnInit {
                   }
                 ];
               }
-              }else if(this.chartType == 'area')
-              {
-          
-                for (let j = 0; j < this.allData[i].data.records.length; j++)
-                  {
-                    this.ids.push(this.allData[i].data.records[j].ID);
-                    this.names.push(Number(this.allData[i].data.records[j].NAME));
-                  }
-                  if(this.allData[i].is3d == 1){
-                    this.newChartObject = [
-                      {
-                        chart: { type: 'area',
-                          options3d: {
-                            enabled: true,
-                            alpha: 10,
-                            beta: 25,
-                            depth: 70,
-                            viewDistance: 25
-                          } },
-                        title: { text: this.allData[i].data.records[0].TITLE},
-                        xAxis: {
-                          categories: this.ids
-                        },
-                        yAxis: {
-                          title: {
-                            text: 'Value'
-                          }
-                        },
-                        series: [{
-                          name: 'Series 1',
-                          data: this.names,
-                        }]
-                      }
-                    ];
-                  }else{
-                this.newChartObject = [
-                  {
-                    chart: { type: 'area' },
-                    title: { text: this.allData[i].data.records[0].TITLE },
-                    xAxis: {
-                      categories: this.ids
-                    },
-                    yAxis: {
+              }else if (this.chartType == 'area') {
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].ID);
+                  this.names.push(Number(this.allData[i].data.records[j].NAME));
+                }
+              
+                if (this.allData[i].is3d == 1) {
+                  this.newChartObject = [
+                    {
+                      chart: {
+                        type: 'area',
+                        options3d: {
+                          enabled: true,
+                          alpha: 10,
+                          beta: 25,
+                          depth: 70,
+                          viewDistance: 25
+                        }
+                      },
                       title: {
-                        text: 'Value'
-                      }
-                    },
-                    series: [{
-                      name: 'Series 1',
-                      data: this.names,
-                    }]
-                  }
-                ];
+                        text: this.allData[i].data.records[0].TITLE
+                      },
+                      xAxis: {
+                        categories: this.ids
+                      },
+                      yAxis: {
+                        title: {
+                          text: 'Value'
+                        }
+                      },
+                      legend: {
+                        enabled: true, // Enable the legend
+                        layout: 'horizontal', // Layout options: 'horizontal' or 'vertical'
+                        align: 'center', // Align the legend horizontally
+                        verticalAlign: 'bottom', // Align the legend vertically
+                        borderWidth: 0 // Add border to the legend (optional)
+                      },
+                      series: [{
+                        name: 'Series 1',
+                        data: this.names
+                      }]
+                    }
+                  ];
+                } else {
+                  this.newChartObject = [
+                    {
+                      chart: {
+                        type: 'area'
+                      },
+                      title: {
+                        text: this.allData[i].data.records[0].TITLE
+                      },
+                      xAxis: {
+                        categories: this.ids
+                      },
+                      yAxis: {
+                        title: {
+                          text: 'Value'
+                        }
+                      },
+                      legend: {
+                        enabled: true, // Enable the legend
+                        layout: 'horizontal', // Layout options: 'horizontal' or 'vertical'
+                        align: 'center', // Align the legend horizontally
+                        verticalAlign: 'bottom', // Align the legend vertically
+                        borderWidth: 0 // Add border to the legend (optional)
+                      },
+                      series: [{
+                        name: 'Series 1',
+                        data: this.names
+                      }]
+                    }
+                  ];
+                }
               }
-              }else if(this.chartType == 'semiPie')
+              else if(this.chartType == 'semiPie')
                 {
                   const transformedData = this.allData[i].data.records.map((item:any) => [item.ID, parseFloat(item.NAME)]);
                   if(this.allData[i].is3d == 1){
@@ -456,14 +602,14 @@ export class DashboardComponent implements OnInit {
                       title: {
                         text: this.allData[i].data.records[0].TITLE,
                         align: 'center',
-                        verticalAlign: 'middle',
+                        verticalAlign: 'top',
                         y: 60,
                         style: {
                           fontSize: '1.1em'
                         }
                       },
                       tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        pointFormat: '{series.name} <b>{point.percentage:.1f}%</b>'
                       },
                       accessibility: {
                         point: {
@@ -476,7 +622,7 @@ export class DashboardComponent implements OnInit {
                           depth: 45,
                           dataLabels: {
                             enabled: true,
-                            distance: -50,
+                            distance: -25,
                             style: {
                               fontWeight: 'bold',
                               color: 'white'
@@ -490,7 +636,7 @@ export class DashboardComponent implements OnInit {
                       },
                       series: [{
                         type: 'pie',
-                        name: 'Browser share',
+                        name: '',
                         data:transformedData
                       }]
                       }];
@@ -504,14 +650,14 @@ export class DashboardComponent implements OnInit {
                 title: {
                     text: this.allData[i].data.records[0].TITLE,
                     align: 'center',
-                    verticalAlign: 'middle',
+                    verticalAlign: 'top',
                     y: 60,
                     style: {
                         fontSize: '1.1em'
                     }
                 },
                 tooltip: {
-                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    pointFormat: '{series.name} <b>{point.percentage:.1f}%</b>'
                 },
                 accessibility: {
                     point: {
@@ -536,7 +682,7 @@ export class DashboardComponent implements OnInit {
                 },
                 series: [{
                     type: 'pie',
-                    name: 'Browser share',
+                    name: '',
                     innerSize: '50%',
                     data: transformedData
                 }]
@@ -614,8 +760,9 @@ export class DashboardComponent implements OnInit {
                     {
                       this.ids.push(this.allData[i].data.records[j].ID);
                       this.names.push(Number(this.allData[i].data.records[j].NAME));
+                      // console.log(this.ids);
                     }
-  
+  // console.log( this.allData[i].data)
                     if(this.allData[i].is3d == 1){
   
   
@@ -679,10 +826,10 @@ export class DashboardComponent implements OnInit {
                           text: this.allData[i].data.records[0].TITLE,
                           align: 'left'
                       },
-                      subtitle: {
-                          text: this.allData[i].data.records[0].TITLE,
-                          align: 'left'
-                      },
+                      // subtitle: {
+                      //     text: this.allData[i].data.records[0].TITLE,
+                      //     align: 'left'
+                      // },
                       legend: {
                           enabled: false
                       },
@@ -724,57 +871,65 @@ export class DashboardComponent implements OnInit {
                     }]
                   }];}
             
-              }else if(this.chartType == 'pie'){
-                  let pieData: any[]= [];
-                  for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                    this.ids.push(this.allData[i].data.records[j].NAME);
-                    this.names.push(Number(this.allData[i].data.records[j].Y));
-                  }
-                  let data1 = this.names.map((id, index) => {
-                    return { name: this.ids[index], y: id };
-                  });
-
-                  if(this.allData[i].is3d == 1){
-                    const transformedData = this.allData[i].data.records.map((item:any) => [item.NAME, parseFloat(item.Y)]);
-
-                    this.newChartObject  = [{
-                      chart: {
-                        type: 'pie',
-                        options3d: {
-                            enabled: true,
-                            alpha: 45
-                        }
+              }else if (this.chartType == 'pie') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                if (this.allData[i].is3d == 1) {
+                  const transformedData = this.allData[i].data.records.map((item: any) => [item.NAME, parseFloat(item.Y)]);
+              
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'pie',
+                      options3d: {
+                        enabled: true,
+                        alpha: 45
+                      }
                     },
                     title: {
-                        text: this.allData[i].data.records[0].TITLE,
-                        align: 'left'
+                      text: this.allData[i].data.records[0].TITLE,
+                      align: 'left'
                     },
                     plotOptions: {
-                        pie: {
-                            innerSize: 100,
-                            depth: 45
-                        }
+                      pie: {
+                        innerSize: 100,
+                        depth: 45
+                      }
+                    },
+                    tooltip: {
+                      headerFormat: '',
+                      pointFormat: '<b>{point.name}</b>: {point.y}'
                     },
                     series: [{
-                        name: 'Medals',
-                        data: transformedData
+                      name: this.allData[i].data.records[0].TITLE,
+                      data: transformedData
                     }]
-                    }];
-                  }else{
-  
-                  
-                  this.newChartObject = [
-                    {
-                      chart: { type: 'pie' },
-                      title: { text: this.allData[i].data.records[0].TITLE },
-                      series: [{
-                        name: 'Fruits',
-                        data:  data1,
-                      }]
-                    }
-                  ];}
-                  //done
-              } else if (this.chartType == 'candlestick') {
+                  }];
+                } else {
+                  this.newChartObject = [{
+                    chart: { type: 'pie' },
+                    title: { text: this.allData[i].data.records[0].TITLE },
+                    plotOptions: {
+                      pie: {}
+                    },
+                    tooltip: {
+                      headerFormat: '',
+                      pointFormat: '<b>{point.name}</b>: {point.y}'
+                    },
+                    series: [{
+                      name: this.allData[i].data.records[0].TITLE,
+                      data: data1,
+                    }]
+                  }];
+                }
+              }
+               else if (this.chartType == 'candlestick') {
                 const transformedData1 =this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.open_price),
@@ -951,9 +1106,19 @@ export class DashboardComponent implements OnInit {
 
   
     }});
-    }
+ 
+    this.toggleAlertsVisibility();
+  }
 
-
+  ngAfterViewInit(): void {
+    this.toggleAlertsVisibility();
+  }
+  toggleAlertsVisibility() : void{
+    // Use setTimeout to delay setting checkVisibiltyDashboard to true
+    setTimeout(() => {
+      this.checkVisibiltyDashboard = true;
+    }, 2000); // Adjust the delay as needed (100 milliseconds is just an example)
+  }
   openChart(data:any){
     this.http.post<any>(GlobalConstants.selectChartRelatedToKpi + data.ID, { headers: GlobalConstants.headers }).subscribe(
       (res:any) => {
@@ -1008,8 +1173,9 @@ export class DashboardComponent implements OnInit {
     if (this.subsVar) {
       this.subsVar.unsubscribe()
     }
+    document.removeEventListener('click', this.onGlobalClick.bind(this));
+    document.removeEventListener('contextmenu', this.onGlobalRightClick.bind(this));
   }
-
   openSelected(data: any) {
     let info = {};
     if (data.type == 'Chart') {
@@ -1089,4 +1255,129 @@ export class DashboardComponent implements OnInit {
     moveItemInArray(this.allData, event.previousIndex, event.currentIndex);
   }
 
-}
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const contextMenu = document.getElementById('customContextMenu');
+    if (contextMenu) {
+      contextMenu.style.display = 'none';
+    }
+  }
+  
+  selectedChartIndex: number | null = null;
+
+  onGlobalClick(event: MouseEvent) {
+    if (!event.defaultPrevented) {
+      this.selectedChartIndex = null;
+    }
+  }
+
+  // Method to handle global right-clicks
+  onGlobalRightClick(event: MouseEvent) {
+    if (this.selectedChartIndex !== null) {
+      event.preventDefault();
+    }
+  }
+
+  onRightClick(event: MouseEvent, index: number) {
+    console.log("1111")
+    event.preventDefault();
+    console.log("2222")
+    event.stopPropagation();
+    this.selectedChartIndex = index;
+
+    const contextMenu = document.getElementById(`customContextMenu-${index}`);
+    
+    if (contextMenu) {
+      contextMenu.style.display = 'none'; // Initially hide the context menu
+      contextMenu.style.position = 'absolute'; // Set the position property
+
+      // Find the closest parent that is a chart container
+      let container = event.target as HTMLElement;
+      while (container && !container.classList.contains('chart-container')) {
+        container = container.parentElement as HTMLElement;
+      }
+
+      if (container) {
+        // Function to calculate and set the position of the context menu
+        const setPosition = () => {
+          // Get the container dimensions and position
+          const containerRect = container.getBoundingClientRect();
+          
+          // Get the context menu dimensions
+          const menuWidth = contextMenu.offsetWidth;
+          const menuHeight = contextMenu.offsetHeight;
+
+          // Calculate the position of the menu relative to the container
+          let left = event.clientX - containerRect.left;
+          let top = event.clientY - containerRect.top;
+
+          // Ensure the context menu stays within the container's bounds
+          left = Math.max(0, Math.min(left, containerRect.width - menuWidth));
+          top = Math.max(0, Math.min(top, containerRect.height - menuHeight));
+
+          // Set the position of the context menu
+          contextMenu.style.top = `${top}px`;
+          contextMenu.style.left = `${left}px`;
+        };
+
+        // Show the context menu and immediately recalculate its position
+        contextMenu.style.display = 'block';
+        setPosition();
+
+        // Listen for window resize events to update the position if necessary
+        window.addEventListener('resize', setPosition);
+
+        // Cleanup listener on component destroy or similar lifecycle hook
+        return () => window.removeEventListener('resize', setPosition);
+      }
+    }
+  }
+  
+  
+  
+
+  export(data: any) {
+    console.log("data>>>>>>>>>>>>:::",data);
+      this.http.post<any>(GlobalConstants.getQueryId + data.ID, { headers: GlobalConstants.headersCSV }).subscribe(
+        (res: any) => {
+          const fileType = 'text/csv';
+          //the name of the saved file, starting with the tab name
+          const fileName ="Query data "+data.ID.toString();
+          
+          //turning the string coming from the backend into a json string 
+          const byteCharacters = JSON.stringify(res);
+          //turning the json string into bytes 
+          const byteNumbers = new Array(byteCharacters.length);
+          //turning all characters to their respective ASCII numeric value
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          //converts the numeric values into a typed javascript array
+          const byteArray = new Uint8Array(byteNumbers);
+          //creates the file with the needed type
+          const blob = new Blob([byteArray], { type: fileType });
+          //creates a url for the file
+          const url = URL.createObjectURL(blob);
+
+          //creates a link <a> in html
+          const link = document.createElement('a');
+          //with a link
+          link.href = url;
+          //a name
+          link.download = fileName;
+          //and a click event to use the link
+          link.click();
+
+          //this deletes all the data from said link after the download was initiated
+          URL.revokeObjectURL(url);
+        },
+        (error) => {
+          console.error('Error fetching data', error);
+        }
+      );
+    }
+  }
+
+
+  

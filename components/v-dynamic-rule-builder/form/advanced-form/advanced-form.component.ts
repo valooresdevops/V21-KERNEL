@@ -321,6 +321,7 @@ export class AdvancedFormComponent implements OnInit {
       const addList = event[0].addList;
       this.addList = JSON.stringify(addList);
       let Object = JSON.parse(this.addList);
+      console.log("adlisttttttttttt:",addList);
       for (let i = 0; i < Object.length; i++) {
         let beginCondition = '';
         let field = '';

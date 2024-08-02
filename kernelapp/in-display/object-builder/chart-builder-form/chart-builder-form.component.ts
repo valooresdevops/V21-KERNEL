@@ -89,7 +89,7 @@ export class ChartBuilderFormComponent implements OnInit {
         this.newChartObject = [{
           chart: {
             type: 'heatmap',
-            marginTop: 40,
+            marginTop: 60,
             marginBottom: 80,
             plotBorderWidth: 1
           },
@@ -195,6 +195,9 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: {
               type: chartType1,
+              marginTop: 60,
+              marginBottom: 80,
+              plotBorderWidth: 1,
               options3d: {
                 enabled: true,
                 alpha: 10,
@@ -269,8 +272,12 @@ export class ChartBuilderFormComponent implements OnInit {
               depth: 45
             }
           },
+          tooltip: {
+            headerFormat: '',
+            pointFormat: '<b>{point.name}</b>: {point.y}'
+          },
           series: [{
-            name: 'Medals',
+            name: 'this.data[i].data.records[0].TITLE',
             data: transformedData
           }]
         }];
@@ -279,8 +286,15 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: { type: 'pie' },
             title: { text: this.data.records[0].TITLE },
+            plotOptions: {
+              pie: {}
+            },
+            tooltip: {
+              headerFormat: '',
+              pointFormat: '<b>{point.name}</b>: {point.y}'
+            },
             series: [{
-              name: 'Serie',
+              name: 'this.data[i].data.records[0].TITLE',
               data: data1,
             }]
           }
@@ -496,14 +510,14 @@ export class ChartBuilderFormComponent implements OnInit {
           title: {
             text: this.data.records[0].TITLE,
             align: 'center',
-            verticalAlign: 'middle',
+            verticalAlign: 'top',
             y: 60,
             style: {
               fontSize: '1.1em'
             }
           },
           tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+           pointFormat: '{series.name} <b>{point.percentage:.1f}%</b>'
           },
           accessibility: {
             point: {
@@ -530,7 +544,7 @@ export class ChartBuilderFormComponent implements OnInit {
           },
           series: [{
             type: 'pie',
-            name: 'Browser share',
+            name: '',
             data: transformedData
           }]
         }];
@@ -545,14 +559,14 @@ export class ChartBuilderFormComponent implements OnInit {
           title: {
             text: this.data.records[0].TITLE,
             align: 'center',
-            verticalAlign: 'middle',
+            verticalAlign: 'top',
             y: 60,
             style: {
               fontSize: '1.1em'
             }
           },
           tooltip: {
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: '{series.name} <b>{point.percentage:.1f}%</b>'
           },
           accessibility: {
             point: {
@@ -577,7 +591,7 @@ export class ChartBuilderFormComponent implements OnInit {
           },
           series: [{
             type: 'pie',
-            name: 'Browser share',
+            name: '',
             innerSize: '50%',
             data: transformedData
           }]
@@ -617,10 +631,10 @@ export class ChartBuilderFormComponent implements OnInit {
             text: this.data.records[0].TITLE,
             align: 'left'
           },
-          subtitle: {
-            text: this.data.records[0].TITLE,
-            align: 'left'
-          },
+          // subtitle: {
+          //   text: this.data.records[0].TITLE,
+          //   align: 'left'
+          // },
           legend: {
             enabled: false
           },

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { DataService } from 'src/app/Kernel/services/data.service';
@@ -65,10 +65,19 @@ export class ColumnModifierComponent implements OnInit {
     public commonFunctions: CommonFunctions,
     private _Activatedroute: ActivatedRoute,
     private dataService: DataService,
-    public informationservice: InformationService
+    public informationservice: InformationService,
+    public router:Router
   ) { }
 
   ngOnInit(): void {
+
+    console.log("ROUTE URL>>>>>>>>>>>>",this.router.url);
+    let breadCrumbData=this.informationservice.getNavBreadCrumb();
+    breadCrumbData.push(JSON.parse('{"name":"' + "Column Modification" + '","route":"' + this.router.url + '"}'))
+    this.informationservice.setNavBreadCrumb(breadCrumbData);
+
+    console.log("information srevice>>>>>>>>>>>>",this.informationservice.getNavBreadCrumb());
+
     this.toggleValue = 0;
 
     this.informationservice.setFirstOpenGrid('1');

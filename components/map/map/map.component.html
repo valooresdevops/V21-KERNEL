@@ -915,7 +915,7 @@ display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; "
 <fieldset > 
    <legend id="legend">Simulation</legend>  
 
-<app-header id="Header" [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
+<app-header id="Header"   [IsClear]="headerchangeCounter"   [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
 </fieldset>
 </div>
 

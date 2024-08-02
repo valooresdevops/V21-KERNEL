@@ -1,5 +1,5 @@
 
-import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild , Renderer2   } from '@angular/core';
+import { Component, OnInit, ElementRef, ChangeDetectorRef, ViewChild , Renderer2,NgZone    } from '@angular/core';
 import { UntypedFormGroup, UntypedFormControl, ReactiveFormsModule, FormsModule  } from '@angular/forms';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
@@ -25,7 +25,7 @@ import * as $ from 'jquery';
   styleUrl: './master-link-form.component.css'
 })
 export class MasterLinkFormComponent implements OnInit {
-
+public ready : Boolean = true;
   @ViewChild('titleInput', { static: false }) titleInput: ElementRef<HTMLInputElement>;
   titleValue: string;
  
@@ -39,7 +39,7 @@ export class MasterLinkFormComponent implements OnInit {
     query: new UntypedFormControl(''),
 
   });
-
+  private gridApi: any;
   public isReload : Boolean = true;
   public isVisible : Boolean = false;
   public selectedLookupId: Number;
@@ -63,6 +63,8 @@ export class MasterLinkFormComponent implements OnInit {
 
   public isQueryexecute: boolean;
   headerNames: any[] = [];
+  public images: any[] = [];
+
   public test = '';
   public shouldReloadGrid: boolean = false;
 
@@ -107,16 +109,21 @@ export class MasterLinkFormComponent implements OnInit {
     public informationservice: InformationService,
     private elementRef: ElementRef,
     private cdRef: ChangeDetectorRef, 
-    private renderer: Renderer2) 
+    private renderer: Renderer2,
+    private ngZone: NgZone) 
     {
-      this.onRunButtonClick = this.onRunButtonClick.bind(this);
-
     this.frameworkComponents = {
       buttonRenderer: ButtonRendererComponent,
     };
      }
-  ngOnInit(): void 
+  async ngOnInit(): Promise<void> 
   {
+    const getNodesImagesApi = from(axios.post(GlobalConstants.getNodesImages,{}));
+    const getNodesImages = await lastValueFrom(getNodesImagesApi);
+    this.images=getNodesImages.data;
+    this.images = this.images.map(item => item.name);
+    console.log("images>>>>>>>>>>",this.images); // ["name1", "name2"]
+
     this.actionType = this.dataservice.getactionType();
     if (this.actionType == 'update') {
       this.gridId = this.informationservice.getAgGidSelectedNode();
@@ -137,6 +144,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Node Name',
         field: 'nodeName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -161,9 +169,19 @@ export class MasterLinkFormComponent implements OnInit {
       {
         headerName: 'Image',
         field: 'image',
+        cellEditor: 'agSelectCellEditor',
+        cellRenderer: DropdownCellRenderer,
+        keyCreator: (params: any) => {
+          return params.value;
+        },
+        cellEditorParams: {
+          cellRenderer: DropdownCellRenderer,
+          values: this.images,
+          isSearchable: true,
+        },
         editable: true,
-         cellEditor: 'agSelectCellEditor'
-        // width: '15px',
+        cellDataType: true,
+        cellClass: 'ag-rich-select-list, ag-rich-select-list-item, ag-rich-select-list-item:hover'
       },
       {
         headerName: 'Height',
@@ -189,6 +207,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Link Name',
         field: 'linkName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -262,6 +281,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Info Name',
         field: 'infoName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -408,8 +428,19 @@ export class MasterLinkFormComponent implements OnInit {
       {
         headerName: 'Image',
         field: 'image',
+        cellEditor: 'agSelectCellEditor',
+        cellRenderer: DropdownCellRenderer,
+        keyCreator: (params: any) => {
+          return params.value;
+        },
+        cellEditorParams: {
+          cellRenderer: DropdownCellRenderer,
+          values: this.images,
+          isSearchable: true,
+        },
         editable: true,
-        cellEditor: 'agSelectCellEditor'
+        cellDataType: true,
+        cellClass: 'ag-rich-select-list, ag-rich-select-list-item, ag-rich-select-list-item:hover'
       },
       {
         headerName: 'Height',
@@ -434,6 +465,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Link Name',
         field: 'linkName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -508,6 +540,7 @@ export class MasterLinkFormComponent implements OnInit {
           headerName: 'Info Name',
           field: 'infoName',
           editable: true,
+          cellEditor: 'agTextCellEditor',
           // width: '20px',
         },
         {
@@ -557,6 +590,7 @@ export class MasterLinkFormComponent implements OnInit {
           headerName: 'Info Name',
           field: 'infoName',
           editable: true,
+          cellEditor: 'agTextCellEditor',
           // width: '20px',
         },
         {
@@ -631,7 +665,7 @@ export class MasterLinkFormComponent implements OnInit {
       this.isReload=false;
     
     this.test = GlobalConstants.inDispGatewat + 'api/getAllQueriesHeaderList';
-    
+    console.log("THIS HEADERNAMES>>>>>>>>>>>>>>",this.headerNames);
     this.http.get<any[]>(GlobalConstants.getAllQueriesHeaderList + event, { headers: GlobalConstants.headers })
       .subscribe(response => {
         if (response && Array.isArray(response)) {
@@ -648,6 +682,21 @@ export class MasterLinkFormComponent implements OnInit {
         }
       });
       // this.selectedLookupId = this.getLastAccessedValue();
+      // this.http.get<any[]>(GlobalConstants.getNodesImages, { headers: GlobalConstants.headers })
+      // .subscribe(response => {
+      //   if (response && Array.isArray(response)) {
+      //     this.images = response.map(header => header.field);
+      //     this.updateAgColumnsJson();
+      //     this.cdRef.detectChanges(); // trigger change detection
+  
+      //     // Add a small timeout before triggering grid reload
+      //     setTimeout(() => {
+      //       const gridReloadEvent = new Event('reloadGrid', { bubbles: true });
+      //       document.getElementById('gridReload')?.dispatchEvent(gridReloadEvent);
+      //     }, 1000); // Adjust timeout duration as needed
+      //     this.isReload = true;
+      //   }
+      // });
   }
   
 
@@ -656,21 +705,7 @@ export class MasterLinkFormComponent implements OnInit {
     // Handle any specific actions needed when the grid reloads
     console.log('Grid is reloading...');
   }
-  onAddClickNodes() {
-  }
-  onRunButtonClick(e: any) 
-  {
-    //  GRID BUILDER
-  }
 
-  onUpdateClickNodes() 
-  {
-    // grid builder
-  }
-  onDeleteClickNodes() 
-  {
-    // grid builder
-  }
   addInfo() 
   {
     this.agColumnsJson3 = [
@@ -678,6 +713,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Info Name',
         field: 'infoName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -727,6 +763,7 @@ export class MasterLinkFormComponent implements OnInit {
         headerName: 'Info Name',
         field: 'infoName',
         editable: true,
+        cellEditor: 'agTextCellEditor',
         // width: '20px',
       },
       {
@@ -790,6 +827,7 @@ export class MasterLinkFormComponent implements OnInit {
     console.log("this is agcolums4",this.agColumns4);
     this.isVisible=true;
   }
+  
   async jsonBuilder(){
     this.jsonRes = "";
     this.jsonRes +="{\"masterLink\":"+ this.jsonMasterLink + "," + this.jsonNodes + "," + this.jsonLink + "," + this.jsonNodeInfo + "," + this.jsonLinkInfo + "}"
@@ -821,28 +859,52 @@ export class MasterLinkFormComponent implements OnInit {
 this.gridEventSave5();
 await this.jsonBuilder();
   }
-  onAddClickLinks()
-  {
+  
 
-  }
-  onUpdateClickLinks()
-  {
-
-  }
-  onDeleteClickLinks()
-  {
-
-  }
   closeDialog() {
     this.dialog.closeAll();
   }
-
+  onGridReady(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+    this.gridApi = params.api;
+  }
+  onGridReady2(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+  }
+  onGridReady3(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+  }
+  onGridReady4(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+  }
+  getAllRowsData(api : any) {
+    let allRowData : any[]= [];
+    api.forEachNode((node: any) => {
+      allRowData.push(node.data);
+    });
+    console.log('All Row Data:', allRowData);
+    // Now you can save allRowData
+  }
+  gridDeselectAll( ){
+    this.ready = false;
+    this.ready=true;
+    this.gridApi.deselectAll();
+    console.log("deselected alll");
+  }
   async gridEventSave(event: any) {
+    
     if (this.countEvent1 == 0) {
       this.countEvent1++;
       console.log("event issssssssssss ::::::: ", event);
       let updatedData: any[] = event[0].addList;
-      console.log("updatedListtttttttttt", event[0].addList);
+      event[0].deleteList.forEach((deleteItem: any[]) => {
+        const rowToDelete = deleteItem[0];
+        updatedData = updatedData.filter((addItem: any) => addItem !== rowToDelete);
+      });
   
       let json: string = "\"nodes\":[";
       if(updatedData.length==0){ 
@@ -896,7 +958,11 @@ async gridEventSave3(event: any) {
     this.countEvent3++;
     console.log("event3 issssssssssss ::::::: ", event);
     let updatedData: any[] = event[0].addList;
-    console.log("updatedListtttttttttt", event[0].addList);
+    event[0].deleteList.forEach((deleteItem: any[]) => {
+      const rowToDelete = deleteItem[0];
+      updatedData = updatedData.filter((addItem: any) => addItem !== rowToDelete);
+    });
+
     let json: string = "\"nodeInfo\":[";
 
     if(updatedData.length==0){
@@ -938,7 +1004,10 @@ async gridEventSave2(event: any) {
     this.countEvent2++;
     console.log("event2 issssssssssss ::::::: ", event);
     let updatedData: any[] = event[0].addList;
-    console.log("updatedListtttttttttt", event[0].addList);
+    event[0].deleteList.forEach((deleteItem: any[]) => {
+      const rowToDelete = deleteItem[0];
+      updatedData = updatedData.filter((addItem: any) => addItem !== rowToDelete);
+    });
     let json: string = "\"link\":[";
 
     if(updatedData.length==0){
@@ -995,7 +1064,10 @@ async gridEventSave4(event: any) {
     this.countEvent4++;
     console.log("event4 issssssssssss ::::::: ", event);
     let updatedData: any[] = event[0].addList;
-    console.log("updatedListtttttttttt", event[0].addList);
+    event[0].deleteList.forEach((deleteItem: any[]) => {
+      const rowToDelete = deleteItem[0];
+      updatedData = updatedData.filter((addItem: any) => addItem !== rowToDelete);
+    });
     let json: string = "\"linkInfo\":[";
 
     if(updatedData.length == 0 ){
@@ -1051,8 +1123,6 @@ async gridEventSave5() {
   console.log("jsonMasterLink :::::::",this.jsonMasterLink);
 
   }}
-
-
 
 }
 class DropdownCellRenderer {

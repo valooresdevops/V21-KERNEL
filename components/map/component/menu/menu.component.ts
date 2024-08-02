@@ -96,19 +96,19 @@ export class NavbarComponent  implements OnInit{
 
   ngOnInit(): void{
 // //178564
-this.parentSimulID=181663;
+// this.parentSimulID=8149;
 
-     this.datacrowdservice.displaysequence2(181663).then(((res:any)=>{
-console.log("resss",res);
-console.log("resss parsed",JSON.parse(res[0]));
-let arr:any[]=[];
-arr.push(JSON.parse(res[0]));
+//      this.datacrowdservice.displaysequence2(8149).then(((res:any)=>{
+// console.log("resss",res);
+// console.log("resss parsed",JSON.parse(res[0]));
+// let arr:any[]=[];
+// arr.push(JSON.parse(res[0]));
 
- this.hierarchyData=arr;
-//  this.hierarchyData=this.convertData(this.jsonData);
+//  this.hierarchyData=arr;
+// //  this.hierarchyData=this.convertData(this.jsonData);
 
 
-    }))
+//     }))
 
 
 }

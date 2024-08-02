@@ -471,7 +471,7 @@
 
                                     <!-- Hidden -->
                                     <div *ngIf="fields.columnType == 'hidden'">
-                                        <input type="hidden" [formControlName]="fields.name"
+                                        <input style="display:none" type="hidden" [formControlName]="fields.name"
                                             [maxlength]="fields.columnLength"
                                             class="{{ fields.name }} fieldSet_{{ fields.fieldSetId }}"
                                             [required]="false" id="field_{{ fields.id }}">

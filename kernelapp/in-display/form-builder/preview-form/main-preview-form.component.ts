@@ -67,13 +67,14 @@ export class PreviewFormComponent implements OnInit {
   hiddenForm = new UntypedFormGroup({});
   menuForm = new UntypedFormGroup({});
   public userId: number = Number(this.informationservice.getLogeduserId());
-
+  public isTreeGrid: boolean =false;
   // Variables added by Nadine
   public buttonObjectId: any;
   public amInfo: any;
   public dialogArray: any[] = [];
   public getWhereCond: any = '-1';
   // public getWhereCond: any[] = [];
+  public jp:boolean =true;
 
 
   constructor(private http: HttpClient,
@@ -398,14 +399,12 @@ export class PreviewFormComponent implements OnInit {
 
             }
           );
-         console.log('jsonQbe_sourceQuery--->: ',jsonQbe_sourceQuery)
          this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             if(data == 2){
               this.queryType =3;
             }else{
               this.queryType =1;
             }
-            console.log("queryType------> ",this.queryType);
 
           this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/"+this.queryType, jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             this.sourceQuery = data;
@@ -418,10 +417,8 @@ export class PreviewFormComponent implements OnInit {
                 this.agColumns = [];
                 this.columnId = "ROW_ID";
                 this.agColumnsJson = gridHeaders;
-                console.log('gridHeaders----->',gridHeaders)
                 this.agColumns.push(this.agColumnsJson);
                 this.gridStaticData = gridResults;
-
                 this.test_1 = '1';
                 this.hasSourceQuery = 1;
               });
@@ -495,7 +492,6 @@ export class PreviewFormComponent implements OnInit {
 
                     this.http.post<any>(GlobalConstants.getDynamicGridHeaders, jsonVal, { headers: GlobalConstants.headers }).subscribe((data: any) => {
                       this.agColumnsJson = data;
-                      console.log('jp>>>>>>>',this.agColumnsJson);
                       this.agColumns.push(this.agColumnsJson);
                       this.previewGridApi = GlobalConstants.getDynamicGridData;
                       this.previewGridApiParam = jsonVal;
@@ -525,13 +521,16 @@ export class PreviewFormComponent implements OnInit {
           const getButtonData = await lastValueFrom(getButtonDataUrl);
 
           let data1 = getButtonData.data;
+          console.log("DATA BUTTON>>>>>>",data1);
+
           if (data1.blobFile != null && data1.blobFile != undefined) {
             const base64EncodedString = data1.blobFile;
             const decodedString = atob(base64EncodedString);
-
+            console.log("DECODED STRING",decodedString);
             let n = decodedString.split("~A~");
             // let lastPart = n.pop();
             let lastPart = decodedString.split("~A~")[4];
+            console.log("LAST PART>>>>>>>>>",lastPart);
             if (lastPart == "false") {
               data[i].mainAndPreview = false;
             } else {
@@ -541,13 +540,13 @@ export class PreviewFormComponent implements OnInit {
         }
       }
       this.test = data;
+      console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
     });
   }
 
   ngOnInit(): void {
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
-
 
      for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -560,10 +559,9 @@ export class PreviewFormComponent implements OnInit {
     this.informationservice.removeTabpath();
 
     this.tableOptions1 = [];
-    this._Activatedroute.paramMap.subscribe((params) => {
+    this._Activatedroute.paramMap.subscribe(async (params) => {
       this.objectId = this.fromScreenBuilder == "1" ? this.screenBuilderObjId : params.get('parentId');
-      console.log("OBJECT ID FROM SCREENBUILDER>>>>>>>>>>>>",this.objectId);
-      this.http.get<any>(GlobalConstants.getAllTabs + this.objectId, { headers: GlobalConstants.headers }).subscribe((res: any) => {
+  await  this.http.get<any>(GlobalConstants.getAllTabs + this.objectId, { headers: GlobalConstants.headers }).subscribe((res: any) => {
         for (let i = 0; i < res.length; i++) {
           this.tableOptions1.push({
             "tableName": res[i].menuName, "canAdd": res[i].canAdd, "canDelete": res[i].canDelete,
@@ -571,6 +569,7 @@ export class PreviewFormComponent implements OnInit {
             "sourceQuery": res[i].sourceQuery,
             "isAdvancedSearch": res[i].isAdvancedSearch,
             "isGrid": res[i].isGrid,
+            "isTreeGrid":res[i].isTreeGrid,
             "hasMultipleSelection": res[i].hasMultipleSelection,
             "isQueryForm": res[i].isQueryForm,
             "isDynamicReport": res[i].isDynamicReport,
@@ -578,8 +577,10 @@ export class PreviewFormComponent implements OnInit {
             "objectId": res[i].objectId,
             "isMain": res[i].isMain,
             "isRowGrouping": res[i].isRowGroup
-          })
-this.informationservice.setIsRowGroup(res[i].isRowGroup);
+          });
+          if(res[i].isTreeGrid == 1){
+            this.isTreeGrid = true;
+          }
           if (res[i].isMain == 1) {
             this.objectMain = res[i].objectId;
           }
@@ -602,7 +603,6 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
           }
         }
         
-        console.log("TABLE OPTIONS>>>>>>>>>>>>",this.tableOptions1[0]);
         
         if(this.tableOptions1[0].isDynamicReport=='1'){
             this.informationservice.setIsDynamicReport(true);
@@ -623,10 +623,9 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
     });
 
     setTimeout(() => {
-
     }, 1000);
 
-
+ 
 
   }
 
@@ -831,7 +830,6 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
         let params = this.informationservice.getAgGidSelectedNode();
         customerId = JSON.parse(params)[0].COLVALUE;
         let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
         let jsonArr: string = "{";
         jsonArr += "\"" + "columns" + "\" : [";
         jsonArr += "{";
@@ -847,9 +845,7 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
         });
         let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
 
-        console.log("URLLLLLL>>>>>>>>>",url);
         if(customerType==='7'){
-          console.log("HOLAAAA");
           url=url.replace("31860","31849");
         }
         // url is : executeReportwithOneParam/31849
@@ -874,7 +870,6 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
         let params = this.informationservice.getAgGidSelectedNode();
         customerId = JSON.parse(params)[0].COLVALUE;
         let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
         let jsonArr: string = "{";
         jsonArr += "\"" + "columns" + "\" : [";
         jsonArr += "{";
@@ -891,8 +886,6 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
         let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
         
         // url is : executeReportwithOneParam/31849
-        console.log("PARAMSSSS>>>>>>>>>",params);
-        console.log("JSON ARRRRRRR>>>>>>>>>",jsonArr);
         let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7004/api/" + url;
         this.http.post(ApiUrl, JSON.parse(params), requestOptions).pipe(map((data: any) => {
         })).subscribe((result: any) => {
@@ -968,12 +961,10 @@ this.informationservice.setIsRowGroup(res[i].isRowGroup);
       }
       else if(buttonAction == "8"){
 let dataselected:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
-console.log("dataselected>>>",dataselected)
 for(let i=0;i<dataselected.length;i++)
   {
-    console.log("dataselected>>>",dataselected)
 
-    this.downloadHtmlFile(dataselected[i].ROW_ID[0].COLVALUE);
+    this.downloadHtmlFile(dataselected[i].COLVALUE);
 
   }
 // this.dialog.closeAll();
@@ -1007,7 +998,6 @@ this.informationservice.setISExport(true);
         });
       }
     } catch (error) {
-      console.log("error on handleSelectedRowIds >>>> ", error)
       newDD = -1;
     }
     return newDD;

@@ -439,8 +439,9 @@ this.generateTimeline();
     }
     const testDiv = this.elementRef.nativeElement.querySelector('#report-container');
     if (testDiv) {
+      alert(this.markerids.data.text.id)
       const iframe = document.createElement('iframe');
-      iframe.src = '/assets/report_' + this.markerids.data.text.id + '.html';
+      iframe.src = '../../../../../assets/report_' + this.markerids.data.text.id + '.html';
       iframe.width = '100%';
       iframe.height = '1800';
       testDiv.appendChild(iframe);
@@ -458,7 +459,7 @@ this.generateTimeline();
     const testDiv = this.elementRef.nativeElement.querySelector('#report-container');
     if (testDiv) {
       const iframe = document.createElement('iframe');
-      iframe.src = '/cybercrowd/angular/assets/report_analytics_0.html';
+      iframe.src = '../../../../../assets/report_analytics_0.html';
       iframe.width = '100%';
       iframe.height = '2000';
       testDiv.appendChild(iframe);
@@ -750,25 +751,50 @@ this.generateTimeline();
         const stringSeparated = Response.join(',');
         this.dataservice.setTimelineSimulID(stringSeparated);
         this.markerids = null;
-        $('#displayTimelineSimul').click();
+        if ($('#MapOffline').css('display') === 'none') {
+          $('#displayTimelineSimul').click();
+       
+        } else {
+        $('#displayTimelineSimulOffline').click();
+          
+        }
+
       });
 
     } else if (this.flagDisplay == 2) {
       this.dataservice.setTimelineSimulID(this.markerids.data.text.id);
       this.markerids = null;
-      $('#displayTimelineSimul').click();
+      if ($('#MapOffline').css('display') === 'none') {
+        $('#displayTimelineSimul').click();
+     
+      } else {
+      $('#displayTimelineSimulOffline').click();
+        
+      }
     } else if (this.flagDisplay == 3) {
       this.datacrowdService.getMonthlySimulationId(this.markerids.data.text.id).then(Response => {
         const stringSeparated = Response.join(',');
         this.dataservice.setTimelineSimulID(stringSeparated);
         this.markerids = null;
-        $('#displayTimelineSimul').click();
+        if ($('#MapOffline').css('display') === 'none') {
+          $('#displayTimelineSimul').click();
+       
+        } else {
+        $('#displayTimelineSimulOffline').click();
+          
+        }
       });
     } else if (this.flagDisplay == 4) {
       this.markerids.data.text.simulationId=179752;
       this.dataservice.setTimelineSimulID(this.markerids.data.text.simulationId);
       this.markerids = null;
-      $('#displayTimelineSimul').click();
+      if ($('#MapOffline').css('display') === 'none') {
+        $('#displayTimelineSimul').click();
+     
+      } else {
+      $('#displayTimelineSimulOffline').click();
+        
+      }
     } else { 
 
     }

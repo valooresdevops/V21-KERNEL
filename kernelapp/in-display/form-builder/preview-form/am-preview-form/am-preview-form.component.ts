@@ -3401,15 +3401,11 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
                     } else if (executeAction == "Optional") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Read Only") {
-                      //console.log("readOnly>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                      //console.log("choosenField>>>>>> :",choosenField);
-                      //console.log("conditionValue>>>>>>>>>>",conditionValue)
-                      //console.log("condition>>>>>>>>>>",condition)
+
 
 
 
                       if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
-                        //console.log("executeOnField>>>>>>>>>>",executeOnField)
 
                         if (executeOnField.length >= 1) {
                           for (let u = 0; u < executeOnField.length; u++) {
@@ -4518,7 +4514,7 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
 
         let isReadOnly = getAllTabs.data[i].readOnlyQbeId == null ? -1 : getAllTabs.data[i].readOnlyQbeId;
         let isReadOnlyB: boolean;
-
+        console.log("IS READ ONLY>>>>>>>",isReadOnly);
         if (isReadOnly != -1) {
           const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + isReadOnly));
           const paramNames = await lastValueFrom(paramNamesUrl);
@@ -4892,6 +4888,7 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
 
       if (paramNames.data.length > 0) {
         // Filter ROW_ID information to get only the ones for Grid
+        console.log('this.amInfo.selectedRowId-------->',this.amInfo.selectedRowId)
         let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
         if (params != undefined) {
           let filteredParams: any = this.handleSelectedRowIds(params, "tab,form,grid");
@@ -5609,6 +5606,9 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
           if (data_0[i].qbeReadOnly != undefined) {
             const qbeReadOnlyUrl = from(axios.post(GlobalConstants.getQbeIdApi + data_0[i].qbeReadOnly + "/0", this.jsonEmpty));
             const qbeReadOnly = await lastValueFrom(qbeReadOnlyUrl);
+            console.log("QBE READ ONL1>>>>>>>>>>>>",qbeReadOnly.data);
+            console.log("QBE READ ONL222>>>>>>>>>>>>", data_0[i].qbeReadOnly);
+
             data_0[i].qbeReadOnly = qbeReadOnly.data[0] ? true : false;
           } else {
             data_0[i].qbeReadOnly = false;
@@ -6085,7 +6085,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     this.loaderService.isLoading.next(false);
     this.listOfData = undefined;
     //fill the form (after close a popup)
-    //console.log("this.test >>>>>>>>><><><><>>>>>>>>>",this.test);
+    console.log("this.test >>>>>>>>><><><><>>>>>>>>>",this.test);
     this.allData = this.test;
     //console.log("in the end of getAllColums ==",this.columnTypeCode);
     //console.log("this.amInfo=",this.amInfo)

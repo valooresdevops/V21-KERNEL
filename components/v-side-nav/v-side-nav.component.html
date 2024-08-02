@@ -34,7 +34,7 @@
         <div class="body-section scrollbar-width-thin hideElement mt-3">
             <ul>
                 <div *ngIf="prevParentCode != '-1';" class="goBackDiv animate__animated animate__fadeIn"
-                    (click)="toggleActiveMenu(prevParentCode,'', ''); shortenCustomPath();">
+                    (click)="toggleActiveMenu(prevParentCode,'', '','Back'); shortenCustomPath();">
                     <span class="title">
                         <i class="fas fa-arrow-circle-left"></i>&nbsp; Back
                     </span>
@@ -43,12 +43,12 @@
                     <li *ngIf="n.menuManaged == '1' && n.display != '0'" id="{{n.id}}"
                         class="list animate__animated animate__fadeIn" (mouseenter)="toggleChildNavigation(n.id)">
                         <a
-                            (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus); onSelect(n.menuVariable, n.childMenus, n.name); ">
-                            <span class="icon-img side-nav-icons"><i class="{{n.icon}}"></i></span>
+                            (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus,n.name); onSelect(n.menuVariable, n.childMenus, n.name); ">
+                            <span  class="icon-img side-nav-icons"><i class="{{n.icon}}"></i></span>
                             <span class="title">{{n.name}}</span>
                         </a>
                         <span *ngIf="n.childMenus != 0" id="childNav_{{n.id}}" class="navigateToChildArrow"
-                            (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus)">
+                            (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus,n.name)">
                             <i class="fas fa-arrow-circle-right"></i>
                         </span>
                     </li>
@@ -65,12 +65,15 @@
                 <a href="/dashboard">
                     <img src="assets/img/clientlogo.png" alt="Logo" class="active animate__animated animate__fadeIn">
                 </a>
-                <!-- <div class="row">
-                <button>TEST</button>
-                </div> -->
+                
             </div>
 
-            
+            <div style="display:flex;flex-direction: row">
+                    <span  *ngFor="let n of this.informationservice.getNavBreadCrumb()">
+                       <b  (click)="fetchUserAccessRights(n.route, 'breadcrumb',n.name,true)"> {{n.name}} /</b>
+                    </span>           
+                 
+        </div>
 
             
             

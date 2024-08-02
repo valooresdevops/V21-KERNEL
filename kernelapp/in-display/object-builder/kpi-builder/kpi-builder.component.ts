@@ -135,7 +135,7 @@ export class KpiBuilderComponent implements OnInit {
 
         const dialogRef = this.dialog.open(KpiBuilderPreviewComponent, {
           data: info,
-          width: '50%',
+          width: '30%',
           height: '30%',
         });
 

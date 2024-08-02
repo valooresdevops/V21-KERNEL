@@ -1,5 +1,5 @@
 import 'ag-grid-enterprise';
-import { Component, Input, OnChanges, OnInit, SimpleChanges, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, EventEmitter, Output, Renderer2  } from '@angular/core';
 import { ColDef, ColumnApi, GridApi, IAfterGuiAttachedParams, RowGroupingDisplayType,GridOptions,  GetMainMenuItemsParams, MenuItemDef,
 } from 'ag-grid-community';
 import { EventEmitterService } from 'src/app/Kernel/services/event-emitter.service';
@@ -11,7 +11,7 @@ import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { from, lastValueFrom } from 'rxjs';
 import axios from 'axios';
 import e from 'cors';
-import { table } from 'console';
+import { Console, table } from 'console';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { read } from 'fs';
 import { data } from 'jquery';
@@ -25,6 +25,10 @@ import { data } from 'jquery';
 })
 
 export class AGGridComponent implements OnInit, OnChanges {
+
+  @Input() checkInput : Boolean; // hayde kermel search bar input design display none or block
+  @Input() checkPagination :boolean;
+
   public gridApi: GridApi;
   private columnApi: ColumnApi;
 
@@ -36,23 +40,33 @@ export class AGGridComponent implements OnInit, OnChanges {
     rowSelection: 'multiple',
     groupSelectsChildren: true,
   };
-  autoGroupColumnDef = {
-    
-    // enabled sorting on Row Group Columns only 
-    sortable: true,   
-    cellRendererParams: {
-    //   suppressCount: false,
-      checkbox: true,
-      checkboxselection: true,
-      groupSelectsChildren: true,
-    //   rowSelection: 'multiple',
+  // autoGroupColumnDef = {
 
-    } 
-    // cellRenderer: CheckboxCellRenderer, // Add this line    
+  //   // enabled sorting on Row Group Columns only
+  //   sortable: true,
+  //   cellRendererParams: {
+  //   //   suppressCount: false,
+  //     checkbox: true,
+  //     checkboxselection: true,
+  //     groupSelectsChildren: true,
+  //   //   rowSelection: 'multiple',
+
+  //   }
+  //   // cellRenderer: CheckboxCellRenderer, // Add this line
+  // };
+  public autoGroupColumnDef = {
+    // enabled sorting on Row Group Columns only
+    sortable: true,
+    headerName: 'Organisational Hierarchy',
+    cellRendererParams: {
+      innerRenderer: 'group',
+      suppressCount: true,
+      expandedByDefault: false
+    },
+
   };
-  
   // public gridColumnApi: any;
-  
+
   public pivotColumnDefs: ColDef[];
   public pivotMode: boolean ;
   public pivotSuppressAutoColumn: boolean;
@@ -85,7 +99,7 @@ export class AGGridComponent implements OnInit, OnChanges {
 
   public isGrouped: boolean = false;
   public commonKeysArray: any = []; // Array to store common keys for all children
-  
+
 
   // Used to handle cellRenderer feature in ag-grid
   @Input() public frameworkComponents: any;
@@ -111,7 +125,7 @@ export class AGGridComponent implements OnInit, OnChanges {
   @Input() public agType: any = 'clientSide';
   // Used to add capability to do crud operations on grid level
   @Input() public agOnGridEvents: boolean = false;
-  //used to show or hide the submit button under the grid 
+  //used to show or hide the submit button under the grid
   @Input() public showOrHideButton: boolean = false;
   //used in masterLinkForm to hide the buttons but the functionality still works
   @Input() public hideBTN: boolean = false;
@@ -141,6 +155,10 @@ export class AGGridComponent implements OnInit, OnChanges {
   @Input() public isGridInLookup: boolean = false;
   @Input() public lookupFieldName: String = "";
   @Input() public isReadOnly: boolean;
+  @Input() public treeGridHeader: any[] ;
+  @Input() public treeGridData: any[];
+
+  @Input() public isTreeGrid: boolean = false;
   public lookupIds: any;
   public lookupNames: any;
   public lookupAllNames: any;
@@ -173,13 +191,38 @@ export class AGGridComponent implements OnInit, OnChanges {
     private eventEmitterService: EventEmitterService,
     private commonFunction: CommonFunctions,
     public dataservice: DataService,
-    public informationservice: InformationService) {
+    public informationservice: InformationService,
+    private renderer: Renderer2) {
      }
-     
+     public groupDefaultExpanded = -1;
+
 
   ngOnInit(): void {
+    if(this.isTreeGrid){
+      this.ColDef=this.agColumns[0];
+      this.rowData=this.staticData;
+      this.gridOptions = {
+        defaultColDef: {
+          sortable: true,
+          filter: true,
+          resizable: true,
+        },
+        autoGroupColumnDef: {
+          headerName: "Hierarchy",
+          minWidth: 300,
+          cellRendererParams: {
+            suppressCount: true,
+            checkbox: true
+          }
+        },
+        treeData: true,
+        animateRows: true,
+        groupDefaultExpanded: -1,
+        getDataPath: this.getDataPath,
+        getRowId: (params) => params.data.id,
+      };
+    }
     this.informationservice.setAgGidSelectedNode('');
-    //console.log("this.informationservice.setAgGidSelectedNode on init :", this.informationservice.getAgGidSelectedNode())
     if(this.informationservice.getAccessRights()){
       this.accessRights = JSON.parse(this.informationservice.getAccessRights());
     }else{
@@ -188,14 +231,65 @@ export class AGGridComponent implements OnInit, OnChanges {
 
     this.NoneGrid = '';
 
+    if(this.checkPagination){ const style = this.renderer.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = '.ag-paging-panel { display: none; }';
+      this.renderer.appendChild(document.head, style);}
   }
 
+getChildren(parentId: number): any[] {
+  const children: any[] = [];
+
+  // Helper function to recursively find all children
+  const findChildren = (id: number) => {
+    const childNodes = this.rowData.filter(item => item.parentid === id);
+    childNodes.forEach(child => {
+      children.push(child);
+      findChildren(child.ROW_ID); // Recursively find children of this child
+    });
+  };
+
+  // Start finding children from the given parentId
+  findChildren(parentId);
+
+  return children;
+}
+  onRowSelectedTreeGrid(event: any): void {
+    const selectedNode = event.node;
+    console.log('event--->', selectedNode);
+    if (selectedNode.isSelected()) {
+      const selectedData = selectedNode.data;
+      const children = this.getChildren(selectedData.id);
+      const allIds = [selectedData.ROW_ID, ...children.map(child => child.ROW_ID)];
+      let result = allIds.join(',');
+      result = result.replaceAll("[","").replaceAll("]","");
+      result = "[" + result + "]";
+      console.log('Result:', result);
+      console.log(event.node.data);
+      this.informationservice.setVcisrowData(event.node.data);
+
+      this.informationservice.setAgGidSelectedNode(result);
+    } else {
+      console.log('Deselected Node:', event.node.data);
+    }
+  }
+
+
+  getDataPath = (data: any) => {
+    const path = [];
+    let current = data;
+    while (current) {
+        path.unshift(current.id); // Adjust if your path should use a different field
+        current = this.rowData.find(item => item.id === current.parentid); // Adjust if needed
+    }
+    return path;
+};
+
   onColumnRowGroupChanged(event: any) {
-    // Show alert or perform any action when columns are dragged to row group
     if(this.isGrouped == false)
     {
       this.uncheckAllCheckboxes();
-      
+
       this.isGrouped = true;
       this.selectedNodesAr = [];
     }
@@ -232,7 +326,7 @@ export class AGGridComponent implements OnInit, OnChanges {
     if ('dataApi' in changes || 'Parameter' in changes || 'staticData' in changes) {
       this.fetchGridData();
     }
-  
+
   }
 
   onAddClick() {
@@ -244,7 +338,7 @@ export class AGGridComponent implements OnInit, OnChanges {
     }
   }
 
-  onUpdateClick() {  
+  onUpdateClick() {
     let selectedRow = this.informationservice.getAgGidSelectedNode();
     if (selectedRow == "") {
       this.commonFunction.alert("alert", "Please choose a selected row");
@@ -273,19 +367,18 @@ export class AGGridComponent implements OnInit, OnChanges {
     }
   }
 
-  autoSizeAllColumns() {
-        const allColumnIds = this.ColDef.map((column: { field: any; }) => column.field);
-        this.columnApi.autoSizeColumns(allColumnIds);
-
-    
-}
+  // autoSizeAllColumns()
+  // {
+  //   const allColumnIds = this.ColDef.map((column: { field: any; }) => column.field);
+  //   this.columnApi.autoSizeColumns(allColumnIds);
+  // }
 
 
   onFirstDataRendered(params: any): void {
 if(this.isGridInLookup){
 
 setTimeout(() => {
-  
+
 
     let rowdata2: any[] = [];
     rowdata2 = this.rowData;
@@ -299,7 +392,7 @@ setTimeout(() => {
         tablesselected=localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").split(",")
        let i=0;
         params.api.forEachNode((rowNode: any, index: any) => {
-        
+
 
           if ((rowNode.data.id == undefined ||rowNode.data.id=="undefined") && rowNode.data.ID == tablesselected[i]) {
 
@@ -312,11 +405,11 @@ setTimeout(() => {
             i++;
           }
         });
-        
+
       }else{
         tablesselected = JSON.parse(localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id"));
 
-      
+
       params.api.forEachNode((rowNode: any, index: any) => {
 
         if (rowNode.data.id == tablesselected || rowNode.data.ID==tablesselected) {
@@ -326,8 +419,8 @@ setTimeout(() => {
       });
       }
 
-      
-      
+
+
     }
   }, 1500);
 
@@ -344,49 +437,49 @@ setTimeout(() => {
       let rowdata2: any[] = [];
       rowdata2 = this.rowData;
       let tablesselected: any;
-  
+
       if (!localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id")) {
         params.api.sizeColumnsToFit();
       } else {
-  
+
         if((!localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes("[") || !localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes("{")) && localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes(",")){
           tablesselected=localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").split(",")
-          //console.log("TABLESELECTED>>>>>>",tablesselected);
+          console.log("TABLESELECTED>>>>>>",tablesselected);
          let i=0;
           params.api.forEachNode((rowNode: any, index: any) => {
-          
-  
+
+
             if ((rowNode.data.id == undefined ||rowNode.data.id=="undefined") && rowNode.data.ID == tablesselected[i]) {
-              //console.log("SINGLE ROW NODEE>>>>",rowNode);
-  
+              console.log("SINGLE ROW NODEE>>>>",rowNode);
+
               rowNode.setSelected(true);
               i++;
-  
+
             }else if ((rowNode.data.ID == undefined ||rowNode.data.ID=="undefined") && rowNode.data.id == tablesselected[i]) {
-              //console.log("SINGLE ROW NODEE>>>>",rowNode);
-  
+              console.log("SINGLE ROW NODEE>>>>",rowNode);
+
               rowNode.setSelected(true);
               i++;
             }
           });
-          
+
         }else{
           tablesselected = JSON.parse(localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id"));
-  
-      //    //console.log("SINGLE RENDERED TABLE SELECTION >>>>>>>",tablesselected);
-        
+
+      //    console.log("SINGLE RENDERED TABLE SELECTION >>>>>>>",tablesselected);
+
         params.api.forEachNode((rowNode: any, index: any) => {
-        //  //console.log("SINGLE RENDERED ROW NODE>>>>",rowNode.data);
-  
+        //  console.log("SINGLE RENDERED ROW NODE>>>>",rowNode.data);
+
           if (rowNode.data.id == tablesselected || rowNode.data.ID==tablesselected) {
-  
+
             rowNode.setSelected(true);
           }
         });
         }
-  
-        
-        
+
+
+
       }
 
 
@@ -398,27 +491,33 @@ setTimeout(() => {
 
   }
 
-
+  onTreeGridReady(params: { api: GridApi, columnApi: ColumnApi }): void {
+    this.gridApi = params.api;
+    this.columnApi = params.columnApi;
+    if (this.gridApi) {
+      this.gridApi.setRowData(this.treeGridData);
+    }
+  }
   onGridReady(params: any) {
     // this.informationservice.setAgGidSelectedNode('');
     this.gridApi = params.api;
     this.columnApi = params.columnApi;
-    
 
-    //console.log("GRID>>>>>>>>>>",this.gridApi);
+
+    console.log("GRID>>>>>>>>>>",this.gridApi);
     this.preloadedEvent = params;
 
-    
+
 
     if (this.agColumns.length > 0) {
       this.fetchGridData();
       if (this.allowSideBar == 'true') {
         params.api.setSideBar('columns');
         params.api.setSideBarVisible('true');
-        
-      
-      
-        
+
+
+
+
 
         this.statusBar = {
           statusPanels: [
@@ -433,27 +532,271 @@ setTimeout(() => {
       params.api.setColumnDefs(this.ColDef);
       params.api.refreshHeader();
       this.gridApi.setDomLayout('autoHeight');
-      
-      
+
+
     }
     //     $('#autoSize')[0].click();
-    // //console.log('on grid ready>>>>>>>>>>>>>');
-    
+    // console.log('on grid ready>>>>>>>>>>>>>');
+
 
     //to resize the columns to the longest data input in their cells
     params.api.sizeColumnsToFit();
     //needed to give time for the grid to load
-    setTimeout(() => {
-      this.autoSizeAllColumns();
-    }, 500);
-    
-    
-    
+
+
+    //   setTimeout(() => {
+    //   this.autoSizeAllColumns();
+    // }, 500);
+
 
   }
 
 
-  handleAggridJSONRowSelection(primaryKey: any, event: any, selectionType: any)
+//   handleAggridJSONRowSelection(primaryKey: any, event: any, selectionType: any)
+//   {
+
+//     let nbOfPrimaryKeys = this.commonFunction.countNbOfOccuranceStr(primaryKey, ",");
+//     nbOfPrimaryKeys = Number(nbOfPrimaryKeys + 1);
+
+//     let columnVal;
+//     this.selectedNodesAr += ",{";
+//     if (selectionType != "unselected")
+//     {
+//       if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
+//         {
+//           for(let q = 0; q < event.node.allLeafChildren.length; q++)
+//           {
+//             for (let i = 0; i < nbOfPrimaryKeys; i++)
+//             {
+//               let columnName: String = primaryKey.split(",")[i];
+
+//                 if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+//                   {
+//                       columnVal = event.node.allLeafChildren[q].data[primaryKey.split(",")[i]] || "0";
+//                       this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
+//                   }
+
+//               console.log("this.selectedNodesAr = ", this.selectedNodesAr);
+
+//               if ((i + 1) == nbOfPrimaryKeys)
+//               {
+//                 if (this.rowContSelected <= this.rowCount)
+//                 {
+//                   this.selectedNodesAr += "\"rowSlectedStatus\":\"update\"";
+//                   this.selectedNodesAr += "}";
+//                 }
+//                 else
+//                 {
+//                   this.selectedNodesAr += "}";
+//                 }
+//               }
+//             }
+//           }
+//         }
+//         else
+//         {
+//           for (let i = 0; i < nbOfPrimaryKeys; i++)
+//           {
+//             let columnName: String = primaryKey.split(",")[i];
+//             columnVal = event.data[primaryKey.split(",")[i]] || "0";
+//             this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
+
+//             if ((i + 1) == nbOfPrimaryKeys)
+//               {
+//                 if (this.rowContSelected <= this.rowCount)
+//                 {
+//                   this.selectedNodesAr += "\"rowSlectedStatus\":\"update\"";
+//                   this.selectedNodesAr += "}";
+//                 }
+//                 else
+//                 {
+//                   this.selectedNodesAr += "}";
+//                 }
+//               }
+//           }
+//         }
+
+//     if (this.selectedNodesAr.endsWith(", }]"))
+//     {
+//       this.selectedNodesAr = this.selectedNodesAr.replace(", }]", "}]");
+//     }
+//     this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
+//     this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
+//     this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
+//     this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+//     this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+//     this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
+//     this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
+
+//     if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+//     {
+//       for (let i = 0; i < event.node.allLeafChildren.length; i++)
+//       {
+//         if(i < event.node.allLeafChildren.length - 1)
+//         {
+//           this.selectedNodesAr = this.selectedNodesAr.replace(", }", "},{");
+//         }
+//         else
+//         {
+//           this.selectedNodesAr = this.selectedNodesAr.replace(", }", "}");
+//         }
+//       }
+//     }
+//     else
+//     {
+//       for(let i = 0; i < this.selectedNodesAr.length; i++)
+//       {
+//         this.selectedNodesAr = this.selectedNodesAr.replace(", ,", "},");
+//       }
+//     }
+//   }
+//     //note that here, the comma is followed by a space for the cases that the json would have ended in ", }]"
+//     if (this.selectedNodesAr.endsWith(", }]"))
+//       {
+//         this.selectedNodesAr = this.selectedNodesAr.replace(", }]", "}]");
+//       }
+
+//     if (selectionType == "unselected") {
+//       this.selectedNodesAr=this.selectedNodesAr.replace(/\s/g,"");
+
+//       console.log("EVENT>>>>>>>>>>>>>",event.data);
+//       console.log("selectedNodesAr ==== ", this.selectedNodesAr);
+//       if (this.selectedNodesAr.endsWith(",{"))
+//       {
+//         this.selectedNodesAr = this.selectedNodesAr.slice(0, -2);
+//       }
+
+//       console.log("OLD ARRAY>>>>>",this.selectedNodesAr);
+
+//       let selectedNodesJson = JSON.parse(this.selectedNodesAr);
+//       this.informationservice.getAgGidSelectedNode();
+//      let commonKeys: { [x: string]: any; };
+
+//     if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1') {
+//       if (event.node.data == '' || event.node.data == null || event.node.data == undefined) {
+
+//         for (let q = 0; q < event.node.allLeafChildren.length; q++) {
+//           let commonKeys = Object.keys(event.node.allLeafChildren[q].data).reduce((result: any, key) => {
+//             if (this.agPrimaryKey.includes(key)) {
+//               result[key] = event.node.allLeafChildren[q].data[key];
+//             }
+//             return result;
+//           }, {});
+//           this.commonKeysArray.push(commonKeys); // Push the result of each iteration to the array
+//         }
+
+//         // Apply replacement operations on each element of commonKeysArray
+//         this.commonKeysArray = this.commonKeysArray.map((commonKeys: any) => {
+//           let selectedNodesAr = JSON.stringify(commonKeys);
+//           selectedNodesAr = selectedNodesAr.replace("[", "")
+//                                            .replace("]", "")
+//                                            .replace("undefined,", "0")
+//                                            .replace("undefined", "0")
+//                                            .replace("},]", "}]")
+//                                            .replace("[,{", "[{")
+//                                            .replace(",,", ",")
+//                                            .replace(",]", "]")
+//                                            .replace("[,", "[");
+//           return JSON.parse(selectedNodesAr);
+//         });
+//       }
+//     }
+
+//     else
+//     {
+//       console.log("event.node.data");
+//       commonKeys = Object.keys(event.node.data).reduce((result:any, key) =>
+//       {
+//         console.log("key == ", key)
+//         if (this.agPrimaryKey.includes(key))
+//         {
+//           result[key] = event.node.data[key];
+//           console.log("event.node.data[key] = ", event.node.data[key])
+//         }
+//       return result;
+//      }, {});
+//     }
+
+//       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
+//       if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+//       {
+//         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(this.commonKeysArray),"");
+
+//         let valuesOfPrimaryKeys = primaryKey.split(",");
+//         this.value1 = valuesOfPrimaryKeys[0];
+//         this.value2 = valuesOfPrimaryKeys[1];
+
+//         selectedNodesJson = selectedNodesJson.filter((item1: { [key: string]: string }) =>
+//           !this.commonKeysArray.some((item2: { [key: string]: string }) =>
+//               item2[this.value1] === item1[this.value1] && item2[this.value2] === item1[this.value2]
+//           )
+//       );
+
+//         console.log("selectedNodesJson == ", selectedNodesJson);
+//         console.log("valuesOfPrimaryKeys === ", valuesOfPrimaryKeys);
+//         console.log("1 this.selectedNodesJson === ", this.selectedNodesAr);
+//         // this.selectedNodesAr = selectedNodesJson;
+//         this.selectedNodesAr = JSON.stringify(selectedNodesJson);
+//         console.log("2 this.selectedNodesAr === ", this.selectedNodesAr);
+
+//       }
+//       else
+//       {
+//         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(commonKeys),"");
+//         console.log("commonKeys = ", commonKeys)
+//       }
+
+//       this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
+//       this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
+//       this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
+//       this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+//       this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+//       this.selectedNodesAr = this.selectedNodesAr.replace("},]", "}]");
+//       this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
+//       this.selectedNodesAr = this.selectedNodesAr.replace(",,", ",");
+//       this.selectedNodesAr = this.selectedNodesAr.replace(",]", "]");
+//       this.selectedNodesAr = this.selectedNodesAr.replace("[,", "[");
+
+//       console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
+
+//       if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+//       {
+//         this.commonKeysArray = [];
+//       }
+
+//     }
+//  //   console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
+// console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
+
+
+//  //////////////////////////////////////////////////////////////HAYA START Access Rights (USM)
+//  if (this.isAccessRightsGrid){
+//   // Remove duplicates based on first primary key only in USM
+//   let primaryKeys = primaryKey.split(",");
+
+//   let firstPrimaryKey = primaryKey.split(",")[0];
+//   let selectedNodesJson = JSON.parse(this.selectedNodesAr);
+//   let uniqueNodesMap = new Map();
+//   selectedNodesJson.forEach((node: { [x: string]: any; }) => {
+//     uniqueNodesMap.set(node[firstPrimaryKey], node);
+// });
+
+// this.selectedNodesAr = JSON.stringify(Array.from(uniqueNodesMap.values()));
+
+// this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+// this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+
+// console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesAr);
+
+
+// }
+// /////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END
+//   }
+
+
+
+
+handleAggridJSONRowSelection(primaryKey: any, event: any, selectionType: any)
   {
     let wasGrouped=0;
     if(event.node.allLeafChildren == undefined){
@@ -465,63 +808,53 @@ setTimeout(() => {
 
       }
       this.informationservice.setIsRowGroup('0');
-      
+
     }
     let nbOfPrimaryKeys = this.commonFunction.countNbOfOccuranceStr(primaryKey, ",");
     nbOfPrimaryKeys = Number(nbOfPrimaryKeys + 1);
 
     let columnVal;
     this.selectedNodesAr += ",{";
-    if (selectionType != "unselected")
-    {
       console.log(' this.informationservice.getIsRowGroup() ---->',this.informationservice.getIsRowGroup())
       if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
         {
           console.log('event.node---->',event);
           if(event.node.allLeafChildren != undefined){
             for(let q = 0; q < event.node.allLeafChildren.length; q++)
-              {  
+              {
                 for (let i = 0; i < nbOfPrimaryKeys; i++)
                 {
                   let columnName: String = primaryKey.split(",")[i];
-        
+
                     if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
-                      {  
+                      {
                           columnVal = event.node.allLeafChildren[q].data[primaryKey.split(",")[i]] || "0";
                           console.log('columnVal>>>>>>>>>>>>>>>>>',columnVal)
                           this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
                       }
-        
+
                   console.log("this.selectedNodesAr = ", this.selectedNodesAr);
-        
+
                   if ((i + 1) == nbOfPrimaryKeys)
                   {
-                    if (this.rowContSelected <= this.rowCount)
-                    {
-                      this.selectedNodesAr += "\"rowSlectedStatus\":\"update\"";
-                      this.selectedNodesAr += "}";
-                    }
-                    else
-                    {
-                      this.selectedNodesAr += "}";
-                    }
+                      columnVal = event.node.allLeafChildren[q].data[primaryKey.split(",")[i]] || "0".replace("[","");
+                      columnVal = columnVal.replace("]","");
+                      this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
                   }
                 }
               }
-          }else{
-            this.isGrouped == false;
-            this.informationservice.setIsRowGroup('0');
-          }
-          
+
+
         }
         else
         {
           for (let i = 0; i < nbOfPrimaryKeys; i++)
           {
             let columnName: String = primaryKey.split(",")[i];
-            columnVal = event.data[primaryKey.split(",")[i]] || "0";
+            columnVal = event.data[primaryKey.split(",")[i]] || "0".replace("[","");
+            columnVal = columnVal.replace("]","");
             this.selectedNodesAr += "\"" + columnName + "\"" + ":" + "\"" + columnVal + "\"" + ", ";
-    
+
             if ((i + 1) == nbOfPrimaryKeys)
               {
                 if (this.rowContSelected <= this.rowCount)
@@ -546,7 +879,7 @@ setTimeout(() => {
     }
   console.log('selectedNodesAr---2221--->',this.selectedNodesAr);
 // if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1' || wasGrouped == 1){
-  
+
 // }
 // else{
 //     this.selectedNodesAr = this.selectedNodesAr.replace("[", "");
@@ -573,7 +906,7 @@ setTimeout(() => {
     this.selectedNodesAr = this.selectedNodesAr.replace("[,{", "[{");
     console.log('selectedNodesAr---1235555--->',this.selectedNodesAr);
 
-    if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+    if(this.isGrouped == true)
     {
 
       for (let i = 0; i < event.node.allLeafChildren.length; i++)
@@ -616,16 +949,16 @@ setTimeout(() => {
       {
         this.selectedNodesAr = this.selectedNodesAr.slice(0, -2);
       }
-      
+
       //console.log("OLD ARRAY>>>>>",this.selectedNodesAr);
 
       let selectedNodesJson = JSON.parse(this.selectedNodesAr);
       this.informationservice.getAgGidSelectedNode();
      let commonKeys: { [x: string]: any; };
-   
-    if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1') {
+
+    if (this.isGrouped == true) {
       if (event.node.data == '' || event.node.data == null || event.node.data == undefined) {
-        
+
         for (let q = 0; q < event.node.allLeafChildren.length; q++) {
           let commonKeys = Object.keys(event.node.allLeafChildren[q].data).reduce((result: any, key) => {
             if (this.agPrimaryKey.includes(key)) {
@@ -635,7 +968,7 @@ setTimeout(() => {
           }, {});
           this.commonKeysArray.push(commonKeys); // Push the result of each iteration to the array
         }
-        
+
         // Apply replacement operations on each element of commonKeysArray
         this.commonKeysArray = this.commonKeysArray.map((commonKeys: any) => {
           let selectedNodesAr = JSON.stringify(commonKeys);
@@ -652,7 +985,7 @@ setTimeout(() => {
         });
       }
     }
-    
+
     else
     {
       //console.log("event.node.data");
@@ -668,17 +1001,21 @@ setTimeout(() => {
      }, {});
     }
 
+    console.log("selectedNodesJson = ", selectedNodesJson)
+    console.log("this.isGrouped = ", this.isGrouped)
       this.selectedNodesAr = JSON.stringify(selectedNodesJson);
-      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+      if (this.isGrouped == true)
       {
         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(this.commonKeysArray),"");
+        console.log("this.commonKeysArray = ", this.commonKeysArray)
+        console.log("this.selectedNodesAr = ", this.selectedNodesAr)
 
         let valuesOfPrimaryKeys = primaryKey.split(",");
         this.value1 = valuesOfPrimaryKeys[0];
         this.value2 = valuesOfPrimaryKeys[1];
 
-        selectedNodesJson = selectedNodesJson.filter((item1: { [key: string]: string }) => 
-          !this.commonKeysArray.some((item2: { [key: string]: string }) => 
+        selectedNodesJson = selectedNodesJson.filter((item1: { [key: string]: string }) =>
+          !this.commonKeysArray.some((item2: { [key: string]: string }) =>
               item2[this.value1] === item1[this.value1] && item2[this.value2] === item1[this.value2]
           )
       );
@@ -689,14 +1026,14 @@ setTimeout(() => {
         // this.selectedNodesAr = selectedNodesJson;
         this.selectedNodesAr = JSON.stringify(selectedNodesJson);
         //console.log("2 this.selectedNodesAr === ", this.selectedNodesAr);
-        
+
       }
       else
       {
         this.selectedNodesAr=this.selectedNodesAr.replaceAll(JSON.stringify(commonKeys),"");
         //console.log("commonKeys = ", commonKeys)
       }
-      
+
       this.selectedNodesAr = this.selectedNodesAr.replace("[", "")
       this.selectedNodesAr = this.selectedNodesAr.replace("]", "");
       this.selectedNodesAr = "[" + this.selectedNodesAr + "]";
@@ -710,11 +1047,17 @@ setTimeout(() => {
 
       //console.log("NEW ARRAY>>>>>",this.selectedNodesAr);
 
-      if (this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+      if (this.isGrouped == true)
       {
         this.commonKeysArray = [];
+        this.selectedNodesAr=this.selectedNodesAr.replace("[","");
+        this.selectedNodesAr=this.selectedNodesAr.replace("]","");
+        this.selectedNodesAr="["+this.selectedNodesAr+"]";
+
       }
-      
+      this.selectedNodesAr=this.selectedNodesAr.replace("[","");
+      this.selectedNodesAr=this.selectedNodesAr.replace("]","");
+      this.selectedNodesAr="["+this.selectedNodesAr+"]";
     }
  //   //console.log("V-GRID LOOKUP GRID SELECTION>>>>>>>>",this.agRowSelection);
 //console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
@@ -728,7 +1071,7 @@ setTimeout(() => {
   let selectedNodesJson = JSON.parse(this.selectedNodesAr);
   let uniqueNodesMap = new Map();
   selectedNodesJson.forEach((node: { [x: string]: any; }) => {
-    uniqueNodesMap.set(node[firstPrimaryKey], node); 
+    uniqueNodesMap.set(node[firstPrimaryKey], node);
 });
 
 this.selectedNodesAr = JSON.stringify(Array.from(uniqueNodesMap.values()));
@@ -740,23 +1083,21 @@ this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
 
 
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END  
+/////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END
 
 this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
     this.selectedNodesAr ="";
-//console.log('jp------->: ',this.informationservice.getAgGidSelectedNode());
   }
-
 
   onRowSelected(event: any) {
     setTimeout(() => {
       if(this.informationservice.getIsDynamicReport()==true){
-        //console.log("FETET");
+        console.log("FETET");
         this.informationservice.setDynamicReportId(this.informationservice.getAgGidSelectedNode());
       }
     }, 1000);
-   
-    ////console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
+
+    //console.log("INFORMATION DYNAMIC REPORT ID>>>>>>>>",this.informationservice.getDynamicReportId());
     this.rowContSelected = this.rowContSelected + 1;
     // If primary key is not available, throw exception Primary key is required
     if (this.agPrimaryKey != '') {
@@ -768,9 +1109,8 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
         // this.gatherAllSelectedRowNodes.push(event.node);
         if (primaryKey != "" && primaryKey != undefined) {
           if (primaryKey.indexOf(",") != -1 && !this.isGridInLookup) {
-            //console.log('111111111111')
             this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
-            
+
             ///elie///////////////
             if(this.agRowSelection=='single' && this.agPrimaryKey.includes(",")){
                 const commonKeys = Object.keys(event.node.data).reduce((result:any, key) => {
@@ -779,11 +1119,11 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
                 }
                 return result;
               }, {});
-              
-              //console.log("COMMON KEYS>>>>>>>>>>>>>>",commonKeys); 
+
+              console.log("COMMON KEYS>>>>>>>>>>>>>>",commonKeys);
 
 
-              
+
               this.informationservice.setAgGidSelectedNode("["+JSON.stringify(commonKeys)+"]");
 
 
@@ -793,9 +1133,9 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
 
           }
 
-            //console.log("this.informationservice.setAgGidSelectedNode on row selected :", this.informationservice.getAgGidSelectedNode())
+            console.log("this.informationservice.setAgGidSelectedNode on row selected :", this.informationservice.getAgGidSelectedNode())
           } else if (primaryKey.indexOf(",") == -1 && this.isGridInLookup) {
-            ////console.log("EVEnTTT>>>>>>",event);
+            //console.log("EVEnTTT>>>>>>",event);
 
             if(!event.data["ID"]) {
               this.lookupIds = this.lookupIds + "," + event.data["id"];
@@ -822,7 +1162,7 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else if (primaryKey.indexOf(",") != -1 && this.isGridInLookup) {
-            //console.log("LESH FETTE LA HON");
+            console.log("LESH FETTE LA HON");
             if(!event.data["ID"]) {
               this.lookupIds = this.lookupIds + "," + event.data["id"];
               this.lookupNames = this.lookupNames + "," + event.data["name"];
@@ -847,36 +1187,40 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
-            //console.log("FETET LA HON",primaryKey);
-            //console.log("event-->",event);
-            this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
-
+            console.log("FETET LA HON");
+            console.log("event-->",event)
             if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
             {
-              this.selectedNodes = '';
+              // this.selectedNodes = '';
               this.selectedNodes = this.selectedNodes + "," + event.node.key;
+              this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
+
+              console.log("this.informationservice.setAgGidSelectedNode group :", this.informationservice.getAgGidSelectedNode())
+
             }
             else
             {
               this.selectedNodes = this.selectedNodes + "," + event.data[primaryKey];
             }
-            
-              
+
+
             if (this.selectedNodes.charAt(0) === ',') {
               this.selectedNodes = this.selectedNodes.substring(1);
             }
 
             if (this.selectedNodes == "undefined") {
-              
+
               this.informationservice.setAgGidSelectedNode(event.data.ROW_ID);
-              //console.log("this.informationservice.setAgGidSelectedNode undefined :", this.informationservice.getAgGidSelectedNode())
+              console.log("this.informationservice.setAgGidSelectedNode undefined :", this.informationservice.getAgGidSelectedNode())
 
             } else {
-               
-              // this.informationservice.setAgGidSelectedNode(this.selectedNodes);
-             // this.handleAggridJSONRowSelection(primaryKey, event, 'selected');
-
-              //console.log("this.informationservice.setAgGidSelectedNode else :", this.informationservice.getAgGidSelectedNode())
+              console.log('isGrouped---->',this.isGrouped);
+              console.log('isRowGroup---->: ',this.informationservice.getIsRowGroup());
+              if(this.informationservice.getIsRowGroup() == 0){
+                console.log("!!!!!!!!!!");
+              this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+              }
+              console.log("this.informationservice.setAgGidSelectedNode else :", this.informationservice.getAgGidSelectedNode())
 
 
             }
@@ -885,27 +1229,25 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
       } else {
         if (primaryKey != "" && primaryKey != undefined) {
           if (primaryKey.indexOf(",") != -1 && !this.isGridInLookup) {
-
-//console.log('22222222222222222')
             this.handleAggridJSONRowSelection(primaryKey, event, 'unselected');
 
              ///elie///////////////
              if(this.agRowSelection=='single' && this.agPrimaryKey.includes(",")){
-            
+
 
                 }else{
-            
-                  
+
+
             this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
-            //console.log("this.informationservice.setAgGidSelectedNode unselected :", this.informationservice.getAgGidSelectedNode())
+            console.log("this.informationservice.setAgGidSelectedNode unselected :", this.informationservice.getAgGidSelectedNode())
  }
           } else if (primaryKey.indexOf(",") && this.isGridInLookup) {
 
-            //console.log("EVEnTTT>>>>>>",event.node.selected);
+            console.log("EVEnTTT>>>>>>",event.node.selected);
 
           //  this.lookupIds = this.lookupIds.replace(event.data["id"] + ",", "");
           //  this.lookupIds = this.lookupIds.replace("," + event.data["id"], "");
-            
+
 
 
             if(!event.data["ID"]) {
@@ -918,13 +1260,13 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
               this.lookupIds = this.lookupIds + "," + event.data["ID"];
               this.lookupNames = this.lookupNames + "," + event.data["NAME"];
               this.lookupAllNames = this.lookupAllNames + "," + event.data["NAME"];
-              //console.log("NAMEEEE>>>>>>>",this.lookupAllNames);
+              console.log("NAMEEEE>>>>>>>",this.lookupAllNames);
               }else{
-                //console.log("LOOKUP ID>>>>",this.lookupIds);
-                //console.log("LOOKUP NAME>>>>",this.lookupAllNames);
-                //console.log("EVENTTTTT>>>>",event.data["ID"]);
+                console.log("LOOKUP ID>>>>",this.lookupIds);
+                console.log("LOOKUP NAME>>>>",this.lookupAllNames);
+                console.log("EVENTTTTT>>>>",event.data["ID"]);
 
-                
+
                 this.lookupIds=this.lookupIds.replace(","+event.data["ID"],"");
                 this.lookupIds=this.lookupIds.replace(event.data["ID"]+",","");
                 this.lookupIds=this.lookupIds.replace(event.data["ID"],"");
@@ -942,7 +1284,7 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
                      }else
                     if(countLookUpNames==1){
                       this.lookupNames=this.lookupAllNames;
-                     
+
                     }else
                      if(countLookUpNames==0){
                       this.lookupNames='';
@@ -950,21 +1292,21 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
                      localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name",this.lookupNames);
 
                   }
-                
+
                 }
               }
 
             }
-              // this.lookupIds = this.lookupIds.replace("", "," + event.data["id"]);            
+              // this.lookupIds = this.lookupIds.replace("", "," + event.data["id"]);
             // this.lookupNames = this.lookupNames.replace(event.data["name"] + ",", "");
             // this.lookupNames = this.lookupNames.replace("," + event.data["name"], "");
 
             let countSelections = this.commonFunction.countNbOfOccuranceStr(this.lookupIds, ",");
             countSelections = Number(countSelections) + 1;
 
-            //console.log("COUNT SELECTIONS>>>>>>",countSelections);
+            console.log("COUNT SELECTIONS>>>>>>",countSelections);
             if(this.agRowSelection=='single'){
-              //console.log("this.agRowSelection : ",this.agRowSelection);
+              console.log("this.agRowSelection : ",this.agRowSelection);
               let lid=localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id");
               let llid=lid.split(",");
               let lenid=llid.length;
@@ -973,22 +1315,22 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
               let llname=lname.split(",");
               let lenname=llname.length;
 
-              //console.log("CURRENT>>>",lid);
-              //console.log("ARRAY>>>",llid);
-              //console.log("LENGTH>>>>",lenid);
-              //console.log("TESTT>>>>>",llid[lenid]);
+              console.log("CURRENT>>>",lid);
+              console.log("ARRAY>>>",llid);
+              console.log("LENGTH>>>>",lenid);
+              console.log("TESTT>>>>>",llid[lenid]);
               localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id",llid[lenid-1])
-          
-              //console.log("CURRENT NAME>>>",lname);
-              //console.log("ARRAY NAME>>>",llname);
-              //console.log("LENGTH NAME>>>>",lenname);
-              //console.log("TESTT NAME>>>>>",llname[lenname-1]);
-              //console.log("LocalStorage>>>",localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id"));
 
-             //console.log("EVENT DATA>>>>>>>",event.data);
+              console.log("CURRENT NAME>>>",lname);
+              console.log("ARRAY NAME>>>",llname);
+              console.log("LENGTH NAME>>>>",lenname);
+              console.log("TESTT NAME>>>>>",llname[lenname-1]);
+              console.log("LocalStorage>>>",localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id"));
+
+             console.log("EVENT DATA>>>>>>>",event.data);
 
              if(!event.data["ID"]){
-              //console.log("EEEEEEEEEEEEEEEEEEEEEE");
+              console.log("EEEEEEEEEEEEEEEEEEEEEE");
               localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name","Selected (1)");
              }else{
               localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name",llname[lenname-1]);
@@ -1006,7 +1348,7 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             if(countSelections==1){
 
               this.lookupNames=this.lookupAllNames;
-             
+
             }
              if(countSelections==0){
               this.lookupNames='';
@@ -1015,8 +1357,8 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
           //  localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
            // localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
-            
-            if(this.isGrouped == true  || this.informationservice.getIsRowGroup() =='1')
+
+            if(this.isGrouped == true)
               {
 
                 this.selectedNodes = this.selectedNodes.replace("," + event.node.key, "");
@@ -1037,10 +1379,10 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             if (this.selectedNodes.charAt(0) === ',') {
               this.selectedNodes = this.selectedNodes.substring(1);
             }
-            
-            
-          //  this.informationservice.setAgGidSelectedNode(this.selectedNodes);
-            //console.log("this.informationservice.setAgGidSelectedNode , :", this.informationservice.getAgGidSelectedNode())
+
+
+            this.informationservice.setAgGidSelectedNode(this.selectedNodes);
+            console.log("this.informationservice.setAgGidSelectedNode , :", this.informationservice.getAgGidSelectedNode())
 
           }
         }
@@ -1050,16 +1392,20 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
     if(this.isForQueryForm==true){
       this.informationservice.setDynamicService('agGidSelectedQueryForm_('+this.lookupFieldName+')',this.informationservice.getAgGidSelectedNode());
     }else if(this.isForQueryForm==false && this.isGridInLookup==false){
-      
-      // this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
-      //console.log("this.selectedNodes :", this.selectedNodes);
-      //console.log("this.informationservice.setAgGidSelectedNode false :", this.informationservice.getAgGidSelectedNode());
-
-
+      if(this.informationservice.getIsRowGroup() == 0){
+      this.informationservice.setAgGidSelectedNodeRule(this.selectedNodes);
+      }
+      console.log("this.selectedNodes :", this.selectedNodes);
+      console.log("this.informationservice.setAgGidSelectedNode false :", this.informationservice.getAgGidSelectedNode());
+      console.log('agPrimaryKey------->',this.agPrimaryKey)
+      if(this.agRowSelection!='single' && this.agPrimaryKey=='ROW_ID'){
+      let tempArray=this.informationservice.getAgGidSelectedNode().replaceAll("[","").replaceAll("]","");
+     tempArray="["+tempArray+"]";
+     console.log("tempArray--->"+tempArray)
+      this.informationservice.setAgGidSelectedNode(tempArray);
+      }
     }
 ////////////////////////////////////////////////////
-//console.log("this.informationservice.setAgGidSelectedNode", this.informationservice.getAgGidSelectedNode());
-
   }
 onCellEditingStopped(event: any) {
   let primaryKey = this.agPrimaryKey.toLowerCase();
@@ -1141,7 +1487,7 @@ onCellEditingStopped(event: any) {
     }
 
     if (this.agType == 'serverSide') {
-     
+
     }
   }
 
@@ -1149,19 +1495,18 @@ onCellEditingStopped(event: any) {
 
 
     this.staticData = this.staticData == undefined ? -1 : this.staticData;
-    
 
-    ////console.log("STATIC DATA>>>>>>>>>>>",this.staticData);
-    
+
+    //console.log("STATIC DATA>>>>>>>>>>>",this.staticData);
+
     if (this.gridApi != undefined) {
       // const { api } = params;
       let agGridRenderedColumns = [];
       if (this.agColumns.length > 0) {
-        
-        for (let kk = 0; kk < this.agColumns[0].length; kk++) {
 
+        for (let kk = 0; kk < this.agColumns[0].length; kk++) {
           let definition: ColDef = {
-            
+
             headerName: this.agColumns[0][kk].headerName,
             field: this.agColumns[0][kk].field,
             // editable: this.agColumns[0][kk].editable,
@@ -1235,7 +1580,7 @@ onCellEditingStopped(event: any) {
             cellClass: this.agColumns[0][kk].cellClass,
             cellClassRules: this.agColumns[0][kk].cellClassRules,
             cellRendererParams: this.agColumns[0][kk].cellRendererParams,
-            cellRendererSelector: this.agColumns[0][kk].cellRendererSelector,  
+            cellRendererSelector: this.agColumns[0][kk].cellRendererSelector,
             autoHeight: this.agColumns[0][kk].autoHeight == null ? true : this.agColumns[0][kk].autoHeight,
             wrapText: this.agColumns[0][kk].wrapText,
             enableCellChangeFlash: this.agColumns[0][kk].enableCellChangeFlash,
@@ -1282,12 +1627,12 @@ onCellEditingStopped(event: any) {
             resizable: this.agColumns[0][kk].resizable == null ? true : this.agColumns[0][kk].resizable,
             suppressSizeToFit: true,
             suppressAutoSize: true,
-            
+
           };
-          
-          
-          
-        
+
+
+console.log('definition==>',definition);
+
           if (this.agColumns[0][kk].isLink) {
             definition.cellRenderer = LinkCellRenderer;
             definition.cellRendererParams = {
@@ -1301,41 +1646,43 @@ onCellEditingStopped(event: any) {
             }
           }
 
-          
+
           if (this.agColumns[0][kk].isCheckBox) {
-            
+
             definition.cellRenderer = CheckboxCellRenderer;
             definition.cellRendererParams = {
               isCheckBoxDisabled: this.agColumns[0][kk].isCheckBoxDisabled,
               col_name: this.agColumns[0][kk].field,
               pinned: true,
-              
+
             }
-           
+
           }
           agGridRenderedColumns.push(definition);
 
         }
-      
+
         this.ColDef = agGridRenderedColumns;
         this.groupDisplayType = 'multipleColumns'
         this.rowModelType = this.agType; // Specify how the data is fetched if from Client Side or Server Side
         this.paginationFlag = this.pagination; // enables pagination in the grid
         this.paginationSize = this.paginationPageSize; // sets 10 rows per page (default is 100)
-        
+
 
         let gridParam = this.dataApiParam == '' ? null : this.dataApiParam;
 
         if (this.staticData == -1) {
-          
-          try {
-            const gridDataApi = gridParam === "" 
-  ? from(axios.get(this.dataApi)) 
-  : from(axios.post(this.dataApi, gridParam));
 
+          try {
+            console.log('dataApi----->',this.dataApi);
+            console.log("gridOaram---->",gridParam)
+            const gridDataApi = gridParam === ""
+  ? from(axios.get(this.dataApi))
+  : from(axios.post(this.dataApi, gridParam));
+console.log('gridDataApi--------->',gridDataApi);
 gridDataApi.subscribe(
   response => {
-    //console.log('Data fetched successfully:', response.data);
+    console.log('Data fetched successfully:', response.data);
   },
   error => {
     console.error('Error fetching data:', error);
@@ -1345,43 +1692,43 @@ gridDataApi.subscribe(
     }
   }
 );
-            // //console.log("data apiiiiiiiiiiiiiiiii isssssssss::::",axios.get(this.dataApi));
+            // console.log("data apiiiiiiiiiiiiiiiii isssssssss::::",axios.get(this.dataApi));
             // const gridDataApi = gridParam == "" ? from(axios.get(this.dataApi)) : from(axios.post(this.dataApi, gridParam));
             // // const gridDataApi = from(axios.post(this.dataApi, gridParam));
             const gridData = await lastValueFrom(gridDataApi);
 
             if (this.rowModelType == 'clientSide') {
-              
+
               if (localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id') === null || localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id') === '') {
-                
+
               } else {
                 let rowdata2: any[] = [];
                 let tablesselected: any;
                 rowdata2 = gridData.data;
                 tablesselected = JSON.parse(localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id'));
-                
-               // //console.log("TABLE ROW SELECTED>>>>>>>>>>",tablesselected);
+
+               // console.log("TABLE ROW SELECTED>>>>>>>>>>",tablesselected);
 
                 gridData.data.forEach((data: any) => {
                   //checking if the id's number and type values are the same before putting it on top
-                  //after submission 
+                  //after submission
                   if (Number(data.id) === Number(tablesselected)) {
                     this.checkedrowData.push(data);
 
-                 // //console.log("CHECKED ROW DATA>>>>>>>>>>",this.checkedrowData);
+                 // console.log("CHECKED ROW DATA>>>>>>>>>>",this.checkedrowData);
 
                     let x = rowdata2.filter((a: any) => a !== data);
                     rowdata2 = x;
-                    
+
                   }
                 });
-              
-             
+
+
                 gridData.data = [...this.checkedrowData, ...rowdata2];
               }
-            //  //console.log("AAAAAA>>>>>>>>",gridData.data);
+            //  console.log("AAAAAA>>>>>>>>",gridData.data);
               this.rowData = gridData.data;
-              
+
             }
           } catch (error) {
           }
@@ -1392,7 +1739,7 @@ gridDataApi.subscribe(
           let agGidSelectedNodesData = "";
           if (this.isGridInLookup) {
             agGidSelectedNodesData = localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id");
-            
+
           }
 
           if (!this.isGridInLookup) {
@@ -1402,20 +1749,20 @@ gridDataApi.subscribe(
               val = val.replace("= ", "=");
               val = val.replace("=", "=");
               agGidSelectedNodesData = val;
-              
+
               // agGidSelectedNodesData = JSON.parse(val);
               // this.informationservice.setAgGidSelectedNode('');
             }
           }
-          
+
           if (agGidSelectedNodesData != "") {
-            
+
             let res1: any[] = [];
 
-            // //console.log("PRIMARY >>>>>>>>>>>>>>>",this.agPrimaryKey);
+            // console.log("PRIMARY >>>>>>>>>>>>>>>",this.agPrimaryKey);
 
             if (this.agPrimaryKey != "" && this.agPrimaryKey != undefined) {
-               
+
               if (this.agPrimaryKey.indexOf(",") != -1) {
                 const agPrimaryKeyAr = this.agPrimaryKey.split(",");
                 for (let i = 0; i < this.rowData.length; i++) {
@@ -1437,7 +1784,7 @@ gridDataApi.subscribe(
                       for (let uu = 0; uu < agGidSelectedNodesData.length; uu++) {
                         if (JSON.stringify(res1[u].data) == JSON.stringify(agGidSelectedNodesData[uu])) {
                           this.rowCount = this.rowCount + 1;
-                          //console.log("ROW NODE111>>>>>>>",this.gridApi.getRowNode(res1[u].id));
+                          console.log("ROW NODE111>>>>>>>",this.gridApi.getRowNode(res1[u].id));
                           this.gridApi.getRowNode(res1[u].id).setSelected(true);
                         }
                       }
@@ -1445,96 +1792,96 @@ gridDataApi.subscribe(
                   }
                 }
               } else {
-                
+
                 if (this.isGridInLookup) {
-                  
+
                   for (let i = 0; i < this.rowData.length; i++) {
-                    
+
                     if (agGidSelectedNodesData.indexOf(",") != -1) {
-                      //console.log("ROW SELECTED GRID111111>>>>>>>",agGidSelectedNodesData);
+                      console.log("ROW SELECTED GRID111111>>>>>>>",agGidSelectedNodesData);
                       let checkX = 0;
-                      
+
                       let lookupIds = agGidSelectedNodesData.split(",");
 
                       for (let j = 0; j < lookupIds.length; j++) {
-                        // //console.log("LOOKUP IDS>>>>>>",lookupIds);
-                        // //console.log("LOOKUP IDS ROW DATA>>>>>>",this.rowData[i]);
-                        // //console.log("AG PRIMARY KEY>>>>>>",this.agPrimaryKey);
+                        // console.log("LOOKUP IDS>>>>>>",lookupIds);
+                        // console.log("LOOKUP IDS ROW DATA>>>>>>",this.rowData[i]);
+                        // console.log("AG PRIMARY KEY>>>>>>",this.agPrimaryKey);
 
                         // if(this.rowData[i].id!=undefined ||this.rowData[i].id!=''){
 
                         //   if (this.rowData[i][this.agPrimaryKey] == lookupIds[j][this.agPrimaryKey]) {
 
-                        //     //console.log("FETETTTTTT");
-  
+                        //     console.log("FETETTTTTT");
+
                         //     checkX += 1;
                         //     if (Number(checkX) == Number(this.commonFunction.countNbOfOccuranceStr(this.agPrimaryKey, ",") + 1)) {
                         //       let dataa = { id: i, data: this.rowData[i] };
                         //       res1.push(dataa);
                         //     }
-                        
+
                         //   }
 
                         // }else {
-                        //  //console.log("IDDD>>>>>>>>>",this.rowData[i].id);
-                        //  //console.log("LOOKUP IDDD>>>>>>>>>",lookupIds[j]);
-                         
+                        //  console.log("IDDD>>>>>>>>>",this.rowData[i].id);
+                        //  console.log("LOOKUP IDDD>>>>>>>>>",lookupIds[j]);
+
 
                           if (this.rowData[i].id == lookupIds[j]) {
-                          // //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", agGidSelectedNodesData)
-                           // //console.log("FETETTTTTT");
-  
+                          // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", agGidSelectedNodesData)
+                           // console.log("FETETTTTTT");
+
                             checkX += 1;
                             if (Number(checkX) == Number(this.commonFunction.countNbOfOccuranceStr(this.agPrimaryKey, ",") + 1)) {
                               let dataa = { id: i, data: this.rowData[i] };
                               res1.push(dataa);
                             }
-                        
+
                       //    }
 
 
-                      
+
                       let rowdata2: any[] = [];
                       let tablesselected: any;
                       rowdata2 = this.staticData;
 
-                      
+
 
                       if((!localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes("[") || !localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes("{")) && localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").includes(",")){
                         tablesselected=localStorage.getItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id").split(",")
-               
-                       // //console.log("MULTIPLE RENDERED TABLE SELECTION >>>>>>>",tablesselected);
+
+                       // console.log("MULTIPLE RENDERED TABLE SELECTION >>>>>>>",tablesselected);
                         // params.api.forEachNode((rowNode: any, index: any) => {
-                        // //  //console.log("MULTIPLE RENDERED ROW NODE>>>>",rowNode.data);
-                  
+                        // //  console.log("MULTIPLE RENDERED ROW NODE>>>>",rowNode.data);
+
                         //   if (rowNode.data.id == tablesselected[i] || rowNode.data.ID==tablesselected[i]) {
-                  
-                        //    // //console.log("MULTIPLE ROW NODEE 222>>>>",rowNode);
+
+                        //    // console.log("MULTIPLE ROW NODEE 222>>>>",rowNode);
                         //     rowNode.setSelected(true);
                         //   }
                       //  });
-                      
+
                       //tablesselected = JSON.parse(localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id'));
-                   //   //console.log("TABLE ROW SELECTED>>>>>>>>>>",tablesselected);
-                    
-                  
+                   //   console.log("TABLE ROW SELECTED>>>>>>>>>>",tablesselected);
+
+
                     for(let i=0;i<tablesselected.length;i++){
 
-                      
+
 
                   setTimeout(() => {
-    
-                     
+
+
                   this.staticData.forEach((data: any) => {
                         if (data.ID == tablesselected[i]) {
-                          this.checkedrowData.push(data);                          
+                          this.checkedrowData.push(data);
                           let x = rowdata2.filter((a: any) => a !== data);
                           rowdata2 = x;
-                          //console.log("CHECKED ROW DATA>>>>>>>>>>",data);
-                         
-                         
-                          
-                                           
+                          console.log("CHECKED ROW DATA>>>>>>>>>>",data);
+
+
+
+
                         }
                       });
 
@@ -1543,7 +1890,7 @@ gridDataApi.subscribe(
                     }
 
                    setTimeout(() => {
-                  
+
 
 
                     this.staticData='';
@@ -1551,26 +1898,26 @@ gridDataApi.subscribe(
                     const uniqueArray = this.removeDuplicates(this.checkedrowData, 'id');
 
                       this.staticData = [...uniqueArray, ...rowdata2];
-                      // //console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+                      // console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
                      // this.staticData = this.checkedrowData.concat(rowdata2);
 
-             
+
                           const transaction = {
                             add: this.staticData
                           };
-                      
+
                           this.gridApi.applyTransaction(transaction);
-                          
+
                           this.rowData=this.staticData;
-                          //console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+                          console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSS");
                       this.rowCount = this.rowCount + 1;
                     }, 700);
 
-                    
+
 
                       }
                         }
-                        
+
                       }
                     } else {
                       if (this.rowData[i][this.agPrimaryKey] == agGidSelectedNodesData) {
@@ -1580,54 +1927,54 @@ gridDataApi.subscribe(
                         let tablesselected: any;
                         rowdata2 = this.staticData;
                         tablesselected = JSON.parse(localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id'));
-                        //console.log("TABLE ROW SELECTED>>>>>>>>>>", tablesselected);
-                        //console.log("ROW DATA BEFORE FILTERING>>>>>>>>>>", this.staticData); //
-                        
-                        
+                        console.log("TABLE ROW SELECTED>>>>>>>>>>", tablesselected);
+                        console.log("ROW DATA BEFORE FILTERING>>>>>>>>>>", this.staticData); //
+
+
                         this.staticData.forEach((data: any) => {
-                          //console.log("CHECKING DATA.ID>>>>>>>>>>", data.id);  //
+                          console.log("CHECKING DATA.ID>>>>>>>>>>", data.id);  //
                           if (data.id == tablesselected || data.ID == tablesselected) {
                             this.checkedrowData.push(data);
-        
-        
+
+
                             let x = rowdata2.filter((a: any) => a !== data);
                             rowdata2 = x;
 
-                           
-                            
+
+
                           }
-                         
+
                         });
-                       
+
                         if (this.isReadOnly) {
                           this.staticData = this.rowData
                           tablesselected = JSON.parse(localStorage.getItem('agGidSelectedLookup_(' + this.lookupFieldName + ')_id'));
 
-                          // //console.log(this.checkedrowData, "REAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDDDDDDDDDDDD")
+                          // console.log(this.checkedrowData, "REAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDDDDDDDDDDDD")
                           this.staticData = this.checkedrowData
-                          // //console.log("OOOOOOOOOOOOOOOOOOOOONNNNNNNNNNLLLLLLLLLYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
+                          // console.log("OOOOOOOOOOOOOOOOOOOOONNNNNNNNNNLLLLLLLLLYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
                         } else {
 
                         this.staticData = [...this.checkedrowData, ...rowdata2];
                         }
-                        // //console.log("STATIC DATA 2>>>>>>>>>>",this.staticData);
-               
+                        // console.log("STATIC DATA 2>>>>>>>>>>",this.staticData);
+
                             const transaction = {
                               add: this.staticData
                             };
-                        
+
                             this.gridApi.applyTransaction(transaction);
-                            
+
                             this.rowData=this.staticData;
 
                         this.rowCount = this.rowCount + 1;
-                        
-                       // //console.log("ROW SELECTED GRID22222>>>>>>>",agGidSelectedNodesData);
-                       // //console.log("GRID APIIIIIII1111>>>>>>>",this.gridApi);
-                        ////console.log("GRID APIIIIIII22222>>>>>>>",this.gridApi.getRowNode(i.toString()));
-                         
+
+                       // console.log("ROW SELECTED GRID22222>>>>>>>",agGidSelectedNodesData);
+                       // console.log("GRID APIIIIIII1111>>>>>>>",this.gridApi);
+                        //console.log("GRID APIIIIIII22222>>>>>>>",this.gridApi.getRowNode(i.toString()));
+
                        // this.gridApi.getRowNode(i.toString()).setSelected(true);
-  
+
                       }
                     }
                     }
@@ -1640,8 +1987,8 @@ gridDataApi.subscribe(
                   throw new Error("Invalid rowModelType, it must be 'serverSide' or 'clientSide'");
                 }
               }
-            } 
-          
+            }
+
         }
 }
     }
@@ -1656,8 +2003,8 @@ gridDataApi.subscribe(
       const rowNode = this.gridApi.getDisplayedRowAtIndex(i);
       gridData.push(rowNode.data);
     }
-    
-    this.paramsChange.emit(gridData); 
+
+    this.paramsChange.emit(gridData);
     // Emit the updated params back to the sender//container
     return gridData;
   }
@@ -1724,31 +2071,11 @@ gridDataApi.subscribe(
 
 
   onRowDoubleClicked(event: any) {
-
-    // //console.log("IS QUERY FORM>>>>>>>>>>>>>>>",this.isForQueryForm);
-    // //console.log("this.agRowSelection>>>>>>>>>"+this.agRowSelection);
-    // //console.log("LOOKUP IDSSSSSSS>>>>>>>>>"+this.lookupIds);
-    // //console.log("LOOKUP NAMESSSSSS>>>>>>>>>"+this.lookupNames);
-
     if((this.isForQueryForm || this.isGridInLookup) && this.agRowSelection!='multiple'){
-        // //console.log(this.lookupIds.split(","));
-        // //console.log(this.lookupNames.split(","));
-
-        // if(this.lookupIds.split(",").length>1 && this.lookupNames.split(",")>1){
-        //   this.lookupIds=this.lookupIds.split(",")[this.lookupIds.length-2];
-        //   this.lookupAllNames=this.lookupNames.split(",")[this.lookupNames.length-1];
-        //   localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
-        //   localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
-        //  }else{
-        //   localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_id", this.lookupIds);
-        //   localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
-        // }
-
         $("#lookupSubmitButton")[0].click();
-
       }
-
-
         }
 
 }
+
+

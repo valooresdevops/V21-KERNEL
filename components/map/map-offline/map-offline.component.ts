@@ -85,6 +85,7 @@ import { OfflinedataService } from '../Services/offlinedata.service';
 import { VAgGridComponent } from '../component/v-ag-grid/v-ag-grid.component';
 import { InformationService } from "src/app/Kernel/services/information.service";
 
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 
 
 useGeographic();
@@ -130,7 +131,11 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   @ViewChild('saveMarker') saveMarker: any;
   @ViewChild('locationMarker') locationMarker: any;
   @ViewChild('SenarioContent') SenarioContent: any;
+  @ViewChild('showPropertiesForm', { static: false }) showPropertiesForm: ElementRef;
+  @ViewChild('popupContent') popupContent: any;
+
   @Output() senarioIdOutput:any= new EventEmitter<any>();
+  
   @Input() changes:any;
   navbarSimulId:any;
   
@@ -466,7 +471,13 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   byrouteValue:boolean=false;
   tcdValue:boolean=false;
   showroutedicv:boolean=false;
-  
+  PropertiesSimulID: any;
+  olpopup1111:any;
+  modalRef:any;
+  showCancelButton: boolean;
+  topcancel: any;
+  leftcancel: any;
+  headerchangeCounter:number=0;
    constructor(
     private datacrowdService: DatacrowdService,
     private httpClient: HttpClient,
@@ -481,6 +492,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     private renderer: Renderer2,
     private el: ElementRef,
     public informationservice: InformationService,
+    private modalService: NgbModal,
   ) {
     this.vectorSource4 = new VectorSource();
     this.vectorLayer4 = new VectorLayer({
@@ -618,6 +630,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
 
   //// measure functions :
   measure(shape: any) {
+    this.ShowHeader=false;
     this.addInteraction(shape);
     this.deactivateDrawInteraction();
   }
@@ -1484,7 +1497,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
      // url: "https://10.1.8.23:443/openstreetmaplebanon/{z}/{x}/{y}.png",
       //url: "https://10.1.7.24:443/map/{z}/{x}/{y}.png",
       // url: 'https://10.1.8.23:443/openstreetmaplebanon/{z}/{x}/{y}.png',
-      url:"https://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
+      url:"http://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
 
       minZoom: 0,
       maxZoom: 15,
@@ -1725,829 +1738,645 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     
   
     this.map.getViewport().addEventListener('contextmenu', (evt: any) => {
-       let pixel = this.map.getEventPixel(evt);
-      this.map.forEachFeatureAtPixel(pixel, (feature:any) => {
-      if (this.isdatepicker === true) {
-      } else {
-        let foundShape = false;
-        let foundfeature: any;
+      let pixel = this.map.getEventPixel(evt);
+     this.map.forEachFeatureAtPixel(pixel, (feature:any) => {
+     if (this.isdatepicker === true) {
+     } else {
+       let foundShape = false;
+       let foundfeature: any;
 
-        evt.preventDefault();
-        console.log('evt>>>>>>>>>>>>>>>>>>>>>', evt);
+       evt.preventDefault();
+       console.log('evt>>>>>>>>>>>>>>>>>>>>>', evt);
 
-        let AzimuthSelected = '';
-        let lngSelcted = '';
-        let latSelected = '';
-        let TechnologySelected = '';
+       let AzimuthSelected = '';
+       let lngSelcted = '';
+       let latSelected = '';
+       let TechnologySelected = '';
 
-        const pixel = [evt.clientX, evt.clientY];
-        const coordinate = this.map.getCoordinateFromPixel(pixel);
-        // let features: any = this.map.getFeaturesAtPixel(pixel);
+       const pixel = [evt.clientX, evt.clientY];
+       const coordinate = this.map.getCoordinateFromPixel(pixel);
+       // let features: any = this.map.getFeaturesAtPixel(pixel);
 
-        // console.log('features in right click -----', features);
+       // console.log('features in right click -----', features);
 
-        console.log('evt in right click -----', evt);
-        // if (features.length > 0) {
-          // Assuming you only have one feature at this pixel
-          // let feature = features[0];
-          console.log('feature[0]-----', feature);
-          console.log('values_-----', feature['values_']);
-          console.log('values_-----', feature['values_'].geometry.flatCoordinates);
-          let coordelement=feature['values_'].geometry.flatCoordinates;
-          console.log('values_-----',coordelement);
+       console.log('evt in right click -----', evt);
+       // if (features.length > 0) {
+         // Assuming you only have one feature at this pixel
+         // let feature = features[0];
+         console.log('feature[0]-----', feature);
+         console.log('values_-----', feature['values_']);
+         console.log('values_-----', feature['values_'].geometry.flatCoordinates);
+         let coordelement=feature['values_'].geometry.flatCoordinates;
+         console.log('values_-----',coordelement);
 
-          console.log(
-            'getGeometry-----',
-            feature['values_'].geometry.constructor.name
-          );
-          console.log(
-            'Right-clicked feature type:',
-            feature.getGeometry().getType()
-          );
-          let geometrytype: any = feature.getGeometry().getType();
-          if (
-            this.aggridmarker === false &&
-            (geometrytype === 'Circle' ||
-              geometrytype === 'Polygon' ||
-              geometrytype === 'LineString')
-          ) {
-            // Get the geometry of the feature
-            let geometry = parseInt(feature.getGeometry().ol_uid) + 1;
-            let id = geometry.toString();
+         console.log(
+           'getGeometry-----',
+           feature['values_'].geometry.constructor.name
+         );
+         console.log(
+           'Right-clicked feature type:',
+           feature.getGeometry().getType()
+         );
+         let geometrytype: any = feature.getGeometry().getType();
+         if (
+           this.aggridmarker === false &&
+           (geometrytype === 'Circle' ||
+             geometrytype === 'Polygon' ||
+             geometrytype === 'LineString')
+         ) {
+           // Get the geometry of the feature
+           let geometry = parseInt(feature.getGeometry().ol_uid) + 1;
+           let id = geometry.toString();
 
-            console.log('geometry:::::::::::::::::::::::::::::::', id);
-            // Check if the geometry is a circle
-            if (this.coordinatesArray.find((a) => a.ID === id)) {
-              // Check if the clicked feature is the circle
-              // if (features && features.length > 0) {
-                if (this.deleteMode === false) {
-                  this.isdatepicker = true;
-                  foundShape = true;
-                  // this.featuretarget = features[0].geometryChangeKey_.target;
-                  this.featuretarget = feature.geometryChangeKey_.target;
-                  const result = this.findDataById(
-                    parseInt(this.featuretarget.ol_uid) + 1
-                  );
-                  this.shapeIdDate = (
-                    parseInt(this.featuretarget.ol_uid) + 1
-                  ).toString();
-                  this.dataservice1.setshapeIdDate(this.shapeIdDate);
+           console.log('geometry:::::::::::::::::::::::::::::::', id);
+           // Check if the geometry is a circle
+           if (this.coordinatesArray.find((a) => a.ID === id)) {
+             // Check if the clicked feature is the circle
+             // if (features && features.length > 0) {
+               if (this.deleteMode === false) {
+                 this.isdatepicker = true;
+                 foundShape = true;
+                 // this.featuretarget = features[0].geometryChangeKey_.target;
+                 this.featuretarget = feature.geometryChangeKey_.target;
+                 const result = this.findDataById(
+                   parseInt(this.featuretarget.ol_uid) + 1
+                 );
+                 this.shapeIdDate = (
+                   parseInt(this.featuretarget.ol_uid) + 1
+                 ).toString();
+                 this.dataservice1.setshapeIdDate(this.shapeIdDate);
 
-                  this.value = false;
-                  $('#datepicker').css('display', '');
+                 this.value = false;
+                 $('#datepicker').css('display', '');
 
-                  //  console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-                  var popup: any = this.elem_id('datepicker');
-                  var popup_closer = this.elem_id('popup-closer')!;
-                  var popup_content = this.elem_id('popup-content');
-                  var olpopup: any = new ol.Overlay({
-                    element: popup!,
-                    autoPan: false,
-                  });
+                 //  console.log(`properties >>>>>>>>>>>>>>>>`, properties);
+                 var popup: any = this.elem_id('datepicker');
+                 var popup_closer = this.elem_id('popup-closer')!;
+                 var popup_content = this.elem_id('popup-content');
+                 var olpopup: any = new ol.Overlay({
+                   element: popup!,
+                   autoPan: false,
+                 });
 
-                  if (result) {
-                    this.dataservice1.setStartDate(result.selectedStartDate);
-                    this.dataservice1.setendDate(result.selectedEndDate);
-                  } else {
-                    this.dataservice1.setStartDate('');
-                    this.dataservice1.setendDate('');
-                  }
+                 if (result) {
+                   this.dataservice1.setStartDate(result.selectedStartDate);
+                   this.dataservice1.setendDate(result.selectedEndDate);
+                 } else {
+                   this.dataservice1.setStartDate('');
+                   this.dataservice1.setendDate('');
+                 }
 
-                  var coord = [
-                    this.featuretarget.flatCoordinates[0],
-                    this.featuretarget.flatCoordinates[1],
-                  ];
-                  //  var coord = this.map.getCoordinateFromPixel(evt.pixel);
-                  olpopup.setPosition(coord);
-                  this.map.addOverlay(olpopup);
-                  //  $('#datepicker').css('display', '');
+                 var coord = [
+                   this.featuretarget.flatCoordinates[0],
+                   this.featuretarget.flatCoordinates[1],
+                 ];
+                 //  var coord = this.map.getCoordinateFromPixel(evt.pixel);
+                 olpopup.setPosition(coord);
+                 this.map.addOverlay(olpopup);
+                 //  $('#datepicker').css('display', '');
 
-                  $(document).ready(() => {
-                    $('#alertify-ok').click(async () => {
-                      if (foundShape) {
+                 $(document).ready(() => {
+                   $('#alertify-ok').click(async () => {
+                     if (foundShape) {
+                       
+                       let data = await this.dataservice1.getData();
+                       this.selectedStartDate = data.selectedStartDate;
+                       this.selectedEndDate = data.selectedEndDate;
+
+
+                       let dateshapename =
+                         'Begin Operation:' +
+                         this.selectedStartDate +
+                         '<br>End Operation:' +
+                         this.selectedEndDate;
+                          
+                       let x = {
+                         id: parseInt(this.featuretarget.ol_uid) + 1,
+                         selectedStartDate: this.selectedStartDate,
+                         selectedEndDate: this.selectedEndDate,
+                       };
                         
-                        let data = await this.dataservice1.getData();
-                        this.selectedStartDate = data.selectedStartDate;
-                        this.selectedEndDate = data.selectedEndDate;
- 
+                       if (
+                         typeof this.selectedStartDate == 'undefined' ||
+                         this.selectedStartDate === '' ||
+                         this.selectedEndDate === '' ||
+                         typeof this.selectedEndDate == 'undefined'
+                       ) {
+                         alert("in iffffffff")
+                         // this.DatingObj.push(x);
+                         let selectedStartDate = (this.coordinatesArray.find(
+                           (a) => a.ID === this.shapeIdDate
+                         )!['selectedStartDate'] = '');
+                         let selectedEndDate = (this.coordinatesArray.find(
+                           (a) => a.ID === this.shapeIdDate
+                         )!['selectedEndDate'] = '');
+                         this.deleteOverlayById(
+                           parseInt(this.featuretarget.ol_uid) + 1
+                         );
+                         let x = {
+                           id: parseInt(this.featuretarget.ol_uid) + 1,
+                           selectedStartDate: selectedStartDate,
+                           selectedEndDate: selectedEndDate,
+                         };
+                         this.DatingObj.push(x);
+                         this.dataservice1.setStartDate(
+                           this.selectedStartDate
+                         );
+                         this.dataservice1.setendDate(this.selectedEndDate);
+                       } else {
 
-                        let dateshapename =
-                          'Begin Operation:' +
-                          this.selectedStartDate +
-                          '<br>End Operation:' +
-                          this.selectedEndDate;
-                           
-                        let x = {
-                          id: parseInt(this.featuretarget.ol_uid) + 1,
-                          selectedStartDate: this.selectedStartDate,
-                          selectedEndDate: this.selectedEndDate,
-                        };
-                         
-                        if (
-                          typeof this.selectedStartDate == 'undefined' ||
-                          this.selectedStartDate === '' ||
-                          this.selectedEndDate === '' ||
-                          typeof this.selectedEndDate == 'undefined'
-                        ) {
-                          alert("in iffffffff")
-                          // this.DatingObj.push(x);
-                          let selectedStartDate = (this.coordinatesArray.find(
-                            (a) => a.ID === this.shapeIdDate
-                          )!['selectedStartDate'] = '');
-                          let selectedEndDate = (this.coordinatesArray.find(
-                            (a) => a.ID === this.shapeIdDate
-                          )!['selectedEndDate'] = '');
-                          this.deleteOverlayById(
-                            parseInt(this.featuretarget.ol_uid) + 1
-                          );
-                          let x = {
-                            id: parseInt(this.featuretarget.ol_uid) + 1,
-                            selectedStartDate: selectedStartDate,
-                            selectedEndDate: selectedEndDate,
-                          };
-                          this.DatingObj.push(x);
-                          this.dataservice1.setStartDate(
-                            this.selectedStartDate
-                          );
-                          this.dataservice1.setendDate(this.selectedEndDate);
-                        } else {
- 
-                          this.DatingObj.push(x);
-                          this.dataservice1.setStartDate(
-                            this.selectedStartDate
-                          );
-                          this.dataservice1.setendDate(this.selectedEndDate);
-                          this.dataservice1.setvaluedate(0);
-                          this.createshapeNameTooltip(
-                            dateshapename,
-                            coord,
-                            parseInt(this.featuretarget.ol_uid) + 1,
-                            'dateTooltip'
-                          );
+                         this.DatingObj.push(x);
+                         this.dataservice1.setStartDate(
+                           this.selectedStartDate
+                         );
+                         this.dataservice1.setendDate(this.selectedEndDate);
+                         this.dataservice1.setvaluedate(0);
+                         this.createshapeNameTooltip(
+                           dateshapename,
+                           coord,
+                           parseInt(this.featuretarget.ol_uid) + 1,
+                           'dateTooltip'
+                         );
+                      
+
+                         let itemToEdit: any = this.coordinatesArray.find((item) => {
+                           const itemUid = parseInt(item.ol_uid);
+                           const targetUid = parseInt(this.featuretarget.ol_uid) + 1;
+                      
                        
+                           return itemUid === targetUid;
+                       });
 
-                          let itemToEdit: any = this.coordinatesArray.find((item) => {
-                            const itemUid = parseInt(item.ol_uid);
-                            const targetUid = parseInt(this.featuretarget.ol_uid) + 1;
-                       
-                        
-                            return itemUid === targetUid;
-                        });
+               
 
-                
-
-                          if (itemToEdit) {
-                            itemToEdit.selectedStartDate =
-                              this.selectedStartDate;
-                            itemToEdit.selectedEndDate = this.selectedEndDate;
-                          } else {
-                          }
-                       
+                         if (itemToEdit) {
+                           itemToEdit.selectedStartDate =
+                             this.selectedStartDate;
+                           itemToEdit.selectedEndDate = this.selectedEndDate;
+                         } else {
+                         }
+                      
 
 
-                        }
-                      }
-                      foundShape = false;
-                      this.closepopup();
-                    });
-                    $('#alertify-cancel').click(async () => {
+                       }
+                     }
+                     foundShape = false;
+                     this.closepopup();
+                   });
+                   $('#alertify-cancel').click(async () => {
+                   
+                     this.closepopup();
+                   });
+                 });
+
+                 popup_closer.onclick = () => {
                     
-                      this.closepopup();
-                    });
-                  });
+                   olpopup.setPosition(undefined);
 
-                  popup_closer.onclick = () => {
-                     
-                    olpopup.setPosition(undefined);
+                   return false;
+                 };
+                 $('#popupGrid').css('display', 'none');
+                 $('#popup2').css('display', 'none');
+               }
+             // }
+           } else {
+             console.log('cannot click on this feauture .');
+           }
+         }
 
-                    return false;
-                  };
-                  $('#popupGrid').css('display', 'none');
-                  $('#popup2').css('display', 'none');
-                }
-              // }
-            } else {
-              console.log('cannot click on this feauture .');
-            }
-          }
+         let sectorType = feature['values_'].type;
+         console.log("type2222222222--------",sectorType);
+         if (sectorType === 'sector') {
+           $('#TCDContent').css('display', '');
+           console.log('feature >>>>>>>>>>>>>>>>', feature);
+           console.log('Azimuth:', feature.get('Azimuth'));
+           AzimuthSelected = feature.get('Azimuth');
+           console.log('Lng:', feature.get('lng'));
+           lngSelcted = feature.get('lng');
+           console.log('Lat:', feature.get('lat'));
+           latSelected = feature.get('lat');
+           console.log('Technology:', feature.get('Technology'));
+           TechnologySelected = feature.get('Technology');
+           let SINFO = feature.get('SINFO');
+           let SINFO2 = feature.get('SINFO2');
+           console.log('SINFO----------', SINFO);
+           console.log('SINFO22222222----------', SINFO2);
+           let findedSectors: any;
 
-          let sectorType = feature['values_'].type;
-          console.log("type2222222222--------",sectorType);
-          if (sectorType === 'sector') {
-            $('#TCDContent').css('display', '');
-            console.log('feature >>>>>>>>>>>>>>>>', feature);
-            console.log('Azimuth:', feature.get('Azimuth'));
-            AzimuthSelected = feature.get('Azimuth');
-            console.log('Lng:', feature.get('lng'));
-            lngSelcted = feature.get('lng');
-            console.log('Lat:', feature.get('lat'));
-            latSelected = feature.get('lat');
-            console.log('Technology:', feature.get('Technology'));
-            TechnologySelected = feature.get('Technology');
-            let SINFO = feature.get('SINFO');
-            let SINFO2 = feature.get('SINFO2');
-            console.log('SINFO----------', SINFO);
-            console.log('SINFO22222222----------', SINFO2);
-            let findedSectors: any;
+           if (AzimuthSelected === '') {
+             console.log('Azimuth is null');
+             this.closeTCDPopup();
+           } else {
+             console.log('Azimuth not null ');
+             if (SINFO != '') {
+               findedSectors = SINFO.filter((element: any) => {
+             
+                 return (
+                   element[7] === AzimuthSelected.toString() &&
+                   Number(element[4]).toString() === latSelected.toString() &&
+                   Number(element[5]).toString()  === lngSelcted.toString()
+                 );
+               });
+               console.log('findedSectors when right click', findedSectors);
+               this.TcdRowData = [];
+               findedSectors.forEach((element: any, key: any) => {
+                 var jsonaggrid = {
+                   imsi_id: element[0],
+                   imei_id: element[1],
+                   service_provider_id: element[2],
+                   usage_timeframe: this.dateTtoDate(element[3]),
+                   location_latitude: element[4],
+                   location_longitude: element[5],
+                   cgi_id: element[6],
+                   location_azimuth: element[7],
+                   type_id: element[8],
+                   phone_number: element[9],
+                   Technology: element[10],
+                 };
+                 // console.log('jsonaggrid----------', jsonaggrid);
 
-            if (AzimuthSelected === '') {
-              console.log('Azimuth is null');
-              this.closeTCDPopup();
-            } else {
-              console.log('Azimuth not null ');
-              if (SINFO != '') {
-                findedSectors = SINFO.filter((element: any) => {
-                  console.log('element----------', element);
-                  // console.log('element[7]----------', element[7]);
-                  // console.log('element[4]----------', element[4]);
-                  // console.log('element[5]----------', element[5]);
-                  // console.log('AzimuthSelected----------', AzimuthSelected);
-                  // console.log('latSelected----------', latSelected);
-                  // console.log('lngSelcted----------', lngSelcted);
+                 this.TcdRowData.push(jsonaggrid);
+               });
 
-                  return (
-                    element[7] === AzimuthSelected.toString() &&
-                    element[4] === latSelected.toString() &&
-                    element[5] === lngSelcted.toString()
-                  );
-                });
-                console.log('findedSectors when right click', findedSectors);
-                this.TcdRowData = [];
-                findedSectors.forEach((element: any, key: any) => {
-                  var jsonaggrid = {
-                    imsi_id: element[0],
-                    imei_id: element[1],
-                    service_provider_id: element[2],
-                    usage_timeframe: this.dateTtoDate(element[3]),
-                    location_latitude: element[4],
-                    location_longitude: element[5],
-                    cgi_id: element[6],
-                    location_azimuth: element[7],
-                    type_id: element[8],
-                    phone_number: element[9],
-                    Technology: element[10],
-                  };
-                  // console.log('jsonaggrid----------', jsonaggrid);
+               console.log('TcdRowData------------', this.TcdRowData);
+               //// open popup
+               var popup: any = this.elem_id('TCDContent');
+               var popup_closer = this.elem_id('popup-closer')!;
+               var popup_content = this.elem_id('popup-content');
 
-                  this.TcdRowData.push(jsonaggrid);
-                });
+               this.olpopupOverlay = new ol.Overlay({
+                 element: popup,
+                 autoPan: false,
+               });
 
-                console.log('TcdRowData------------', this.TcdRowData);
-                //// open popup
-                var popup: any = this.elem_id('TCDContent');
-                var popup_closer = this.elem_id('popup-closer')!;
-                var popup_content = this.elem_id('popup-content');
+               this.olpopupOverlay.setPosition([lngSelcted, latSelected]);
+               this.map.addOverlay(this.olpopupOverlay);
+             } else if (SINFO2 != '') {
+               this.bts = true;
+               this.GridID='btspopup';
+               $('#btspopup').css('display', '');
 
-                this.olpopupOverlay = new ol.Overlay({
-                  element: popup,
-                  autoPan: false,
-                });
+               findedSectors = SINFO2.filter((element: any) => {
+               
+                 return (
+                   element[1] == AzimuthSelected.toString() &&
+                   element[3] === latSelected.toString() &&
+                   element[2] === lngSelcted.toString()
+                 );
+               });
+               console.log('findedSectors when right click', findedSectors);
+               this.rowDatabts = [];
+               findedSectors.forEach((element: any, key: any) => {
+                 var jsonaggrid = {
+                   Type: 'Sector',
+                   Location: element[5],
+                   BTSName: element[9],
+                   Sector: element[1],
+                   Frequency: element[6],
+                   Lng: element[2],
+                   Lat: element[3],
+                   Azimuth: element[1],
+                 };
+                 console.log('jsonaggrid--------', jsonaggrid);
+                 this.rowDatabts.push(jsonaggrid);
+               });
+               this.columnDefsBts = this.columnDefsBts;
 
-                this.olpopupOverlay.setPosition([lngSelcted, latSelected]);
-                this.map.addOverlay(this.olpopupOverlay);
-              } else if (SINFO2 != '') {
-                this.bts = true;
-                this.GridID='btspopup';
-                $('#btspopup').css('display', '');
+               console.log('rowDatabts', this.rowDatabts);
+               //// open popup
+               var popup: any = this.elem_id('btspopup');
+               var popup_closer = this.elem_id('popup-closer')!;
 
-                findedSectors = SINFO2.filter((element: any) => {
-                  console.log('element----------', element);
-                  console.log('element[1]----------', element[1]);
-                  console.log('element[3]----------', element[3]);
-                  console.log('element[2]----------', element[2]);
-                  return (
-                    element[1] == AzimuthSelected.toString() &&
-                    element[3] === latSelected.toString() &&
-                    element[2] === lngSelcted.toString()
-                  );
-                });
-                console.log('findedSectors when right click', findedSectors);
-                this.rowDatabts = [];
-                findedSectors.forEach((element: any, key: any) => {
-                  var jsonaggrid = {
-                    Type: 'Sector',
-                    Location: element[5],
-                    BTSName: element[9],
-                    Sector: element[1],
-                    Frequency: element[6],
-                    Lng: element[2],
-                    Lat: element[3],
-                    Azimuth: element[1],
-                  };
-                  console.log('jsonaggrid--------', jsonaggrid);
-                  this.rowDatabts.push(jsonaggrid);
-                });
-                this.columnDefsBts = this.columnDefsBts;
+               this.olpopupOverlay = new ol.Overlay({
+                 element: popup,
+                 autoPan: false,
+               });
 
-                console.log('rowDatabts', this.rowDatabts);
-                //// open popup
-                var popup: any = this.elem_id('btspopup');
-                var popup_closer = this.elem_id('popup-closer')!;
+               this.olpopupOverlay.setPosition([lngSelcted, latSelected]);
+               this.map.addOverlay(this.olpopupOverlay);
+             }
+           }
+         }else if(sectorType === 'icon'){
 
-                this.olpopupOverlay = new ol.Overlay({
-                  element: popup,
-                  autoPan: false,
-                });
+           var popup: any = this.elem_id('elementpopup');
+           var popup_closer = this.elem_id('popup-closer')!;
+           var popup_content = this.elem_id('popup-content');
+           var olpopup: any = new ol.Overlay({
+             element: popup!,
+             autoPan: false,
+           });
 
-                this.olpopupOverlay.setPosition([lngSelcted, latSelected]);
-                this.map.addOverlay(this.olpopupOverlay);
-              }
-            }
-          }else if(sectorType === 'icon'){
+           olpopup.setPosition(coordelement);
+           this.map.addOverlay(olpopup);
+         } else {
+           // alert('else');
 
-            var popup: any = this.elem_id('elementpopup');
-            var popup_closer = this.elem_id('popup-closer')!;
-            var popup_content = this.elem_id('popup-content');
-            var olpopup: any = new ol.Overlay({
-              element: popup!,
-              autoPan: false,
-            });
+           console.log(
+             'values_.features-----',
+             feature['values_'].features[0]['values_']
+           );
+           console.log(
+             'typeeeeeeeeeeeeeeeeee-----',
+             feature['values_'].features[0]['values_'].type
+           );
+           let type = feature['values_'].features[0]['values_'].type;
 
-            olpopup.setPosition(coordelement);
-            this.map.addOverlay(olpopup);
-          } else {
-            // alert('else');
+           if (type === 'bts') {
+             // alert('bts');
+             this.GridID='btspopup';
+             $('#btspopup').css('display', '');
+             this.bts = true;
+             $('#datepicker').css('display', 'none');
 
-            console.log(
-              'values_.features-----',
-              feature['values_'].features[0]['values_']
-            );
-            console.log(
-              'typeeeeeeeeeeeeeeeeee-----',
-              feature['values_'].features[0]['values_'].type
-            );
-            let type = feature['values_'].features[0]['values_'].type;
+             this.deleteMode = false;
 
-            if (type === 'bts') {
-              // alert('bts');
-              this.GridID='btspopup';
-              $('#btspopup').css('display', '');
-              this.bts = true;
-              $('#datepicker').css('display', 'none');
+             console.log(`feature >>>>>>>>>>>>>>>>`, feature);
+             const properties = feature.getProperties();
+             console.log(
+               `properties 1111111111111111111>>>>>>>>>>>>>>>>`,
+               properties
+             );
+             console.log(
+               `type 1111111111111111111>>>>>>>>>>>>>>>>`,
+               properties.type
+             );
+             console.log(
+               `flatCoordinates>>>>>>>>>>>>>>>>`,
+               properties.geometry.flatCoordinates
+             );
+             if (properties.id) {
+             } else if (properties.type === 'sector') {
+               this.displaySectorGrid(properties);
+             } else if (properties.features) {
+               console.log(
+                 `properties.id >>>>>>>>>>>>>>>>`,
+                 properties.features.length
+               );
+               console.log(
+                 `2222222222222222222222 >>>>>>>>>>>>>>>>`,
+                 properties.features
+               );
 
-              this.deleteMode = false;
+               for (let i = 0; i < properties.features.length; i++) {
+                 console.log(
+                   '4444444444444444444444------',
+                   properties.features[i]['values_']['info']
+                 );
+                 console.log(
+                   'Type------',
+                   properties.features[i]['values_'].Type
+                 );
+                 let info = properties.features[i]['values_']['info'];
+                 for (let j = 0; j < info.length; j++) {
+                   this.rowDatabts.push({
+                     Type: `${feature['values_'].features[0]['values_'].type}`,
+                     Location: `${properties.features[i]['values_']['info'][j][5]}`,
+                     BTSName: `${properties.features[i]['values_']['info'][j][9]}`,
+                     Sector: `${properties.features[i]['values_']['info'][j][1]}`,
+                     Frequency: `${properties.features[i]['values_']['info'][j][6]}`,
+                     Lng: `${properties.features[i]['values_']['info'][j][3]}`,
+                     Lat: `${properties.features[i]['values_']['info'][j][2]}`,
+                     Azimuth: `${properties.features[i]['values_']['info'][j][1]}`,
+                   });
+                 }
 
-              console.log(`feature >>>>>>>>>>>>>>>>`, feature);
-              const properties = feature.getProperties();
-              console.log(
-                `properties 1111111111111111111>>>>>>>>>>>>>>>>`,
-                properties
-              );
-              console.log(
-                `type 1111111111111111111>>>>>>>>>>>>>>>>`,
-                properties.type
-              );
-              console.log(
-                `flatCoordinates>>>>>>>>>>>>>>>>`,
-                properties.geometry.flatCoordinates
-              );
-              if (properties.id) {
-              } else if (properties.type === 'sector') {
-                this.displaySectorGrid(properties);
-              } else if (properties.features) {
-                console.log(
-                  `properties.id >>>>>>>>>>>>>>>>`,
-                  properties.features.length
-                );
-                console.log(
-                  `2222222222222222222222 >>>>>>>>>>>>>>>>`,
-                  properties.features
-                );
+                 console.log('rowDatabts:::::::::', this.rowDatabts);
+               }
+               this.columnDefsBts=this.columnDefsBts;
+           
+               console.log(`properties >>>>>>>>>>>>>>>>`, properties.features);
+               var popup: any = this.elem_id('btspopup');
+               var popup_closer = this.elem_id('popup-closerbts')!;
 
-                for (let i = 0; i < properties.features.length; i++) {
-                  console.log(
-                    '4444444444444444444444------',
-                    properties.features[i]['values_']['info']
-                  );
-                  console.log(
-                    'Type------',
-                    properties.features[i]['values_'].Type
-                  );
-                  let info = properties.features[i]['values_']['info'];
-                  for (let j = 0; j < info.length; j++) {
-                    this.rowDatabts.push({
-                      Type: `${feature['values_'].features[0]['values_'].type}`,
-                      Location: `${properties.features[i]['values_']['info'][j][5]}`,
-                      BTSName: `${properties.features[i]['values_']['info'][j][9]}`,
-                      Sector: `${properties.features[i]['values_']['info'][j][1]}`,
-                      Frequency: `${properties.features[i]['values_']['info'][j][6]}`,
-                      Lng: `${properties.features[i]['values_']['info'][j][3]}`,
-                      Lat: `${properties.features[i]['values_']['info'][j][2]}`,
-                      Azimuth: `${properties.features[i]['values_']['info'][j][1]}`,
-                    });
-                  }
+               var coord0 = properties.geometry.flatCoordinates[1];
+               var coord1 = properties.geometry.flatCoordinates[0];
+               this.olpopupOverlay = new ol.Overlay({
+                 element: popup,
+                 autoPan: false,
+               });
 
-                  console.log('rowDatabts:::::::::', this.rowDatabts);
-                }
-                this.columnDefsBts=this.columnDefsBts;
-                // this.columnDefsBts = [
-                //   {
-                //     headerName: 'Type',
-                //     field: 'Type',
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     width: 100,
-                //     wrapText: true,
-                //     autoHeight: true,
-                //     cellStyle: { flex: '1' },
-                //   },
-                //   {
-                //     headerName: 'Location',
-                //     field: 'Location',
-                //     sortable: true,
-                //     width: 100,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right', color: 'blue' },
-                //   },
-                //   {
-                //     headerName: 'BTSName',
-                //     field: 'BTSName',
-                //     width: 100,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Sector',
-                //     field: 'Sector',
-                //     sortable: false,
-                //     filter: false,
-                //     autoSizeColumns: true,
-                //     width: 100,
-                //     cellStyle: { 'text-align': '-webkit-center', flex: '1' },
-                //   },
-                //   {
-                //     headerName: 'Frequency',
-                //     field: 'Frequency',
-                //     width: 100,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Lng',
-                //     field: 'Lng',
-                //     width: 100,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Lat',
-                //     field: 'Lat',
-                //     width: 100,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Azimuth',
-                //     field: 'Azimuth',
-                //     width: 100,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                // ];
+               this.olpopupOverlay.setPosition([coord1, coord0]);
+               this.map.addOverlay(this.olpopupOverlay);
 
-                //// open popup
-                console.log(`properties >>>>>>>>>>>>>>>>`, properties.features);
-                var popup: any = this.elem_id('btspopup');
-                var popup_closer = this.elem_id('popup-closerbts')!;
+               // this.openPopupp(event, olpopup);
+               $('#popupGrid').css('display', 'none');
+               $('#popup2').css('display', 'none');
+               $('#cotravelerpopup').css('display', 'none');
+               this.deactivateDrawInteraction();
+             }
+           } else if (type === 'marker') {
+             this.aggridmarker = true;
+             this.value=true;
+             // alert('markerrrrrrrr');
+             console.log(`feature >>>>>>>>>>>>>>>>`, feature);
+             const properties = feature.getProperties();
 
-                var coord0 = properties.geometry.flatCoordinates[1];
-                var coord1 = properties.geometry.flatCoordinates[0];
-                this.olpopupOverlay = new ol.Overlay({
-                  element: popup,
-                  autoPan: false,
-                });
+             console.log(`properties >>>>>>>>>>>>>>>>`, properties);
+             if (properties.id) {
+             } else if (properties.features) {
+               // datajs = [];
+               this.rowData = [];
 
-                this.olpopupOverlay.setPosition([coord1, coord0]);
-                this.map.addOverlay(this.olpopupOverlay);
+               console.log(
+                 `properties.id >>>>>>>>>>>>>>>>`,
+                 properties.features.length
+               );
+               this.GridID='popupGrid';
+               for (let i = 0; i < properties.features.length; i++) {
+                 console.log(`hiiiiiiiiiii >>>>>>>>>>>>>>>>`, properties.features[i]['values_']['info']);
 
-                // this.openPopupp(event, olpopup);
-                $('#popupGrid').css('display', 'none');
-                $('#popup2').css('display', 'none');
-                $('#cotravelerpopup').css('display', 'none');
-                this.deactivateDrawInteraction();
-              }
-            } else if (type === 'marker') {
-              this.aggridmarker = true;
-              this.value=true;
-              // alert('markerrrrrrrr');
-              console.log(`feature >>>>>>>>>>>>>>>>`, feature);
-              const properties = feature.getProperties();
+                 this.rowData.push({
+                   Device_id: `${properties.features[i]['values_']['info'][0]}`,
+                   Date: `${this.dateTtoDate(
+                     properties.features[i]['values_']['info'][1]
+                   )}`,
+                   Coord: `${properties.features[i]['values_']['info'][3]},${properties.features[i]['values_']['info'][4]}`,
+                   Hits: `${properties.features[i]['values_']['info'][5]}`,
+                 });
+               }
+               
+               this.columnDefs2 = this.columnDefs2 ;
+              
+               // //// open popup
+               console.log("columndefs:",this.columnDefs);
+               console.log("rowdata:",this.rowData);
+               console.log(`properties >>>>>>>>>>>>>>>>`, properties);
+               var popup: any = this.elem_id('popup2');
+               var popup_closer = this.elem_id('popup-closer')!;
+               var popup_content = this.elem_id('popup-content');
+                this.olpopup1111 = new ol.Overlay({
+                 element: popup!,
+                 autoPan: false,
+               });
+               console.log('geometry-------', properties['geometry']);
 
-              console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-              if (properties.id) {
-              } else if (properties.features) {
-                // datajs = [];
-                this.rowData = [];
+               console.log(
+                 'flatCoordinates-------',
+                 properties['geometry']['flatCoordinates']
+               );
 
-                console.log(
-                  `properties.id >>>>>>>>>>>>>>>>`,
-                  properties.features.length
-                );
-                this.GridID='popupGrid';
-                for (let i = 0; i < properties.features.length; i++) {
-                  this.rowData.push({
-                    Device_id: `${properties.features[i]['values_']['info'][2]}`,
-                    Date: `${new Date(
-                      properties.features[i]['values_']['info'][3]
-                    )}`,
-                    Coord: `${properties.features[i]['values_']['info'][0]},${properties.features[i]['values_']['info'][1]}`,
-                    Hits: `${properties.features[i]['values_']['info'][3]}`,
-                  });
-                }
-                
-                this.columnDefs2 = this.columnDefs2 ;
-                // this.columnDefs2 = [
-                //   {
-                //     headerName: 'Device_id',
-                //     field: 'Device_id',
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     width: 310,
-                //     wrapText: true,
-                //     autoHeight: true,
-                //     cellStyle: { flex: '1' },
-                //   },
+               let lng = properties['geometry']['flatCoordinates'][0];
+               console.log('lng', lng);
+               let lat = properties['geometry']['flatCoordinates'][1];
+               console.log('lat', lat);
+               this.GridPosition = [lng, lat];
+               this.olpopup1111.setPosition(this.GridPosition);
 
-                //   {
-                //     headerName: 'Date',
-                //     field: 'Date',
-                //     width: 150,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Coord',
-                //     field: 'Coord',
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     width: 150,
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right', color: 'blue' },
-                //   },
-                //   {
-                //     headerName: 'Hits',
-                //     field: 'Hits',
-                //     sortable: false,
-                //     filter: false,
-                //     autoSizeColumns: true,
-                //     width: 100,
-                //     valueGetter: function (params: any) {
-                //       var count = 0;
-                //       params.api.forEachNode(function (node: any) {
-                //         if (node.data.Device_id === params.data.Device_id) {
-                //           count++;
-                //         }
-                //       });
-                //       return count;
-                //     },
-                //     cellStyle: { 'text-align': '-webkit-center', flex: '1' },
-                //   },
-                // ];
+               this.map.addOverlay(this.olpopup1111);
+               console.log(`11111111111 >>>>>>>>>>>>>>>>`);
 
-                //// open popup
-                console.log("columndefs:",this.columnDefs);
-                console.log("rowdata:",this.rowData);
-                console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-                var popup: any = this.elem_id('popup2');
-                var popup_closer = this.elem_id('popup-closer')!;
-                var popup_content = this.elem_id('popup-content');
-                var olpopup: any = new ol.Overlay({
-                  element: popup!,
-                  autoPan: false,
-                });
-                console.log('geometry-------', properties['geometry']);
+               $('#popup2').css('display', '');
 
-                console.log(
-                  'flatCoordinates-------',
-                  properties['geometry']['flatCoordinates']
-                );
+              
+               this.value = true;
 
-                let lng = properties['geometry']['flatCoordinates'][0];
-                console.log('lng', lng);
-                let lat = properties['geometry']['flatCoordinates'][1];
-                console.log('lat', lat);
-                this.GridPosition = [lng, lat];
-                olpopup.setPosition(this.GridPosition);
-                this.map.addOverlay(olpopup);
-                console.log(`11111111111 >>>>>>>>>>>>>>>>`);
+               // popup_closer.onclick = () => {
+               //   olpopup.setPosition(undefined);
 
-                $('#popup2').css('display', '');
-                this.value = true;
+               //   //  $("#popup2").hide();
+               //   return false;
+               // };
+               console.log(`22222222222 >>>>>>>>>>>>>>>>`);
 
-                // popup_closer.onclick = () => {
-                //   olpopup.setPosition(undefined);
+               // this.openPopupp(event, olpopup);
+               console.log(`333333333333333 >>>>>>>>>>>>>>>>`);
 
-                //   //  $("#popup2").hide();
-                //   return false;
-                // };
-                console.log(`22222222222 >>>>>>>>>>>>>>>>`);
+               $('#popupGrid').css('display', 'none');
+               this.deactivateDrawInteraction();
+               console.log(`44444444444 >>>>>>>>>>>>>>>>`);
+             }
+           } else if (type === 'markerdev') {
+             // alert('markerrrrrrrr');
+             console.log(`feature >>>>>>>>>>>>>>>>`, feature);
+             const properties = feature.getProperties();
 
-                // this.openPopupp(event, olpopup);
-                console.log(`333333333333333 >>>>>>>>>>>>>>>>`);
+             console.log(`properties >>>>>>>>>>>>>>>>`, properties);
+             if (properties.id) {
+             } else if (properties.features) {
+               // datajs = [];
+               this.rowData = [];
 
-                $('#popupGrid').css('display', 'none');
-                this.deactivateDrawInteraction();
-                console.log(`44444444444 >>>>>>>>>>>>>>>>`);
-              }
-            } else if (type === 'markerdev') {
-              // alert('markerrrrrrrr');
-              console.log(`feature >>>>>>>>>>>>>>>>`, feature);
-              const properties = feature.getProperties();
+               console.log(
+                 `properties.id >>>>>>>>>>>>>>>>`,
+                 properties.features.length
+               );
+               for (let i = 0; i < properties.features.length; i++) {
+                 console.log(
+                   'info lengthhh-------',
+                   properties.features[i]['values_']['info'].length
+                 );
+                 console.log(
+                   'info ----------',
+                   properties.features[i]['values_']['info']
+                 );
 
-              console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-              if (properties.id) {
-              } else if (properties.features) {
-                // datajs = [];
-                this.rowData = [];
+                 let info = properties.features[i]['values_']['info'];
 
-                console.log(
-                  `properties.id >>>>>>>>>>>>>>>>`,
-                  properties.features.length
-                );
-                for (let i = 0; i < properties.features.length; i++) {
-                  console.log(
-                    'info lengthhh-------',
-                    properties.features[i]['values_']['info'].length
-                  );
-                  console.log(
-                    'info ----------',
-                    properties.features[i]['values_']['info']
-                  );
+                 for (let j = 0; j < info.length; j++) {
+                   console.log(
+                     `info jjjjjjjjjj>>>>>>>>>>>>>>>>`,
+                     `${info[j]}`
+                   );
 
-                  let info = properties.features[i]['values_']['info'];
+                   console.log(`Device_id>>>>>>>>>>>>>>>>`, `${info[j][2]}`);
+                   console.log(`Tel>>>>>>>>>>>>>>>>`, `${info[j][4]}`);
+                   console.log(
+                     `Date>>>>>>>>>>>>>>>>`,
+                     `${new Date(info[j][3])}`
+                   );
+                   console.log(`Hits>>>>>>>>>>>>>>>>`, `${info[j][3]}`);
 
-                  for (let j = 0; j < info.length; j++) {
-                    console.log(
-                      `info jjjjjjjjjj>>>>>>>>>>>>>>>>`,
-                      `${info[j]}`
-                    );
+                   this.rowData.push({
+                     Device_id: `${info[j][2]}`,
+                     Date: `${new Date(info[j][3])}`,
+                     Coord: `${info[j][0]},${info[j][1]}`,
+                     Hits: `${info[j][3]}`,
+                   });
+                 }
+               }
+               this.columnDefs2 = this.columnDefs2 ;
+              
+               //// open popup
+               console.log(`properties >>>>>>>>>>>>>>>>`, properties);
+               var popup: any = this.elem_id('popup2');
+               var popup_closer = this.elem_id('popup-closer')!;
+               var popup_content = this.elem_id('popup-content');
+               var olpopup: any = new ol.Overlay({
+                 element: popup!,
+                 autoPan: false,
+               });
+               console.log('geometry-------', properties['geometry']);
 
-                    console.log(`Device_id>>>>>>>>>>>>>>>>`, `${info[j][2]}`);
-                    console.log(`Tel>>>>>>>>>>>>>>>>`, `${info[j][4]}`);
-                    console.log(
-                      `Date>>>>>>>>>>>>>>>>`,
-                      `${new Date(info[j][3])}`
-                    );
-                    console.log(`Hits>>>>>>>>>>>>>>>>`, `${info[j][3]}`);
+               console.log(
+                 'flatCoordinates-------',
+                 properties['geometry']['flatCoordinates']
+               );
 
-                    this.rowData.push({
-                      Device_id: `${info[j][2]}`,
-                      Date: `${new Date(info[j][3])}`,
-                      Coord: `${info[j][0]},${info[j][1]}`,
-                      Hits: `${info[j][3]}`,
-                    });
-                  }
-                }
-                this.columnDefs2 = this.columnDefs2 ;
-                // this.columnDefs2 = [
-                //   {
-                //     headerName: 'Device_id',
-                //     field: 'Device_id',
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     width: 310,
-                //     wrapText: true,
-                //     autoHeight: true,
-                //     cellStyle: { flex: '1' },
-                //   },
+               let lng = properties['geometry']['flatCoordinates'][0];
+               console.log('lng', lng);
+               let lat = properties['geometry']['flatCoordinates'][1];
+               console.log('lat', lat);
+               this.GridPosition = [lng, lat];
+               olpopup.setPosition(this.GridPosition);
+               this.map.addOverlay(olpopup);
+               console.log(`11111111111 >>>>>>>>>>>>>>>>`);
 
-                //   {
-                //     headerName: 'Date',
-                //     field: 'Date',
-                //     width: 150,
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right' },
-                //   },
-                //   {
-                //     headerName: 'Coord',
-                //     field: 'Coord',
-                //     sortable: true,
-                //     filter: 'agSetColumnFilter',
-                //     width: 150,
-                //     autoSizeColumns: true,
-                //     cellStyle: { 'text-align': 'right', color: 'blue' },
-                //   },
-                //   {
-                //     headerName: 'Hits',
-                //     field: 'Hits',
-                //     sortable: false,
-                //     filter: false,
-                //     autoSizeColumns: true,
-                //     width: 100,
-                //     valueGetter: function (params: any) {
-                //       var count = 0;
-                //       params.api.forEachNode(function (node: any) {
-                //         if (node.data.Device_id === params.data.Device_id) {
-                //           count++;
-                //         }
-                //       });
-                //       return count;
-                //     },
-                //     cellStyle: { 'text-align': '-webkit-center', flex: '1' },
-                //   },
-                // ];
+               $('#popup2').css('display', '');
+               this.value = true;
 
-                //// open popup
-                console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-                var popup: any = this.elem_id('popup2');
-                var popup_closer = this.elem_id('popup-closer')!;
-                var popup_content = this.elem_id('popup-content');
-                var olpopup: any = new ol.Overlay({
-                  element: popup!,
-                  autoPan: false,
-                });
-                console.log('geometry-------', properties['geometry']);
+              
+               console.log(`22222222222 >>>>>>>>>>>>>>>>`);
 
-                console.log(
-                  'flatCoordinates-------',
-                  properties['geometry']['flatCoordinates']
-                );
+               // this.openPopupp(event, olpopup);
+               console.log(`333333333333333 >>>>>>>>>>>>>>>>`);
 
-                let lng = properties['geometry']['flatCoordinates'][0];
-                console.log('lng', lng);
-                let lat = properties['geometry']['flatCoordinates'][1];
-                console.log('lat', lat);
-                this.GridPosition = [lng, lat];
-                olpopup.setPosition(this.GridPosition);
-                this.map.addOverlay(olpopup);
-                console.log(`11111111111 >>>>>>>>>>>>>>>>`);
+               $('#popupGrid').css('display', 'none');
+               this.deactivateDrawInteraction();
+               console.log(`44444444444 >>>>>>>>>>>>>>>>`);
+             }
+           }
+           else if(type === 'fixedelement'){
+             this.fixedelementpopup=true;
+             console.log(`feature >>>>>>>>>>>>>>>>`, feature);
+             const properties = feature.getProperties();
 
-                $('#popup2').css('display', '');
-                this.value = true;
-
-                // popup_closer.onclick = () => {
-                //   olpopup.setPosition(undefined);
-
-                //   //  $("#popup2").hide();
-                //   return false;
-                // };
-                console.log(`22222222222 >>>>>>>>>>>>>>>>`);
-
-                // this.openPopupp(event, olpopup);
-                console.log(`333333333333333 >>>>>>>>>>>>>>>>`);
-
-                $('#popupGrid').css('display', 'none');
-                this.deactivateDrawInteraction();
-                console.log(`44444444444 >>>>>>>>>>>>>>>>`);
-              }
-            }
-            else if(type === 'fixedelement'){
-              this.fixedelementpopup=true;
-              console.log(`feature >>>>>>>>>>>>>>>>`, feature);
-              const properties = feature.getProperties();
-
-              console.log(`properties >>>>>>>>>>>>>>>>`, properties);
-      
-              this.fixedelementname=properties.features[0].A_name;
-              console.log(`fixedelementname >>>>>>>>>>>>>>>>`, this.fixedelementname);
-
-              var popup: any = this.elem_id('fixedelementpopup');
+             console.log(`properties >>>>>>>>>>>>>>>>`, properties);
      
-              var olpopup: any = new ol.Overlay({
-                element: popup!,
-                autoPan: false,
-              });
-              console.log('geometry-------', properties['geometry']);
+             this.fixedelementname=properties.features[0].A_name;
+             console.log(`fixedelementname >>>>>>>>>>>>>>>>`, this.fixedelementname);
 
-              console.log(
-                'flatCoordinates-------',
-                properties['geometry']['flatCoordinates']
-              );
+             var popup: any = this.elem_id('fixedelementpopup');
+    
+             var olpopup: any = new ol.Overlay({
+               element: popup!,
+               autoPan: false,
+             });
+             console.log('geometry-------', properties['geometry']);
 
-              let lng = properties['geometry']['flatCoordinates'][0];
-              console.log('lng', lng);
-              let lat = properties['geometry']['flatCoordinates'][1];
-              console.log('lat', lat);
-              this.GridPosition = [lng, lat];
-              olpopup.setPosition(this.GridPosition);
-              this.map.addOverlay(olpopup);
-              console.log(`11111111111 >>>>>>>>>>>>>>>>`);
+             console.log(
+               'flatCoordinates-------',
+               properties['geometry']['flatCoordinates']
+             );
 
-              $('#popup2').css('display', '');
-              this.value = true;
+             let lng = properties['geometry']['flatCoordinates'][0];
+             console.log('lng', lng);
+             let lat = properties['geometry']['flatCoordinates'][1];
+             console.log('lat', lat);
+             this.GridPosition = [lng, lat];
+             olpopup.setPosition(this.GridPosition);
+             this.map.addOverlay(olpopup);
+             console.log(`11111111111 >>>>>>>>>>>>>>>>`);
 
-              $('#popupGrid').css('display', 'none');
-            }
-          }
-        // }
-      }
-    })
-    });
+             $('#popup2').css('display', '');
+             this.value = true;
+
+             $('#popupGrid').css('display', 'none');
+           }
+         }
+       // }
+     }
+   })
+   });
   
       this.map.on('click', (event) => {
 
@@ -3061,6 +2890,7 @@ this.regiondata=res;
  
   drawCircle() {
     this.countries=[];
+    this.showCancelButton = true;
     this.deactivateDrawInteraction();
     this.drawInteraction = new Draw({
       source: this.vectorSource,
@@ -3305,6 +3135,7 @@ this.regiondata=res;
     this.map.addInteraction(this.drawInteraction);
   }
   drawPolygon() {
+
     this.countries=[];
 
     this.deactivateDrawInteraction();
@@ -3314,7 +3145,7 @@ this.regiondata=res;
     });
     this.drawInteraction.setActive(true);
     let points:any[] = [];
-    this.drawInteraction.on('drawend', async (event: any) => {
+    this.drawInteraction.on('drawend', async (event: any) => { 
       this.coordinates = event.feature.getGeometry().getCoordinates()[0];
       const geometry = event.feature.getGeometry();
       const polygon = new Polygon(geometry.getCoordinates());
@@ -3574,7 +3405,7 @@ this.regiondata=res;
     this.coordinatesArray = [];
     this.clusterFeatures2 = [];
     this.clusters2Array = [];
-    localStorage.clear();
+    this.clearlocalStorage();
     this.fixedbtsGroupArray = [];
     this.fixedMarkersGroupsArray = [];
     this.indexTimeline = 0;
@@ -3610,7 +3441,7 @@ this.regiondata=res;
     this.aggridmarker = false;
     $('#animatonbar').css('display', 'none');
     this.fixedbtsGroup = [];
-    localStorage.clear();
+    this.clearlocalStorage();
     this.fixedBtsArray = [];
     this.clusterSourcebts = [];
     this.sourcebts = [];
@@ -3631,14 +3462,7 @@ this.regiondata=res;
     this.routeDevicestable=[];
 
     this.A_locSimulId = '';
-    if (this.isSimul == true) {
-      console.log('clearforsimul>>>>');
-      (window.parent.parent.parent[7] as any).clearforsimul();
-    } else {
-      console.log('clearshapes>>>>');
-
-      (window.parent.parent.parent[7] as any).clearshapes();
-    }
+    this.headerchangeCounter++;
   }
 
   // async getSimulationData(obj: any) {
@@ -4206,7 +4030,7 @@ this.routeDevices=this.Devices;
           // showCancelButton: true,
         });
 
-        localStorage.clear();
+        this.clearlocalStorage();
       } else {
         let shouldExecuteTest = true; // Flag variable
 
@@ -4734,12 +4558,8 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
     if (this.reportType == 6) {
       console.log('multiselection>>>', this.multiselection);
 
-      this.datacrowdService
-        .getdirection(
-          this.simulationid,
-          JSON.parse(localStorage.getItem('multiselection')!)
-        )
-        .then((res) => {
+      const jsonCoord = JSON.parse(localStorage.getItem("jsonCoords"));
+      this.datacrowdService.getdirection(this.simulationid,jsonCoord).then((res: any) => {
           console.log('data>><<', res);
 
           let data: any = res;
@@ -5079,7 +4899,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
     if (!localStorage.getItem('multiselection')) {
       this.multiselection = [];
     }
- localStorage.clear();
+//  localStorage.clear();
   }
 
 
@@ -5761,7 +5581,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
 
         //  }
       } else {
-        localStorage.clear();
+        this.clearlocalStorage();
       }
     }
   }
@@ -6669,9 +6489,10 @@ if(this.indexTimeline==1){
   }
 
   clustersZoom(obj: any) {
+    console.log("obj<<<<",obj)
     var desiredCoordinates = [
-      obj.markerPositions[0][3],
-      obj.markerPositions[0][4],
+      obj[0][3],
+      obj[0][4],
     ];
     console.log('zoomCordinatessss:::::::' + desiredCoordinates);
     var desiredZoomLevel = 0;
@@ -6898,7 +6719,7 @@ if(this.indexTimeline==1){
   displayCircleForLoop(long: any, lat: any, radius: any, BulkshapeId: any) {
  
     const view = this.map.getView();
-
+    this.showCancelButton = false;
     console.log('centerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', [long, lat]);
 
     const resolution = view.getResolution();
@@ -7229,27 +7050,63 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
     // Call your desired function or perform any action here
     (window.parent.parent.parent[7] as any).openkyc(rowData);
     //because one each click we add teh device to the multislection
-    localStorage.clear();
+    this.clearlocalStorage();
   }
 
   openPopup2() {
+    alert(111);
     // this.grid=true;
-    // this.value=true;
-this.GridID='popupGrid';
+    this.value=false;
+  
+    this.GridID='popupGrid';
+    
     $('#popup2').css('display', 'none');
 
-    var popup = this.elem_id('popupGrid');
+    // var popup = this.elem_id('popupGrid');
 
-    var olpopup = new ol.Overlay({
-      element: popup!,
-      autoPan: false,
-    });
-    olpopup.setPosition(this.GridPosition);
+    // var olpopup = new ol.Overlay({
+    //   element: popup!,
+    //   autoPan: false,
+    // });
+    // olpopup.setPosition(this.GridPosition);
 
-    this.map.addOverlay(olpopup);
-    $('#popupGrid').css('display', '');
-    return false;
+    // this.map.addOverlay(olpopup);
+    // $('#popupGrid').css('display', '');
+    // return false;
+    const componentfactory =
+    this.componentFactoryResolver.resolveComponentFactory(
+      VAgGridComponent
+    );
+  const componentref =
+    this.viewContainerRef.createComponent(componentfactory);
+  componentref.instance.rowData = this.rowData;
+  componentref.instance.columnDefs = this.columnDefs2;
+  componentref.instance.headerHeight = 30;
+  // componentref.instance.selectdevices = true;
+  componentref.instance.Title = "";
+  componentref.instance.distinct = true;
+  componentref.instance.rowGrouping = false;
+  componentref.changeDetectorRef.detectChanges();
+  const html1 = componentref.location.nativeElement;
+
+  
+   this.modalRef = this.modalService.open(this.popupContent);
+
+
+
+  $(".modal-content").css("width", "650px");
+  $(".modal-content").css("right", "200px");
+  $(".modal-content").css("padding", "10px");
+  $(".modal-content").css("top", "85px");
+  $(".modal-content").draggable({
+    axis: "both",
+    cursor: "move"
+  });
   }
+
+
+
+
 
   opentcdGrid() {
     // this.grid=true;
@@ -8348,23 +8205,15 @@ this.GridID='popupGrid';
   }
 
 
-  RunDeviceHistory() {
-    // alert(' in RunDeviceHistory angular:');
-    console.log('RunDeviceHistory-----------');
+  async RunDeviceHistory() {
+    //let device:any =this.dataService.getDHselectedDevice();
+    let device = localStorage.getItem('deviceselected');
+    this.selectedType=2;
+    
 
-    let device: any = this.dataservice1.getDHselectedDevice();
+ 
 
-    console.log('device-----------', device);
-    let devices:any[]=[];
-    device.forEach((element:any)=>{
-      devices.push(element.key)
-    });
-    devices =[...new Set(devices)];
-
-let deviceh=this.arrayToString(devices);
-
-console.log("RunDeviceHistory-----------",deviceh);
-    (window.parent.parent.parent[7] as any).RunDeviceHistory(deviceh);
+this.test33();
   }
 
   drawarc(
@@ -8780,7 +8629,7 @@ displayBtsOnMap(){
       // console.log('size::::',size);
       let style = styleCache[size];
       if (!style) {
-        src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
+        src = '../../../../../assets/assetsOffline/icons/BTS.png';
 
         styleCache[size] = style;
       }
@@ -9115,7 +8964,7 @@ this.displayarcLoop();
               const size = bts.get('features').length;
               let style = styleCache[size];
               if (!style) {
-                src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
+                src = '../../../../../assets/assetsOffline/icons/BTS.png';
 
                 styleCache[size] = style;
               }
@@ -10001,7 +9850,7 @@ if($('#tabletest').css('display') === 'block'){
             // console.log('size::::',size);
             let style = styleCache[size];
             if (!style) {
-              src = '/cybercrowd/angular-offline/assets/icons/BTS.png';
+              src = '../../../../../assets/assetsOffline/icons/BTS.png';
 
               styleCache[size] = style;
             }
@@ -11919,10 +11768,10 @@ this.displayPolyline(x,"bts")
                     if (size === 1) {
                       for (let i = 0; i < this.deviceCoordinatesArr.length; i++) {
                         src =
-                          '/cybercrowd/angular-offline/assets/icons/singleperson.png';
+                          '../../../../../assets/assetsOffline/icons/singleperson.png';
                       }
                     } else if (size > 1) {
-                      src = '/cybercrowd/angular-offline/assets/icons/group.png';
+                      src = '../../../../../assets/assetsOffline/icons/group.png';
                     }
                     styleCache[size] = style;
                   }
@@ -11998,10 +11847,10 @@ this.displayPolyline(x,"bts")
                       if (size === 1) {
                         for (let i = 0; i < parsedJson.length; i++) {
                           src =
-                            '/cybercrowd/angular-offline/assets/icons/singleperson.png';
+                            '../../../../../assets/assetsOffline/icons/singleperson.png';
                         }
                       } else if (size > 1) {
-                        src = '/cybercrowd/angular-offline/assets/icons/group.png';
+                        src = '../../../../../assets/assetsOffline/icons/group.png';
                       }
                       styleCache[size] = style;
                     }
@@ -14482,12 +14331,19 @@ let src: any;
 
 console.log('datajson>>>', this.datajson);
 
-this.CdrData = this.datajson;
 
 console.log('x', this.CdrData);
 
 this.CdrRowData = [];
 this.CdrRowData = [];
+
+if(this.reportType== "8"){
+  this.CdrData = this.datajson;
+
+}else{
+  this.CdrData = this.datajson.BTS;
+
+}
 
 for (let i = 0; i < this.CdrData.length; i++) {
   this.displayBTS(this.CdrData[i].BTS, this.CdrData[i].INFO);
@@ -14547,6 +14403,11 @@ this.map.addLayer(this.fixedbtsGroup);
 this.displayBtsOnMap();
 this.displayarc();
 this.isTcd = false;
+if(this.reportType== "9"){
+  this.displayClusters(this.datajson.geo);
+  this.clustersZoom(this.datajson.geo);
+}
+
 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           this.BtsTypeSlected='FixedElements';
@@ -14585,7 +14446,15 @@ this.isTcd = false;
 console.log('datajson>', this.datajson);
 console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
 
-this.displayFixedElements(this.datajson);
+
+if(this.reportType== "8"){
+  this.displayFixedElements(this.datajson);
+
+}else{
+  this.displayFixedElements(this.datajson.fixedelements);
+  this.displayClusters(this.datajson.geo);
+  this.clustersZoom(this.datajson.geo);
+}
         }
 
 
@@ -14615,7 +14484,7 @@ this.displayFixedElements(this.datajson);
                      backdrop: false,
                      // showCancelButton: true,
                    });
-         localStorage.clear();
+        //  localStorage.clear();
           
         } else {
         
@@ -14681,7 +14550,7 @@ this.displayFixedElements(this.datajson);
         }
         let obj:any={"table_id": this.simulationid }
     
-        await this.datacrowdService.SaveSimul(obj);
+          this.datacrowdService.SaveSimul(obj);
      } 
 
 
@@ -14877,5 +14746,48 @@ this.displayFixedElements(this.datajson);
       // }); 
       }
           }
+
+          openPropertiesForm(SimulID:any) {
+            this.PropertiesSimulID=SimulID;
+            // this.showPropertiesForm=true;
+          // this.showPropertiesForm=this.dataService.getopenProperties();
+          // console.log("this.showPropertiesForm---",this.showPropertiesForm);
+          this.modalService.open(this.showPropertiesForm);
+          
+          $(".modal-content").css("width", "650px");
+          $(".modal-content").css("right", "200px");
+          $(".modal-content").css("padding", "10px");
+          $(".modal-content").css("top", "85px");
+          $(".modal-content").draggable({
+            axis: "both",
+            cursor: "move"
+          });
+      
+          console.log("fielDValue>>",$("#fielDValue"));
+        
+          }
+
+          closemodalmarkers(){
+            this.modalRef.close()
+          }
+
+          cancelDrawing(): void {
+    
+            this.drawInteraction.setActive(false);
+        
+            this.showCancelButton = false;
+          }
+
+          clearlocalStorage(){
+            localStorage.removeItem("multiselection");
+            localStorage.removeItem("deviceselected");
+            localStorage.removeItem("locSimulId");
+            localStorage.removeItem("userCode");
+            localStorage.removeItem("locSimulId");
+            localStorage.removeItem("locSimulId");
+
+       
+           }
+        
 }
 

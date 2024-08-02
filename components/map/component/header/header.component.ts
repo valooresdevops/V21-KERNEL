@@ -13,6 +13,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   IMSI_IDValue: string = '';
   getAllProcAndPack: any;
   @Input() simulationtype: any[] = [];
+  @Input() IsClear:number=0; 
 
   @Output() onChangeEvent: EventEmitter<any> = new EventEmitter();
 
@@ -52,7 +53,35 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.getAllProcAndPack = this.convertArray(res);
     });
     console.log("getAllProcAndPack", this.getAllProcAndPack);
+  
   }
+
+
+   
+ngOnChanges(changes: any): void {
+  console.log("changes",changes);
+  if (changes['IsClear'] ) {
+    this.reset();
+    this.form.reset();
+    this.form.controls['TYPE'].setValue(1);
+    this.selectedType = 1;
+
+    this.simulationtype = [
+      { id: 1, name: "Activity Scan By Hits" },
+      { id: 2, name: "Device History" },
+      { id: 3, name: "Device Travel Pattern" },
+      { id: 6, name: "Device History Pattern" },
+      { id: 7, name: "POI" },
+      { id: 8, name: "Fixed Element Scan" },
+      { id: 9, name: "Fixed Element Activity Scan" },
+      { id: 10, name: "Activity Scan By Device" },
+      { id: 11, name: "TCD History" },
+      { id: 13, name: "Grouping History" },
+      { id: 14, name: "TCD History Pattern" }
+    ];
+  }
+}
+  
 
   ngOnDestroy(): void {
     this.saveFormData();
@@ -119,3 +148,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this.form.get('MeterFrom')?.setValue(200);
   }
 }
+

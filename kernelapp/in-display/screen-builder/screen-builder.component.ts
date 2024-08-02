@@ -91,6 +91,7 @@ onUpdateClick(){
   }else{
     
         this.showPopup = false;
+        console.log("this.informationSCREENBUILDER>>>>>>>>>>>>",this.informationservice.getAgGidSelectedNode);
         this.commonFunctions.navigateToPage(
           "/dsp/augmentedConfigScratch/form/update/"+this.informationservice.getAgGidSelectedNode());
     }

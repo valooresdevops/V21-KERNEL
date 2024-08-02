@@ -13,6 +13,7 @@ export class GlobalConstants {
   // -- Globally used headers in API requests
   // --------------------------------------------------------------------------------
   public static headerstext = new HttpHeaders().set('Content-Type', 'text');
+  public static headersCSV = new HttpHeaders().set('Content-Type', 'text/csv');
 
   public static headers = new HttpHeaders().set('Content-Type', 'application/json');
   public static loginHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
@@ -315,6 +316,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
   public static getRowFieldGrouping  = GlobalConstants.inDispGatewat + 'api/getRowFieldGrouping/';
+  public static exportCharts  = GlobalConstants.inDispGatewat + 'api/exportCharts/';
 
   
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
@@ -412,7 +414,10 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getExecutedReports = GlobalConstants.inDispGatewat + 'api/getExecutedReports/';
   public static getExecutedReportData = GlobalConstants.inDispGatewat + 'api/getExecutedReportData/';
   public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';
+  public static getQueryId = GlobalConstants.inDispGatewat +'api/getQueryId/'
+  public static getNodesImages = GlobalConstants.inDispGatewat + 'api/getNodesImages/';
 
+  
   
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
@@ -442,6 +447,7 @@ public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
 public static ipAddressCassandraSpark = "http://"+ GlobalConstants.endPointAddress +":8092";
+public static ipAddressMap = "http://"+ GlobalConstants.endPointAddress +":8112/datacrowd";
 
 
 }

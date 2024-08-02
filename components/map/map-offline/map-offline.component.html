@@ -1,4 +1,4 @@
-<app-navbar  [SimulID]="navbarSimulId" (displayclusters2)="getsenarioId($event)"></app-navbar>
+<app-navbar  [SimulID]="navbarSimulId" (displayclusters2)="getsenarioId($event)"  (openProperties)="openPropertiesForm($event)"></app-navbar>
 
 <div id="fullscreen" class="fullscreen" style="position:relative;">
   <div #mapContainer id="mapContainer" class="map">
@@ -48,6 +48,11 @@
   <!-- <button id="tabledatabtn"  (click)="opentimelineScreen()"> Display Data</button> -->
 </div>
 
+<ng-template #showPropertiesForm  >
+  <!-- <app-properties  [showForm]="true"></app-properties> -->
+  <app-properties [SimulID]="PropertiesSimulID" (openProperties)="openPropertiesForm($event)"></app-properties>
+  </ng-template>
+
 <div id='routebar' class='routebar'  *ngIf="bydeviceValue===true">
   <div class="controls">
     <span (click)="startRoute()">Start</span>
@@ -86,7 +91,7 @@
   </div>
 </div>
 
-<div  id="search"  class="box" style="position: absolute; top: 14px; right: 6px; z-index: 99999;  box-shadow: 0 1px 7px #999;" >
+<div  id="search"  class="box" style="position: absolute; top: 14px; right: 6px; z-index: 999;  box-shadow: 0 1px 7px #999;" >
   <img src="../../../../../assets/assetsOffline/img/Search.PNG" alt="search" class="searchbtn">
   <input type="text" [(ngModel)]="locationName" placeholder="Search Location..." (window:keydown.enter)="search(locationName)">
   
@@ -112,19 +117,21 @@
  </div>
 
 
-<div id="popupGrid"  >
-  <button  *ngIf="value===true" id="popup-closer" class="ol-popup-closer"  (click)="closeGridPopup();"></button>
+ <ng-template #popupContent >
+  <div class="modal-header">
+       <button type="button" class="btn-close" aria-label="Close" (click)="closemodalmarkers()"> </button>   
+  </div> 
+  <app-v-ag-grid  [headerHeight]="20" [columnDefs]="columnDefs2"  [rowData]="rowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" [GridID]="GridID" ></app-v-ag-grid>
+</ng-template>
 
-    <app-v-ag-grid *ngIf="value===true"  [headerHeight]="20" [columnDefs]="columnDefs2"  [rowData]="rowData" [distinct]="false"  [pagination]="true" [contextmenu]="false" [GridID]="GridID" ></app-v-ag-grid>
+
+<div id="popup2" class="ol-popup"  >
+
+   
+    <button id="popup-closer" class="ol-popup-closer" (click)="closeGridPopup();" *ngIf="value===true" ></button>
+    <app-v-ag-grid  *ngIf="value===true"   [Grid2Type]="'btn-54Offline'" [headerHeight]="0"    [autoGroupColumnDef]="autoGroupColumnDef"  [columnDefs]="columnDefs"  [rowData]="rowData" [distinct]="true"  [pagination]="false" [contextmenu]="false"  [title]="title" [rowGrouping]="true"  >  </app-v-ag-grid>
   
-</div> 
-
-<div id="popup2" class="ol-popup">
-  <button id="popup-closer" class="ol-popup-closer" (click)="closeGridPopup();" ></button>
-  <div>
-    <app-v-ag-grid *ngIf="value===true"   [headerHeight]="0"    [autoGroupColumnDef]="autoGroupColumnDef"  [columnDefs]="columnDefs"  [rowData]="rowData" [distinct]="true"  [pagination]="false" [contextmenu]="false"  [title]="title" [rowGrouping]="true"  >  </app-v-ag-grid>
-  </div>
-</div> 
+</div>
 
 <div id="TCDContent" class="ol-popup">
   <button id="popup-closer" class="ol-popup-closer" (click)="closeTCDPopup();" ></button>
@@ -153,12 +160,13 @@
 
 
 
-<button id="btn-54"
+<button id="btn-54Offline"
 style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
 (click)="openPopup2()"
 >
 openPopup
 </button>
+
 <button id="opentcd"
   style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
   (click)="opentcdGrid()"
@@ -192,6 +200,10 @@ class="customButtons customButtons_Layout" style="display: none;">
   <!-- <button (click)="addMarker()" title='Draw a Point'><img src="./assets/img/Point.PNG" alt="Point"></button> -->
   
 </div>
+<button *ngIf="showCancelButton" id="cancelDrawingCircle" (click)="cancelDrawing()"  title='Cancel'>
+  Cancel
+</button>
+
 <div class="button-container2" [class.hidetools]="status" [class.showtools]="!status" [class.dimmed]="isDimmed"> 
   <!-- <button (click)="EditShapes()" title='Edit layers' ><img src="./assets/img/Edit.PNG" alt="edit"></button> -->
   <!-- <div *ngIf="editMode===true" class="editMode">
@@ -243,7 +255,7 @@ display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; "
 <fieldset > 
    <legend id="legend">Simulation</legend>  
 
-<app-header id="Header" [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
+<app-header id="Header"  [IsClear]="headerchangeCounter"  [simulationtype]="Convertedsimulationtype"   (onChangeEvent)="CatchHeaderParam($event)"></app-header>
 </fieldset>
 </div>
   
@@ -296,14 +308,14 @@ display: table;right: 25px;top: 35px;   border: 6px solid white ;color: black; "
 >
 DisplayCdr
 </button>
-<button id="displayTimelineSimul"
+<button id="displayTimelineSimulOffline"
   style="position: absolute; bottom: 0; z-index: 999999999999; display: none;"
   (click)="displayTimelineSimul()"
 >
 refreshJsp
 </button>
 
-<button id="RunDeviceHistory1"
+<button id="RunDeviceHistoryOffline"
   style="position: absolute; bottom: 0; z-index: 999999999999 ; display: none; "
   (click)="RunDeviceHistory()"
 ></button>
@@ -352,7 +364,7 @@ refreshJsp
 <button style="position: absolute;
 width: 31px;  
 top: 14px;
-z-index: 2147483647;
+z-index:999;
 left: 182px;
 outline-color: transparent;
 border-radius: 2px;

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormGroup, UntypedFormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -30,6 +30,7 @@ export class NewTabComponent implements OnInit {
   public getTabTables: string = "";
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
+  public isTreeGrid: any;
   public isQueryForm: any;
   public isRowGroup: any;
   public hasMultipleSelection: any;
@@ -45,6 +46,7 @@ export class NewTabComponent implements OnInit {
   public sourceQueryId:any;
   fieldGrouping:any;
   showAddSearchProcedure:any;
+  showIsRowGroupHidden:any;
   showQueryFormButtonCombo:any;
   public getAllProcAndPack: string = '';
   public getAllColumns: any;
@@ -58,6 +60,7 @@ export class NewTabComponent implements OnInit {
     tableName: new UntypedFormControl(''),
     orderField: new UntypedFormControl(''),
     isGrid: new UntypedFormControl(''),
+    isTreeGrid: new UntypedFormControl(''),
     isQueryForm: new UntypedFormControl(''),
     hasMultipleSelection: new UntypedFormControl(''),
     isDynamicReport: new UntypedFormControl(''),
@@ -77,14 +80,26 @@ export class NewTabComponent implements OnInit {
     callRestApi2:new UntypedFormControl(''),
     isRowGroup:new UntypedFormControl(''),
     fieldGrouping:new UntypedFormControl(''),
+    isRowGroupHidden:new UntypedFormControl(''),
+    fieldGroupingHidden:new UntypedFormControl(''),
   });
   agPrimaryKey: any;
 
-  constructor(private dialog: MatDialog, private http: HttpClient, private _Activatedroute: ActivatedRoute, private commonFunctions: CommonFunctions,
+  constructor(private dialog: MatDialog, private http: HttpClient, private _Activatedroute: ActivatedRoute, private commonFunctions: CommonFunctions,public router:Router,
 
     public informationservice: InformationService ) { }
 
   ngOnInit(): void {
+
+    console.log("ROUTE URL>>>>>>>>>>>>",this.router.url);
+    let breadCrumbData=this.informationservice.getNavBreadCrumb();
+    breadCrumbData.push(JSON.parse('{"name":"' + "Tab Modification" + '","route":"' + this.router.url + '"}'))
+    this.informationservice.setNavBreadCrumb(breadCrumbData);
+
+    console.log("information srevice>>>>>>>>>>>>",this.informationservice.getNavBreadCrumb());
+
+
+
     this.getAllProcAndPack = GlobalConstants.getAllProcAndPack;
     this._Activatedroute.paramMap.subscribe((params) => {
       this.objectId = params.get('childId');
@@ -312,9 +327,12 @@ console.log('data--------->',data)
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
+          isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
+          IsRowGroupHidden: this.newTabForm.controls['IsRowGroupHidden']?.value,
+
           fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -338,6 +356,7 @@ console.log('data--------->',data)
         };
         List.push(jsonParams);
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
+        this.isTreeGrid = this.newTabForm.controls['isTreeGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
         this.isRowGroup = this.newTabForm.controls['isRowGroup']?.value;
@@ -362,17 +381,19 @@ console.log('data--------->',data)
       }
 
       if (this.actionType == 'update') {
-       console.log('jp------>',this.newTabForm.controls['fieldGrouping']?.value)
+       console.log('jp------>',this.newTabForm.controls['IsRowGroupHidden']?.value)
         let updateList = [];
-
+        
         const jsonParams = {
           menuName: this.newTabForm.controls['tabName']?.value,
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
+          isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
-          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value.toString(),
+          IsRowGroupHidden:this.newTabForm.controls['IsRowGroupHidden']?.value, 
+          fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -395,6 +416,7 @@ console.log('data--------->',data)
           isSave: this.newTabForm.controls['isSave']?.value,
           readOnlyQbeId: readOnlyQbeId
         };
+        console.log('jp::: ',jsonParams)
         updateList.push(jsonParams);
 
         this.http.post<any>(GlobalConstants.updateTabApi + this.objectId, updateList, { headers: GlobalConstants.headers }).subscribe(
@@ -428,13 +450,11 @@ console.log('data--------->',data)
       this.test = data;
     });
   }
-
-
   fetchTabData() {
     
     this.http.get<any>(GlobalConstants.getTabConfigurationApi + this.objectId, { headers: GlobalConstants.headers, }).subscribe(
       async (res: any) => {
-        //console.log("TAB DATA>>>>>>>>>>",res);
+        console.log("TAB DATA>>>>>>>>>>",res);
         this.newTabForm.controls['tabName'].setValue(res[0].menuName);
 
         this.newTabForm.controls['orderField'].setValue(res[0].orderNo);
@@ -474,6 +494,13 @@ console.log('data--------->',data)
         } else {
           console.log("IS GRID IS TRUE");
           this.newTabForm.controls['isGrid'].setValue(true);
+        }
+
+        if (res[0].isTreeGrid == "0") {
+          this.newTabForm.controls['isTreeGrid'].setValue(false);
+        } else {
+          console.log("IS tree GRID IS TRUE");
+          this.newTabForm.controls['isTreeGrid'].setValue(true);
         }
 
         if (res[0].isDynamicReport == "0") {
@@ -601,6 +628,15 @@ console.log('data--------->',data)
     }else{
       this.showAddSearchProcedure=false;
       this.newTabForm.controls['addSearchProcedure'].setValue('');
+    }
+  }
+
+  isRowGroupHidden(){
+    if(this.newTabForm.get('isRowGroupHidden').value==true){
+      this.showIsRowGroupHidden=true;
+    }else{
+      this.showIsRowGroupHidden=false;
+      this.newTabForm.controls['isRowGroupHidden'].setValue('');
     }
   }
 

@@ -337,7 +337,7 @@ html, body {
   .listContainerColKpi {
     position: relative;
     width: 350px;
-    height: 180px;
+    height: fit-content;
     padding-top: 10px;
     padding-bottom: 10px;
     background-color: white;

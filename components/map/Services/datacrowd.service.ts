@@ -13,7 +13,6 @@ export class DatacrowdService {
   constructor(private httpClient: HttpClient) {
 
    }
-
   ipAddress:any = GlobalConstants.ipAddress;
   ipAddressKYG:any = GlobalConstants.ipAddressKYG;
   urlCassandraServer:string=this.ipAddress;
@@ -866,7 +865,7 @@ async getdirectionByTime(v_method_log:any,devices:any){
   return response; 
 }
 async getScanBts(object :any){
-  let response= await this.httpClient.post<any>(this.ipAddressDataCrowd+"/api/getScanBts/",object, {headers: GlobalConstants.headers}).toPromise();
+  let response= await this.httpClient.post<any>(this.ipAddress+"/api/getScanBts/",object, {headers: GlobalConstants.headers}).toPromise();
   return response; 
 }
 

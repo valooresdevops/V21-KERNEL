@@ -21,12 +21,35 @@ export class KpiBuilderPreviewComponent implements OnInit {
   constructor(private http: HttpClient, public commonFunctions: CommonFunctions,
     @Inject(MAT_DIALOG_DATA) public data: any, private dialog: MatDialog,) { }
 
+    // valueFromSecondObject: string;
+
   ngOnInit(): void {
     this.http.post<any>(GlobalConstants.getKpiQueryData + this.data.kpiId, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.info = res;
-      });
+        console.log("this.info = ", JSON.stringify(this.info));
 
+        // Ensure the array has at least two objects
+        // if (this.info.length > 1)
+        // {
+        //   const firstObject = this.info[0]; // Get the first object
+        //   const secondObject = this.info[1]; // Get the second object
+
+        //   // Get the keys of the first object
+        //   const firstObjectKeys = Object.keys(firstObject);
+
+        //   // Assuming you want the value from the second object corresponding to the first object's keys
+        //   // Here, we assume you want the value of the first field in the first object from the second object
+        //   const firstFieldName = firstObjectKeys[0];
+        //   this.valueFromSecondObject = secondObject[firstFieldName];
+
+        //   console.log("Value from the second object for the first field of the first object:", this.valueFromSecondObject);
+        // }
+        // else
+        // {
+        //   console.log("The array does not have enough elements.");
+        // }
+      });
   }
 
   openChart() {

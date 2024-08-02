@@ -19,6 +19,10 @@
       </div>
 
       <div class="col-lg-4">
+        <v-toggle label="Is Tree Grid" formControlName="isTreeGrid" [parentForm]="newTabForm" fieldName="isTreeGrid"> </v-toggle>
+    </div>
+
+      <div class="col-lg-4">
           <v-toggle label="Has Multiple Selection" formControlName="hasMultipleSelection" [parentForm]="newTabForm" fieldName="hasMultipleSelection"></v-toggle>
       </div>
 
@@ -39,7 +43,15 @@
           fieldName="isQueryFormSelectedButtons" [multiple]="true"></v-dropdown>
 
       </div>
-
+      <div class="col-lg-4">
+        <v-toggle *ngIf="showColumnRowGroup"label="Is Row Group hidden" formControlName="isRowGroupHidden" [parentForm]="newTabForm" (toggleChange)="isRowGroupHidden()"
+            fieldName="isRowGroupHidden"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+        <v-dropdown *ngIf="showIsRowGroupHidden" formControlName="fieldGroupingHidden"
+        label="Field Grouping Hidden" placeholder="" [parentForm]="newTabForm" [dataApi]="fieldGrouping"
+        fieldName="fieldGroupingHidden" [multiple]="true"></v-dropdown>
+        </div>
       <!-- (onChangeEvent)="onParamSelect($event)" -->
       <!-- ------------------------------------------- -->
       <div class="col-lg-4">
@@ -71,12 +83,20 @@
           <v-toggle label="Is Advanced Search" formControlName="isAdvancedSearch" [parentForm]="newTabForm" (toggleChange)="isAdvancedSearchChange()"
               fieldName="isAdvancedSearch"> </v-toggle>
       </div>
-      <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+      <!-- <div class="col-lg-4" *ngIf="showAddSearchProcedure">
           <v-input  formControlName="addSearchProcedure" [parentForm]="newTabForm" type="lookup"
           [lookupDataApi]="getAllProcAndPack" lookupWidth="700px" lookupHeight="700px" label="Add Procedure"
           fieldName="addSearchProcedure">
       </v-input>
-      </div>
+      </div> -->
+      <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-toggle label="Call Api  On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
+        fieldName="callRestApi"> </v-toggle>
+    </div>
+    <div class="col-lg-4" *ngIf="showCallApi">
+        <v-input formControlName="callRestApi2" type="text" label="End Of Url"  [parentForm]="newTabForm"
+        fieldName="callRestApi2"></v-input>
+    </div>
       <div class="col-lg-4">
           <v-input formControlName="canAdd" [parentForm]="newTabForm" type="lookup" [lookupDataApi]="getSourceQuery"
               lookupWidth="700px" lookupHeight="700px" label="Can Add" fieldName="canAdd">

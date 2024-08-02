@@ -121,7 +121,7 @@ button {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   /* padding: 2px 0; */
   min-width: 120px;
-  z-index: 999; /* Ensure it's above other elements */
+  z-index: 9999; /* Ensure it's above other elements */
 }
 
 .custom-context-menu button {

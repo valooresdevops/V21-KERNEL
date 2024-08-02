@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input } from '@angular/core';
 import { FormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription, from, lastValueFrom } from 'rxjs';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -70,7 +70,9 @@ export class InputComponent {
     private dialog: MatDialog,
     private dataService: DataService,
     public loaderService: LoaderService,
-    public informationservice: InformationService ) { }
+    public informationservice: InformationService,
+    private route: ActivatedRoute,
+    private router: Router) { }
 
   async getAllColums() {
     // Used to show loading animation
@@ -202,7 +204,6 @@ export class InputComponent {
   }
 
   ngOnInit(): void {
-    
     this._Activatedroute.paramMap.subscribe((params) => {
       // this.objectId = params.get('childId');
       if (this.fromScreenBuilder == "1") {
@@ -217,6 +218,27 @@ export class InputComponent {
 
     });
 
+/////breadcrumb////////////
+    console.log("ROUTE URL>>>>>>>>>>>>",this.router.url);
+    let breadCrumbData=this.informationservice.getNavBreadCrumb();
+    breadCrumbData.push(JSON.parse('{"name":"' + "Form Configuration" + '","route":"' + this.router.url + '"}'))
+    this.informationservice.setNavBreadCrumb(breadCrumbData);
+
+    console.log("information srevice>>>>>>>>>>>>",this.informationservice.getNavBreadCrumb());
+
+    let uniqueItems = this.informationservice.getNavBreadCrumb().reduce((acc, current) => {
+      const x = acc.find((item: { name: any; }) => item.name === current.name);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, []);
+    
+    console.log("UNIQUE ARRAY>>>>>>>>>>",uniqueItems);
+    this.informationservice.setNavBreadCrumb(uniqueItems);
+    
+    /////////////////////////
     this.getAllTabs();
     this.fetchMenuName();
 

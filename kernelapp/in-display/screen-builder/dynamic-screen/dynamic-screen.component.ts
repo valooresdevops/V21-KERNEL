@@ -22,6 +22,17 @@ export class DynamicScreenComponent implements OnInit {
       this.menuVariable = params.get('menuVariable');
     });
     console.log("menu variable>>>>>>>>>",this.menuVariable);
+
+    const numericPattern = /^[0-9]+$/;
+
+    // Check if myString consists only of numeric characters
+    if (numericPattern.test(this.menuVariable)) {
+      console.log('String contains only numeric characters');
+    } else {
+      console.log('String does not contain only numeric characters');
+    }
+
+
     this.http.get<any>(GlobalConstants.getScreenPreviewData+this.menuVariable, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => { 
     });    
