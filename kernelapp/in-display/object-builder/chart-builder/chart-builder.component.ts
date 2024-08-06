@@ -12,6 +12,12 @@ import { ChartBuilderFormComponent } from '../chart-builder-form/chart-builder-f
 import { data } from 'jquery';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import Highcharts from 'highcharts';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
 
 @Component({
   selector: 'app-chart-builder',
@@ -117,13 +123,13 @@ export class ChartBuilderComponent implements OnInit {
           info = res;
           console.log('res--> ',res)
         const dialogConfig = new MatDialogConfig();
-        dialogConfig.width = '700px';
-        dialogConfig.height = '70%';
+        dialogConfig.width = '500px';
+        dialogConfig.height = '500px';
 
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
-          width: '45%',
-          height: '70%',
+          width: '50%',
+          height: '60%',
         });
   
       });

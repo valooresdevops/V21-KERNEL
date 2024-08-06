@@ -52,6 +52,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
           return el.tabId === "tabId_" + this.informationservice.getChoosenTab();
         });
         let tab: any = data;
+        console.log("NG AFTER CONTENT TAB>>>>>>>>>");
         this.selectTab(tab, 1);
         // localStorage.removeItem("choosenTab");
         this.informationservice.removeChoosenTab();
@@ -156,6 +157,9 @@ export class TabsComponent implements AfterContentInit,OnInit {
   }
 
   selectTab(tab: TabComponent, isFromClosedScreen: number) {
+    console.log("TAB DATA>>>>>>>>>>>>>>>>",tab);
+    console.log("TAB CLOSED SCREEN>>>>>>>>>>>>>>>>",isFromClosedScreen);
+
     if (!tab.disabled) {
       if (isFromClosedScreen == 0) {
         // deactivate all tabs

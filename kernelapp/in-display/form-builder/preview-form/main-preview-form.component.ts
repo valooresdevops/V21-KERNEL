@@ -24,10 +24,10 @@ import { FileDownloadService } from 'src/app/Kernel/components/map/Services/File
 
 
 export class PreviewFormComponent implements OnInit {
-
+  public isGridOptions:any;
   @Input() fromScreenBuilder: String = "0";
   @Input() screenBuilderObjId: any;
-
+  public mainPreviewDataFromMain:any[]=[];
   public subsVar: Subscription;
   public AllTabs: any = [];
   public tableOptions1: any[] = [];
@@ -545,6 +545,7 @@ export class PreviewFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
 
@@ -617,15 +618,24 @@ export class PreviewFormComponent implements OnInit {
         this.tableOptions1 = this.tableOptions1.filter(value => value.isMain == '1');
         this.http.get<any>(GlobalConstants.getMenuNameApi + this.objectId).subscribe((data: any) => {
           this.AllTabs = data;
+          this.isGridOptions=this.tableOptions1[0].isGrid;
+          console.log("IS GRID OPTIONS>>>>>>>>>>>",this.isGridOptions);
           this.getAllColums();
         });
       });
     });
     console.log("MAIN PREVIEW FORM TABLE OPTIONS>>>>>>>>>",this.tableOptions1);
     setTimeout(() => {
+      this.mainPreviewDataFromMain= [{
+        objectId: this.objectMain,
+        actionType: this.actionType,
+        isFromGridClick: 1,
+        primaryColumn: this.columnId,
+        previousTab: "-1"
+      }];
+      console.log("DATA TO SEND ELIE>>>>>>>>>>",this.mainPreviewDataFromMain);
     }, 1000);
 
- 
 
   }
 

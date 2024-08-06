@@ -1,4 +1,4 @@
-<div * ngIf="tableOptions1[0].isGrid==1">
+<div *ngIf="isGridOptions==1">
 <div *ngFor="let tableOption of tableOptions1">
 
 
@@ -30,6 +30,6 @@
   </div>
 </div>
 </div>
-<div * ngIf="tableOptions1[0].isGrid==0">
-  <p>TEST RUN</p>
+<div *ngIf="isGridOptions==0">
+<am-preview-form [mainPreviewDataInput]="mainPreviewDataFromMain"></am-preview-form>
 </div>

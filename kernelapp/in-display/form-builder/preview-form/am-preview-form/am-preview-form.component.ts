@@ -1,6 +1,6 @@
 import { DatePipe, ɵNullViewportScroller } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, NgZone, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, Input, NgZone, OnInit, Renderer2 ,Optional} from '@angular/core';
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Subscription, from, lastValueFrom, map } from 'rxjs';
@@ -26,6 +26,7 @@ import { DynamicReportResultComponent } from 'src/app/Kernel/components/v-dynami
   styleUrls: ['./am-preview-form.component.css']
 })
 export class AmPreviewFormComponent implements OnInit {
+  @Input() mainPreviewDataInput: any[]=[];
 
   hiddenForm = new UntypedFormGroup({});
   menuForm = new UntypedFormGroup({});
@@ -139,8 +140,8 @@ export class AmPreviewFormComponent implements OnInit {
   public getFieldDynamicTitle:any;
   public getFieldDynamicTitleValue: string = '';
 
-  constructor(private dialogRef: MatDialogRef<AmPreviewFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public lookupData: any,
+  constructor(@Optional() private dialogRef: MatDialogRef<AmPreviewFormComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public lookupData: any,
     private http: HttpClient,
     private eventEmitterService: EventEmitterService,
     public commonFunctions: CommonFunctions,
@@ -4675,7 +4676,7 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
   }
 
   async ngOnInit(): Promise<void> {
-
+    this.lookupData=this.mainPreviewDataInput;
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith('agGidSelectedLookup_')) {

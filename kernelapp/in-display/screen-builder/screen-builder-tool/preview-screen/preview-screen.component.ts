@@ -11,6 +11,12 @@ import { GridBuilderPreviewComponent } from 'src/app/Kernel/kernelapp/in-display
 import Highcharts from 'highcharts';
 import Highcharts3D from 'highcharts/highcharts-3d';
 Highcharts3D(Highcharts);
+
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
 @Component({
   selector: 'app-preview-screen',
   templateUrl: './preview-screen.component.html',

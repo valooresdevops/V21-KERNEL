@@ -1,5 +1,13 @@
 import { Component, ElementRef, Input, OnInit, Renderer2 } from '@angular/core';
 import * as Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more';
+
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
+
+
 @Component({
   selector: 'v-highcharts',
   templateUrl: './v-highcharts.component.html',

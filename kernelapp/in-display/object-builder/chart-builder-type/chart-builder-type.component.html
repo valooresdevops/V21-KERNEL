@@ -9,7 +9,7 @@
                 <div style="width: fit-content;"> 
                   <ng-container>
                     <div class="chart-container">
-                      <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type, 'c')"></v-highcharts>
+                      <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type, options.chart.identifier, 'c')"></v-highcharts>
                     </div>
                   </ng-container>
                 </div>    
@@ -28,7 +28,7 @@
                       <v-highcharts-stocks 
                         [Highcharts]="Highcharts" 
                         [options]="options" 
-                        (click)="nextTab(options.series[0].type, 's')">
+                        (click)="nextTab(options.series[0].type, options.series[0].identifier, 's')">
                       </v-highcharts-stocks>
                     </div>
                   </ng-container>

@@ -6,7 +6,8 @@
                  label="Search Here"
                  (input)="agQuickFilter($event)"
                  fontawesome="fa fa-search"
-                 [allowLabel]="false"></v-input>
+                 [allowLabel]="false"
+                 [ngStyle]="{'display': checkInput ? 'none' : 'block'}"></v-input>
     </div>
 
     <div class="flex-elements">

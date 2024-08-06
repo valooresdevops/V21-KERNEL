@@ -1,5 +1,5 @@
 <form [formGroup]="chartForm">
-  <div class="box" style="position:absolute"  *ngFor="let options of newChartObject; let i = index" cdkDrag >
+  <div class="boxForCharts" style="position:absolute;"  *ngFor="let options of newChartObject; let i = index" >
   <div class="chart-row">
    <ng-container >
      <div class="chart-container" id="chartContainer">
@@ -8,7 +8,7 @@
    </ng-container>
  </div>   
  </div>
- <div class="box" style="position:absolute"  *ngFor="let options of stockObject; let i = index" >
+ <div class="boxForStocks" style="position:absolute"  *ngFor="let options of stockObject; let i = index" >
   <div class="chart-row">
    <ng-container >
      <div class="chart-container">

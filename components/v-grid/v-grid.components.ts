@@ -25,8 +25,8 @@ import { data } from 'jquery';
 })
 
 export class AGGridComponent implements OnInit, OnChanges {
-
-  @Input() checkInput : Boolean; // hayde kermel search bar input design display none or block
+  
+  @Input() checkInput : Boolean = false; //  hayde kermel search bar input design display none or block
   @Input() checkPagination :boolean;
 
   public gridApi: GridApi;
@@ -231,10 +231,26 @@ export class AGGridComponent implements OnInit, OnChanges {
 
     this.NoneGrid = '';
 
-    if(this.checkPagination){ const style = this.renderer.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = '.ag-paging-panel { display: none; }';
-      this.renderer.appendChild(document.head, style);}
+    if(this.checkPagination){
+      this.hidePagination();
+    }else{
+      this.showPagination();
+    }
+   
+  } 
+
+  hidePagination(): void {
+    const paginationPanel = document.querySelector('.ag-paging-panel') as HTMLElement;
+    if (paginationPanel) {
+      paginationPanel.style.display = 'none';
+    }
+  }
+  
+  showPagination(): void {
+    const paginationPanel = document.querySelector('.ag-paging-panel') as HTMLElement;
+    if (paginationPanel) {
+      paginationPanel.style.display = '';
+    }
   }
 
 getChildren(parentId: number): any[] {

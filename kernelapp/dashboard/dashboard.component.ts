@@ -16,6 +16,12 @@ import Highcharts from 'highcharts';
 import Highcharts3D from 'highcharts/highcharts-3d';
 Highcharts3D(Highcharts);
 
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -70,28 +76,11 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
 
   newChartObject:any;
   stockObject: any;
-public data : any;
-allDataa : any[] = [];
-public gridIndexes :number[]= [];
-gridIndexesMapping :Map<number, number> = new Map();
+  public data : any;
+  allDataa : any[] = [];
+  public gridIndexes :number[]= [];
+  gridIndexesMapping :Map<number, number> = new Map();
  gridCounter : number = 0;
-
-
-
-  // ngOnInit(): void {
-  //   this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
-  //     (res: any) => {
-  //       this.tabs = res;
-  //     })
-
-  //   this.subsVar = this.eventEmitterService.onTabActionClick.subscribe(() => {
-  //     this.showDashboard = false;
-  //     this.onSelectTab();
-  //     setTimeout(() => {
-  //       this.showDashboard = true;
-  //     }, 1000);
-  //   });
-  // }
 
   valueFromSecondObject: string;
 
@@ -116,42 +105,10 @@ gridIndexesMapping :Map<number, number> = new Map();
   
   currentIndexGrid : number = 0;
   conditionalIncrement() : number{
-    // console.log("----Miky:::", this.currentIndexGrid);
     this.currentIndexGrid++;
   return this.currentIndexGrid-1;
   }
- 
-  
 
-//  getGridIndex(index : number):number | undefined{
-//   let value = this.gridIndexesMapping.get(index);
-//     return value;
-//  }
-
-  // conditionalIncrement() :number
-  // {
-  //   // this.cdr.detach();
-  //  this.currentIndexGrid++;
-  //  return this.currentIndexGrid - 1;
-  //   // this.cdr.detectChanges();
-  //   // console.log("hhhhhhhhhhh_____",this.gridCounter);
-  //   //   this.gridCounter++;
-  //   //   this.cdr.detach();
-  //   //   return this.gridCounter;
-    
-  //   // else if(!this.gridIndexes.includes(index) ){
-  //   //   return index -1 ;
-  //   // }
-  //   // else{console.log("else---------->"); return index;}
-  //   // this.currentIndexGrid++;
-  //   // // if(this.currentIndexGrid== this.gridCounter) this.cdr.detach();
-  //   // return this.currentIndexGrid-1;
-  // }
-
-  // triggerChangeDetection(){
-  //   alert('hey')
-  //   this.cdr.detectChanges();
-  // }
   setupGridIndexes(): void {
     this.gridValue.forEach((data, index) => {
       this.gridIndexesMapping.set(data.ID, index);
@@ -162,6 +119,7 @@ gridIndexesMapping :Map<number, number> = new Map();
    gridIndexMapping(id: number): number | undefined {
     return this.gridIndexesMapping.get(id);
   }
+  
   onSelectTab() {
     this.checkVisibiltyDashboard = false;
     this.gridCounter=0;
@@ -171,13 +129,12 @@ gridIndexesMapping :Map<number, number> = new Map();
     this.newChartObject = [];
     this.allData = this.newChartObject;
     this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers });
-    
+    console.log("data>>>>>",this.data);
+    this.tabName = this.informationservice.getSelectedTabName();
     this.data.subscribe(
       (res: any) => {
-        // console.log("res---->",res)
         this.allData = res;
-        // this.allDataa = this.allData;
-        this.tabName = this.informationservice.getSelectedTabName();
+        
         console.log("allData::::: ", this.allData );
         this.gridValue = [];
         for (let i = 0; i < this.allData.length; i++)
@@ -186,19 +143,20 @@ gridIndexesMapping :Map<number, number> = new Map();
           {
             this.chartValue.push(this.allData[i]);
           }
-          // console.log("7imarrrr ", this.chartValue.length); 
           
-          if (this.allData[i].type == 'Grid') {
+          if(this.allData[i].type == 'Grid')
+          {
             this.gridValue.push(this.allData[i]);
             this.gridIndexes.push(i);
-            // console.log("this.allData[i] ===== ", this.allData[i]);
           }
         }
+
         this.setupGridIndexes();
         console.log("grid valueeeee:",this.gridValue);
         this.gridCounter = this.gridIndexes.length;
     
         this.gridHeader = [];
+        
         for (let i = 0; i < this.gridValue.length; i++)
         {
           this.gridRecords.push(this.gridValue[i].Records);
@@ -212,7 +170,8 @@ gridIndexesMapping :Map<number, number> = new Map();
 
         for (let i = 0; i < this.allData.length; i++)
         {
-          if (this.allData[i].type == 'Chart') {
+          if (this.allData[i].type == 'Chart')
+          {
             if (this.allData[i].data.chartType == 1) {
               this.allData[i].stockAd = 0 
               this.chartType = 'heatmap';
@@ -248,22 +207,70 @@ gridIndexesMapping :Map<number, number> = new Map();
               this.allData[i].stockAd = 1
            
               this.chartType = 'candlestick';
-            } else if (this.allData[i].data.chartType == 10) {
+            } else  if (this.allData[i].data.chartType == 10) {
+              this.allData[i].stockAd = 1
+           
+              this.chartType = 'line';
+            } else if (this.allData[i].data.chartType == 11) {
               this.allData[i].stockAd = 1 
               this.chartType = 'stockLine';
-            } else if (this.allData[i].data.chartType == 11) {
+            } else if (this.allData[i].data.chartType == 12) {
               this.allData[i].stockAd = 1 
       
               this.chartType = 'stockColumn';
-            } else if (this.allData[i].data.chartType == 12) {
-              this.allData[i].stockAd = 1 
-       
-              this.chartType = 'ohlc';
             } else if (this.allData[i].data.chartType == 13) {
               this.allData[i].stockAd = 1 
        
-              this.chartType = 'stockArea';
+              this.chartType = 'ohlc';
+            } else if (this.allData[i].data.chartType == 14) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'VU solid';
+            } else if (this.allData[i].data.chartType == 15) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'VU meter';
+            } else if (this.allData[i].data.chartType == 16) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'Speedometer';
+            } else if (this.allData[i].data.chartType == 17) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'Dual Axes Speedometer';
+            } else if (this.allData[i].data.chartType == 18) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'Speedometer solid';
+            } else if (this.allData[i].data.chartType == 19) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'Multiple KPI gauge';
+            } else if (this.allData[i].data.chartType == 20) {
+              this.allData[i].stockAd = 0 
+       
+              this.chartType = 'clock gauge';
             }
+
+            const trackColors = Highcharts.getOptions().colors.map(color =>
+              new Highcharts.Color(color).setOpacity(0.3).get());
+
+
+              const getNow = () => {
+                const now = new Date();
+            
+                return {
+                    date: now,
+                    hours: now.getHours() + now.getMinutes() / 60,
+                    minutes: now.getMinutes() * 12 / 60 + now.getSeconds() * 12 / 3600,
+                    seconds: now.getSeconds() * 12 / 60
+                };
+            };
+        
+            let now = getNow();
+          
+          
+        
           
             if (this.chartType == 'bar'){
 
@@ -296,15 +303,14 @@ gridIndexesMapping :Map<number, number> = new Map();
                           },
                           plotOptions: {
                             series: {
-                              pointPadding: 1, // Adjust the spacing between bars
-                              groupPadding: 0.8, // Adjust the spacing between groups
+                              pointPadding: 1,
+                              groupPadding: 0.8,
                               borderWidth: 0,
                             }
                           },
                           tooltip: {
                             headerFormat: '',
-                            pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
-                            // pointFormat: '<b>{point.x}</b>: {point.y}' // Changed from {point.name} to {point.x}
+                            pointFormat: '{point.y}'
                           },
                           series: [{
                             name: this.allData[i].data.records[0].TITLE,
@@ -344,7 +350,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                       ];
                     }
                  
-              }else if (this.chartType == 'heatmap') {
+              } else if (this.chartType == 'heatmap') {
                 this.newChartObject = [{
                   chart: {
                       type: this.chartType,
@@ -440,7 +446,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                   }
               }];
   
-              }else if(this.chartType == 'line'){
+              } else if(this.chartType == 'line'){
   
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
@@ -508,7 +514,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                   }
                 ];
               }
-              }else if (this.chartType == 'area') {
+              } else if (this.chartType == 'area') {
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
                   this.ids.push(this.allData[i].data.records[j].ID);
                   this.names.push(Number(this.allData[i].data.records[j].NAME));
@@ -582,8 +588,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                     }
                   ];
                 }
-              }
-              else if(this.chartType == 'semiPie')
+              } else if(this.chartType == 'semiPie')
                 {
                   const transformedData = this.allData[i].data.records.map((item:any) => [item.ID, parseFloat(item.NAME)]);
                   if(this.allData[i].is3d == 1){
@@ -753,7 +758,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                       }]
                     }
                   ];}
-              }else if(this.chartType == 'column'){
+              } else if(this.chartType == 'column'){
                   
              
                   for (let j = 0; j < this.allData[i].data.records.length; j++)
@@ -871,7 +876,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                     }]
                   }];}
             
-              }else if (this.chartType == 'pie') {
+              } else if (this.chartType == 'pie') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
                   this.ids.push(this.allData[i].data.records[j].NAME);
@@ -928,8 +933,7 @@ gridIndexesMapping :Map<number, number> = new Map();
                     }]
                   }];
                 }
-              }
-               else if (this.chartType == 'candlestick') {
+              } else if (this.chartType == 'candlestick') {
                 const transformedData1 =this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.open_price),
@@ -1096,6 +1100,702 @@ gridIndexesMapping :Map<number, number> = new Map();
                         ]
                     }
                 }]}]
+              } else if (this.chartType == 'VU solid') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'solidgauge',
+                      height: 400, // Increased height to accommodate the larger gauge
+                      spacingTop: 50, // Add spacing to avoid clipping at the top
+                      spacingBottom: 50, // Add spacing to avoid clipping at the bottom
+                      identifier:'VU solid'
+                  },
+              
+                  title: {
+                      text: 'VU solid',
+                      style: {
+                          fontSize: '28px' // Adjusted font size to match the increased size
+                      }
+                  },
+              
+                  pane: {
+                      center: ['50%', '50%'], // Center the gauge vertically and horizontally
+                      size: '100%', // Adjust size for the gauge to ensure it's centered properly
+                      startAngle: -90,
+                      endAngle: 90,
+                      background: {
+                          backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#fafafa',
+                          borderRadius: 5,
+                          innerRadius: '60%',
+                          outerRadius: '100%',
+                          shape: 'arc'
+                      }
+                  },
+              
+                  exporting: {
+                      enabled: false
+                  },
+              
+                  tooltip: {
+                      enabled: false
+                  },
+              
+                  yAxis: {
+                      min: -20,
+                      max: 6,
+                      stops: [
+                          [0.1, '#55BF3B'], // green
+                          [0.5, '#DDDF0D'], // yellow
+                          [0.9, '#DF5353'] // red
+                      ],
+                      lineWidth: 0,
+                      tickWidth: 0,
+                      minorTickInterval: null,
+                      tickAmount: 2,
+                      labels: {
+                          y: 10, // Adjusted label position to match the new size
+                          rotation: 'auto',
+                          distance: 0 // Increased distance to match new size
+                      },
+                      title: {
+                          text: 'VU<br/><span style="font-size:20px">Channel A</span>', // Adjusted font size
+                          y: 50 // Adjusted vertical position
+                      }
+                  },
+              
+                  plotOptions: {
+                      solidgauge: {
+                          dataLabels: {
+                              enabled: false
+                          },
+                          dial: {
+                              radius: '85%' // Adjusted radius for the larger gauge
+                          }
+                      }
+                  },
+              
+                  series: [{
+                      name: 'Channel A',
+                      data: [-20],
+                      dataLabels: {
+                          format: '<div style="text-align:center">' +
+                                  '<span style="font-size:50px">{y}</span><br/>' +
+                                  '<span style="font-size:24px;opacity:0.4">Value</span>' +
+                                  '</div>'
+                      }
+                    }]
+                  }];
+                
+              } else if (this.chartType == 'VU meter') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart:
+                    {
+                      type: 'gauge',
+                      plotBorderWidth: 1,
+                      plotBackgroundColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                        stops: [
+                          [0, '#FFF4C6'],
+                          [0.3, '#FFFFFF'],
+                          [1, '#FFF4C6']
+                        ]
+                        },
+                        plotBackgroundImage: null,
+                        height: 200,
+                        identifier:'VU meter'
+                    },
+                    
+                    title: {
+                        text: 'VU meter',
+                        style: {
+                            fontSize: '14px' // Font size adjusted to match the gauge
+                        }
+                    },
+                    
+                    pane: {
+                        startAngle: -45,
+                        endAngle: 45,
+                        background: null,
+                        center: ['50%', '75%'], // Adjusted center position to start lower
+                        size: '100%' // Increased size to make the gauge a bit larger
+                    },
+                    
+                    exporting: {
+                        enabled: false
+                    },
+                    
+                    tooltip: {
+                        enabled: false
+                    },
+                    
+                    yAxis: {
+                        min: -20,
+                        max: 6,
+                        minorTickPosition: 'outside',
+                        tickPosition: 'outside',
+                        labels: {
+                            rotation: 'auto',
+                            distance: 10 // Adjusted distance to fit the gauge
+                        },
+                        plotBands: [{
+                            from: 0,
+                            to: 6,
+                            color: '#C02316',
+                            innerRadius: '100%',
+                            outerRadius: '105%'
+                        }],
+                        title: {
+                            text: 'VU<br/><span style="font-size:10px">Channel A</span>',
+                            y: -10 // Adjusted y position to fit the gauge better
+                        }
+                    },
+                    
+                    plotOptions: {
+                        gauge: {
+                            dataLabels: {
+                                enabled: false
+                            },
+                            dial: {
+                                radius: '85%' // Adjusted radius to make the gauge larger
+                            }
+                        }
+                    },
+                    
+                    series: [{
+                        name: 'Channel A',
+                        data: [-20]
+                    }]
+                  }];
+                
+              } else if (this.chartType == 'Speedometer') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      renderTo: 'container', // Make sure this matches your container ID
+                      type: 'gauge',
+                      plotBackgroundColor: null,
+                      plotBackgroundImage: null,
+                      plotBorderWidth: null,
+                      plotShadow: false,
+                      height: '100%',
+                      identifier: 'Speedometer'
+                    },
+                    title: {
+                      text: 'Speedometer'
+                    },
+                    pane: {
+                      startAngle: -90,
+                      endAngle: 90,
+                      background: {
+                        backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+                        innerRadius: '60%',
+                        outerRadius: '100%',
+                        shape: 'arc'
+                      }
+                    },
+                    yAxis: {
+                      min: 0,
+                      max: 200,
+                      tickPixelInterval: 30,
+                      tickWidth: 2,
+                      tickPosition: 'inside',
+                      tickLength: 10,
+                      labels: {
+                        step: 2,
+                        rotation: 'auto',
+                        style: {
+                          fontSize: '10px'
+                        }
+                      },
+                      title: {
+                        text: 'km/h',
+                        style: {
+                          fontSize: '17px'
+                        }
+                      }
+                    },
+                    series: [{
+                      name: 'Speed',
+                      data: [140],
+                      dataLabels: {
+                        format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                          '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+                      },
+                      dial: {
+                        baseWidth: 10,
+                        rearLength: 0
+                      }
+                    }]
+                  }];
+                
+              } else if (this.chartType == 'Dual Axes Speedometer') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'gauge',
+                      alignTicks: false,
+                      plotBackgroundColor: null,
+                      plotBackgroundImage: null,
+                      plotBorderWidth: 0,
+                      plotShadow: false,
+                      identifier: 'Dual Axes Speedometer'
+                  },
+            
+                  title: {
+                      text: 'Speedometer with Dual Axes'
+                  },
+            
+                  pane: {
+                      startAngle: -150,
+                      endAngle: 150
+                  },
+            
+                  yAxis: [{
+                      min: 0,
+                      max: 200,
+                      lineColor: '#339',
+                      tickColor: '#339',
+                      minorTickColor: '#339',
+                      offset: -25,
+                      lineWidth: 2,
+                      labels: {
+                          distance: -20,
+                          rotation: 'auto'
+                      },
+                      tickLength: 5,
+                      minorTickLength: 5,
+                      endOnTick: false
+                  }, {
+                      min: 0,
+                      max: 124,
+                      tickPosition: 'outside',
+                      lineColor: '#933',
+                      lineWidth: 2,
+                      minorTickPosition: 'outside',
+                      tickColor: '#933',
+                      minorTickColor: '#933',
+                      tickLength: 5,
+                      minorTickLength: 5,
+                      labels: {
+                          distance: 12,
+                          rotation: 'auto'
+                      },
+                      offset: -20,
+                      endOnTick: false
+                  }],
+            
+                  series: [{
+                      name: 'Speed',
+                      data: [80],
+                      dataLabels: {
+                          format: '<span style="color:#339">{y} km/h</span><br/>' +
+                              '<span style="color:#933">{(multiply y 0.621):.0f} mph</span>',
+                          backgroundColor: {
+                              linearGradient: {
+                                  x1: 0,
+                                  y1: 0,
+                                  x2: 0,
+                                  y2: 1
+                              },
+                              stops: [
+                                  [0, '#DDD'],
+                                  [1, '#FFF']
+                              ]
+                          }
+                      },
+                      tooltip: {
+                          valueSuffix: ' km/h'
+                      }
+                  }]
+                  }];
+                
+              } else if (this.chartType == 'Speedometer solid') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'gauge',
+                      plotBackgroundColor: null,
+                      plotBackgroundImage: null,
+                      plotBorderWidth: 0,
+                      plotShadow: false,
+                      height: '80%',
+                      identifier: 'Speedometer solid'
+                  },
+              
+                  title: {
+                      text: 'Speedometer'
+                  },
+              
+                  pane: {
+                      startAngle: -90,
+                      endAngle: 89.9,
+                      background: null,
+                      center: ['50%', '75%'],
+                      size: '110%'
+                  },
+              
+                  // the value axis
+                  yAxis: {
+                      min: 0,
+                      max: 200,
+                      tickPixelInterval: 72,
+                      tickPosition: 'inside',
+                      tickColor: Highcharts.defaultOptions.chart.backgroundColor || '#FFFFFF',
+                      tickLength: 20,
+                      tickWidth: 2,
+                      minorTickInterval: null,
+                      labels: {
+                          distance: 20,
+                          style: {
+                              fontSize: '14px'
+                          }
+                      },
+                      lineWidth: 0,
+                      plotBands: [{
+                          from: 0,
+                          to: 130,
+                          color: '#55BF3B', // green
+                          thickness: 20,
+                          borderRadius: '50%'
+                      }, {
+                          from: 150,
+                          to: 200,
+                          color: '#DF5353', // red
+                          thickness: 20,
+                          borderRadius: '50%'
+                      }, {
+                          from: 120,
+                          to: 160,
+                          color: '#DDDF0D', // yellow
+                          thickness: 20
+                      }]
+                  },
+              
+                  series: [{
+                      name: 'Speed',
+                      data: [80],
+                      tooltip: {
+                          valueSuffix: ' km/h'
+                      },
+                      dataLabels: {
+                          format: '{y} km/h',
+                          borderWidth: 0,
+                          color: (
+                              Highcharts.defaultOptions.title &&
+                              Highcharts.defaultOptions.title.style &&
+                              Highcharts.defaultOptions.title.style.color
+                          ) || '#333333',
+                          style: {
+                              fontSize: '16px'
+                          }
+                      },
+                      dial: {
+                          radius: '80%',
+                          backgroundColor: 'gray',
+                          baseWidth: 12,
+                          baseLength: '0%',
+                          rearLength: '0%'
+                      },
+                      pivot: {
+                          backgroundColor: 'gray',
+                          radius: 6
+                      }
+              
+                  }]
+                  }];
+                
+              } else if (this.chartType == 'Multiple KPI gauge') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'solidgauge',
+                      height: '85%',
+                      identifier: 'Multiple KPI gauge'
+                      // events: {
+                      //     render: renderIcons
+                      // }
+                  },
+            
+                  title: {
+                      text: 'Multiple KPI gauge',
+                      style: {
+                          fontSize: '24px'
+                      }
+                  },
+            
+                  tooltip: {
+                      borderWidth: 0,
+                      backgroundColor: 'none',
+                      shadow: false,
+                      style: {
+                          fontSize: '16px'
+                      },
+                      valueSuffix: '%',
+                      pointFormat: '{series.name}<br>' +
+                          '<span style="font-size: 2em; color: {point.color}; ' +
+                          'font-weight: bold">{point.y}</span>',
+                      // positioner: function (labelWidth) {
+                      //     return {
+                      //         x: (this.chart.chartWidth - labelWidth) / 2,
+                      //         y: (this.chart.plotHeight / 2) + 15
+                      //     };
+                      // }
+                  },
+            
+                  pane: {
+                      startAngle: 0,
+                      endAngle: 360,
+                      background: [{ // Track for Conversion
+                          outerRadius: '112%',
+                          innerRadius: '88%',
+                          backgroundColor: trackColors[0],
+                          borderWidth: 0
+                      }, { // Track for Engagement
+                          outerRadius: '87%',
+                          innerRadius: '63%',
+                          backgroundColor: trackColors[1],
+                          borderWidth: 0
+                      }, { // Track for Feedback
+                          outerRadius: '62%',
+                          innerRadius: '38%',
+                          backgroundColor: trackColors[2],
+                          borderWidth: 0
+                      }]
+                  },
+            
+                  yAxis: {
+                      min: 0,
+                      max: 100,
+                      lineWidth: 0,
+                      tickPositions: []
+                  },
+            
+                  plotOptions: {
+                      solidgauge: {
+                          dataLabels: {
+                              enabled: false
+                          },
+                          linecap: 'round',
+                          stickyTracking: false,
+                          rounded: true
+                      }
+                  },
+            
+                  series: [{
+                      name: 'Conversion',
+                      data: [{
+                          color: Highcharts.getOptions().colors[0],
+                          radius: '112%',
+                          innerRadius: '88%',
+                          y: 80
+                      }],
+                      custom: {
+                          icon: 'filter',
+                          iconColor: '#303030'
+                      }
+                  }, {
+                      name: 'Engagement',
+                      data: [{
+                          color: Highcharts.getOptions().colors[1],
+                          radius: '87%',
+                          innerRadius: '63%',
+                          y: 65
+                      }],
+                      custom: {
+                          icon: 'comments-o',
+                          iconColor: '#ffffff'
+                      }
+                  }, {
+                      name: 'Feedback',
+                      data: [{
+                          color: Highcharts.getOptions().colors[2],
+                          radius: '62%',
+                          innerRadius: '38%',
+                          y: 50
+                      }],
+                      custom: {
+                          icon: 'commenting-o',
+                          iconColor: '#303030'
+                      }
+                  }]
+                  }];
+                
+              } else if (this.chartType == 'clock gauge') {
+                let pieData: any[] = [];
+                for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                  this.ids.push(this.allData[i].data.records[j].NAME);
+                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                }
+                let data1 = this.names.map((id, index) => {
+                  return { name: this.ids[index], y: id };
+                });
+              
+                
+                  this.newChartObject = [{
+                    chart: {
+                      type: 'gauge',
+                      plotBackgroundColor: null,
+                      plotBackgroundImage: null,
+                      plotBorderWidth: 0,
+                      plotShadow: false,
+                      height: '85%',
+                      identifier:'clock gauge'
+                  },
+            
+                  credits: {
+                      enabled: false
+                  },
+            
+                  title: {
+                      text: 'The Highcharts clock'
+                  },
+            
+                  pane: {
+                    background: [{
+                      // default background
+                    }, {
+                      // reflex for supported browsers
+                      backgroundColor: {
+                        radialGradient: {
+                          cx: 0.5,
+                          cy: -0.4,
+                          r: 1.9
+                        },
+                        stops: [
+                          [0.5, 'rgba(255, 255, 255, 0.2)'],
+                          [0.5, 'rgba(200, 200, 200, 0.2)']
+                        ]
+                      }
+                    }]
+                  },
+                  yAxis: {
+                      labels: {
+                          distance: -23,
+                          style: {
+                              fontSize: '18px'
+                          }
+                      },
+                      min: 0,
+                      max: 12,
+                      lineWidth: 0,
+                      showFirstLabel: false,
+            
+                      minorTickInterval: 'auto',
+                      minorTickWidth: 3,
+                      minorTickLength: 5,
+                      minorTickPosition: 'inside',
+                      minorGridLineWidth: 0,
+                      minorTickColor: '#666',
+            
+                      tickInterval: 1,
+                      tickWidth: 4,
+                      tickPosition: 'inside',
+                      tickLength: 10,
+                      tickColor: '#666',
+                      title: {
+                          // text: 'Powered by<br/>Highcharts',
+                          style: {
+                              color: '#BBB',
+                              fontWeight: 'normal',
+                              fontSize: '10px',
+                              lineHeight: '10px'
+                          },
+                          y: 10
+                      }
+                  },
+            
+                  tooltip: {
+                      format: '{series.chart.tooltipText}'
+                  },
+            
+                  series: [{
+                      data: [{
+                          id: 'hour',
+                          y: now.hours,
+                          dial: {
+                              radius: '60%',
+                              baseWidth: 4,
+                              baseLength: '95%',
+                              rearLength: 0
+                          }
+                      }, {
+                          id: 'minute',
+                          y: now.minutes,
+                          dial: {
+                              baseLength: '95%',
+                              rearLength: 0
+                          }
+                      }, {
+                          id: 'second',
+                          y: now.seconds,
+                          dial: {
+                              radius: '100%',
+                              baseWidth: 1,
+                              rearLength: '20%'
+                          }
+                      }],
+                      animation: false,
+                      dataLabels: {
+                          enabled: false
+                      }
+                  }]
+                  }];
+                
               } else{
               }
               this.ids = [];
@@ -1124,12 +1824,24 @@ gridIndexesMapping :Map<number, number> = new Map();
       (res:any) => {
           this.chartData = res
   
-  setTimeout(() => {
+//   setTimeout(() => {
     
+//   const dialogConfig = new MatDialogConfig();
+//   dialogConfig.width = '500px';
+//   dialogConfig.height = '500px';
+  
+//   const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
+//     data: this.chartData,
+//     width: '50%',
+//     height: '60%',
+//   });
+// }, 1000);
+
+setTimeout(() => {
   const dialogConfig = new MatDialogConfig();
   dialogConfig.width = '700px';
   dialogConfig.height = '700px';
-  
+
   const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
     data: this.chartData,
     width: '50%',
@@ -1183,11 +1895,6 @@ gridIndexesMapping :Map<number, number> = new Map();
       this.http.post<any>(GlobalConstants.getQueryData + data.ID, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res
-      
-
-
-     
-
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
         dialogConfig.height = '700px';

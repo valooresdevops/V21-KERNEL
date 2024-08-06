@@ -13,6 +13,12 @@ import Highcharts from 'highcharts';
 import Highcharts3D from 'highcharts/highcharts-3d';
 Highcharts3D(Highcharts);
 
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
+
 @Component({
   selector: 'app-chart-from-kpi-builder',
   templateUrl: './chart-from-kpi-builder.component.html',
@@ -54,6 +60,26 @@ export class ChartFromKpiBuilderComponent implements OnInit {
       this.chartType = this.data[i].chartType;
       let ids = this.ids
       let chartType1;
+
+
+      const trackColors = Highcharts.getOptions().colors.map(color =>
+        new Highcharts.Color(color).setOpacity(0.3).get());
+
+      const getNow = () => {
+        const now = new Date();
+    
+        return {
+            date: now,
+            hours: now.getHours() + now.getMinutes() / 60,
+            minutes: now.getMinutes() * 12 / 60 + now.getSeconds() * 12 / 3600,
+            seconds: now.getSeconds() * 12 / 60
+        };
+    };
+    
+    let now = getNow();
+    
+
+
       if (this.chartType == 1) {
         chartType1 = 'heatmap';
       } else if (this.chartType == 2) {
@@ -70,6 +96,22 @@ export class ChartFromKpiBuilderComponent implements OnInit {
         chartType1 = 'column';
       }else if (this.chartType == 8) {
         chartType1= 'semiPie';
+      }else if (this.chartType == 14) {
+        chartType1= 'VU solid';
+      }else if (this.chartType == 15) {
+        chartType1= 'VU meter';
+      }else if (this.chartType == 16) {
+        chartType1= 'Speedometer';
+      }
+      
+      else if (this.chartType == 17) {
+        chartType1= 'Dual Axes Speedometer';
+      }else if (this.chartType == 18) {
+        chartType1= 'Speedometer solid';
+      }else if (this.chartType == 19) {
+        chartType1= 'Multiple KPI gauge';
+      }else if (this.chartType == 20) {
+        chartType1= 'clock gauge';
       }
 
       if (chartType1 == 'heatmap') {
@@ -365,7 +407,577 @@ export class ChartFromKpiBuilderComponent implements OnInit {
           }]
         });
   
-      }  else {
+      }else if(chartType1 == 'VU solid'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            type: 'solidgauge',
+            height: 400, // Increased height to accommodate the larger gauge
+            spacingTop: 50, // Add spacing to avoid clipping at the top
+            spacingBottom: 50, // Add spacing to avoid clipping at the bottom
+            identifier:'VU solid'
+        },
+    
+        title: {
+            text: 'VU solid',
+            style: {
+                fontSize: '28px' // Adjusted font size to match the increased size
+            }
+        },
+    
+        pane: {
+            center: ['50%', '50%'], // Center the gauge vertically and horizontally
+            size: '100%', // Adjust size for the gauge to ensure it's centered properly
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+                backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#fafafa',
+                borderRadius: 5,
+                innerRadius: '60%',
+                outerRadius: '100%',
+                shape: 'arc'
+            }
+        },
+    
+        exporting: {
+            enabled: false
+        },
+    
+        tooltip: {
+            enabled: false
+        },
+    
+        yAxis: {
+            min: -20,
+            max: 6,
+            stops: [
+                [0.1, '#55BF3B'], // green
+                [0.5, '#DDDF0D'], // yellow
+                [0.9, '#DF5353'] // red
+            ],
+            lineWidth: 0,
+            tickWidth: 0,
+            minorTickInterval: null,
+            tickAmount: 2,
+            labels: {
+                y: 10, // Adjusted label position to match the new size
+                rotation: 'auto',
+                distance: 0 // Increased distance to match new size
+            },
+            title: {
+                text: 'VU<br/><span style="font-size:20px">Channel A</span>', // Adjusted font size
+                y: 50 // Adjusted vertical position
+            }
+        },
+    
+        plotOptions: {
+            solidgauge: {
+                dataLabels: {
+                    enabled: false
+                },
+                dial: {
+                    radius: '85%' // Adjusted radius for the larger gauge
+                }
+            }
+        },
+    
+        series: [{
+            name: 'Channel A',
+            data: [-20],
+            dataLabels: {
+                format: '<div style="text-align:center">' +
+                        '<span style="font-size:50px">{y}</span><br/>' +
+                        '<span style="font-size:24px;opacity:0.4">Value</span>' +
+                        '</div>'
+            }
+          }]
+        });
+  
+      }else if(chartType1 == 'VU meter'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart:
+        {
+          type: 'gauge',
+          plotBorderWidth: 1,
+          plotBackgroundColor: {
+            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+            stops: [
+              [0, '#FFF4C6'],
+              [0.3, '#FFFFFF'],
+              [1, '#FFF4C6']
+            ]
+            },
+            plotBackgroundImage: null,
+            height: 200,
+            identifier:'VU meter'
+        },
+        
+        title: {
+            text: 'VU meter',
+            style: {
+                fontSize: '14px' // Font size adjusted to match the gauge
+            }
+        },
+        
+        pane: {
+            startAngle: -45,
+            endAngle: 45,
+            background: null,
+            center: ['50%', '75%'], // Adjusted center position to start lower
+            size: '100%' // Increased size to make the gauge a bit larger
+        },
+        
+        exporting: {
+            enabled: false
+        },
+        
+        tooltip: {
+            enabled: false
+        },
+        
+        yAxis: {
+            min: -20,
+            max: 6,
+            minorTickPosition: 'outside',
+            tickPosition: 'outside',
+            labels: {
+                rotation: 'auto',
+                distance: 10 // Adjusted distance to fit the gauge
+            },
+            plotBands: [{
+                from: 0,
+                to: 6,
+                color: '#C02316',
+                innerRadius: '100%',
+                outerRadius: '105%'
+            }],
+            title: {
+                text: 'VU<br/><span style="font-size:10px">Channel A</span>',
+                y: -10 // Adjusted y position to fit the gauge better
+            }
+        },
+        
+        plotOptions: {
+            gauge: {
+                dataLabels: {
+                    enabled: false
+                },
+                dial: {
+                    radius: '85%' // Adjusted radius to make the gauge larger
+                }
+            }
+        },
+        
+        series: [{
+            name: 'Channel A',
+            data: [-20]
+        }]
+        });
+  
+      }else if(chartType1 == 'Speedometer'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            renderTo: 'container', // Make sure this matches your container ID
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            height: '200px',
+            identifier: 'Speedometer'
+          },
+          title: {
+            text: 'Speedometer'
+          },
+          pane: {
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+              backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+              innerRadius: '60%',
+              outerRadius: '100%',
+              shape: 'arc'
+            }
+          },
+          yAxis: {
+            min: 0,
+            max: 200,
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            labels: {
+              step: 2,
+              rotation: 'auto',
+              style: {
+                fontSize: '10px'
+              }
+            },
+            title: {
+              text: 'km/h',
+              style: {
+                fontSize: '17px'
+              }
+            }
+          },
+          series: [{
+            name: 'Speed',
+            data: [140],
+            dataLabels: {
+              format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+            },
+            dial: {
+              baseWidth: 10,
+              rearLength: 0
+            }
+          }]
+        });
+  
+      }  
+      
+      else if(chartType1 == 'Dual Axes Speedometer'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            renderTo: 'container', // Make sure this matches your container ID
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            height: '200px',
+            identifier: 'Speedometer'
+          },
+          title: {
+            text: 'Speedometer'
+          },
+          pane: {
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+              backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+              innerRadius: '60%',
+              outerRadius: '100%',
+              shape: 'arc'
+            }
+          },
+          yAxis: {
+            min: 0,
+            max: 200,
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            labels: {
+              step: 2,
+              rotation: 'auto',
+              style: {
+                fontSize: '10px'
+              }
+            },
+            title: {
+              text: 'km/h',
+              style: {
+                fontSize: '17px'
+              }
+            }
+          },
+          series: [{
+            name: 'Speed',
+            data: [140],
+            dataLabels: {
+              format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+            },
+            dial: {
+              baseWidth: 10,
+              rearLength: 0
+            }
+          }]
+        });
+  
+      } else if(chartType1 == 'Speedometer solid'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            renderTo: 'container', // Make sure this matches your container ID
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            height: '200px',
+            identifier: 'Speedometer'
+          },
+          title: {
+            text: 'Speedometer'
+          },
+          pane: {
+            startAngle: -90,
+            endAngle: 90,
+            background: {
+              backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+              innerRadius: '60%',
+              outerRadius: '100%',
+              shape: 'arc'
+            }
+          },
+          yAxis: {
+            min: 0,
+            max: 200,
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            labels: {
+              step: 2,
+              rotation: 'auto',
+              style: {
+                fontSize: '10px'
+              }
+            },
+            title: {
+              text: 'km/h',
+              style: {
+                fontSize: '17px'
+              }
+            }
+          },
+          series: [{
+            name: 'Speed',
+            data: [140],
+            dataLabels: {
+              format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+            },
+            dial: {
+              baseWidth: 10,
+              rearLength: 0
+            }
+          }]
+        });
+  
+      } else if(chartType1 == 'Multiple KPI gauge'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            renderTo: 'container', // Make sure this matches your container ID
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            height: '200px',
+            identifier: 'Speedometer'
+          },
+          title: {
+            text: 'Speedometer'
+          },
+          pane: {
+            startAngle: 0,
+            endAngle: 360,
+            background: [{ // Track for Conversion
+                outerRadius: '112%',
+                innerRadius: '88%',
+                backgroundColor: trackColors[0],
+                borderWidth: 0
+            }, { // Track for Engagement
+                outerRadius: '87%',
+                innerRadius: '63%',
+                backgroundColor: trackColors[1],
+                borderWidth: 0
+            }, { // Track for Feedback
+                outerRadius: '62%',
+                innerRadius: '38%',
+                backgroundColor: trackColors[2],
+                borderWidth: 0
+            }]
+          },
+          yAxis: {
+            min: 0,
+            max: 200,
+            tickPixelInterval: 30,
+            tickWidth: 2,
+            tickPosition: 'inside',
+            tickLength: 10,
+            labels: {
+              step: 2,
+              rotation: 'auto',
+              style: {
+                fontSize: '10px'
+              }
+            },
+            title: {
+              text: 'km/h',
+              style: {
+                fontSize: '17px'
+              }
+            }
+          },
+          series: [{
+            name: 'Speed',
+            data: [140],
+            dataLabels: {
+              format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+            },
+            dial: {
+              baseWidth: 10,
+              rearLength: 0
+            }
+          }]
+        });
+  
+      } else if(chartType1 == 'clock gauge'){
+        // for (let j = 0; j < this.data[i].records.length; j++) {
+        //   this.ids.push(this.data[i].records[i].ID);
+        //   this.names.push(Number(this.data[i].records[j].NAME));
+        // }
+        this.chartObject.push
+        ({
+          chart: {
+            type: 'gauge',
+            plotBackgroundColor: null,
+            plotBackgroundImage: null,
+            plotBorderWidth: 0,
+            plotShadow: false,
+            height: '80%',
+            identifier:'clock gauge'
+        },
+  
+        credits: {
+            enabled: false
+        },
+  
+        title: {
+            text: 'The Highcharts clock'
+        },
+  
+        pane: {
+          background: [{
+            // default background
+          }, {
+            // reflex for supported browsers
+            backgroundColor: {
+              radialGradient: {
+                cx: 0.5,
+                cy: -0.4,
+                r: 1.9
+              },
+              stops: [
+                [0.5, 'rgba(255, 255, 255, 0.2)'],
+                [0.5, 'rgba(200, 200, 200, 0.2)']
+              ]
+            }
+          }]
+        },
+  
+        yAxis: {
+            labels: {
+                distance: -23,
+                style: {
+                    fontSize: '18px'
+                }
+            },
+            min: 0,
+            max: 12,
+            lineWidth: 0,
+            showFirstLabel: false,
+  
+            minorTickInterval: 'auto',
+            minorTickWidth: 3,
+            minorTickLength: 5,
+            minorTickPosition: 'inside',
+            minorGridLineWidth: 0,
+            minorTickColor: '#666',
+  
+            tickInterval: 1,
+            tickWidth: 4,
+            tickPosition: 'inside',
+            tickLength: 10,
+            tickColor: '#666',
+            title: {
+                // text: 'Powered by<br/>Highcharts',
+                style: {
+                    color: '#BBB',
+                    fontWeight: 'normal',
+                    fontSize: '10px',
+                    lineHeight: '10px'
+                },
+                y: 10
+            }
+        },
+  
+        tooltip: {
+            format: '{series.chart.tooltipText}'
+        },
+  
+        series: [{
+            data: [{
+                id: 'hour',
+                y: now.hours,
+                dial: {
+                    radius: '60%',
+                    baseWidth: 4,
+                    baseLength: '95%',
+                    rearLength: 0
+                }
+            }, {
+                id: 'minute',
+                y: now.minutes,
+                dial: {
+                    baseLength: '95%',
+                    rearLength: 0
+                }
+            }, {
+                id: 'second',
+                y: now.seconds,
+                dial: {
+                    radius: '100%',
+                    baseWidth: 1,
+                    rearLength: '20%'
+                }
+            }],
+            animation: false,
+            dataLabels: {
+                enabled: false
+            }
+        }]
+        });
+  
+      } 
+      
+      
+      
+      
+      else {
 
       }
       
