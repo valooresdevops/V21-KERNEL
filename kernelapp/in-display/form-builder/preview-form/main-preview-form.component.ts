@@ -621,7 +621,7 @@ export class PreviewFormComponent implements OnInit {
         });
       });
     });
-
+    console.log("MAIN PREVIEW FORM TABLE OPTIONS>>>>>>>>>",this.tableOptions1);
     setTimeout(() => {
     }, 1000);
 
@@ -644,6 +644,7 @@ export class PreviewFormComponent implements OnInit {
       primaryColumn: this.columnId,
       previousTab: "-1"
     }];
+    console.log("DATA SENT TO AM PREVIEW FORM>>>>>>>>",data);
 
     const dialogRef = this.dialog.open(AmPreviewFormComponent, {
       width: "80%",
