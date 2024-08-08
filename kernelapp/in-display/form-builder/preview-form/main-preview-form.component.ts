@@ -75,6 +75,7 @@ export class PreviewFormComponent implements OnInit {
   public getWhereCond: any = '-1';
   // public getWhereCond: any[] = [];
   public jp:boolean =true;
+  isUpdateColsDef: number = 0;
 
 
   constructor(private http: HttpClient,
@@ -91,7 +92,11 @@ export class PreviewFormComponent implements OnInit {
   onSearchSubmit(getWhereCond: any) {
    // this.getWhereCond = getWhereCond.data;
 
-    this.getWhereCond = getWhereCond;
+    this.getWhereCond = getWhereCond.result;
+    if(getWhereCond.reloadGrid == true){
+      this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectMain + '/-1/previewForm/');
+
+    }
     this.getAllColums();
   }
 
@@ -540,12 +545,12 @@ export class PreviewFormComponent implements OnInit {
         }
       }
       this.test = data;
-      console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
+     // console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
     });
   }
 
   ngOnInit(): void {
-
+   
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
 
@@ -579,6 +584,18 @@ export class PreviewFormComponent implements OnInit {
             "isMain": res[i].isMain,
             "isRowGrouping": res[i].isRowGroup
           });
+
+          ///////// elie  am preview form in main preview form/////////////
+          this.mainPreviewDataFromMain= [{
+            objectId: this.objectMain,
+            actionType: this.actionType,
+            isFromGridClick: 1,
+            primaryColumn: this.columnId,
+            previousTab: "-1"
+          }];
+          console.log("DATA TO SEND ELIE>>>>>>>>>>",this.mainPreviewDataFromMain);
+          ///////////////////////////////////////////////
+
           if(res[i].isTreeGrid == 1){
             this.isTreeGrid = true;
           }
@@ -626,14 +643,7 @@ export class PreviewFormComponent implements OnInit {
     });
     console.log("MAIN PREVIEW FORM TABLE OPTIONS>>>>>>>>>",this.tableOptions1);
     setTimeout(() => {
-      this.mainPreviewDataFromMain= [{
-        objectId: this.objectMain,
-        actionType: this.actionType,
-        isFromGridClick: 1,
-        primaryColumn: this.columnId,
-        previousTab: "-1"
-      }];
-      console.log("DATA TO SEND ELIE>>>>>>>>>>",this.mainPreviewDataFromMain);
+   
     }, 1000);
 
 

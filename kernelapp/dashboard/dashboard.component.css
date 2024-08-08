@@ -518,12 +518,6 @@ button:hover {
   margin-top: 0; /* No extra margin needed for side-by-side layout */
 }
 
-.button-section {
-  display: flex;
-  align-items: center;
-  margin-bottom: 6%;
-}
-
 .btn-red, .btn-yellow, .btn-green {
   width: 120px; /* Fixed width */
   height: 40px; /* Fixed height */
@@ -609,4 +603,17 @@ button:hover {
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   height: 200px; /* Set a uniform height */
+}
+
+
+.button-section {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 33%;
 }

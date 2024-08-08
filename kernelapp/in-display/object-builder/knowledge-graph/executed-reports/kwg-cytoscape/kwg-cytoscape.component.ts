@@ -10,7 +10,10 @@ import fcose from 'cytoscape-fcose';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import $ from 'jquery';
 import { InformationService } from 'src/app/Kernel/services/information.service';
-import { MatDialogConfig } from '@angular/material/dialog';
+import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
+import { NextLayerFormComponent } from '../next-layer-form/next-layer-form.component';
+import axios from 'axios';
+import { from, lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-kwg-cytoscape',
@@ -88,7 +91,10 @@ export class KwgCytoscapeComponent {
       private route: ActivatedRoute,
       private elementRef: ElementRef,
       private http: HttpClient,
-      public informationservice: InformationService)
+      public informationservice: InformationService,
+      private dialogNext: MatDialog,
+      public dialogRef: MatDialogRef<KwgCytoscapeComponent>,
+    )
       {}
     private cy: any;
   
@@ -283,13 +289,21 @@ export class KwgCytoscapeComponent {
               dialogConfig.width = '700px';
               dialogConfig.height = '700px';
           
-              const dialogRef = this.dialog.open(KwgCytoscapeComponent, {
+              const dialogRef = this.dialogNext.open(NextLayerFormComponent, {
                //data: info,
-                width: '80%',
-                height: '80%',
+                width: '50%',
+                height: '50%',
               });
 
-              (window.parent.parent.parent[7] as any).runNextLayer(event.target.id());
+              dialogRef.afterClosed().subscribe(result => {
+                setTimeout(() => {
+                  console.log("RUN NEXT LAYER EVENT ID>>>>>>>>>>>>",event.target.id());
+                  this.runNextLayer(event.target.id());
+                }, 100);
+               
+               });
+
+
             },
             hasTrailingDivider: true,
           },
@@ -984,11 +998,11 @@ export class KwgCytoscapeComponent {
       }
     }
   
-    getUpdGraph()
+    getUpdGraph(nextLayerReportId:any)
     {
-      var localid = sessionStorage.getItem("newReport");
-      console.log("localid: " + localid);
-      this.getGraph(localid)
+     // var localid = sessionStorage.getItem("newReport");
+      console.log("getUPdGraph Report Id>>>>>>>" + nextLayerReportId);
+      this.getGraph(nextLayerReportId)
     }
   
     switchmode(){
@@ -1105,6 +1119,29 @@ export class KwgCytoscapeComponent {
       neighbor.show();
     });
     }
+
+    closeDialog(): void {
+      this.dialogRef.close();
+    }
+
+
+    async runNextLayer(id:any){
+
+      const getQueryParamsApi=from(axios.get(GlobalConstants.getQueryParams+JSON.parse(JSON.parse(this.informationservice.getAgGidSelectedNode())[0].masterQueryId)));
+      const getQueryParams=await lastValueFrom(getQueryParamsApi);
+      // info=getQueryParams.data[0];
+      // this.query=getQueryParams.data[0].query;
+      // this.parameters=JSON.parse(getQueryParams.data[0].queryParams);
+      // this.queryId=getQueryParams.data[0].queryId;
+      // this.queryName=getQueryParams.data[0].queryName;
+      // this.execHeads=JSON.parse(getQueryParams.data[0].execHeads);
+      const runNextLayerProcessApi = from(axios.post(GlobalConstants.runNextLayerProcess+JSON.parse(this.informationservice.getAgGidSelectedNode())[0].masterId+"/"+id+"/"+this.informationservice.getLogeduserId(),getQueryParams.data));
+      const runNextLayerProcess = await lastValueFrom(runNextLayerProcessApi);
+      console.log("RUN NEXT LAYER RETURN VALUE>>>>>>>>>>",runNextLayerProcess.data);
+
+      this.getUpdGraph(runNextLayerProcess.data);
+    }
+
   }
   
   

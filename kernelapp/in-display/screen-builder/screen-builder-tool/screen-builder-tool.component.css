@@ -440,8 +440,3 @@ html, body {
     justify-content: center;
     align-items: center;
   }
-  
-  .stock-container {
-    width: 100%;
-    min-width: 330px;
-  }

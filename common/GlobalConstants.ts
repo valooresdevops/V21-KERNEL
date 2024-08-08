@@ -416,6 +416,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';
   public static getQueryId = GlobalConstants.inDispGatewat +'api/getQueryId/'
   public static getNodesImages = GlobalConstants.inDispGatewat + 'api/getNodesImages/';
+  public static runNextLayerProcess = GlobalConstants.inDispGatewat + 'api/runNextLayerProcess/';
 
   
   

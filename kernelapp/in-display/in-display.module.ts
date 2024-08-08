@@ -45,6 +45,7 @@ import { ExecutedReportsComponent } from './object-builder/knowledge-graph/execu
 import { CreateExecutedReportComponent } from './object-builder/knowledge-graph/master-link-analysis/create-executed-report/create-executed-report.component';
 import { KwgCytoscapeComponent } from './object-builder/knowledge-graph/executed-reports/kwg-cytoscape/kwg-cytoscape.component';
 import { PopupComponent } from './object-builder/knowledge-graph/popup/popup.component';
+import { NextLayerFormComponent } from './object-builder/knowledge-graph/executed-reports/next-layer-form/next-layer-form.component';
 
 @NgModule({
     declarations: [
@@ -87,7 +88,8 @@ import { PopupComponent } from './object-builder/knowledge-graph/popup/popup.com
         ExecutedReportsComponent,
         CreateExecutedReportComponent,
         KwgCytoscapeComponent,
-        PopupComponent
+        PopupComponent,
+        NextLayerFormComponent
     ],
     imports: [
         InDisplayRoutingModule,

@@ -129,6 +129,7 @@ export class ChartBuilderFormComponent implements OnInit {
           chart: {
             type: 'heatmap',
             width: 550,
+            height: '40%',
             identifier: 'heatmap',
             marginTop: 60,
             marginBottom: 80,
@@ -237,6 +238,7 @@ export class ChartBuilderFormComponent implements OnInit {
             chart: {
               type: chartType1,
               width: 550,
+              height: '50%',
               identifier: this.data.records[0].identifier,
               marginTop: 60,
               marginBottom: 80,
@@ -304,6 +306,7 @@ export class ChartBuilderFormComponent implements OnInit {
             type: 'pie',
             identifier: 'pie',
             width: 550,
+            height: '50%',
             options3d: {
               enabled: true,
               alpha: 45
@@ -333,6 +336,7 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: { type: 'pie',
               width: 550,
+              height: '50%',
               identifier: 'pie' },
             title: { text: this.data.records[0].TITLE },
             plotOptions: {
@@ -359,6 +363,7 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: {
               type: 'line', identifier: 'line',
+              height: '50%',
               options3d: {
                 enabled: true,
                 alpha: 10,
@@ -398,7 +403,8 @@ export class ChartBuilderFormComponent implements OnInit {
       } else {
         this.newChartObject = [
           {
-            chart: { type: 'line', identifier: 'line' },
+            chart: { type: 'line',
+              height: '50%', identifier: 'line' },
             title: { text: this.data.records[0].TITLE },
             xAxis: {
               categories: this.ids
@@ -427,6 +433,7 @@ export class ChartBuilderFormComponent implements OnInit {
               type: 'area',
               identifier: 'area',
               width: 550,
+              height: '50%',
               options3d: {
                 enabled: true,
                 alpha: 10,
@@ -455,7 +462,8 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: { type: 'area',
               identifier: 'area',
-              width: 550 },
+              width: 550,
+              height: '50%', },
             title: { text: this.data.records[0].TITLE },
             xAxis: {
               categories: this.ids
@@ -489,6 +497,7 @@ export class ChartBuilderFormComponent implements OnInit {
                 depth: 250,
                 viewDistance: 5,
                 width: 550,
+                height: '50%',
                 frame: {
                   bottom: { size: 1, color: 'rgba(0,0,0,0.02)' },
                   back: { size: 1, color: 'rgba(0,0,0,0.04)' },
@@ -528,7 +537,8 @@ export class ChartBuilderFormComponent implements OnInit {
       } else {
         this.newChartObject = [
           {
-            chart: { type: 'scatter', width: 550, identifier: 'scatter' },
+            chart: { type: 'scatter', width: 500,
+              height: '40%', identifier: 'scatter' },
             title: { text: this.data.records[0].TITLE },
             xAxis: {
               title: {
@@ -559,6 +569,7 @@ export class ChartBuilderFormComponent implements OnInit {
             type: 'pie',
             identifier: 'pie',
             width: 550,
+            height: '55%',
             options3d: {
               enabled: true,
               alpha: 45,
@@ -614,6 +625,7 @@ export class ChartBuilderFormComponent implements OnInit {
             plotShadow: false,
             type: 'semiPie',
             width: 550,
+            height: '55%',
             identifier: 'semiPie'
           },
           title: {
@@ -669,6 +681,7 @@ export class ChartBuilderFormComponent implements OnInit {
             type: 'column',
             identifier: 'column',
             width: 550,
+            height: '50%',
             options3d: {
               enabled: true,
               alpha: 15,
@@ -712,7 +725,8 @@ export class ChartBuilderFormComponent implements OnInit {
         }];
       } else {
         this.newChartObject = [{
-          chart: { type: 'column', width: 550, identifier: 'column' },
+          chart: { type: 'column', width: 550,
+            height: '50%', identifier: 'column' },
           title: { text: this.data.records[0].TITLE },
           xAxis: [{ categories: this.ids }],
           yAxis: [{
@@ -748,7 +762,8 @@ export class ChartBuilderFormComponent implements OnInit {
       this.stockObject = [{
 
         chart: {
-          width: 550
+          width: 550,
+          height: '50%',
         },
 
         rangeSelector: {
@@ -789,7 +804,8 @@ export class ChartBuilderFormComponent implements OnInit {
         Number(item.close_price)]);
       this.stockObject = [{
         chart: {
-          width: 550
+          width: 550,
+          height: '50%',
         },
         rangeSelector: {
           selected: 2
@@ -824,7 +840,8 @@ export class ChartBuilderFormComponent implements OnInit {
       this.stockObject = [{
         chart: {
           alignTicks: false,
-          width: 550
+          width: 550,
+          height: '50%',
         },
 
         rangeSelector: {
@@ -860,7 +877,8 @@ export class ChartBuilderFormComponent implements OnInit {
       this.stockObject = [{
 
         chart: {
-          width: 550
+          width: 550,
+          height: '50%',
         },
 
         rangeSelector: {
@@ -891,7 +909,8 @@ export class ChartBuilderFormComponent implements OnInit {
         Number(item.close_price)]);
       this.stockObject = [{
         chart: {
-          width: 550
+          width: 550,
+          height: '50%',
         },
           title: {
               text: 'AAPL Stock Price'
@@ -1044,7 +1063,7 @@ export class ChartBuilderFormComponent implements OnInit {
             ]
             },
             plotBackgroundImage: null,
-            height: '70%',
+            height: '45%',
             width: 550,
             identifier:'VU meter'
         },
@@ -1128,7 +1147,7 @@ export class ChartBuilderFormComponent implements OnInit {
               plotBackgroundImage: null,
               plotBorderWidth: null,
               plotShadow: false,
-              height: '80%',
+              height: '50%',
               width: 550,
               identifier: 'Speedometer'
             },
@@ -1199,7 +1218,7 @@ export class ChartBuilderFormComponent implements OnInit {
               plotShadow: false,
               identifier: 'Dual Axes Speedometer',
               width: 550,
-              height: '80%',
+              height: '50%',
           },
     
           title: {
@@ -1286,7 +1305,7 @@ export class ChartBuilderFormComponent implements OnInit {
               plotBackgroundImage: null,
               plotBorderWidth: 0,
               plotShadow: false,
-              height: '80%',
+              height: '50%',
               width: 550,
               identifier: 'Speedometer solid'
           },
@@ -1385,7 +1404,7 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: {
               type: 'solidgauge',
-              height: '70%',
+              height: '45%',
               width: 550, // Set the width of the chart
               identifier: 'Multiple KPI gauge'
               // events: {
@@ -1503,7 +1522,6 @@ export class ChartBuilderFormComponent implements OnInit {
         this.ids.push(this.data.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
       }
-
       
         this.newChartObject = [
           {
@@ -1513,7 +1531,7 @@ export class ChartBuilderFormComponent implements OnInit {
                       plotBackgroundImage: null,
                       plotBorderWidth: 0,
                       plotShadow: false,
-                      height: '80%',
+                      height: '50%',
                       width: 550,
                       identifier:'clock gauge'
                   },

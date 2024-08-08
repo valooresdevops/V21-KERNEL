@@ -315,7 +315,10 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           series: [{
                             name: this.allData[i].data.records[0].TITLE,
                             data: this.names,
-                          }]
+                          }],
+                          credits: {
+                              enabled: false
+                          },
                         }
                       ]
                     }else{
@@ -367,6 +370,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       }
                   },
               
+                  credits: {
+                    enabled: false
+                },
                   xAxis: {
                       categories: [
                           'Alexander', 'Marie', 'Maximilian', 'Sophia', 'Lukas',
@@ -478,6 +484,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                             text: 'Value'
                           }
                         },
+                        credits: {
+                            enabled: false
+                        },
                         plotOptions: {
                           line: {
                             depth: 25,
@@ -535,6 +544,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       },
                       title: {
                         text: this.allData[i].data.records[0].TITLE
+                      },
+                      credits: {
+                          enabled: false
                       },
                       xAxis: {
                         categories: this.ids
@@ -612,6 +624,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         style: {
                           fontSize: '1.1em'
                         }
+                      },
+                      credits: {
+                          enabled: false
                       },
                       tooltip: {
                         pointFormat: '{series.name} <b>{point.percentage:.1f}%</b>'
@@ -706,6 +721,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       {
                         chart: { type: 'scatter'},
                         title: { text: this.allData[i].data.records[0].TITLE },
+                        credits: {
+                            enabled: false
+                        },
                         xAxis: {
                           title: {
                             text: 'X Axis'
@@ -751,6 +769,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         title: {
                           text: 'Y Axis'
                         }
+                      },
+                      credits: {
+                          enabled: false
                       },
                       series: [{
                         name: 'Series 1',
@@ -831,6 +852,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           text: this.allData[i].data.records[0].TITLE,
                           align: 'left'
                       },
+                      credits: {
+                          enabled: false
+                      },
                       // subtitle: {
                       //     text: this.allData[i].data.records[0].TITLE,
                       //     align: 'left'
@@ -861,6 +885,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       title: { text: 'Pareto' },
                       opposite: true
                     }],
+                    credits: {
+                        enabled: false
+                    },
                     tooltip: { shared: true },
                     series: [{
                       name: 'Primary',
@@ -907,6 +934,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         depth: 45
                       }
                     },
+                    credits: {
+                        enabled: false
+                    },
                     tooltip: {
                       headerFormat: '',
                       pointFormat: '<b>{point.name}</b>: {point.y}'
@@ -926,6 +956,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     tooltip: {
                       headerFormat: '',
                       pointFormat: '<b>{point.name}</b>: {point.y}'
+                    },
+                    credits: {
+                        enabled: false
                     },
                     series: [{
                       name: this.allData[i].data.records[0].TITLE,
@@ -948,6 +981,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
           
                   title: {
                     text: this.allData[i].data.records[0].title
+                  },
+                  credits: {
+                      enabled: false
                   },
           
                   series: [{
@@ -1049,6 +1085,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 title: {
                     text: this.allData[i].data.records[0].title
                 },
+                credits: {
+                    enabled: false
+                },
         
                 series: [{
                     name: this.allData[i].data.records[0].title,
@@ -1073,7 +1112,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 title: {
                     text: this.allData[i].data.records[0].title
                 },
-        
+                credits: {
+                    enabled: false
+                },
                 series: [{
                     name: 'AAPL Stock Price',
                     data: transformedData1,
@@ -1126,7 +1167,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           fontSize: '28px' // Adjusted font size to match the increased size
                       }
                   },
-              
+                  credits: {
+                      enabled: false
+                  },
                   pane: {
                       center: ['50%', '50%'], // Center the gauge vertically and horizontally
                       size: '100%', // Adjust size for the gauge to ensure it's centered properly
@@ -1223,7 +1266,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         height: 200,
                         identifier:'VU meter'
                     },
-                    
+                    credits: {
+                        enabled: false
+                    },
                     title: {
                         text: 'VU meter',
                         style: {
@@ -1311,6 +1356,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     title: {
                       text: 'Speedometer'
                     },
+                    credits: {
+                        enabled: false
+                    },
                     pane: {
                       startAngle: -90,
                       endAngle: 90,
@@ -1381,7 +1429,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   title: {
                       text: 'Speedometer with Dual Axes'
                   },
-            
+                  credits: {
+                      enabled: false
+                  },
                   pane: {
                       startAngle: -150,
                       endAngle: 150
@@ -1471,7 +1521,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   title: {
                       text: 'Speedometer'
                   },
-              
+                  credits: {
+                      enabled: false
+                  },
                   pane: {
                       startAngle: -90,
                       endAngle: 89.9,
@@ -1577,7 +1629,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           fontSize: '24px'
                       }
                   },
-            
+                  credits: {
+                      enabled: false
+                  },
                   tooltip: {
                       borderWidth: 0,
                       backgroundColor: 'none',
@@ -1696,7 +1750,6 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       height: '85%',
                       identifier:'clock gauge'
                   },
-            
                   credits: {
                       enabled: false
                   },
@@ -1902,7 +1955,7 @@ setTimeout(() => {
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',
-          height: '60%',
+          height: '300px',
         });
       });
     } else if (data.type == 'Grid') {

@@ -24,7 +24,7 @@
     width: 30%;
     height: 30%; /* Ensure the box has a defined height */
     margin-left: 5%;
-    margin-top: 20%;
+    margin-top: 12%;
     min-width: fit-content;
     justify-content: center; /* Center the chart container horizontally */
     align-items: center; /* Center the chart container vertically */
@@ -36,7 +36,7 @@
     width: 30%;
     height: 30%; /* Ensure the box has a defined height */
     margin-left: 5%;
-    margin-top: 20%;
+    margin-top: 12%;
     min-width: fit-content;
     justify-content: center; /* Center the chart container horizontally */
     align-items: center; /* Center the chart container vertically */

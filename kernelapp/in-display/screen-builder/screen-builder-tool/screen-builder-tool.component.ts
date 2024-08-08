@@ -657,6 +657,7 @@ export class ScreenBuilderToolComponent implements OnInit {
         let part = parts[i];
       this.http.post<any>(GlobalConstants.getQueryData + part, { headers: GlobalConstants.headers }).subscribe(
           (res: any) => {
+
             if (res.chartType == 1) {
               this.chartType = 'heatmap';
             } else if (res.chartType == 2) {
@@ -698,6 +699,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             } else if (res.chartType == 20) {
               this.chartType == "clock gauge"
             }
+            
             
 
             if (this.chartType == 'heatmap') {
@@ -1235,29 +1237,31 @@ export class ScreenBuilderToolComponent implements OnInit {
                   chart: {
                     alignTicks: false
                   },
-
+          
                   rangeSelector: {
                     selected: 1
                   },
-
+          
                   title: {
                     text: res.records[0].title
                   },
                   credits: {
                     enabled: false // Disable the credits link
                   },
-
+          
                   series: [{
-                    name: 'Primary',
+                    name: this.names,
                     type: 'column',
-                    data: this.names
-                  }, {
-                    name: 'Pareto',
-                    type: 'line',
-                    yAxis: 1,
-                    data: this.names,
-                    zIndex: 10,
-                    dashStyle: 'ShortDot'
+                    data: transformedData1,
+                    dataGrouping: {
+                      units: [[
+                        'week', // unit name
+                        [1] // allowed multiples
+                      ], [
+                        'month',
+                        [1, 2, 3, 4, 6]
+                      ]]
+                    }
                   }]
                 }
               );
@@ -1337,7 +1341,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                       ]
                   }
               }]}]
-            } else if (this.chartType == 'semiPie') {
+            } else if (res.chartType == 14) {
               const transformedData = res.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
               if (res.is3d == 1) {
                 this.newChartObject.push(
@@ -1449,7 +1453,7 @@ export class ScreenBuilderToolComponent implements OnInit {
 
                 }
           }
-            } else if(this.chartType == 'VU solid')
+            } else if(res.chartType == 15)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -1545,7 +1549,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                     }]
                   }
                 );
-            } else if(this.chartType == 'VU meter')
+            } else if(res.chartType == 16)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -1672,7 +1676,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                     }]
                     }
                   );
-            } else if(this.chartType == 'Dual Axes Speedometer')
+            } else if(res.chartType == 17)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -1763,7 +1767,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }]
                   }
                 );
-            } else if(this.chartType == 'Speedometer solid')
+            } else if(res.chartType == 18)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -1774,7 +1778,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 this.newChartObject.push
                 (
                   {
-                    type:'solidgauge', identifier: 'Multiple KPI gauge',
+                    type:'solidgauge', identifier: 'Speedometer solid',
                       
                     
                     chart: {
@@ -1869,7 +1873,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }]
                   }
                 );
-            } else if(this.chartType == 'Multiple KPI gauge')
+            } else if(res.chartType == 19)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -1995,7 +1999,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }]
                   }
                 );
-            } else if(this.chartType == 'clock gauge')
+            } else if(res.chartType == 20)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -2119,13 +2123,9 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }
                 );
             }
-
-
-
-
-
             else
             {}
+
             this.ids = [];
             this.names = [];
               if((this.newChartObject.length) == parts.length)
@@ -2203,9 +2203,7 @@ export class ScreenBuilderToolComponent implements OnInit {
             this.chartType == "VU meter"
           } else if (res.chartType == 16) {
             this.chartType == "Speedometer"
-          } 
-
-          else if (res.chartType == 17) {
+          } else if (res.chartType == 17) {
             this.chartType == "Dual Axes Speedometer"
           } else if (res.chartType == 18) {
             this.chartType == "Speedometer solid"
@@ -2737,30 +2735,33 @@ export class ScreenBuilderToolComponent implements OnInit {
                 chart: {
                   alignTicks: false
                 },
-
+        
                 rangeSelector: {
                   selected: 1
                 },
-
+        
                 title: {
                   text: res.records[0].title
                 },
                 credits: {
                   enabled: false // Disable the credits link
                 },
-
+        
                 series: [{
-                  name: 'Primary',
+                  name: this.names,
                   type: 'column',
-                  data: this.names
-                }, {
-                  name: 'Pareto',
-                  type: 'line',
-                  yAxis: 1,
-                  data: this.names,
-                  zIndex: 10,
-                  dashStyle: 'ShortDot'
+                  data: transformedData1,
+                  dataGrouping: {
+                    units: [[
+                      'week', // unit name
+                      [1] // allowed multiples
+                    ], [
+                      'month',
+                      [1, 2, 3, 4, 6]
+                    ]]
+                  }
                 }]
+                
               }
             );
           } else if (this.chartType == 'ohlc') {
@@ -2950,7 +2951,7 @@ export class ScreenBuilderToolComponent implements OnInit {
 
               }
           }
-          } else if(this.chartType == 'VU solid')
+          } else if(res.chartType == 14)
                         {
                           for (let j = 0; j < res.records.length; j++)
                             {
@@ -3045,7 +3046,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                               }]  
                             }
                           );
-          } else if(this.chartType == 'VU meter')
+          } else if(res.chartType == 15)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -3055,9 +3056,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   
                 this.newChartObject.push
                 (
-                  {
-                    type:'solidgauge', identifier: 'Multiple KPI gauge',
-                      
+                  {                      
                     chart:
                     {
                       type: 'gauge',
@@ -3137,7 +3136,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                     }]
                     }
                   );
-          } else if(this.chartType == 'Speedometer')
+          } else if(res.chartType == 16)
           {
             for (let j = 0; j < res.records.length; j++)
             {
@@ -3207,7 +3206,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 }]
               }
             );
-          } else if(this.chartType == 'Dual Axes Speedometer')
+          } else if(res.chartType == 17)
             {
               for (let j = 0; j < res.records.length; j++)
               {
@@ -3297,7 +3296,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 }]
                 }
               );
-          } else if(this.chartType == 'Speedometer solid')
+          } else if(res.chartType == 18)
               {
                 for (let j = 0; j < res.records.length; j++)
                 {
@@ -3401,7 +3400,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                   }]
                   }
                 );
-          } else if(this.chartType == 'Multiple KPI gauge')
+          } else if(res.chartType == 19)
                 {
                   for (let j = 0; j < res.records.length; j++)
                   {
@@ -3526,7 +3525,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                     }]
                     }
                   );
-          } else if(this.chartType == 'clock gauge')
+          } else if(res.chartType == 20)
                   {
                     for (let j = 0; j < res.records.length; j++)
                     {
@@ -3663,7 +3662,6 @@ export class ScreenBuilderToolComponent implements OnInit {
               });
             }
 
-
            this.newChartObject = []
            this.stockChartObject=[]
            this.ids = [];
@@ -3714,8 +3712,8 @@ export class ScreenBuilderToolComponent implements OnInit {
          setTimeout(() => {
  
            const dialogConfig = new MatDialogConfig();
-           dialogConfig.width = '500px';
-           dialogConfig.height = '500px';
+           dialogConfig.width = '700px';
+           dialogConfig.height = '700px';
  
            const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
              data: this.chartData,
@@ -3970,5 +3968,4 @@ export class ScreenBuilderToolComponent implements OnInit {
  
  
  }
- 
  

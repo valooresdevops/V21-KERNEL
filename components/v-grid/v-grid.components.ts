@@ -157,6 +157,7 @@ export class AGGridComponent implements OnInit, OnChanges {
   @Input() public isReadOnly: boolean;
   @Input() public treeGridHeader: any[] ;
   @Input() public treeGridData: any[];
+  @Input() public isUpdateColsDef: number = 0;
 
   @Input() public isTreeGrid: boolean = false;
   public lookupIds: any;
@@ -240,18 +241,23 @@ export class AGGridComponent implements OnInit, OnChanges {
   } 
 
   hidePagination(): void {
-    const paginationPanel = document.querySelector('.ag-paging-panel') as HTMLElement;
-    if (paginationPanel) {
-      paginationPanel.style.display = 'none';
-    }
+    setTimeout(() => {
+      const paginationPanels = document.querySelectorAll('.ag-paging-panel');
+      paginationPanels.forEach(panel => {
+        (panel as HTMLElement).style.display = 'none';
+      });
+    }, 100); // Adjust the delay as needed
   }
   
   showPagination(): void {
-    const paginationPanel = document.querySelector('.ag-paging-panel') as HTMLElement;
-    if (paginationPanel) {
-      paginationPanel.style.display = '';
-    }
+    setTimeout(() => {
+      const paginationPanels = document.querySelectorAll('.ag-paging-panel');
+      paginationPanels.forEach(panel => {
+        (panel as HTMLElement).style.display = '';
+      });
+    }, 100); // Adjust the delay as needed
   }
+  
 
 getChildren(parentId: number): any[] {
   const children: any[] = [];
@@ -341,6 +347,15 @@ getChildren(parentId: number): any[] {
 
     if ('dataApi' in changes || 'Parameter' in changes || 'staticData' in changes) {
       this.fetchGridData();
+    }
+    // if(changes['isUpdateColsDef']){
+    //   alert(this.isUpdateColsDef);
+    //   this.updateColsdef();
+    // }
+    if(this.isUpdateColsDef != 0){
+      alert(6)
+          this.updateColsdef();
+
     }
 
   }
@@ -1645,10 +1660,6 @@ onCellEditingStopped(event: any) {
             suppressAutoSize: true,
 
           };
-
-
-console.log('definition==>',definition);
-
           if (this.agColumns[0][kk].isLink) {
             definition.cellRenderer = LinkCellRenderer;
             definition.cellRendererParams = {
@@ -2090,7 +2101,14 @@ gridDataApi.subscribe(
     if((this.isForQueryForm || this.isGridInLookup) && this.agRowSelection!='multiple'){
         $("#lookupSubmitButton")[0].click();
       }
-        }
+  }
+
+  updateColsdef(){
+    this.fetchGridData();
+    console.log("this.colDef<<>>",this.rowData);
+    
+    this.gridApi.setRowData(this.rowData);
+  }
 
 }
 

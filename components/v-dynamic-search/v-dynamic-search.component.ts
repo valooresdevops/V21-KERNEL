@@ -3,8 +3,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormArray, UntypedFormBuilder, FormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import axios from 'axios';
 import { get } from 'jquery';
-import { Observable, from, lastValueFrom } from 'rxjs';
+import { Observable, Subscription, from, lastValueFrom } from 'rxjs';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
+import { CommonFunctions } from '../../common/CommonFunctions';
+import { InformationService } from '../../services/information.service';
 
 @Component({
   selector: 'v-dynamic-search',
@@ -40,10 +42,14 @@ export class VDynamicSearchComponent implements OnInit {
    @Input() public sourceQuery: any;
 
    @Output() public onSearchSubmit: EventEmitter<any> = new EventEmitter();
-      // @Output() public onSearchSubmit = new EventEmitter<{ getWhereCondNew: any, checkIfFIeldExistsNew: any }>();
+  rowData: any;
+  gridOptions: any;
+  searchService: any;
 
    
-  constructor(private formBuilder: UntypedFormBuilder, private http: HttpClient) {}
+  constructor(private formBuilder: UntypedFormBuilder,
+     private http: HttpClient,private commonFunctions: CommonFunctions,
+     public informationservice: InformationService,) {}
 
   async ngOnInit(): Promise<void> {
 
@@ -60,7 +66,6 @@ if(this.sourceQuery == null){
     const getDynamicSearch = await lastValueFrom(getDynamicSearchUrl);
     const getSearchTypeUrl = from(axios.get(GlobalConstants.getSearchType));
     const getSearchType = await lastValueFrom(getSearchTypeUrl);
-    console.log('getSearchType --->',getSearchType)
 
     this.dynamicSearchForm = this.formBuilder.group({
       conditions: this.formBuilder.array([]),
@@ -68,7 +73,6 @@ if(this.sourceQuery == null){
       textControl: [null, Validators.required],
     });
     
-    console.log("n getDynamicSearch  ",getDynamicSearch)
     for (let i = 0; i < getDynamicSearch.data.length; i++) {
       this.fieldsCombo.push({
         id: getDynamicSearch.data[i].id,
@@ -80,14 +84,12 @@ if(this.sourceQuery == null){
       this.isDropdownStatus.push(false);
       this.isDate.push(false);
     }
-    console.log('this.fieldsCombo>>>>>>> ',this.fieldsCombo)
     for(let i = 0; i < getSearchType.data.length; i ++) {
       this.firstCombo.push({
         id: getSearchType.data[i].id, 
         name: getSearchType.data[i].name
       });
     }
-    console.log('this.firstCombo>>>>>>> ',this.firstCombo)
 
 
     setTimeout(() => {
@@ -139,8 +141,6 @@ if(this.sourceQuery == null){
   }
 
   async onDropdownChange(selectedValue: any, fields: any, DropDownChange: any, index: number): Promise<void> {
-    console.log("selectedValue----->",selectedValue);
-    console.log("fields----->: ",fields);
     fields.selectedValue = selectedValue;
     let keyArray = Object.keys(this.fieldsCombo);
   
@@ -152,7 +152,6 @@ if(this.sourceQuery == null){
     if (this.fieldsCombo[index]) {
       for (let i = 0; i < keyArray.length; i++) {
         if (selectedValue == this.fieldsCombo[i].id) {
-console.log('this.fieldCombo----->',this.fieldsCombo[i])
           if (this.fieldsCombo[i].queryId != undefined && this.fieldsCombo[i].code == 'COMBO') {
 
             this.isDropdownStatus[index] = true;
@@ -244,6 +243,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     }
     let MyList = [];
     let elementSize = 0 ;
+    let obj:any;
 
 
     for (let i = 0; i < this.formElem.length; i++) {
@@ -290,10 +290,8 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     }else{
       elementSize = 1;
     }
-console.log("MyList   >>>>  ",MyList)
     const getWhereCondUrl = from(axios.post( GlobalConstants.getWhereCondition + "/" +  elementSize   ,  MyList  )  );
     let getWhereCond1 = await lastValueFrom(getWhereCondUrl);
-    console.log('getWhereCond1----->',getWhereCond1)
     let result: any;
     let getWhereCondNew: any = "-1";
   
@@ -302,12 +300,10 @@ console.log("MyList   >>>>  ",MyList)
       getWhereCondNew = this.getWhereCond;
     }
   
-    console.log("getWhereCondNew----->", getWhereCondNew);
-  
+  console.log("getWhereCondNew ::: ",getWhereCondNew);
     let functionName: string | any;
     let condition: string | any;
   
-    // Check if 'Function Name:' and 'Condition:' are in the string
     if (getWhereCondNew.indexOf('Function Name:') !== -1 && getWhereCondNew.indexOf('Condition:') !== -1) {
       const functionNameMatch = getWhereCondNew.match(/Function Name:\s*([^,]*)/);
       const conditionMatch = getWhereCondNew.match(/Condition:\s*(.*)/);
@@ -322,16 +318,24 @@ console.log("MyList   >>>>  ",MyList)
     }
   
     if (condition && condition.indexOf(' ') !== -1) {
-      result = this.transformCondition(condition);
+      result = await this.transformCondition(condition);
     }
     if (functionName) {
-      from(axios.post( GlobalConstants.callApi +functionName )  );  }
+      const callApi =  from(axios.post( GlobalConstants.callApi +functionName ,result )  );  
+      let apiReturn =await lastValueFrom(callApi);      
+       obj = {
+        result :"",
+        reloadGrid : true
+      }
+    }else{
+      obj = {
+        result :result,
+        reloadGrid : false
+      }
+    }
   
-    console.log("Condition:", condition);
-  
-    this.onSearchSubmit.emit(result);
+    this.onSearchSubmit.emit(obj);
   }
- 
   filterData(data: any[], searchCriteria: any[]): any[] {
 
     return data.filter(item => {
@@ -348,83 +352,80 @@ console.log("MyList   >>>>  ",MyList)
   }
 
 
-  transformCondition(getWhereCondNew:any) {
+  transformCondition(getWhereCondNew: any) {
+    console.log("getWhereCondNew ::: ::: ::: ", getWhereCondNew);
     // Split the string by the logical operator 'and'
     let conditions = getWhereCondNew.split(" and ");
-    
+
     // Function to process each individual condition
-    const processCondition = (condition:any) => {
+    const processCondition = (condition: any) => {
         if (condition.includes(' = ')) {
-            const parts = condition.split("=");
+            const parts = condition.split(' = ');
             const fieldName = `"${parts[0].trim()}"`;
             const fieldValue = parts[1].trim();
-            return `${fieldName}=${fieldValue}`;
-        } else if (condition.includes('!=')) {
-          const parts = condition.split("!=");
-          const fieldName = `"${parts[0].trim()}"`;
-          const fieldValue = parts[1].trim();
-          return `${fieldName}!=${fieldValue}`;
-      } else if (condition.includes('like')) {
-        if (condition.includes('or')) {
-          const orParts = condition.split('or');
-          const modifiedConditions = orParts.map((part:any) => {
-              const likeParts = part.split('like');
-              let fieldName = likeParts[0].trim();
-              const modifiedFieldName = `upper("${fieldName.substring(fieldName.indexOf('(') + 1, fieldName.lastIndexOf(')'))}")`;
-              const modifiedValue = likeParts[1].trim();
-              return `${modifiedFieldName} like ${modifiedValue}`;
-          });
-          return modifiedConditions.join(' or ');
-        }else{
-            const parts = condition.split("like");
-            for(let i = 0 ; i<parts.length ; i++){
-              console.log('parts[',i,']>>>>>>>>: ',parts[i]);
-            }
+            return `${fieldName} = ${fieldValue}`;
+        } else if (condition.includes(' != ')) {
+            const parts = condition.split(' != ');
+            const fieldName = `"${parts[0].trim()}"`;
+            const fieldValue = parts[1].trim();
+            return `${fieldName} != ${fieldValue}`;
+        } else if (condition.includes(' not like ')) {
+            const parts = condition.split(' not like ');
             let fieldName = parts[0].trim();
             const modifiedFieldName = `upper("${fieldName.substring(fieldName.indexOf('(') + 1, fieldName.lastIndexOf(')'))}")`;
-            const modifiedValue = `${parts[1].trim()}`;
-                  return `${modifiedFieldName} like ${modifiedValue}`;
-          }
+            const modifiedValue = parts[1].trim();
+            return `${modifiedFieldName} not like ${modifiedValue}`;
+        } else if (condition.includes(' like ')) {
+            const parts = condition.split(' like ');
+            let fieldName = parts[0].trim();
+            const modifiedFieldName = `upper("${fieldName.substring(fieldName.indexOf('(') + 1, fieldName.lastIndexOf(')'))}")`;
+            const modifiedValue = parts[1].trim();
+            return `${modifiedFieldName} like ${modifiedValue}`;
         } else if (condition.includes(' < ')) {
-            const parts = condition.split(" < ");
+            const parts = condition.split(' < ');
             const fieldName = `"${parts[0].trim()}"`;
             const fieldValue = parts[1].trim();
-            return `${fieldName}<${fieldValue}`;
+            return `${fieldName} < ${fieldValue}`;
         } else if (condition.includes(' > ')) {
-            const parts = condition.split(" > ");
+            const parts = condition.split(' > ');
             const fieldName = `"${parts[0].trim()}"`;
             const fieldValue = parts[1].trim();
-            return `${fieldName}>${fieldValue}`;
+            return `${fieldName} > ${fieldValue}`;
+        } else if (condition.includes(' <= ')) {
+            const parts = condition.split(' <= ');
+            const fieldName = `"${parts[0].trim()}"`;
+            const fieldValue = parts[1].trim();
+            return `${fieldName} <= ${fieldValue}`;
+        } else if (condition.includes(' >= ')) {
+            const parts = condition.split(' >= ');
+            const fieldName = `"${parts[0].trim()}"`;
+            const fieldValue = parts[1].trim();
+            return `${fieldName} >= ${fieldValue}`;
         }
-        else if (condition.includes(' <= ')) {
-          const parts = condition.split(" <= ");
-          const fieldName = `"${parts[0].trim()}"`;
-          const fieldValue = parts[1].trim();
-          return `${fieldName}<=${fieldValue}`;
-      } else if (condition.includes(' >= ')) {
-          const parts = condition.split(" >= ");
-          const fieldName = `"${parts[0].trim()}"`;
-          const fieldValue = parts[1].trim();
-          return `${fieldName}>=${fieldValue}`;
-      }
         return condition; // return the condition as is if no known operator is found
     };
 
     // Process each condition and join them back with 'and'
     let transformedConditions = conditions.map(processCondition);
-    return transformedConditions.join(" and ");
+    return transformedConditions.join(' and ');
 }
-
   onReset(){
 
-    this.dynamicSearchForm.reset();
+    // this.dynamicSearchForm.reset();
 
-    setTimeout(() => {
-      this.clearAll=true;
-    }, 20);
+    // setTimeout(() => {
+    //   this.clearAll=true;
+    // }, 20);
 
-    setTimeout(() => {
-      this.clearAll=false;
-    }, 50);  }
+    // setTimeout(() => {
+    //   this.clearAll=false;
+    // }, 50);
+  
+   let obj = {
+      result :"",
+      reloadGrid : true
+    }
+    this.onSearchSubmit.emit(obj);
+  }
 
 }

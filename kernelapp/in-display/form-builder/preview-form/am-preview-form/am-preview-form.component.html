@@ -21,6 +21,17 @@
                 <div class="body" *ngIf="tableOption.tableName == selectedTabName">
                     <form [formGroup]="dynamicForm"
                         *ngIf="tableOption.isQueryForm!='1' && !isPageGrid && test_1 == '1'">
+
+            <!------------------------Dynamic Search on Form----------------------------------------------------->
+                      
+                            <div *ngIf="tableOption.isAdvancedSearch == 1 ">
+                                            <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
+                                                (onSearchSubmit)="onSearchSubmit($event)"></v-dynamic-search> 
+                            </div>
+
+            <!-------------------------------------------------------------------------------------------------->
+
+
                         <div class="row">
                             <div class="form-group row">
                                 <div *ngFor="let fields of test" class="mb-3" [ngClass]="{'hidden': fields.columnType == 'hidden',

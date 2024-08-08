@@ -4292,6 +4292,7 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
       const getAllTabsUrl = from(axios.get(GlobalConstants.getAllTabs + this.amInfo.objectId));
       const getAllTabs = await lastValueFrom(getAllTabsUrl);
       this.allTabsTemp=getAllTabs.data;
+      console.log("ALL TABS DATA>>>>>>>>",getAllTabs.data);
       this.loaderService.isLoading.next(true);
       for (let i = 0; i < getAllTabs.data.length; i++) {
 
@@ -4676,7 +4677,12 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
   }
 
   async ngOnInit(): Promise<void> {
+    if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
+    }
+
+    console.log("MAIN PREVIEW DATA INPUT>>>>>>>>>>>>>",this.mainPreviewDataInput);
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key && key.startsWith('agGidSelectedLookup_')) {
@@ -4768,7 +4774,7 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
     this.loadAllFormColumns(this.objectId);
 
     // Filter tableOptions on selected tab
-    //console.log("ALL OPTIONS>>>>>>>>>>>>>",this.tableOptions1)
+    console.log("ALL OPTIONS>>>>>>>>>>>>>",this.tableOptions1)
     let tableOptions: any = this.tableOptions1.filter((el: any) => {
       return Number(el.objectId) === Number(this.objectId);
     });
@@ -5022,86 +5028,20 @@ console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data
       hasSourceQuery = 1;
     }
 
-//     const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
-//     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
-//     isGrid = getTabConfigurationApi.data[0].isGrid;
-
-// //console.log("is grid ya  >>>>>>>>>>>>>>>>>>>>>>> : " , isGrid);
-// //console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
-//     ////////////////elie//////////////////////////////////
-//     //console.log("AMINFO>>>>>>>>>>>>",this.amInfo);
-//     //console.log("getTabConfigurationApi.data[0].isMain>>>>>>>>>>>>",getTabConfigurationApi.data[0].isMain);
-
-//     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
-//       //test2
-//       //console.log("this.informationservice.getPopupBreadcrumb():",this.informationservice.getPopupBreadcrumb());
-//       //console.log("this.informationservice.getPreviousMainTab():",this.informationservice.getPreviousMainTab());
-//       //console.log("getTabConfigurationApi.data[0].menuName:",getTabConfigurationApi.data[0].menuName);
-
-//       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
-//         isGrid = 0;
-//         //console.log("tes1");
-//       }
-//       //console.log("TABLE OPTIONS>>>>>>>>>>>>> " , this.tableOptions1);
-//       //console.log("ALL TABS TEMP>>>>>>>>>>",this.allTabsTemp);
-//       //console.log("ALL TABS TEMP LENGTH>>>>>>>>>>",this.allTabsTemp.length);
-
-//       //////for alert monitoring kyc general info////////////
-//       if(this.allTabsTemp.length>1){
-//       for(let i=0;i<this.allTabsTemp.length;i++){
-//         if(this.allTabsTemp[i].parentId==null && this.allTabsTemp[i].canModify!=null){
-//           isGrid=0;
-//           break;
-//         }
-
-//       }
-//       //console.log("IS GRID 1st LAST>>>>",isGrid);
 
 
-//     }
-//       /////////////////////////////////////////////////
-//       ///////////////////////////////////////////////
-//     }
-
-//     else
-//       if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick) {
-
-//         isGrid = getTabConfigurationApi.data[0].isGrid;
-
-//       } else {
-//         if (getTabConfigurationApi.data[0].isMain == "1" &&
-//             getTabConfigurationApi.data[0].isGrid == "1" &&
-//             this.amInfo.buttonClick == undefined) {
-//           isGrid = 0
-//         } else if (getTabConfigurationApi.data[0].isMain == "0" &&
-//                    getTabConfigurationApi.data[0].isGrid == "1" &&
-//                    this.isFromGridClick == 1) {
-//           isGrid = 0
-//         } else if (getTabConfigurationApi.data[0].isMain == "1" &&
-//                    getTabConfigurationApi.data[0].isGrid == "1" &&
-//                    this.amInfo.buttonClick == 14) {
-//           isGrid = getTabConfigurationApi.data[0].isGrid;
-//         } else {
-//           isGrid = getTabConfigurationApi.data[0].isGrid;
-//         }
-//       }
-//     if (this.amInfo.isFromButtonClick && this.amInfo.isFromButtonClick == 1) {
-//       isGrid = getTabConfigurationApi.data[0].isGrid;
-//     }
-
-//     if (getTabConfigurationApi.data[0].isMain == "1" && getTabConfigurationApi.data[0].isGrid == "0" && this.amInfo.buttonClick == 14) {
-//       this.actionType = 'update';
-//     }
-
-
-
+//////////////////////////elie//////////////////////////////////////////////////////////////////////////////////
 
 
 const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
     isGrid = getTabConfigurationApi.data[0].isGrid;
+    console.log("ELIE IS FROM BUTTON CLICK 111>>>>>>>>>>>>>>>>",this.amInfo);
+    console.log("ELIE IS FROM BUTTON CLICK 2222>>>>>>>>>>>>>>>>",this.amInfo.isFromButtonClick);
+    console.log("ELIE IS FROM BUTTON CLICK 3333>>>>>>>>>>>>>>>>",this.amInfo.buttonClick);
+    console.log("ELIE IS FROM BUTTON CLICK 4444>>>>>>>>>>>>>>>>",getTabConfigurationApi.data[0].isGrid);
 
-
+    
     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
         isGrid = 0;
@@ -5148,8 +5088,10 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     if (getTabConfigurationApi.data[0].isMain == "1" && getTabConfigurationApi.data[0].isGrid == "0" && this.amInfo.buttonClick == 14) {
       this.actionType = 'update';
     }
-
-    // //console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
+    if(this.amInfo.isFromButtonClick==undefined && this.amInfo.buttonClick==14 && getTabConfigurationApi.data[0].isGrid==1){
+      isGrid=1;
+    }
+    console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
     this.isPageGrid = isGrid == 1 ? true : false;
     //make buttons appear under a grid
     const getColumnsApiUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
@@ -5247,10 +5189,13 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
           const decodedString = atob(base64EncodedString);
           let condition: any = decodedString.split("~A~")[5];
           let conditionQuery = condition == null ? -1 : condition;
+          console.log("CONDITION QUERY 1111>>>>>>>>>>>>",conditionQuery);
            if(condition == 'null'){
             conditionQuery = -1;
            }
-          if (conditionQuery != -1 && conditionQuery != "") {
+           console.log("CONDITION QUERY 2222>>>>>>>>>>>>",conditionQuery);
+
+          if (conditionQuery != -1 && conditionQuery != "" && conditionQuery!=undefined && conditionQuery!="undefined") {
             const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + conditionQuery));
             const paramNames = await lastValueFrom(paramNamesUrl);
 
@@ -5319,7 +5264,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
             }
           }
 
-          if (conditionQuery != "" && conditionQuery != null) {
+          if (conditionQuery != "" && conditionQuery != null && conditionQuery != -1 && conditionQuery!=undefined && conditionQuery!="undefined") {
             //console.log("test hahahahhahahaha ");
             const conditionUrl = from(axios.post(GlobalConstants.getQbeIdApi + conditionQuery + "/0", jsonCondition));
             const ConditionResult = await lastValueFrom(conditionUrl);

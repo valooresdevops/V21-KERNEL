@@ -119,8 +119,8 @@ export class ExecutedReportsComponent {
   
       const dialogRef = this.dialog.open(KwgCytoscapeComponent, {
          data: info,
-        width: '80%',
-        height: '80%',
+        width: '90%',
+        height: '90%',
       });
     }
   }

@@ -36,7 +36,7 @@ export class VHighChartsComponent implements OnInit {
     elements.forEach(element => {
       this.renderer.setStyle(element, 'width', '100%');
       this.renderer.setStyle(element, 'min-width', '40%');
-      this.renderer.setStyle(element, 'height', '50%');
+      this.renderer.setStyle(element, 'height', '100%');
       this.renderer.setStyle(element, 'margin', '0 auto');
     });
   }

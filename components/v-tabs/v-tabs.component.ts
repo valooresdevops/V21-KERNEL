@@ -1,4 +1,4 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, Input, EventEmitter, Output, ViewChild, ElementRef, OnInit, } from '@angular/core';
+import { Component, ContentChildren, QueryList, AfterContentInit, Input, EventEmitter, Output, ViewChild, ElementRef, OnInit, Optional, } from '@angular/core';
 import { TabComponent } from './v-tab.components';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -18,7 +18,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
 })
 export class TabsComponent implements AfterContentInit,OnInit {
 
-  @ContentChildren(TabComponent) tabs: QueryList<TabComponent> | any;
+  @Optional() @ContentChildren(TabComponent) tabs: QueryList<TabComponent> | any;
   @Output() tabActionClick: EventEmitter<any> = new EventEmitter;
   @ViewChild('contextMenu') contextMenu: ElementRef;
 
@@ -42,6 +42,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
   // contentChildren are set
   ngAfterContentInit() {
     setTimeout(() => {
+     // console.log("V-tabs all tabs>>>>>>>",this.tabs);
       // get all active tabs
       let activeTabs = this.tabs.filter((tab: { active: any; }) => tab.active);
 
@@ -52,7 +53,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
           return el.tabId === "tabId_" + this.informationservice.getChoosenTab();
         });
         let tab: any = data;
-        console.log("NG AFTER CONTENT TAB>>>>>>>>>");
+      //  console.log("NG AFTER CONTENT TAB>>>>>>>>>",tab);
         this.selectTab(tab, 1);
         // localStorage.removeItem("choosenTab");
         this.informationservice.removeChoosenTab();
@@ -60,6 +61,8 @@ export class TabsComponent implements AfterContentInit,OnInit {
       } else {
         // if there is no active tab set, activate the first
         if (activeTabs.length === 0) {
+      //    console.log("NG AFTER CONTENT TAB 222>>>>>>>>>",this.tabs.first);
+
           this.selectTab(this.tabs.first, 0);
         }
       }
