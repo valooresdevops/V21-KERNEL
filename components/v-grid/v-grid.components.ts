@@ -86,6 +86,8 @@ export class AGGridComponent implements OnInit, OnChanges {
   public accessRights: any;
   public arrayOfData: any = [];
   public selectedNodesAr: any = "";
+  public selectedCellsAr: any = "";
+  public selectedCellsArString: any = "";
   public selectedNodesNew: any;
   public isOnGridReady: Boolean = true;
   public rowCount: any = 0;
@@ -1094,33 +1096,140 @@ handleAggridJSONRowSelection(primaryKey: any, event: any, selectionType: any)
 //console.log("SELECTED AR NODES BEFORE", this.selectedNodesAr);
 
  //////////////////////////////////////////////////////////////HAYA START Access Rights (USM)
- if (this.isAccessRightsGrid){
-  // Remove duplicates based on first primary key only in USM
-  let primaryKeys = primaryKey.split(",");
+//  if (this.isAccessRightsGrid){
+//   // Remove duplicates based on first primary key only in USM
+//   let primaryKeys = primaryKey.split(",");
 
-  let firstPrimaryKey = primaryKey.split(",")[0];
-  let selectedNodesJson = JSON.parse(this.selectedNodesAr);
-  let uniqueNodesMap = new Map();
-  selectedNodesJson.forEach((node: { [x: string]: any; }) => {
-    uniqueNodesMap.set(node[firstPrimaryKey], node);
-});
+//   let firstPrimaryKey = primaryKey.split(",")[0];
+//   let selectedNodesJson = JSON.parse(this.selectedNodesAr);
+//   let uniqueNodesMap = new Map();
+//   selectedNodesJson.forEach((node: { [x: string]: any; }) => {
+//     uniqueNodesMap.set(node[firstPrimaryKey], node);
+// });
 
-this.selectedNodesAr = JSON.stringify(Array.from(uniqueNodesMap.values()));
+// this.selectedNodesAr = JSON.stringify(Array.from(uniqueNodesMap.values()));
 
-this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
-this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
+// this.selectedNodesAr = this.selectedNodesAr.replace("undefined", "0");
+// this.selectedNodesAr = this.selectedNodesAr.replace("undefined,", "0");
 
-//console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesAr);
+// //console.log("SELECTED NODES AR>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedNodesAr);
 
 
-}
+// }
 /////////////////////////////////////////////////////////////////////////////////////////////////////HAYA END
 
 this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
     this.selectedNodesAr ="";
   }
 
+  onCellClicked(cellParams: any): void {
+    if(this.isAccessRightsGrid){
+      console.log("cellParamsssssssssss>>>", cellParams);
+      console.log("cellParamsssssssssssagcolumns>>>", cellParams.colDef.field);
+  
+      this.handleAggridJSONCellSelection(cellParams.colDef.field, cellParams, cellParams.value === '1' ? 'selected' : 'unselected');
+  
+      const commonKeys = Object.keys(cellParams.data).reduce((result: any, key) => {
+        if (this.agPrimaryKey.includes(key)) {
+          result[key] = cellParams.data[key];
+        }
+        return result;
+      }, {});
+  
+      console.log("COMMON KEYS>>>>>>>>>>>>>>", commonKeys);
+  
+      // Retrieve the existing data
+      let existingData = this.informationservice.getAgGidSelectedCell();
+      let jsonData: any[] = [];
+  
+      if (existingData) {
+        try {
+          jsonData = JSON.parse(existingData);
+        } catch (e) {
+          console.error("Error parsing existing JSON data", e);
+        }
+      }
+  
+      // Update or add the new entry
+      const id = commonKeys.id;
+      let found = false;
+  
+      jsonData = jsonData.map((item: any) => {
+        if (item.id === id) {
+          found = true;
+          return commonKeys;
+        }
+        return item;
+      });
+  
+      if (!found) {
+        jsonData.push(commonKeys);
+      }
+  
+      // Save the updated data
+      this.informationservice.setAgGidSelectedCell(JSON.stringify(jsonData));
+      console.log("this.informationservice.getAgGidSelectedCell", this.informationservice.getAgGidSelectedCell());    }
+  }
+
+  handleAggridJSONCellSelection(primaryKey: any, cellParams: any, selectionType: any) {
+    let nbOfPrimaryKeys = this.commonFunction.countNbOfOccuranceStr(primaryKey, ",");
+    nbOfPrimaryKeys = Number(nbOfPrimaryKeys + 1);
+
+    const rowId = cellParams.data.id;
+    const colId = cellParams.colDef.field;
+    const cellValue = cellParams.value;
+
+    // Initialize the cell data structure if not already present
+    if (!this.selectedCellsAr) {
+        this.selectedCellsAr = {};
+    }
+
+    if (!this.selectedCellsAr[rowId]) {
+        this.selectedCellsAr[rowId] = {};
+    }
+
+    if (selectionType === "selected") {
+        this.selectedCellsAr[rowId][colId] = cellValue;
+    } else {
+        delete this.selectedCellsAr[rowId][colId];
+        if (Object.keys(this.selectedCellsAr[rowId]).length === 0) {
+            delete this.selectedCellsAr[rowId];
+        }
+    }
+
+    // Convert to JSON format
+    let selectedCellsJson: { [key: string]: any }[] = [];
+    for (let row in this.selectedCellsAr) {
+        let rowData: { [key: string]: any } = { id: row };
+        for (let col in this.selectedCellsAr[row]) {
+            rowData[col] = this.selectedCellsAr[row][col];
+        }
+        selectedCellsJson.push(rowData);
+    }
+
+    // Convert the JSON array to string
+    this.selectedCellsArString = JSON.stringify(selectedCellsJson);
+
+    // Remove duplicates based on the first primary key if in USM
+    
+        let firstPrimaryKey = primaryKey.split(",")[0];
+        let uniqueCellsMap = new Map();
+
+        selectedCellsJson.forEach((cell: { [x: string]: any }) => {
+            uniqueCellsMap.set(cell[firstPrimaryKey], cell);
+        });
+
+        this.selectedCellsArString = JSON.stringify(Array.from(uniqueCellsMap.values()));
+        this.selectedCellsArString = this.selectedCellsArString.replace("undefined", "0");
+        this.selectedCellsArString = this.selectedCellsArString.replace("undefined,", "0");
+    
+
+    console.log("SELECTED CELLS AR >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", this.selectedCellsArString);
+    // alert("Cell selection updated");
+  }
+
   onRowSelected(event: any) {
+    if(!this.isAccessRightsGrid){
     setTimeout(() => {
       if(this.informationservice.getIsDynamicReport()==true){
         console.log("FETET");
@@ -1437,7 +1546,7 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
       }
     }
 ////////////////////////////////////////////////////
-  }
+  }}
 onCellEditingStopped(event: any) {
   let primaryKey = this.agPrimaryKey.toLowerCase();
   let rowPrimaryKey = event.data[primaryKey];

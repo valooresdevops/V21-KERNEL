@@ -71,6 +71,7 @@ export class GlobalConstants {
   public static fetchUSMRolesRoleTypeComboApi = GlobalConstants.usmGateway + 'api/getSyslines/';
   public static addUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/add/';
   public static AddApplicationInAccessRight = GlobalConstants.usmGateway + 'api/AddUSMApplication';
+    public static fetchPreviousSelectedNodesBAR = GlobalConstants.usmGateway + 'api/previousnodesBAR/'
   public static deleteUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/delete/';
   public static fetchUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/';
   public static updateUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/update/';

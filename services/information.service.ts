@@ -21,6 +21,7 @@ export class InformationService {
   public twiceClose: String = '';
   public userRoleId: string = '';
   public agGidSelectedNode: string = '';
+  public agGidSelectedCell: string = '';
   public popupBreadcrumb: any;
   public previousMainTab2: string = '';
   public previousTabIdSelected: string = '';
@@ -166,6 +167,13 @@ export class InformationService {
   
   getAgGidSelectedNode() {
     return this.agGidSelectedNode;
+  }
+
+  setAgGidSelectedCell(agGidSelectedCellVal :string){
+    this.agGidSelectedCell = agGidSelectedCellVal;
+  }
+  getAgGidSelectedCell(){
+    return this.agGidSelectedCell;
   }
 
   setSelectedTabId(selectedTabIdVal: string){
