@@ -26,9 +26,9 @@ export class VHighChartsComponent implements OnInit {
     if (!this.options.credits) {
       this.options.credits = { enabled: false };
     }
-    if(this.sizeCheck){
-      this.applySizeCheckStyles();
-    }
+    // if(this.sizeCheck){
+    //   this.applySizeCheckStyles();
+    // }
     this.Highcharts.chart(this.elementRef.nativeElement.querySelector('.chart-container'), this.options);
   }
   applySizeCheckStyles() {

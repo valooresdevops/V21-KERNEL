@@ -14,6 +14,7 @@ import { KpiRatioPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/kpi-r
 import { GridPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/grid-popup/grid-popup.component';
 import { DashboardPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/dashboard-popup/dashboard-popup.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { DashboardAccessRightsComponent } from '../../kernelapp/dashboard/dashboard-access-rights/dashboard-access-rights.component';
 
 @Component({
   selector: 'v-side-nav',
@@ -508,6 +509,14 @@ export class SideNavComponent implements OnInit {
   }
   openDashboardPopup() {
     const dialogRef = this.dialog.open(DashboardPopupComponent, {
+      // data:
+      width: '70%',
+      height: '70%',
+    });
+  }
+
+  openDashboardAccessSettings() {
+    const dialogRef = this.dialog.open(DashboardAccessRightsComponent, {
       // data:
       width: '70%',
       height: '70%',

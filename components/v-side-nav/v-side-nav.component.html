@@ -104,8 +104,8 @@
                             <form>
                                 <fieldset>
                                     <legend>Dashboard</legend>
-                                    <div class="col-md-5" style="float: left;text-align: justify; margin-left: 40px;">
-                                        <div class="col-md-12">
+                                    <div class="col-md-5" style="float: left;text-align: justify; margin-left: 40px; height: 275px;">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a>
                                                 <span (click)="openKpiPopup()">
                                                 <i class="liDashAppImg headerIconsColor far fa-newspaper"></i>
@@ -113,7 +113,7 @@
                                                 </span>
                                             </a>
                                         </div>
-                                        <div class="col-md-12" >
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a >
                                                 <span (click)="openChartPopup()">
                                                     <i class="liDashAppImg headerIconsColor fa fa-chart-bar "></i>
@@ -122,32 +122,32 @@
                                                 
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-chart-bar"></i>
                                                 Charts Group
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-bell"></i>
                                                 <span>Cases</span>
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
 
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-bell"></i>
                                                 Alerts
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-bell"></i>
                                                 Rules Alerts
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <span (click)="openGridPopup()">
                                                 <i class="liDashAppImg headerIconsColor fa fa-th "></i>
@@ -155,13 +155,13 @@
                                                 </span>
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-object-ungroup"></i>
                                                 Object
                                             </a>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-12" style="padding-bottom: 10px;">
                                             <a class="">
                                                 <i class="liDashAppImg headerIconsColor fa fa-file "></i>
                                                 Report
@@ -169,13 +169,13 @@
                                         </div>
                                     </div>
                                     <div class="col-md-5" style="float: right;text-align: left;">
-                                        <div> <a class=""><i
+                                        <div style="padding-bottom: 10px;"> <a class=""><i
                                                     class="liDashAppImg headerIconsColor far fa-newspaper "></i>Newsroom
                                                 <label class="headerIconsColor fa fa-arrow-right"></label></a>
                                         </div>
-                                        <div> <a class=""><i class="liDashAppImg headerIconsColor fa fa-rss "></i>RSS
+                                        <div style="padding-bottom: 10px;"> <a class=""><i class="liDashAppImg headerIconsColor fa fa-rss "></i>RSS
                                                 <label class="headerIconsColor fa fa-arrow-right"></label></a></div>
-                                        <div> <a class=""><i
+                                        <div style="padding-bottom: 10px;"> <a class=""><i
                                                     class="liDashAppImg headerIconsColor fa fa-forward "></i>Last
                                                 Session
                                             </a></div>
@@ -183,16 +183,25 @@
                                 </fieldset>
                             </form>
                         </div>
-                        <div class="row" style="margin-top: -80px;">
-                            <fieldset>
+                        <div class="row" >
+                            <fieldset style="margin-top: 150px; margin-bottom: 15px;">
                                 <legend class="legend-text">Supplementary Dashboard</legend>
                                 <div class="col-md-12"
-                                    style="text-align: left; margin-left: 40px;font-size: 14px;font-family: Calibri;">
+                                    style="text-align: left; margin-left: 40px;font-size: 14px;font-family: Calibri; padding-bottom: 5px;">
                                     <a>
                                         <span (click)="openDashboardPopup()">
                                         <i class="liDashAppImg headerIconsColor fa fa-folder-open "></i>
                                         Dashboard
                                     </span>
+                                    </a>
+                                </div>
+                                <div class="col-md-12"
+                                    style="text-align: left; margin-left: 40px;font-size: 14px;font-family: Calibri; padding-bottom: 5px;">
+                                    <a>
+                                        <span (click)="openDashboardAccessSettings()">
+                                            <i class="liDashAppImg headerIconsColor fa fa-folder-open"></i>
+                                            Dashboard Access Rights
+                                        </span>
                                     </a>
                                 </div>
                             </fieldset>

@@ -394,6 +394,9 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static deleteDashboardTempalte = GlobalConstants.inDispGatewat +'api/deleteDashboardTempalte/';
   public static getDashboardTemplateName = GlobalConstants.inDispGatewat +'api/getDashboardTemplateName/';
   public static getDashboardTemplateTab = GlobalConstants.inDispGatewat +'api/getDashboardTemplateTab/';
+  public static getGetDashboardTemplateTab = GlobalConstants.inDispGatewat +'api/getGetDashboardTemplateTab/';
+  public static updateDashboardTemplateUsersIds = GlobalConstants.inDispGatewat +'api/updateDashboardTemplateUsersIds/';
+  public static getDashboardTemplateCreatedByForAccess = GlobalConstants.inDispGatewat +'api/getDashboardTemplateCreatedByForAccess/';
   public static displayDashboard = GlobalConstants.inDispGatewat +'api/displayDashboard/';
   public static addDashboardKpi = GlobalConstants.inDispGatewat +'api/addDashboardKpi/';
   public static addDashboardGrid = GlobalConstants.inDispGatewat +'api/addDashboardGrid/';
@@ -402,6 +405,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static selectChartRelatedToKpi =  GlobalConstants.inDispGatewat +'api/selectChartRelatedToKpi/';
   public static getAllGridforDropdown =  GlobalConstants.inDispGatewat +'api/getAllGridforDropdown/';
   public static getAllChartforDropdown =  GlobalConstants.inDispGatewat +'api/getAllChartforDropdown/';
+  public static getAllUsersData =  GlobalConstants.inDispGatewat +'api/getAllUsersData/';
   public static getAllChartScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllChartScreenBuilder/';
   public static getAllGridScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllGridScreenBuilder/';
   public static getAllKpiScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllKpiScreenBuilder/';
@@ -419,7 +423,12 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getNodesImages = GlobalConstants.inDispGatewat + 'api/getNodesImages/';
   public static runNextLayerProcess = GlobalConstants.inDispGatewat + 'api/runNextLayerProcess/';
 
-  
+
+
+  //////////////API BUILDER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  public static getApiBuilderListDropDown = GlobalConstants.inDispGatewat + 'api/getApiBuilderListDropDown/';
+  public static getApiJsons = GlobalConstants.inDispGatewat + 'api/getApiJsons/';
+
   
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';

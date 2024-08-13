@@ -129,7 +129,7 @@ export class ChartBuilderComponent implements OnInit {
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',
-          height: '60%',
+          height: '300px',
         });
   
       });

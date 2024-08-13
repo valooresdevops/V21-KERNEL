@@ -1,0 +1,14 @@
+<form [formGroup]="usersForm">
+    <v-dropdown
+      formControlName="dropdownUsers"
+      label="Select Users to access selected tab"
+      [multiple]="true"
+      [dataApi]="getAllUsersData"
+      placeholder="Users"
+      [parentForm]="usersForm"
+      fieldName="dropdownUsers"
+      required="true">
+    </v-dropdown>
+</form>
+<v-button value="Submit" (click)="submit()" style="max-width: 7%;"></v-button>
+  

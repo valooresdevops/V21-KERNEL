@@ -110,7 +110,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   }
 
   public loadData(): Promise<void> {
-    console.log("11111111")
+    // console.log("11111111")
     return new Promise<void>((resolve) => {
       if (this.dataApi != '' || this.dataJSON != null) {
         this.dropdownList = [];
@@ -340,7 +340,7 @@ private extractDropdownValues(jsonData: any): void {
   ngOnChanges(changes: SimpleChanges): void
   {
     this.loadData();
-    console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    // console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   }
 
   onItemSelect(item: any)

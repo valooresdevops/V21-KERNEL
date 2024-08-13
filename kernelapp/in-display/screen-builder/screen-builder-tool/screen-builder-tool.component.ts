@@ -401,7 +401,7 @@ export class ScreenBuilderToolComponent implements OnInit {
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',
-          height: '60%',
+          height: '300px',
         });
     });
 
@@ -1011,17 +1011,18 @@ export class ScreenBuilderToolComponent implements OnInit {
                 );
               }
             } else if (this.chartType == 'line') {
-               
-              for (let i = 0; i < res.records.length; i++) {
-                this.ids.push(res.records[i].ID);
-                this.names.push(Number(res.records[i].NAME));
-              }
+              for (let j = 0; j < res.records.length; j++)
+                {
+                  this.ids.push(res.records[j].ID);
+                  this.names.push(Number(res.records[j].NAME));
+                }
               if (res.is3d == 1) {
                 this.newChartObject.push(
                   {
                     type:'Chart',
                     chart: {
                       type: 'line',
+                      height: '55%',
                       options3d: {
                         enabled: true,
                         alpha: 10,
@@ -1061,6 +1062,7 @@ export class ScreenBuilderToolComponent implements OnInit {
                 this.newChartObject.push(
                   {
                     type:'Chart',
+                    height: '55%',
                     chart: { type: 'line' },
                     title: { text: res.records[0].TITLE },
                     xAxis: {

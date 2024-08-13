@@ -364,6 +364,7 @@ export class ChartBuilderFormComponent implements OnInit {
             chart: {
               type: 'line', identifier: 'line',
               height: '50%',
+              width: 500,
               options3d: {
                 enabled: true,
                 alpha: 10,
@@ -404,7 +405,8 @@ export class ChartBuilderFormComponent implements OnInit {
         this.newChartObject = [
           {
             chart: { type: 'line',
-              height: '50%', identifier: 'line' },
+              width: 500,
+              height: '55%', identifier: 'line' },
             title: { text: this.data.records[0].TITLE },
             xAxis: {
               categories: this.ids

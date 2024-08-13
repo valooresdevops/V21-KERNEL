@@ -1,0 +1,16 @@
+<v-grid 
+allowSideBar="true"
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="ad"
+agPrimaryKey="nodeName"
+[agOnGridEvents]="true"
+(onGridEventSave)="gridEventSave($event)"
+(gridReady)="onGridReady($event)"
+>
+</v-grid>
+
+<!-- 
+[showOrHideButton]="true"
+[hideBTN]="true" -->

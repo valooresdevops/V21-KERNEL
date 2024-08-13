@@ -46,6 +46,7 @@ import { CreateExecutedReportComponent } from './object-builder/knowledge-graph/
 import { KwgCytoscapeComponent } from './object-builder/knowledge-graph/executed-reports/kwg-cytoscape/kwg-cytoscape.component';
 import { PopupComponent } from './object-builder/knowledge-graph/popup/popup.component';
 import { NextLayerFormComponent } from './object-builder/knowledge-graph/executed-reports/next-layer-form/next-layer-form.component';
+import { ButtonJsonRelationComponent } from './form-builder/newbutton/button-json-relation/button-json-relation.component';
 
 @NgModule({
     declarations: [
@@ -89,7 +90,8 @@ import { NextLayerFormComponent } from './object-builder/knowledge-graph/execute
         CreateExecutedReportComponent,
         KwgCytoscapeComponent,
         PopupComponent,
-        NextLayerFormComponent
+        NextLayerFormComponent,
+        ButtonJsonRelationComponent
     ],
     imports: [
         InDisplayRoutingModule,
