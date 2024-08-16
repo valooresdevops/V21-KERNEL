@@ -90,13 +90,25 @@
       </v-input>
       </div> -->
       <div class="col-lg-4" *ngIf="showAddSearchProcedure">
-        <v-toggle label="Call Api  On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
+        <v-toggle label="Call Function On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
         fieldName="callRestApi"> </v-toggle>
     </div>
+    
+
+
     <div class="col-lg-4" *ngIf="showCallApi">
         <v-input formControlName="callRestApi2" type="text" label="End Of Url"  [parentForm]="newTabForm"
         fieldName="callRestApi2"></v-input>
     </div>
+    <!-- <div class="col-lg-4" *ngIf="showCallApi">
+         <v-dropdown *ngIf="showCallApi" formControlName="callRestApi2"
+            label="Prebuilt Buttons" placeholder="" [parentForm]="newTabForm" [dataApi]="getAllButtonsUnderObject"
+            fieldName="callRestApi2"></v-dropdown>
+    </div> -->
+
+
+
+
       <div class="col-lg-4">
           <v-input formControlName="canAdd" [parentForm]="newTabForm" type="lookup" [lookupDataApi]="getSourceQuery"
               lookupWidth="700px" lookupHeight="700px" label="Can Add" fieldName="canAdd">

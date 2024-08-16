@@ -7275,6 +7275,9 @@ console.log('COLUMN_ID--------------------->',data[i])
       let thirdCondition = part.split("~A~")[8];
 
       let alertMessage = part.split("~A~")[9];
+      let jsonRequest = part.split("~A~")[10];
+      let jsonResponse = part.split("~A~")[11];
+
       this.buttonObjectId = procedureName;
 
       // Call Procedure
@@ -7567,207 +7570,247 @@ console.log('COLUMN_ID--------------------->',data[i])
         if (formData) {
           this.listOfData = JSON.parse(JSON.stringify(formData));
         }
+        // console.log("Button Data>>>>>>>",part);
+        // console.log("button action 1>>>>>>",formData);
+        // console.log("11111>>>>>>",part.split("~A~")[0]);
+        // console.log("22222>>>>>>",part.split("~A~")[1]);
+        // console.log("33333>>>>>>",part.split("~A~")[2]);
+        // console.log("44444>>>>>>",part.split("~A~")[3]);
+        // console.log("55555>>>>>>",part.split("~A~")[5]);
+        // console.log("66666>>>>>>",part.split("~A~")[6]);
+        // console.log("77777>>>>>>",part.split("~A~")[7]);
+        // console.log("88888>>>>>>",part.split("~A~")[8]);
+        // console.log("99999>>>>>>",part.split("~A~")[9]);
+        // console.log("10101010>>>>>>",part.split("~A~")[10]);
+        // console.log("11111111>>>>>>",part.split("~A~")[11]);
+        
+        const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
+        const getApiJsons = await lastValueFrom(getApiJsonsApi);
 
-        let customerId = -1;
-        let sessionId = -1;
-        //test2
-        let userId = this.informationservice.getLogeduserId();
-
-        let nearBy = 0;
-        let sameSession = 0;
-        //test2
-        if (this.informationservice.getStatusOfCheckExisting() == "nearMatch") {
-          nearBy = 1;
-        } else {
-          nearBy = 0;
-        }
-
-        if(this.informationservice.getSameSession() == "sameSession"){
-          sameSession = 1;
-        }else{
-          sameSession = 0;
-        }
-
-
-        if (params == '') {
-          //test2
-          params = this.informationservice.getAgGidSelectedNode();
-
-          if (!isNaN(Number(params))) {
-
-          } else {
-            if (params.indexOf(",") != -1) {
-              customerId = Number(params.split(",")[0].split('=')[1].trim());
-              sessionId = Number(params.split(",")[1].split('=')[1].trim());
-            } else {
-              customerId = Number(params.split('=')[1].trim());
+        let requestJsonString=getApiJsons.data[0].requestJson;
+        for(let i=0;i<JSON.parse(jsonRequest).length;i++){
+          for(let j=0;j<Object.keys(this.dynamicForm.value).length;j++){
+            if(Object.keys(this.dynamicForm.value)[j]==JSON.parse(jsonRequest)[i].fieldName){
+              requestJsonString=requestJsonString.replaceAll("#"+JSON.parse(jsonRequest)[i].jsonParameter+"#",this.dynamicForm.get(JSON.parse(jsonRequest)[i].fieldName).value);
             }
           }
-
-
-          let globalInfo = "{";
-          globalInfo += "\"" + "colName" + "\"" + ":" + "\"" + "customer_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"" + "},";
-          globalInfo += "{" + "\"" + "colName" + "\"" + ":" + "\"" + "session_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + sessionId + "\"" + "}";
-
-          let jsonArr: string = "{";
-          //test2
-          let ListOfData = JSON.parse(this.informationservice.getMainJsonForDataWhenSkip());
-
-          jsonArr += "\"" + "columns" + "\" : [";
-          for (let i = 0; i < ListOfData.columns.length; i++) {
-            jsonArr += "{";
-
-            jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + ListOfData.columns[i].colName + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + ListOfData.columns[i].colVal + "\"";
-
-            if (i == ListOfData.columns.length - 1) {
-              jsonArr += "}," + globalInfo;
-            } else {
-              jsonArr += "},";
-            }
-          }
-          //console.log("hey 3333 >>>>>>>>>>>");
-          // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
-          jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-          // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
-          this.mainJsonForApi = jsonArr;
-          //test2
-          this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForApi);
         }
-        else {
-          //globalJson ---> to get the session and the customer id
-          let globalInfo: any[] = this.handleSelectedRowIds(this.amInfo.selectedRowId, "grid,form,button");
-          let globalJson = "{";
-          if (globalInfo.toString() == "-1") {
-            globalJson = "";
-          } else {
-            for (let y = 0; y < globalInfo.length; y++) {
-              if (globalInfo.length - 1 == y) {
-                globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"";
-              } else {
-                globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"" + ",";
-              }
-            }
-            globalJson += "}";
-          }
-
-          const arrayFromString = params.split(',').map(Number);
-          const dynamicDRBOnBeforeSaveUrl = from(axios.post(GlobalConstants.getColNameAndColId, arrayFromString));
-          const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
-
-          const dynamicDRBOnBeforeSaveUrl1 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
-          const ApiResultGetAllColums = await lastValueFrom(dynamicDRBOnBeforeSaveUrl1);
-
-          //creating Json to use it when i do a skip
-          let JsonForDataWhenSkip = "{";
-          JsonForDataWhenSkip += "\"" + "columns" + "\" : [";
-          for (let i = 0; i < ApiResultGetAllColums.data.length; i++) {
-            JsonForDataWhenSkip += "{";
-
-            JsonForDataWhenSkip += "\"" + "colName" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[ApiResultGetAllColums.data[i].name]?.value + "\"" + "," + "\"" + "colId" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].id + "\"";
-
-            if (i == ApiResultGetAllColums.data.length - 1) {
-              if (globalJson == "") {
-                JsonForDataWhenSkip += "}";
-              } else {
-                JsonForDataWhenSkip += "}," + globalJson;
-              }
-            } else {
-              JsonForDataWhenSkip += "},";
-            }
-          }
-          //console.log("hrty213234562436244356");
-          JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-          this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
-          this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
-
-
-          let jsonArr: string = "{";
-          jsonArr += "\"" + "columns" + "\" : [";
-          for (let i = 0; i < dynamicDRBOnBeforeSave.data.length; i++) {
-            jsonArr += "{";
-
-            jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + dynamicDRBOnBeforeSave.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[dynamicDRBOnBeforeSave.data[i].name]?.value + "\"";
-
-            if (i == dynamicDRBOnBeforeSave.data.length - 1) {
-              if (globalJson == "") {
-                jsonArr += "}";
-              } else {
-                jsonArr += "}," + globalJson;
-              }
-            } else {
-              jsonArr += "},";
-            }
-          }
-          //console.log("hommmmmmmmm2 >>>>>>");
-          jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-          this.mainJsonForApi = jsonArr;
+       
+        let responseJsonString=getApiJsons.data[0].responseJson;
+        for(let i=0;i<JSON.parse(jsonResponse).length;i++){
+          responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i]+"#",JSON.parse(jsonResponse)[i].fieldName);
         }
 
-        //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
-        let apiUrl = GlobalConstants.callingApi + url;
-        const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
-        const ResultOfCallingApi = await lastValueFrom(callingApi);
-        //test2
-        this.informationservice.setStatusOfCheckExisting(ResultOfCallingApi.data.status);
-        this.informationservice.setSameSession(ResultOfCallingApi.data.code);
+        console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
+        console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
 
-        if (ResultOfCallingApi.data.description == "alert") {
-          this.listOfData = [];
-          this.commonFunctions.alert("alert", ResultOfCallingApi.data.status);
-          if (ResultOfCallingApi.data.showSaveButton == 1) {
-            this.showAndHideButtons(1234, this.idOfCheckExisting);
-          }
-        }
-        else if (ResultOfCallingApi.data.description == "open") {
 
-          //test2
-          this.informationservice.setCheckExisting('yes');
-          let result = ResultOfCallingApi.data.objectId;
-          let data = [{
-            objectId: result.split("~A~")[0],
-            isFromGridClick: 0,
-            isFromButtonClick: 1,
-            primaryColumn: this.columnId,
-            buttonClick: this.columnTypeCode,
-            selectedRowId: JSON.parse(result.split("~A~")[1])
-          }];
 
-          this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
-            width: "80%",
-            height: "80%",
-            data: data
-          });
+       // console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
 
-          this.dataservice.PushdialogArray(this.dialogRef);
-          //test2
-          this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+        //  const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));
+      //  const getApiMethodUrl = await lastValueFrom(getApiMethodDataApi);
+      // let fullUrl=getApiMethodUrl.data;
 
-          //test2
-          this.informationservice.setTabToBeSelectedOnValidate(this.informationservice.getSelectedTabId());
+        // let customerId = -1;
+        // let sessionId = -1;
+        // //test2
+        // let userId = this.informationservice.getLogeduserId();
 
-        }
-        else if (ResultOfCallingApi.data.description == "validate") {
-          // let ValidatedSessionId = ResultOfCallingApi.data.code;
-          //test2
-          this.listOfData = [];
-          if (this.informationservice.getPopupBreadcrumb().includes("Initiation")) {
-            this.dialog.closeAll();
-          }
-          else {
-            localStorage.setItem("closeTwice","true");
-            this.closeDialog(true);
-          }
-        }
+        // let nearBy = 0;
+        // let sameSession = 0;
+        // //test2
+        // if (this.informationservice.getStatusOfCheckExisting() == "nearMatch") {
+        //   nearBy = 1;
+        // } else {
+        //   nearBy = 0;
+        // }
 
-        //console.log("this.listOfData ====",this.listOfData);
-        this.informationservice.setListOFData(this.listOfData);
+        // if(this.informationservice.getSameSession() == "sameSession"){
+        //   sameSession = 1;
+        // }else{
+        //   sameSession = 0;
+        // }
+
+
+        // if (params == '') {
+        //   //test2
+        //   params = this.informationservice.getAgGidSelectedNode();
+
+        //   if (!isNaN(Number(params))) {
+
+        //   } else {
+        //     if (params.indexOf(",") != -1) {
+        //       customerId = Number(params.split(",")[0].split('=')[1].trim());
+        //       sessionId = Number(params.split(",")[1].split('=')[1].trim());
+        //     } else {
+        //       customerId = Number(params.split('=')[1].trim());
+        //     }
+        //   }
+
+
+        //   let globalInfo = "{";
+        //   globalInfo += "\"" + "colName" + "\"" + ":" + "\"" + "customer_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"" + "},";
+        //   globalInfo += "{" + "\"" + "colName" + "\"" + ":" + "\"" + "session_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + sessionId + "\"" + "}";
+
+        //   let jsonArr: string = "{";
+        //   //test2
+        //   let ListOfData = JSON.parse(this.informationservice.getMainJsonForDataWhenSkip());
+
+        //   jsonArr += "\"" + "columns" + "\" : [";
+        //   for (let i = 0; i < ListOfData.columns.length; i++) {
+        //     jsonArr += "{";
+
+        //     jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + ListOfData.columns[i].colName + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + ListOfData.columns[i].colVal + "\"";
+
+        //     if (i == ListOfData.columns.length - 1) {
+        //       jsonArr += "}," + globalInfo;
+        //     } else {
+        //       jsonArr += "},";
+        //     }
+        //   }
+        //   //console.log("hey 3333 >>>>>>>>>>>");
+        //   // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
+        //   jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+        //   // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
+        //   this.mainJsonForApi = jsonArr;
+        //   //test2
+        //   this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForApi);
+        // }
+        // else {
+        //   //globalJson ---> to get the session and the customer id
+        //   let globalInfo: any[] = this.handleSelectedRowIds(this.amInfo.selectedRowId, "grid,form,button");
+        //   let globalJson = "{";
+        //   if (globalInfo.toString() == "-1") {
+        //     globalJson = "";
+        //   } else {
+        //     for (let y = 0; y < globalInfo.length; y++) {
+        //       if (globalInfo.length - 1 == y) {
+        //         globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"";
+        //       } else {
+        //         globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"" + ",";
+        //       }
+        //     }
+        //     globalJson += "}";
+        //   }
+
+        //   const arrayFromString = params.split(',').map(Number);
+        //   const dynamicDRBOnBeforeSaveUrl = from(axios.post(GlobalConstants.getColNameAndColId, arrayFromString));
+        //   const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
+
+        //   const dynamicDRBOnBeforeSaveUrl1 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
+        //   const ApiResultGetAllColums = await lastValueFrom(dynamicDRBOnBeforeSaveUrl1);
+
+        //   //creating Json to use it when i do a skip
+        //   let JsonForDataWhenSkip = "{";
+        //   JsonForDataWhenSkip += "\"" + "columns" + "\" : [";
+        //   for (let i = 0; i < ApiResultGetAllColums.data.length; i++) {
+        //     JsonForDataWhenSkip += "{";
+
+        //     JsonForDataWhenSkip += "\"" + "colName" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[ApiResultGetAllColums.data[i].name]?.value + "\"" + "," + "\"" + "colId" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].id + "\"";
+
+        //     if (i == ApiResultGetAllColums.data.length - 1) {
+        //       if (globalJson == "") {
+        //         JsonForDataWhenSkip += "}";
+        //       } else {
+        //         JsonForDataWhenSkip += "}," + globalJson;
+        //       }
+        //     } else {
+        //       JsonForDataWhenSkip += "},";
+        //     }
+        //   }
+        //   //console.log("hrty213234562436244356");
+        //   JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+        //   this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
+        //   this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
+
+
+        //   let jsonArr: string = "{";
+        //   jsonArr += "\"" + "columns" + "\" : [";
+        //   for (let i = 0; i < dynamicDRBOnBeforeSave.data.length; i++) {
+        //     jsonArr += "{";
+
+        //     jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + dynamicDRBOnBeforeSave.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[dynamicDRBOnBeforeSave.data[i].name]?.value + "\"";
+
+        //     if (i == dynamicDRBOnBeforeSave.data.length - 1) {
+        //       if (globalJson == "") {
+        //         jsonArr += "}";
+        //       } else {
+        //         jsonArr += "}," + globalJson;
+        //       }
+        //     } else {
+        //       jsonArr += "},";
+        //     }
+        //   }
+        //   //console.log("hommmmmmmmm2 >>>>>>");
+        //   jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+        //   this.mainJsonForApi = jsonArr;
+        // }
+
+        // //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
+        // let apiUrl = GlobalConstants.callingApi + url;
+        // const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
+        // const ResultOfCallingApi = await lastValueFrom(callingApi);
+        // //test2
+        // this.informationservice.setStatusOfCheckExisting(ResultOfCallingApi.data.status);
+        // this.informationservice.setSameSession(ResultOfCallingApi.data.code);
+
+        // if (ResultOfCallingApi.data.description == "alert") {
+        //   this.listOfData = [];
+        //   this.commonFunctions.alert("alert", ResultOfCallingApi.data.status);
+        //   if (ResultOfCallingApi.data.showSaveButton == 1) {
+        //     this.showAndHideButtons(1234, this.idOfCheckExisting);
+        //   }
+        // }
+        // else if (ResultOfCallingApi.data.description == "open") {
+
+        //   //test2
+        //   this.informationservice.setCheckExisting('yes');
+        //   let result = ResultOfCallingApi.data.objectId;
+        //   let data = [{
+        //     objectId: result.split("~A~")[0],
+        //     isFromGridClick: 0,
+        //     isFromButtonClick: 1,
+        //     primaryColumn: this.columnId,
+        //     buttonClick: this.columnTypeCode,
+        //     selectedRowId: JSON.parse(result.split("~A~")[1])
+        //   }];
+
+        //   this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
+        //     width: "80%",
+        //     height: "80%",
+        //     data: data
+        //   });
+
+        //   this.dataservice.PushdialogArray(this.dialogRef);
+        //   //test2
+        //   this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+
+        //   //test2
+        //   this.informationservice.setTabToBeSelectedOnValidate(this.informationservice.getSelectedTabId());
+
+        // }
+        // else if (ResultOfCallingApi.data.description == "validate") {
+        //   // let ValidatedSessionId = ResultOfCallingApi.data.code;
+        //   //test2
+        //   this.listOfData = [];
+        //   if (this.informationservice.getPopupBreadcrumb().includes("Initiation")) {
+        //     this.dialog.closeAll();
+        //   }
+        //   else {
+        //     localStorage.setItem("closeTwice","true");
+        //     this.closeDialog(true);
+        //   }
+        // }
+
+        // //console.log("this.listOfData ====",this.listOfData);
+        // this.informationservice.setListOFData(this.listOfData);
       }
       // Close Popup
       else if (buttonAction == "4") {
 
-
-        //console.log("selectedTabName --->",this.informationservice.getChoosenTab())
         this.closeDialog(true);
+
       } else if (buttonAction == "5") {
         let customerId = -1;
         let userId = this.informationservice.getLogeduserId();

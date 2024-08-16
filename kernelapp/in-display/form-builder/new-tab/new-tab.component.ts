@@ -50,7 +50,9 @@ export class NewTabComponent implements OnInit {
   showQueryFormButtonCombo:any;
   public getAllProcAndPack: string = '';
   public getAllColumns: any;
+  public getAllButtonsUnderObject='';
 
+  
   queryFormpossibleButtons:any[]=[{id:'1',name:'Save'},{id:'2',name:'Execute'},{id:'3',name:'Rule'}];
 
   // public reloadUrl: string = '';
@@ -90,7 +92,6 @@ export class NewTabComponent implements OnInit {
     public informationservice: InformationService ) { }
 
   ngOnInit(): void {
-
     console.log("ROUTE URL>>>>>>>>>>>>",this.router.url);
     let breadCrumbData=this.informationservice.getNavBreadCrumb();
     breadCrumbData.push(JSON.parse('{"name":"' + "Tab Modification" + '","route":"' + this.router.url + '"}'))
@@ -154,6 +155,8 @@ export class NewTabComponent implements OnInit {
         this.getAllColums();
       }
     });
+    this.getAllButtonsUnderObject=GlobalConstants.getAllButtonsUnderObject+this.objectId;
+
     this.getAllColumns= GlobalConstants.getAllColumnsTitle +this.objectId;
 
   }

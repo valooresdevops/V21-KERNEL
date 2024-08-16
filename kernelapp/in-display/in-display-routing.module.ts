@@ -23,6 +23,8 @@ import { GridBuilderFormComponent } from './object-builder/grid-builder-form/gri
 import { MasterLinkAnalysisComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-analysis.component';
 import { ExecutedReportsComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports.component';
 import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
+import { APIBuilderComponent } from './api-builder/api-builder.component';
+import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
 const routes: Routes = [
    {
       path: 'augmentedConfig',
@@ -75,6 +77,27 @@ const routes: Routes = [
          },
       ]
    },
+   {
+    path: 'apiBuilder',
+    data: { breadcrumb: 'API Builder ' },
+    children: [
+       {
+          path: '',
+          component: APIBuilderComponent
+       },
+       {
+          path: 'form/:actionType/:id',
+          data: { breadcrumb: 'API  Builder Tool' },
+          children: [
+             {
+                path: '',
+                component: APIBuilderForm
+             },
+          ],
+       }
+    ]
+ },
+
    {
       path: 'augmentedConfigScratch',
       data: { breadcrumb: 'Screen Builder ' },
@@ -232,7 +255,7 @@ const routes: Routes = [
    //       }
    //    ]
    // },
-   
+
 ]
 
 

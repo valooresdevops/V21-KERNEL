@@ -47,11 +47,15 @@ import { KwgCytoscapeComponent } from './object-builder/knowledge-graph/executed
 import { PopupComponent } from './object-builder/knowledge-graph/popup/popup.component';
 import { NextLayerFormComponent } from './object-builder/knowledge-graph/executed-reports/next-layer-form/next-layer-form.component';
 import { ButtonJsonRelationComponent } from './form-builder/newbutton/button-json-relation/button-json-relation.component';
+import { APIBuilderComponent } from './api-builder/api-builder.component';
+import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
 
 @NgModule({
     declarations: [
         FormBuilderComponent,
         ScreenBuilderComponent,
+        APIBuilderComponent,
+        APIBuilderForm,
         FormComponent,
         InputComponent,
         ColumnModifierComponent,
@@ -84,7 +88,7 @@ import { ButtonJsonRelationComponent } from './form-builder/newbutton/button-jso
         OrderManagementComponent,
         ChartFromKpiBuilderComponent,
         CustomFieldComponent,
-        MasterLinkAnalysisComponent, 
+        MasterLinkAnalysisComponent,
         MasterLinkFormComponent,
         ExecutedReportsComponent,
         CreateExecutedReportComponent,
@@ -104,9 +108,9 @@ import { ButtonJsonRelationComponent } from './form-builder/newbutton/button-jso
         // AgGridModule.withComponents([]),
         AgGridModule,
         BrowserModule,
-        AgGridModule , 
+        AgGridModule ,
     ] ,
-    exports: [MasterLinkFormComponent, 
+    exports: [MasterLinkFormComponent,
     ],
 })
 

@@ -312,7 +312,7 @@ export class PreviewFormComponent implements OnInit {
           const getColumnsQueryApi = from(axios.get(GlobalConstants.getColumnsQuery + w));
           const getColumnsQuery = await lastValueFrom(getColumnsQueryApi);
 
-          if(getColumnsQuery.data!=null || getColumnsQuery.data.length!=0){
+          if(getColumnsQuery.data.length!=0){
           let linkQueryColumn: any = getColumnsQuery.data.filter((el: any) => {
             return el.isLink === "1";
           });

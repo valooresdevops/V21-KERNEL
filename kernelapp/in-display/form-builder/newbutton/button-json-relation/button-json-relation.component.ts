@@ -53,7 +53,7 @@ export class ButtonJsonRelationComponent {
 
   public isQueryexecute: boolean;
   headerNames: any[] = [];
-  public images: any[] = [];
+  public jsonParameters: any[] = [];
 
   public test = '';
   public shouldReloadGrid: boolean = false;
@@ -83,13 +83,9 @@ export class ButtonJsonRelationComponent {
   ngOnInit(): void {
   
     this.isReload=false;
-    
-    //const allColuumsUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
-    //const allColuums = await lastValueFrom(allColuumsUrl);
-
+ 
     this.http.get<any[]>(GlobalConstants.getColumnsApi + this.data.objectId, { headers: GlobalConstants.headers })
       .subscribe(response => {
-        console.log("RESPONSE<<<<<<<<<<>>>>>>>>>>>>",response);
         if (response && Array.isArray(response)) {
           this.headerNames = response.map(header => header.name);
           this.updateAgColumnsJson();
@@ -101,10 +97,12 @@ export class ButtonJsonRelationComponent {
           this.isReload = true;
         }
       });
-    
       console.log("THIS HEADERNAMES>>>>>>>>>>>>>>",this.headerNames);
+  }
 
 
+  closeDialog(): void {
+    this.dialogRef.close();
   }
 
   updateAgColumnsJson(): void {
@@ -112,7 +110,7 @@ export class ButtonJsonRelationComponent {
     this.agColumnsJson = [
       {
         headerName: 'Field Name',
-        field: 'name',
+        field: 'fieldName',
         width: 110,
         cellEditor: 'agSelectCellEditor',
         cellRenderer: DropdownCellRenderer,
@@ -130,7 +128,7 @@ export class ButtonJsonRelationComponent {
       },
       {
         headerName: 'Json Parameter',
-        field: 'image',
+        field: 'jsonParameter',
         cellEditor: 'agSelectCellEditor',
         cellRenderer: DropdownCellRenderer,
         keyCreator: (params: any) => {
@@ -138,7 +136,7 @@ export class ButtonJsonRelationComponent {
         },
         cellEditorParams: {
           cellRenderer: DropdownCellRenderer,
-          values: this.images,
+          values: this.data.jsonData,
           isSearchable: true,
         },
         editable: true,
@@ -147,7 +145,7 @@ export class ButtonJsonRelationComponent {
       },
     ];
   
-    this.agColumns = []; // Update agColumns with the new configuration
+    this.agColumns = []; 
     this.agColumns.push(this.agColumnsJson);
 
 
@@ -171,7 +169,20 @@ export class ButtonJsonRelationComponent {
   }
 
   async gridEventSave(event: any) {
-    console.log("ON GRID EVENT SAVE!");
+    let updatedData: any[] = event[0].addList;
+    event[0].deleteList.forEach((deleteItem: any[]) => {
+      const rowToDelete = deleteItem[0];
+      updatedData = updatedData.filter((addItem: any) => addItem !== rowToDelete);
+    });
+
+
+    console.log("UPDATED DATA>>>>>>>>>>>",updatedData);
+
+    this.closeDialogWithData(updatedData);
+  }
+
+  closeDialogWithData(data:any){
+    this.dialogRef.close(data);
   }
 
 }
@@ -217,17 +228,15 @@ class DropdownCellRenderer {
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden; /* Hide overflow to prevent text from spilling */
       text-overflow: ellipsis; /* Ensure text overflow is handled with ellipsis */
       white-space: nowrap; /* Prevent text wrapping */
       overflow-y:auto !important
-
+      z-index:999999999
     `;
     this.eGui.appendChild(span);
   }
 
   updateValue(params: any) {
-    console.log("PARAM VALUE>>>>>>>",params.value);
     if (params.value !== undefined) {
       this.selectedValue = params.value.name !== undefined ? params.value.name : params.value;
     }

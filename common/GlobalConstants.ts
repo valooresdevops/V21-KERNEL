@@ -318,11 +318,12 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
   public static getRowFieldGrouping  = GlobalConstants.inDispGatewat + 'api/getRowFieldGrouping/';
   public static exportCharts  = GlobalConstants.inDispGatewat + 'api/exportCharts/';
+  public static getAllButtonsUnderObject  = GlobalConstants.inDispGatewat + 'api/getAllButtonsUnderObject/';
 
-  
+
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
   public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
-  
+
 
 
 
@@ -428,8 +429,14 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   //////////////API BUILDER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   public static getApiBuilderListDropDown = GlobalConstants.inDispGatewat + 'api/getApiBuilderListDropDown/';
   public static getApiJsons = GlobalConstants.inDispGatewat + 'api/getApiJsons/';
+  public static getApiMethodData = GlobalConstants.inDispGatewat + 'api/getApiMethodData/';
 
-  
+
+  public static getAPIMethodResults =GlobalConstants.inDispGatewat + '/api/GetApiMethodResult/';
+  public static getAPIMethodFormResults = GlobalConstants.inDispGatewat + '/api/GetApiMethodFormResult/';
+  public static insertApiData = GlobalConstants.inDispGatewat + '/api/InsertApiData';
+  public static updateApiData =GlobalConstants.inDispGatewat + '/api/UpdateApiData/';
+  public static deleteApiData =GlobalConstants.inDispGatewat + '/api/DeleteApiData/';
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
   public static getSearchType = GlobalConstants.inDispGatewat + 'api/getSearchType/';

@@ -34,8 +34,10 @@ export class NewbuttonComponent implements OnInit {
   public objectButtonId: any;
   public ALLcol : any;
   public buttonActions: number[] = [];
-  
-
+  public requestJsonParams:any[]=[];
+  public responseJsonParams:any[]=[];
+  public requestSavedParams:any[]=[];
+  public responseSavedParams:any[]=[];
   // public getAllTablesCombo: any = GlobalConstants.getAllTablesCombo;
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public getApiBuilderListDropDown = GlobalConstants.getApiBuilderListDropDown;
@@ -105,10 +107,11 @@ export class NewbuttonComponent implements OnInit {
           let nbOfAction = decodedString.split("~N~")[1];
           const parts = decodedString.split('~N~');
           let relevantPart = parts[2];
+          console.log("RELEVANT PART>>>>>>>>>>>>>>",relevantPart);
           this.buttonForm.controls["nbOfAction"].setValue(nbOfAction);
           this.onNbOfActionInput(); // This will create the form controls based on nbOfAction
 
-          let actionsArray = relevantPart.split('|');
+          //let actionsArray = relevantPart.split('|');
           let splitedString = relevantPart.split("|");
           splitedString.forEach(async (part, index) => {         
           let menuId = part.split("~A~")[0];
@@ -407,7 +410,8 @@ submitForm() {
         let thirdCondition = '';
         let alertMessage = '';
         let PATH = '';
-
+        let jsonResponse='';
+        let jsonRequest='';
         switch (buttonAction) {
           case 1:
             objectButtonId = this.buttonForm.controls['Menus']?.value;
@@ -427,6 +431,16 @@ submitForm() {
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             break;
           case 3:
+            selectedCols = this.buttonForm.controls['allColumns']?.value;
+            URL = this.buttonForm.controls['url']?.value;
+            condition = this.buttonForm.controls['condition']?.value;
+            OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
+            alertValue = this.buttonForm.controls['alertValue']?.value;
+            thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
+            alertMessage = this.buttonForm.controls['alertMessage']?.value;
+            jsonRequest=JSON.stringify(this.requestSavedParams);
+            jsonResponse=JSON.stringify(this.responseSavedParams);
+            break;
           case 5:
             selectedCols = this.buttonForm.controls['allColumns']?.value;
             URL = this.buttonForm.controls['url']?.value;
@@ -459,10 +473,10 @@ submitForm() {
             break;
         }
 
-        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}`;
+        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
         objectButtonIds.push(objectButtonIdString);
       }
-
+      console.log("JAVA METHOD FILE>>>>>>>>>>>>>",objectButtonIds);
       let object = {
         "buttonName": buttonName,
         "position": 0,
@@ -471,7 +485,7 @@ submitForm() {
         "createdBy": this.informationservice.getLogeduserId(),
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
-      console.log("object ===", object);
+      console.log("BUTTON DATA OBJECT>>>>>>>>>>>>>>>", object);
 
       this.http.post<any>(GlobalConstants.createFormButton + this.objectId, object, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
@@ -489,7 +503,8 @@ submitForm() {
       let fieldSet = this.buttonForm.controls['fieldSet']?.value;
       let isMainPreview = this.buttonForm.controls['isMainPreview']?.value;
       let buttonId = this.buttonForm.controls['buttonId']?.value ;
-
+      let jsonResponse='';
+      let jsonRequest='';
       let objectButtonIds = [];
 
       for (let i = 0; i < this.buttonActions.length; i++) {
@@ -527,6 +542,15 @@ submitForm() {
             break;
           case 3:
             objectButtonId = this.buttonForm.controls[`Menus`]?.value;
+            selectedCols = this.buttonForm.controls['allColumns']?.value;
+            URL = this.buttonForm.controls['url']?.value;
+            condition = this.buttonForm.controls['condition']?.value;
+            OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
+            alertValue = this.buttonForm.controls['alertValue']?.value;
+            thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
+            alertMessage = this.buttonForm.controls['alertMessage']?.value;
+            jsonRequest=JSON.stringify(this.requestSavedParams);
+            jsonResponse=JSON.stringify(this.responseSavedParams);
             break;
           case 5:
             selectedCols = this.buttonForm.controls['allColumns']?.value;
@@ -562,7 +586,7 @@ submitForm() {
             break;
         }
 
-        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}`;
+        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
         objectButtonIds.push(objectButtonIdString);
       }
 
@@ -717,12 +741,31 @@ submitForm() {
     const getApiJsons = await lastValueFrom(getApiJsonsApi);
     this.buttonForm.controls['requestJson'].setValue(getApiJsons.data[0].requestJson);
     this.buttonForm.controls['responseJson'].setValue(getApiJsons.data[0].responseJson);
+    
+    const hashTagRegex = /#([^#]+)#/g;
+
+    let matchesRequest = getApiJsons.data[0].requestJson.match(hashTagRegex);
+    let matchesResponse = getApiJsons.data[0].responseJson.match(hashTagRegex);
+    // let requestJsonParams=[];
+    // let responseJsonParams=[];
+    
+    if (matchesRequest) {
+      this.requestJsonParams = matchesRequest.map((match: string | any[]) => match.slice(1, -1)); 
+      } 
+
+    if (matchesResponse) {
+      this.responseJsonParams = matchesResponse.map((match: string | any[]) => match.slice(1, -1)); 
+      } 
+
+      console.log("requestJsonParams>>>>>>>>>>>",this.requestJsonParams); 
+      console.log("responseJsonParams>>>>>>>>>",this.responseJsonParams); 
 
   }
   
-  openRelationPopup(){
+  openRelationRequestPopup(){
     let info={
-    objectId:this.objectId
+    objectId:this.objectId,
+    jsonData:this.requestJsonParams
     }
 
 
@@ -737,9 +780,40 @@ submitForm() {
     });
   
     dialogRef.afterClosed().subscribe(result => {
-    
-    
+      if(result==undefined){
+
+      }else{
+        console.log("close json relation data>>>>>>>>>>>>>>",result);
+        this.requestSavedParams=result;
+      }
+
     });
   }
+  
+  openRelationResponsePopup(){
+    let info={
+    objectId:this.objectId,
+    jsonData:this.responseJsonParams
+    }
 
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '700px';
+    dialogConfig.height = '700px';
+  
+    const dialogRef = this.dialog.open(ButtonJsonRelationComponent, {
+      data: info,
+      width: '50%',
+      height: '60%',
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+  if(result==undefined){
+
+      }else{
+        console.log("close json relation data>>>>>>>>>>>>>>",result);
+        this.responseSavedParams=result;
+      }    
+    });
+  }
 }

@@ -76,10 +76,13 @@
         </v-input>
         </div>
 
-        <div class="col-lg-12" *ngIf="showApiBuilderJson">   
-        <v-button btnType="form" value="Json Relation" (click)="openRelationPopup()" class="submit-button"></v-button>
-        </div>
-
+        <div class="col-lg-12" *ngIf="showApiBuilderJson">
+        <div style="position:flex">
+        <v-button btnType="form" value="Json Request Relation" (click)="openRelationRequestPopup()" class="submit-button"></v-button>
+        <v-button btnType="form" value="Json Response Relation" (click)="openRelationResponsePopup()" class="submit-button"></v-button>
+    </div>    
+    </div>
+        
 
 
 
@@ -123,6 +126,9 @@
     </div>
 </form>
 
+
+
+ 
 
 
 
