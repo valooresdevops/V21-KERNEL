@@ -28,9 +28,9 @@ HighchartsSolidGauge(Highcharts);
 })
 export class ChartBuilderFormComponent implements OnInit {
   Highcharts: typeof Highcharts = Highcharts;
-
   public getQueryName = GlobalConstants.getQueryNameApi;
   public getchartType = GlobalConstants.selectChartType;
+  public chartType1:any;
   chartObject: any;
   newChartObject: any;
   stockObject: any;
@@ -51,6 +51,7 @@ export class ChartBuilderFormComponent implements OnInit {
   gaugeType: string[] = [];
   gaugeValue: number[] = [];
   gaugeLabel: string[] = [];
+  gaugeTitle: string[] = [];
   gaugeAppendText: string[] = [];
 
   chartType: number;
@@ -61,7 +62,6 @@ export class ChartBuilderFormComponent implements OnInit {
     this.is3d = this.data.is3d;
     this.chartType = this.data.chartType;
     let ids = this.ids
-    let chartType1;
     let stockChartType;
 
     const trackColors = Highcharts.getOptions().colors.map(color =>
@@ -82,21 +82,21 @@ export class ChartBuilderFormComponent implements OnInit {
     let now = getNow();
 
     if (this.chartType == 1) {
-      chartType1 = 'heatmap';
+      this.chartType1 = 'heatmap';
     } else if (this.chartType == 2) {
-      chartType1 = 'pie';
+      this.chartType1 = 'pie';
     } else if (this.chartType == 3) {
-      chartType1 = 'bar';
+      this.chartType1 = 'bar';
     } else if (this.chartType == 4) {
-      chartType1 = 'line';
+      this.chartType1 = 'line';
     } else if (this.chartType == 5) {
-      chartType1 = 'area';
+      this.chartType1 = 'area';
     } else if (this.chartType == 6) {
-      chartType1 = 'scatter';
+      this.chartType1 = 'scatter';
     } else if (this.chartType == 7) {
-      chartType1 = 'column';
+      this.chartType1 = 'column';
     } else if (this.chartType == 8) {
-      chartType1 = 'semiPie';
+      this.chartType1 = 'semiPie';
     }else if (this.chartType == 9) {
       stockChartType = 'candlestick';
     } else if (this.chartType == 10) {
@@ -108,22 +108,24 @@ export class ChartBuilderFormComponent implements OnInit {
     } else if (this.chartType == 13) {
       stockChartType = 'area';
     }else if (this.chartType == 14) {
-      chartType1 = 'VU solid';
+      this.chartType1 = 'VU solid';
     }else if (this.chartType == 15) {
-      chartType1 = 'VU meter';
+      this.chartType1 = 'VU meter';
     }else if (this.chartType == 16) {
-      chartType1 = 'Speedometer';
+      this.chartType1 = 'Speedometer';
     }else if (this.chartType == 17) {
-      chartType1 = 'Dual Axes Speedometer';
+      this.chartType1 = 'Dual Axes Speedometer';
     }else if (this.chartType == 18) {
-      chartType1 = 'Speedometer solid';
-    }else if (this.chartType == 19) {
-      chartType1 = 'Multiple KPI gauge';
-    }else if (this.chartType == 20) {
-      chartType1 = 'clock gauge';
+      this.chartType1 = 'Speedometer solid';
     }
+    // else if (this.chartType == 19) {
+    //   this.chartType1 = 'Multiple KPI gauge';
+    // }
+    // else if (this.chartType == 20) {
+    //   this.chartType1 = 'clock gauge';
+    // }
 
-    if (chartType1 == 'heatmap') {
+    if (this.chartType1 == 'heatmap') {
       if (this.data.is3d == 1) { } else {
         this.newChartObject = [{
           chart: {
@@ -225,7 +227,7 @@ export class ChartBuilderFormComponent implements OnInit {
         }];
       }
       //done
-    } else if (chartType1 == 'bar') {
+    } else if (this.chartType1 == 'bar') {
 
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
@@ -236,7 +238,7 @@ export class ChartBuilderFormComponent implements OnInit {
         this.newChartObject = [
           {
             chart: {
-              type: chartType1,
+              type: this.chartType1,
               width: 550,
               height: '50%',
               identifier: this.data.records[0].identifier,
@@ -269,7 +271,7 @@ export class ChartBuilderFormComponent implements OnInit {
       } else {
         this.newChartObject = [
           {
-            chart: { type: chartType1,
+            chart: { type: this.chartType1,
               width: 550, 
               identifier: this.data.records[0].identifier, },
             title: { text: this.data.records[0].TITLE },
@@ -288,7 +290,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }
         ];
       }
-    } else if (chartType1 == 'pie') {
+    } else if (this.chartType1 == 'pie') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].NAME);
         this.names.push(parseInt(this.data.records[i].Y));
@@ -306,7 +308,7 @@ export class ChartBuilderFormComponent implements OnInit {
             type: 'pie',
             identifier: 'pie',
             width: 550,
-            height: '50%',
+            height: '40%',
             options3d: {
               enabled: true,
               alpha: 45
@@ -353,7 +355,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }
         ];
       }
-    } else if (chartType1 == 'line') {
+    } else if (this.chartType1 == 'line') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(Number(this.data.records[i].NAME));
@@ -423,7 +425,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }
         ];
       }
-    } else if (chartType1 == 'area') {
+    } else if (this.chartType1 == 'area') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(Number(this.data.records[i].NAME));
@@ -482,7 +484,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }
         ];
       }
-    } else if (chartType1 == 'scatter') {
+    } else if (this.chartType1 == 'scatter') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.names.push(Number(this.data.records[i].NAME));
       }
@@ -492,6 +494,7 @@ export class ChartBuilderFormComponent implements OnInit {
             chart: {
               type: 'scatter',
               identifier: 'scatter',
+              width: 550,
               options3d: {
                 enabled: true,
                 alpha: 10,
@@ -559,7 +562,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }
         ];
       }
-    } else if (chartType1 == 'semiPie') {
+    } else if (this.chartType1 == 'semiPie') {
 
       const transformedData = this.data.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
       if (this.data.is3d == 1) {
@@ -671,7 +674,7 @@ export class ChartBuilderFormComponent implements OnInit {
           }]
         }];
       }
-    } else if (chartType1 == 'column') {
+    } else if (this.chartType1 == 'column') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(Number(this.data.records[i].NAME));
@@ -949,112 +952,126 @@ export class ChartBuilderFormComponent implements OnInit {
               }
         }]
       }]
-    } else if (chartType1 == 'VU solid') {
+    } else if (this.chartType1 == 'VU solid') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
-      }
 
+        this.gaugeValue.push(this.data.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.records[i].title);
+      }
       
-        this.newChartObject = [
-          {
-            chart: {
-              type: 'solidgauge',
-              height: '70%',
-              width: 550,
-              // spacingTop: 50, // Add spacing to avoid clipping at the top
-              // spacingBottom: 50, // Add spacing to avoid clipping at the bottom
-              identifier:'VU solid'
-          },
+      const gaugeValueData = this.data.records[0].gaugevalue;
+      const gaugeLabelData = this.data.records[0].gaugelabel;
+      const gaugeTitleData = this.data.records[0].title;
       
-          title: {
-              text: 'VU solid',
-              style: {
-                  fontSize: '28px' // Adjusted font size to match the increased size
-              }
-          },
-      
-          pane: {
-              center: ['50%', '50%'], // Center the gauge vertically and horizontally
-              size: '100%', // Adjust size for the gauge to ensure it's centered properly
-              startAngle: -90,
-              endAngle: 90,
-              background: {
-                  backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#fafafa',
-                  borderRadius: 5,
-                  innerRadius: '60%',
-                  outerRadius: '100%',
-                  shape: 'arc'
-              }
-          },
-      
-          exporting: {
-              enabled: false
-          },
-      
-          tooltip: {
-              enabled: false
-          },
-      
-          yAxis: {
-              min: -20,
-              max: 6,
-              stops: [
-                  [0.1, '#55BF3B'], // green
-                  [0.5, '#DDDF0D'], // yellow
-                  [0.9, '#DF5353'] // red
-              ],
-              lineWidth: 0,
-              tickWidth: 0,
-              minorTickInterval: null,
-              tickAmount: 2,
-              labels: {
-                  y: 10, // Adjusted label position to match the new size
-                  rotation: 'auto',
-                  distance: 0 // Increased distance to match new size
-              },
-              title: {
-                  text: 'VU<br/><span style="font-size:20px">Channel A</span>', // Adjusted font size
-                  y: 50 // Adjusted vertical position
-              }
-          },
-      
-          plotOptions: {
-              solidgauge: {
-                  dataLabels: {
-                      enabled: false
-                  },
-                  dial: {
-                      radius: '85%' // Adjusted radius for the larger gauge
-                  }
-              }
-          },
-      
-          series: [{
-              name: 'Channel A',
-              data: [-20],
-              dataLabels: {
-                  format: '<div style="text-align:center">' +
-                          '<span style="font-size:50px">{y}</span><br/>' +
-                          '<span style="font-size:24px;opacity:0.4">Value</span>' +
-                          '</div>'
-              }
-            }]
+      this.newChartObject = [{
+        chart: {
+          type: 'solidgauge',
+          height: 400, // Increased height to accommodate the larger gauge
+          width: 550,
+          spacingTop: 50, // Add spacing to avoid clipping at the top
+          spacingBottom: 50, // Add spacing to avoid clipping at the bottom
+          identifier:'VU solid'
+      },
+  
+      title: {
+          text: gaugeTitleData,
+          style: {
+              fontSize: '28px' // Adjusted font size to match the increased size
           }
-        ];
+      },
+      credits: {
+          enabled: false
+      },
+      pane: {
+          center: ['50%', '50%'], // Center the gauge vertically and horizontally
+          size: '100%', // Adjust size for the gauge to ensure it's centered properly
+          startAngle: -90,
+          endAngle: 90,
+          background: {
+              backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#fafafa',
+              borderRadius: 5,
+              innerRadius: '60%',
+              outerRadius: '100%',
+              shape: 'arc'
+          }
+      },
+  
+      exporting: {
+          enabled: false
+      },
+  
+      tooltip: {
+          enabled: false
+      },
+  
+      yAxis: {
+          min: -20,
+          max: 150,
+          stops: [
+              [0.1, '#55BF3B'], // green
+              [0.5, '#DDDF0D'], // yellow
+              [0.9, '#DF5353'] // red
+          ],
+          lineWidth: 0,
+          tickWidth: 0,
+          minorTickInterval: null,
+          tickAmount: 2,
+          labels: {
+              y: 10, // Adjusted label position to match the new size
+              rotation: 'auto',
+              distance: 0 // Increased distance to match new size
+          },
+          title: {
+              text: gaugeValueData + '<br/><span style="font-size:20px">' + gaugeLabelData + '</span>', // Adjusted font size
+              y: 50 // Adjusted vertical position
+          }
+      },
+  
+      plotOptions: {
+          solidgauge: {
+              dataLabels: {
+                  enabled: false
+              },
+              dial: {
+                  radius: '85%' // Adjusted radius for the larger gauge
+              }
+          }
+      },
+  
+      series: [{
+          name: gaugeLabelData,
+          data: [gaugeValueData - 0],
+          dataLabels: {
+              format: '<div style="text-align:center">' +
+                      '<span style="font-size:50px">{y}</span><br/>' +
+                      '<span style="font-size:24px;opacity:0.4">Value</span>' +
+                      '</div>'
+          }
+        }]
+      }];
       
-    } else if (chartType1 == 'VU meter') {
+    } else if (this.chartType1 == 'VU meter') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
-      }
 
+        this.gaugeValue.push(this.data.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.records[i].title);
+      }
       
-        this.newChartObject = [
-          {
-            chart:
+      const gaugeValueData = this.data.records[0].gaugevalue;
+      const gaugeLabelData = this.data.records[0].gaugelabel;
+      const gaugeTitleData = this.data.records[0].title;
+      
+      this.newChartObject = [{
+        chart:
         {
           type: 'gauge',
+          width: 550,
           plotBorderWidth: 1,
           plotBackgroundColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -1065,13 +1082,14 @@ export class ChartBuilderFormComponent implements OnInit {
             ]
             },
             plotBackgroundImage: null,
-            height: '45%',
-            width: 550,
+            height: 200,
             identifier:'VU meter'
         },
-        
+        credits: {
+            enabled: false
+        },
         title: {
-            text: 'VU meter',
+            text: gaugeTitleData,
             style: {
                 fontSize: '14px' // Font size adjusted to match the gauge
             }
@@ -1094,8 +1112,8 @@ export class ChartBuilderFormComponent implements OnInit {
         },
         
         yAxis: {
-            min: -20,
-            max: 6,
+            min: 0,
+            max: 220,
             minorTickPosition: 'outside',
             tickPosition: 'outside',
             labels: {
@@ -1103,16 +1121,16 @@ export class ChartBuilderFormComponent implements OnInit {
                 distance: 10 // Adjusted distance to fit the gauge
             },
             plotBands: [{
-                from: 0,
-                to: 6,
+                from: 150,
+                to: 220,
                 color: '#C02316',
                 innerRadius: '100%',
                 outerRadius: '105%'
             }],
             title: {
-                text: 'VU<br/><span style="font-size:10px">Channel A</span>',
-                y: -10 // Adjusted y position to fit the gauge better
-            }
+              text: gaugeValueData + '<br/><span style="font-size:20px">' + gaugeLabelData + '</span>', // Adjusted font size
+              y: -10 // Adjusted vertical position
+          }
         },
         
         plotOptions: {
@@ -1128,518 +1146,548 @@ export class ChartBuilderFormComponent implements OnInit {
         
         series: [{
             name: 'Channel A',
-            data: [-20]
+            data: [gaugeValueData - 0]
         }]
-          }
-        ];
+      }];
       
-    } else if (chartType1 == 'Speedometer') {
+    } else if (this.chartType1 == 'Speedometer') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
-      }
 
+        this.gaugeValue.push(this.data.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.records[i].title);
+      }
       
-        this.newChartObject = [
-          {
-            chart: {
-              renderTo: 'container', // Make sure this matches your container ID
-              type: 'gauge',
-              plotBackgroundColor: null,
-              plotBackgroundImage: null,
-              plotBorderWidth: null,
-              plotShadow: false,
-              height: '50%',
-              width: 550,
-              identifier: 'Speedometer'
-            },
-            title: {
-              text: 'Speedometer'
-            },
-            pane: {
-              startAngle: -90,
-              endAngle: 90,
-              background: {
-                backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
-                innerRadius: '60%',
-                outerRadius: '100%',
-                shape: 'arc'
-              }
-            },
-            yAxis: {
-              min: 0,
-              max: 200,
-              tickPixelInterval: 30,
-              tickWidth: 2,
-              tickPosition: 'inside',
-              tickLength: 10,
-              labels: {
-                step: 2,
-                rotation: 'auto',
-                style: {
-                  fontSize: '10px'
-                }
-              },
-              title: {
-                text: 'km/h',
-                style: {
-                  fontSize: '17px'
-                }
-              }
-            },
-            series: [{
-              name: 'Speed',
-              data: [140],
-              dataLabels: {
-                format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
-                  '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
-              },
-              dial: {
-                baseWidth: 10,
-                rearLength: 0
-              }
-            }]
+      const gaugeValueData = this.data.records[0].gaugevalue;
+      const gaugeLabelData = this.data.records[0].gaugelabel;
+      const gaugeTitleData = this.data.records[0].title;
+      
+      this.newChartObject = [{
+        chart: {
+          width: 400,
+          renderTo: 'container', // Make sure this matches your container ID
+          type: 'gauge',
+          plotBackgroundColor: null,
+          plotBackgroundImage: null,
+          plotBorderWidth: null,
+          plotShadow: false,
+          height: '85%',
+          identifier: 'Speedometer'
+        },
+        title: {
+          text: gaugeTitleData
+        },
+        credits: {
+            enabled: false
+        },
+        pane: {
+          startAngle: -90,
+          endAngle: 90,
+          background: {
+            backgroundColor: Highcharts.defaultOptions.legend.backgroundColor || '#EEE',
+            innerRadius: '60%',
+            outerRadius: '100%',
+            shape: 'arc'
           }
-        ];
-      
-    } else if (chartType1 == 'Dual Axes Speedometer') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
-      }
-
-      
-        this.newChartObject = [
-          {
-            chart: {
-              type: 'gauge',
-              alignTicks: false,
-              plotBackgroundColor: null,
-              plotBackgroundImage: null,
-              plotBorderWidth: 0,
-              plotShadow: false,
-              identifier: 'Dual Axes Speedometer',
-              width: 550,
-              height: '50%',
+        },
+        yAxis: {
+          min: 0,
+          max: 200,
+          tickPixelInterval: 30,
+          tickWidth: 2,
+          tickPosition: 'inside',
+          tickLength: 10,
+          labels: {
+            step: 2,
+            rotation: 'auto',
+            style: {
+              fontSize: '10px'
+            }
           },
-    
           title: {
-              text: 'Speedometer with Dual Axes'
-          },
-    
-          pane: {
-              startAngle: -150,
-              endAngle: 150
-          },
-    
-          yAxis: [{
-              min: 0,
-              max: 200,
-              lineColor: '#339',
-              tickColor: '#339',
-              minorTickColor: '#339',
-              offset: -25,
-              lineWidth: 2,
-              labels: {
-                  distance: -20,
-                  rotation: 'auto'
-              },
-              tickLength: 5,
-              minorTickLength: 5,
-              endOnTick: false
-          }, {
-              min: 0,
-              max: 124,
-              tickPosition: 'outside',
-              lineColor: '#933',
-              lineWidth: 2,
-              minorTickPosition: 'outside',
-              tickColor: '#933',
-              minorTickColor: '#933',
-              tickLength: 5,
-              minorTickLength: 5,
-              labels: {
-                  distance: 12,
-                  rotation: 'auto'
-              },
-              offset: -20,
-              endOnTick: false
-          }],
-    
-          series: [{
-              name: 'Speed',
-              data: [80],
-              dataLabels: {
-                  format: '<span style="color:#339">{y} km/h</span><br/>' +
-                      '<span style="color:#933">{(multiply y 0.621):.0f} mph</span>',
-                  backgroundColor: {
-                      linearGradient: {
-                          x1: 0,
-                          y1: 0,
-                          x2: 0,
-                          y2: 1
-                      },
-                      stops: [
-                          [0, '#DDD'],
-                          [1, '#FFF']
-                      ]
-                  }
-              },
-              tooltip: {
-                  valueSuffix: ' km/h'
-              }
-          }]
+            // text: this.allData[i].data.records[0].gaugevalue,
+            style: {
+              fontSize: '17px'
+            }
           }
-        ];
+        },
+        series: [{
+          // name: gaugelabelData,
+          data: [gaugeValueData - 0],
+          dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+              '<div style="opacity:0.4; font-size:12px; text-align:center">' + gaugeLabelData + '</div></div>'
+          },
+          dial: {
+            baseWidth: 10,
+            rearLength: 0
+          }
+        }]
+      }];
       
-    } else if (chartType1 == 'Speedometer solid') {
+    } else if (this.chartType1 == 'Dual Axes Speedometer') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
-      }
 
-      
-        this.newChartObject = [
-          {
-            chart: {
-              type: 'gauge',
-              plotBackgroundColor: null,
-              plotBackgroundImage: null,
-              plotBorderWidth: 0,
-              plotShadow: false,
-              height: '50%',
-              width: 550,
-              identifier: 'Speedometer solid'
-          },
-      
-          title: {
-              text: 'Speedometer solid'
-          },
-      
-          pane: {
-              startAngle: -90,
-              endAngle: 89.9,
-              background: null,
-              center: ['50%', '75%'],
-              size: '110%'
-          },
-      
-          // the value axis
-          yAxis: {
-              min: 0,
-              max: 200,
-              tickPixelInterval: 72,
-              tickPosition: 'inside',
-              tickColor: Highcharts.defaultOptions.chart.backgroundColor || '#FFFFFF',
-              tickLength: 20,
-              tickWidth: 2,
-              minorTickInterval: null,
-              labels: {
-                  distance: 20,
-                  style: {
-                      fontSize: '14px'
-                  }
-              },
-              lineWidth: 0,
-              plotBands: [{
-                  from: 0,
-                  to: 130,
-                  color: '#55BF3B', // green
-                  thickness: 20,
-                  borderRadius: '50%'
-              }, {
-                  from: 150,
-                  to: 200,
-                  color: '#DF5353', // red
-                  thickness: 20,
-                  borderRadius: '50%'
-              }, {
-                  from: 120,
-                  to: 160,
-                  color: '#DDDF0D', // yellow
-                  thickness: 20
-              }]
-          },
-      
-          series: [{
-              name: 'Speed',
-              data: [80],
-              tooltip: {
-                  valueSuffix: ' km/h'
-              },
-              dataLabels: {
-                  format: '{y} km/h',
-                  borderWidth: 0,
-                  color: (
-                      Highcharts.defaultOptions.title &&
-                      Highcharts.defaultOptions.title.style &&
-                      Highcharts.defaultOptions.title.style.color
-                  ) || '#333333',
-                  style: {
-                      fontSize: '16px'
-                  }
-              },
-              dial: {
-                  radius: '80%',
-                  backgroundColor: 'gray',
-                  baseWidth: 12,
-                  baseLength: '0%',
-                  rearLength: '0%'
-              },
-              pivot: {
-                  backgroundColor: 'gray',
-                  radius: 6
-              }
-      
-          }]
-          }
-        ];
-      
-    } else if (chartType1 == 'Multiple KPI gauge') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+        this.gaugeValue.push(this.data.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.records[i].title);
       }
-
       
-        this.newChartObject = [
-          {
-            chart: {
-              type: 'solidgauge',
-              height: '45%',
-              width: 550, // Set the width of the chart
-              identifier: 'Multiple KPI gauge'
-              // events: {
-              //     render: renderIcons
-              // }
+      const gaugeValueData = this.data.records[0].gaugevalue;
+      const gaugeLabelData = this.data.records[0].gaugelabel;
+      const gaugeTitleData = this.data.records[0].title;
+      
+      this.newChartObject = [{
+        chart: {
+          width: 550,
+          type: 'gauge',
+          alignTicks: false,
+          plotBackgroundColor: null,
+          plotBackgroundImage: null,
+          plotBorderWidth: 0,
+          plotShadow: false,
+          identifier: 'Dual Axes Speedometer'
+      },
+
+      title: {
+          text: gaugeTitleData
+      },
+      credits: {
+          enabled: false
+      },
+      pane: {
+          startAngle: -150,
+          endAngle: 150
+      },
+
+      yAxis: [{
+          min: 0,
+          max: 200,
+          lineColor: '#339',
+          tickColor: '#339',
+          minorTickColor: '#339',
+          offset: -25,
+          lineWidth: 2,
+          labels: {
+              distance: -20,
+              rotation: 'auto'
           },
-    
-          title: {
-              text: 'Multiple KPI gauge',
-              style: {
-                  fontSize: '24px'
+          tickLength: 5,
+          minorTickLength: 5,
+          endOnTick: false
+      }, {
+          min: 0,
+          max: 124,
+          tickPosition: 'outside',
+          lineColor: '#933',
+          lineWidth: 2,
+          minorTickPosition: 'outside',
+          tickColor: '#933',
+          minorTickColor: '#933',
+          tickLength: 5,
+          minorTickLength: 5,
+          labels: {
+              distance: 12,
+              rotation: 'auto'
+          },
+          offset: -20,
+          endOnTick: false,
+      }],
+
+      series: [{
+          name: gaugeLabelData,
+          data: [gaugeValueData - 0],
+          dataLabels: {
+            format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+              '<div style="opacity:0.4; font-size:12px; text-align:center">' + gaugeLabelData + '</div></div>',
+              backgroundColor: {
+                  linearGradient: {
+                      x1: 0,
+                      y1: 0,
+                      x2: 0,
+                      y2: 1
+                  },
+                  stops: [
+                      [0, '#DDD'],
+                      [1, '#FFF']
+                  ]
               }
           },
-    
           tooltip: {
+              valueSuffix: ' km/h'
+          }
+      }],
+      }];
+      
+    } else if (this.chartType1 == 'Speedometer solid') {
+      for (let i = 0; i < this.data.records.length; i++) {
+        this.ids.push(this.data.records[i].ID);
+        this.names.push(parseInt(this.data.records[i].NAME));
+
+        this.gaugeValue.push(this.data.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.records[i].title);
+      }
+      
+      const gaugeValueData = this.data.records[0].gaugevalue;
+      const gaugeLabelData = this.data.records[0].gaugelabel;
+      const gaugeTitleData = this.data.records[0].title;
+
+      this.newChartObject = [{
+        chart: {
+          width: 350,
+          spacingLeft: 60,
+          type: 'gauge',
+          plotBackgroundColor: null,
+          plotBackgroundImage: null,
+          plotBorderWidth: 0,
+          plotShadow: false,
+          height: '70%',
+          identifier: 'Speedometer solid'
+      },
+  
+      title: {
+          text: gaugeTitleData
+      },
+      credits: {
+          enabled: false
+      },
+      pane: {
+          startAngle: -90,
+          endAngle: 89.9,
+          background: null,
+          center: ['50%', '75%'],
+          size: '110%'
+      },
+  
+      // the value axis
+      yAxis: {
+          min: 0,
+          max: 200,
+          tickPixelInterval: 72,
+          tickPosition: 'inside',
+          tickColor: Highcharts.defaultOptions.chart.backgroundColor || '#FFFFFF',
+          tickLength: 20,
+          tickWidth: 2,
+          minorTickInterval: null,
+          labels: {
+              distance: 20,
+              style: {
+                  fontSize: '14px'
+              }
+          },
+          lineWidth: 0,
+          plotBands: [{
+              from: 0,
+              to: 130,
+              color: '#55BF3B', // green
+              thickness: 20,
+              borderRadius: '50%'
+          }, {
+              from: 150,
+              to: 200,
+              color: '#DF5353', // red
+              thickness: 20,
+              borderRadius: '50%'
+          }, {
+              from: 120,
+              to: 160,
+              color: '#DDDF0D', // yellow
+              thickness: 20
+          }]
+      },
+  
+      series: [{
+          name: gaugeLabelData,
+          data: [gaugeValueData - 0],
+          tooltip: {
+              valueSuffix: ' km/h'
+          },
+          dataLabels: {
+              format: '{y} km/h',
               borderWidth: 0,
-              backgroundColor: 'none',
-              shadow: false,
+              color: (
+                  Highcharts.defaultOptions.title &&
+                  Highcharts.defaultOptions.title.style &&
+                  Highcharts.defaultOptions.title.style.color
+              ) || '#333333',
               style: {
                   fontSize: '16px'
-              },
-              valueSuffix: '%',
-              pointFormat: '{series.name}<br>' +
-                  '<span style="font-size: 2em; color: {point.color}; ' +
-                  'font-weight: bold">{point.y}</span>',
-              // positioner: function (labelWidth) {
-              //     return {
-              //         x: (this.chart.chartWidth - labelWidth) / 2,
-              //         y: (this.chart.plotHeight / 2) + 15
-              //     };
-              // }
-          },
-    
-          pane: {
-              startAngle: 0,
-              endAngle: 360,
-              background: [{ // Track for Conversion
-                  outerRadius: '112%',
-                  innerRadius: '88%',
-                  backgroundColor: trackColors[0],
-                  borderWidth: 0
-              }, { // Track for Engagement
-                  outerRadius: '87%',
-                  innerRadius: '63%',
-                  backgroundColor: trackColors[1],
-                  borderWidth: 0
-              }, { // Track for Feedback
-                  outerRadius: '62%',
-                  innerRadius: '38%',
-                  backgroundColor: trackColors[2],
-                  borderWidth: 0
-              }]
-          },
-    
-          yAxis: {
-              min: 0,
-              max: 100,
-              lineWidth: 0,
-              tickPositions: []
-          },
-    
-          plotOptions: {
-              solidgauge: {
-                  dataLabels: {
-                      enabled: false
-                  },
-                  linecap: 'round',
-                  stickyTracking: false,
-                  rounded: true
               }
           },
-    
-          series: [{
-              name: 'Conversion',
-              data: [{
-                  color: Highcharts.getOptions().colors[0],
-                  radius: '112%',
-                  innerRadius: '88%',
-                  y: 80
-              }],
-              custom: {
-                  icon: 'filter',
-                  iconColor: '#303030'
-              }
-          }, {
-              name: 'Engagement',
-              data: [{
-                  color: Highcharts.getOptions().colors[1],
-                  radius: '87%',
-                  innerRadius: '63%',
-                  y: 65
-              }],
-              custom: {
-                  icon: 'comments-o',
-                  iconColor: '#ffffff'
-              }
-          }, {
-              name: 'Feedback',
-              data: [{
-                  color: Highcharts.getOptions().colors[2],
-                  radius: '62%',
-                  innerRadius: '38%',
-                  y: 50
-              }],
-              custom: {
-                  icon: 'commenting-o',
-                  iconColor: '#303030'
-              }
-          }]
+          dial: {
+              radius: '80%',
+              backgroundColor: 'gray',
+              baseWidth: 12,
+              baseLength: '0%',
+              rearLength: '0%'
+          },
+          pivot: {
+              backgroundColor: 'gray',
+              radius: 6
           }
-        ];
+  
+      }]
+      }];
       
-    } else if (chartType1 == 'clock gauge') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
-      }
+    } 
+    // else if (this.chartType1 == 'Multiple KPI gauge') {
+    //   for (let i = 0; i < this.data.records.length; i++) {
+    //     this.ids.push(this.data.records[i].ID);
+    //     this.names.push(parseInt(this.data.records[i].NAME));
+
+    //     this.gaugeValue.push(this.data.records[i].gaugevalue);
+    //     this.gaugeLabel.push(this.data.records[i].gaugelabel);
+    //     this.gaugeTitle.push(this.data.records[i].title);
+    //   }
       
-        this.newChartObject = [
-          {
-            chart: {
-                      type: 'gauge',
-                      plotBackgroundColor: null,
-                      plotBackgroundImage: null,
-                      plotBorderWidth: 0,
-                      plotShadow: false,
-                      height: '50%',
-                      width: 550,
-                      identifier:'clock gauge'
-                  },
-            
-                  credits: {
-                      enabled: false
-                  },
-            
-                  title: {
-                      text: 'Clock gauge'
-                  },
-            
-                  pane: {
-                    background: [{
-                      // default background
-                    }, {
-                      // reflex for supported browsers
-                      backgroundColor: {
-                        radialGradient: {
-                          cx: 0.5,
-                          cy: -0.4,
-                          r: 1.9
-                        },
-                        stops: [
-                          [0.5, 'rgba(255, 255, 255, 0.2)'],
-                          [0.5, 'rgba(200, 200, 200, 0.2)']
-                        ]
-                      }
-                    }]
-                  },
-            
-                  yAxis: {
-                      labels: {
-                          distance: -23,
-                          style: {
-                              fontSize: '18px'
-                          }
-                      },
-                      min: 0,
-                      max: 12,
-                      lineWidth: 0,
-                      showFirstLabel: false,
-            
-                      minorTickInterval: 'auto',
-                      minorTickWidth: 3,
-                      minorTickLength: 5,
-                      minorTickPosition: 'inside',
-                      minorGridLineWidth: 0,
-                      minorTickColor: '#666',
-            
-                      tickInterval: 1,
-                      tickWidth: 4,
-                      tickPosition: 'inside',
-                      tickLength: 10,
-                      tickColor: '#666',
-                      title: {
-                          // text: 'Powered by<br/>Highcharts',
-                          style: {
-                              color: '#BBB',
-                              fontWeight: 'normal',
-                              fontSize: '10px',
-                              lineHeight: '10px'
-                          },
-                          y: 10
-                      }
-                  },
-            
-                  tooltip: {
-                      format: '{series.chart.tooltipText}'
-                  },
-            
-                  series: [{
-                      data: [{
-                          id: 'hour',
-                          y: now.hours,
-                          dial: {
-                              radius: '60%',
-                              baseWidth: 4,
-                              baseLength: '95%',
-                              rearLength: 0
-                          }
-                      }, {
-                          id: 'minute',
-                          y: now.minutes,
-                          dial: {
-                              baseLength: '95%',
-                              rearLength: 0
-                          }
-                      }, {
-                          id: 'second',
-                          y: now.seconds,
-                          dial: {
-                              radius: '100%',
-                              baseWidth: 1,
-                              rearLength: '20%'
-                          }
-                      }],
-                      animation: false,
-                      dataLabels: {
-                          enabled: false
-                      }
-                  }]
-          }
-        ];
+    //   const gaugeValueData = this.data.records[0].gaugevalue;
+    //   const gaugeLabelData = this.data.records[0].gaugelabel;
+    //   const gaugeTitleData = this.data.records[0].title;
       
-    }
+    //   this.newChartObject = [{
+    //     chart: {
+    //       width: 550,
+    //       type: 'solidgauge',
+    //       height: '85%',
+    //       identifier: 'Multiple KPI gauge'
+    //       // events: {
+    //       //     render: renderIcons
+    //       // }
+    //   },
+
+    //   title: {
+    //       text: gaugeTitleData,
+    //       style: {
+    //           fontSize: '24px'
+    //       }
+    //   },
+    //   credits: {
+    //       enabled: false
+    //   },
+    //   tooltip: {
+    //       borderWidth: 0,
+    //       backgroundColor: 'none',
+    //       shadow: false,
+    //       style: {
+    //           fontSize: '16px'
+    //       },
+    //       valueSuffix: '%',
+    //       pointFormat: '{series.name}<br>' +
+    //           '<span style="font-size: 2em; color: {point.color}; ' +
+    //           'font-weight: bold">{point.y}</span>',
+    //       // positioner: function (labelWidth) {
+    //       //     return {
+    //       //         x: (this.chart.chartWidth - labelWidth) / 2,
+    //       //         y: (this.chart.plotHeight / 2) + 15
+    //       //     };
+    //       // }
+    //   },
+
+    //   pane: {
+    //       startAngle: 0,
+    //       endAngle: 360,
+    //       background: [{ // Track for Conversion
+    //           outerRadius: '112%',
+    //           innerRadius: '88%',
+    //           backgroundColor: trackColors[0],
+    //           borderWidth: 0
+    //       }, { // Track for Engagement
+    //           outerRadius: '87%',
+    //           innerRadius: '63%',
+    //           backgroundColor: trackColors[1],
+    //           borderWidth: 0
+    //       }, { // Track for Feedback
+    //           outerRadius: '62%',
+    //           innerRadius: '38%',
+    //           backgroundColor: trackColors[2],
+    //           borderWidth: 0
+    //       }]
+    //   },
+
+    //   yAxis: {
+    //       min: 0,
+    //       max: 100,
+    //       lineWidth: 0,
+    //       tickPositions: []
+    //   },
+
+    //   plotOptions: {
+    //       solidgauge: {
+    //           dataLabels: {
+    //               enabled: false
+    //           },
+    //           linecap: 'round',
+    //           stickyTracking: false,
+    //           rounded: true
+    //       }
+    //   },
+
+    //   series: [{
+    //       name: gaugeLabelData,
+    //       data: [{
+    //           color: Highcharts.getOptions().colors[0],
+    //           radius: '112%',
+    //           innerRadius: '88%',
+    //           y: gaugeValueData,
+    //       }],
+    //       custom: {
+    //           icon: 'filter',
+    //           iconColor: '#303030'
+    //       }
+    //   }, {
+    //       name: 'Engagement',
+    //       data: [{
+    //           color: Highcharts.getOptions().colors[1],
+    //           radius: '87%',
+    //           innerRadius: '63%',
+    //           y: gaugeValueData - 20,
+    //       }],
+    //       custom: {
+    //           icon: 'comments-o',
+    //           iconColor: '#ffffff'
+    //       }
+    //   }, {
+    //       name: 'Feedback',
+    //       data: [{
+    //           color: Highcharts.getOptions().colors[2],
+    //           radius: '62%',
+    //           innerRadius: '38%',
+    //           y: gaugeValueData + 14.5,
+    //       }],
+    //       custom: {
+    //           icon: 'commenting-o',
+    //           iconColor: '#303030'
+    //       }
+    //   }]
+    //   }];
+      
+    // } 
+    // else if (this.chartType1 == 'clock gauge') {
+    //   for (let i = 0; i < this.data.records.length; i++) {
+    //     this.ids.push(this.data.records[i].ID);
+    //     this.names.push(parseInt(this.data.records[i].NAME));
+    //   }
+      
+    //     this.newChartObject = [
+    //       {
+    //         chart: {
+    //                   type: 'gauge',
+    //                   plotBackgroundColor: null,
+    //                   plotBackgroundImage: null,
+    //                   plotBorderWidth: 0,
+    //                   plotShadow: false,
+    //                   height: '50%',
+    //                   width: 550,
+    //                   identifier:'clock gauge'
+    //               },
+            
+    //               credits: {
+    //                   enabled: false
+    //               },
+            
+    //               title: {
+    //                   text: 'Clock gauge'
+    //               },
+            
+    //               pane: {
+    //                 background: [{
+    //                   // default background
+    //                 }, {
+    //                   // reflex for supported browsers
+    //                   backgroundColor: {
+    //                     radialGradient: {
+    //                       cx: 0.5,
+    //                       cy: -0.4,
+    //                       r: 1.9
+    //                     },
+    //                     stops: [
+    //                       [0.5, 'rgba(255, 255, 255, 0.2)'],
+    //                       [0.5, 'rgba(200, 200, 200, 0.2)']
+    //                     ]
+    //                   }
+    //                 }]
+    //               },
+            
+    //               yAxis: {
+    //                   labels: {
+    //                       distance: -23,
+    //                       style: {
+    //                           fontSize: '18px'
+    //                       }
+    //                   },
+    //                   min: 0,
+    //                   max: 12,
+    //                   lineWidth: 0,
+    //                   showFirstLabel: false,
+            
+    //                   minorTickInterval: 'auto',
+    //                   minorTickWidth: 3,
+    //                   minorTickLength: 5,
+    //                   minorTickPosition: 'inside',
+    //                   minorGridLineWidth: 0,
+    //                   minorTickColor: '#666',
+            
+    //                   tickInterval: 1,
+    //                   tickWidth: 4,
+    //                   tickPosition: 'inside',
+    //                   tickLength: 10,
+    //                   tickColor: '#666',
+    //                   title: {
+    //                       // text: 'Powered by<br/>Highcharts',
+    //                       style: {
+    //                           color: '#BBB',
+    //                           fontWeight: 'normal',
+    //                           fontSize: '10px',
+    //                           lineHeight: '10px'
+    //                       },
+    //                       y: 10
+    //                   }
+    //               },
+            
+    //               tooltip: {
+    //                   format: '{series.chart.tooltipText}'
+    //               },
+            
+    //               series: [{
+    //                   data: [{
+    //                       id: 'hour',
+    //                       y: now.hours,
+    //                       dial: {
+    //                           radius: '60%',
+    //                           baseWidth: 4,
+    //                           baseLength: '95%',
+    //                           rearLength: 0
+    //                       }
+    //                   }, {
+    //                       id: 'minute',
+    //                       y: now.minutes,
+    //                       dial: {
+    //                           baseLength: '95%',
+    //                           rearLength: 0
+    //                       }
+    //                   }, {
+    //                       id: 'second',
+    //                       y: now.seconds,
+    //                       dial: {
+    //                           radius: '100%',
+    //                           baseWidth: 1,
+    //                           rearLength: '20%'
+    //                       }
+    //                   }],
+    //                   animation: false,
+    //                   dataLabels: {
+    //                       enabled: false
+    //                   }
+    //               }]
+    //       }
+    //     ];
+      
+    // }
     else {
       this.data = null;
       this.chartType = null;

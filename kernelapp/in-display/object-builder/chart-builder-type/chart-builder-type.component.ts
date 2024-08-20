@@ -967,229 +967,230 @@ export class ChartBuilderTypeComponent implements OnInit {
     
         }]
       },
-      {
-        chart: {
-          type: 'solidgauge',
-          height: '100%',
-          identifier: 'Multiple KPI gauge'
-          // events: {
-          //     render: renderIcons
-          // }
-      },
 
-      title: {
-          text: 'Multiple KPI gauge',
-          style: {
-              fontSize: '24px'
-          }
-      },
+      // {
+      //   chart: {
+      //     type: 'solidgauge',
+      //     height: '100%',
+      //     identifier: 'Multiple KPI gauge'
+      //     // events: {
+      //     //     render: renderIcons
+      //     // }
+      // },
 
-      tooltip: {
-          borderWidth: 0,
-          backgroundColor: 'none',
-          shadow: false,
-          style: {
-              fontSize: '16px'
-          },
-          valueSuffix: '%',
-          pointFormat: '{series.name}<br>' +
-              '<span style="font-size: 2em; color: {point.color}; ' +
-              'font-weight: bold">{point.y}</span>',
-          // positioner: function (labelWidth) {
-          //     return {
-          //         x: (this.chart.chartWidth - labelWidth) / 2,
-          //         y: (this.chart.plotHeight / 2) + 15
-          //     };
-          // }
-      },
+      // title: {
+      //     text: 'Multiple KPI gauge',
+      //     style: {
+      //         fontSize: '24px'
+      //     }
+      // },
 
-      pane: {
-          startAngle: 0,
-          endAngle: 360,
-          background: [{ // Track for Conversion
-              outerRadius: '112%',
-              innerRadius: '88%',
-              backgroundColor: trackColors[0],
-              borderWidth: 0
-          }, { // Track for Engagement
-              outerRadius: '87%',
-              innerRadius: '63%',
-              backgroundColor: trackColors[1],
-              borderWidth: 0
-          }, { // Track for Feedback
-              outerRadius: '62%',
-              innerRadius: '38%',
-              backgroundColor: trackColors[2],
-              borderWidth: 0
-          }]
-      },
+      // tooltip: {
+      //     borderWidth: 0,
+      //     backgroundColor: 'none',
+      //     shadow: false,
+      //     style: {
+      //         fontSize: '16px'
+      //     },
+      //     valueSuffix: '%',
+      //     pointFormat: '{series.name}<br>' +
+      //         '<span style="font-size: 2em; color: {point.color}; ' +
+      //         'font-weight: bold">{point.y}</span>',
+      //     // positioner: function (labelWidth) {
+      //     //     return {
+      //     //         x: (this.chart.chartWidth - labelWidth) / 2,
+      //     //         y: (this.chart.plotHeight / 2) + 15
+      //     //     };
+      //     // }
+      // },
 
-      yAxis: {
-          min: 0,
-          max: 100,
-          lineWidth: 0,
-          tickPositions: []
-      },
+      // pane: {
+      //     startAngle: 0,
+      //     endAngle: 360,
+      //     background: [{ // Track for Conversion
+      //         outerRadius: '112%',
+      //         innerRadius: '88%',
+      //         backgroundColor: trackColors[0],
+      //         borderWidth: 0
+      //     }, { // Track for Engagement
+      //         outerRadius: '87%',
+      //         innerRadius: '63%',
+      //         backgroundColor: trackColors[1],
+      //         borderWidth: 0
+      //     }, { // Track for Feedback
+      //         outerRadius: '62%',
+      //         innerRadius: '38%',
+      //         backgroundColor: trackColors[2],
+      //         borderWidth: 0
+      //     }]
+      // },
 
-      plotOptions: {
-          solidgauge: {
-              dataLabels: {
-                  enabled: false
-              },
-              linecap: 'round',
-              stickyTracking: false,
-              rounded: true
-          }
-      },
+      // yAxis: {
+      //     min: 0,
+      //     max: 100,
+      //     lineWidth: 0,
+      //     tickPositions: []
+      // },
 
-      series: [{
-          name: 'Conversion',
-          data: [{
-              color: Highcharts.getOptions().colors[0],
-              radius: '112%',
-              innerRadius: '88%',
-              y: 80
-          }],
-          custom: {
-              icon: 'filter',
-              iconColor: '#303030'
-          }
-      }, {
-          name: 'Engagement',
-          data: [{
-              color: Highcharts.getOptions().colors[1],
-              radius: '87%',
-              innerRadius: '63%',
-              y: 65
-          }],
-          custom: {
-              icon: 'comments-o',
-              iconColor: '#ffffff'
-          }
-      }, {
-          name: 'Feedback',
-          data: [{
-              color: Highcharts.getOptions().colors[2],
-              radius: '62%',
-              innerRadius: '38%',
-              y: 50
-          }],
-          custom: {
-              icon: 'commenting-o',
-              iconColor: '#303030'
-          }
-      }]
-      },
-      {
-        chart: {
-          type: 'gauge',
-          plotBackgroundColor: null,
-          plotBackgroundImage: null,
-          plotBorderWidth: 0,
-          plotShadow: false,
-          height: '80%',
-          identifier:'clock gauge'
-      },
+      // plotOptions: {
+      //     solidgauge: {
+      //         dataLabels: {
+      //             enabled: false
+      //         },
+      //         linecap: 'round',
+      //         stickyTracking: false,
+      //         rounded: true
+      //     }
+      // },
 
-      credits: {
-          enabled: false
-      },
+      // series: [{
+      //     name: 'Conversion',
+      //     data: [{
+      //         color: Highcharts.getOptions().colors[0],
+      //         radius: '112%',
+      //         innerRadius: '88%',
+      //         y: 80
+      //     }],
+      //     custom: {
+      //         icon: 'filter',
+      //         iconColor: '#303030'
+      //     }
+      // }, {
+      //     name: 'Engagement',
+      //     data: [{
+      //         color: Highcharts.getOptions().colors[1],
+      //         radius: '87%',
+      //         innerRadius: '63%',
+      //         y: 65
+      //     }],
+      //     custom: {
+      //         icon: 'comments-o',
+      //         iconColor: '#ffffff'
+      //     }
+      // }, {
+      //     name: 'Feedback',
+      //     data: [{
+      //         color: Highcharts.getOptions().colors[2],
+      //         radius: '62%',
+      //         innerRadius: '38%',
+      //         y: 50
+      //     }],
+      //     custom: {
+      //         icon: 'commenting-o',
+      //         iconColor: '#303030'
+      //     }
+      // }]
+      // },
+      // {
+      //   chart: {
+      //     type: 'gauge',
+      //     plotBackgroundColor: null,
+      //     plotBackgroundImage: null,
+      //     plotBorderWidth: 0,
+      //     plotShadow: false,
+      //     height: '80%',
+      //     identifier:'clock gauge'
+      // },
 
-      title: {
-          text: 'The Highcharts clock'
-      },
+      // credits: {
+      //     enabled: false
+      // },
 
-      pane: {
-        background: [{
-          // default background
-        }, {
-          // reflex for supported browsers
-          backgroundColor: {
-            radialGradient: {
-              cx: 0.5,
-              cy: -0.4,
-              r: 1.9
-            },
-            stops: [
-              [0.5, 'rgba(255, 255, 255, 0.2)'],
-              [0.5, 'rgba(200, 200, 200, 0.2)']
-            ]
-          }
-        }]
-      },
+      // title: {
+      //     text: 'The Highcharts clock'
+      // },
 
-      yAxis: {
-          labels: {
-              distance: -23,
-              style: {
-                  fontSize: '18px'
-              }
-          },
-          min: 0,
-          max: 12,
-          lineWidth: 0,
-          showFirstLabel: false,
+      // pane: {
+      //   background: [{
+      //     // default background
+      //   }, {
+      //     // reflex for supported browsers
+      //     backgroundColor: {
+      //       radialGradient: {
+      //         cx: 0.5,
+      //         cy: -0.4,
+      //         r: 1.9
+      //       },
+      //       stops: [
+      //         [0.5, 'rgba(255, 255, 255, 0.2)'],
+      //         [0.5, 'rgba(200, 200, 200, 0.2)']
+      //       ]
+      //     }
+      //   }]
+      // },
 
-          minorTickInterval: 'auto',
-          minorTickWidth: 3,
-          minorTickLength: 5,
-          minorTickPosition: 'inside',
-          minorGridLineWidth: 0,
-          minorTickColor: '#666',
+      // yAxis: {
+      //     labels: {
+      //         distance: -23,
+      //         style: {
+      //             fontSize: '18px'
+      //         }
+      //     },
+      //     min: 0,
+      //     max: 12,
+      //     lineWidth: 0,
+      //     showFirstLabel: false,
 
-          tickInterval: 1,
-          tickWidth: 4,
-          tickPosition: 'inside',
-          tickLength: 10,
-          tickColor: '#666',
-          title: {
-              // text: 'Powered by<br/>Highcharts',
-              style: {
-                  color: '#BBB',
-                  fontWeight: 'normal',
-                  fontSize: '10px',
-                  lineHeight: '10px'
-              },
-              y: 10
-          }
-      },
+      //     minorTickInterval: 'auto',
+      //     minorTickWidth: 3,
+      //     minorTickLength: 5,
+      //     minorTickPosition: 'inside',
+      //     minorGridLineWidth: 0,
+      //     minorTickColor: '#666',
 
-      tooltip: {
-          format: '{series.chart.tooltipText}'
-      },
+      //     tickInterval: 1,
+      //     tickWidth: 4,
+      //     tickPosition: 'inside',
+      //     tickLength: 10,
+      //     tickColor: '#666',
+      //     title: {
+      //         // text: 'Powered by<br/>Highcharts',
+      //         style: {
+      //             color: '#BBB',
+      //             fontWeight: 'normal',
+      //             fontSize: '10px',
+      //             lineHeight: '10px'
+      //         },
+      //         y: 10
+      //     }
+      // },
 
-      series: [{
-          data: [{
-              id: 'hour',
-              y: now.hours,
-              dial: {
-                  radius: '60%',
-                  baseWidth: 4,
-                  baseLength: '95%',
-                  rearLength: 0
-              }
-          }, {
-              id: 'minute',
-              y: now.minutes,
-              dial: {
-                  baseLength: '95%',
-                  rearLength: 0
-              }
-          }, {
-              id: 'second',
-              y: now.seconds,
-              dial: {
-                  radius: '100%',
-                  baseWidth: 1,
-                  rearLength: '20%'
-              }
-          }],
-          animation: false,
-          dataLabels: {
-              enabled: false
-          }
-      }]
-      }
+      // tooltip: {
+      //     format: '{series.chart.tooltipText}'
+      // },
+
+      // series: [{
+      //     data: [{
+      //         id: 'hour',
+      //         y: now.hours,
+      //         dial: {
+      //             radius: '60%',
+      //             baseWidth: 4,
+      //             baseLength: '95%',
+      //             rearLength: 0
+      //         }
+      //     }, {
+      //         id: 'minute',
+      //         y: now.minutes,
+      //         dial: {
+      //             baseLength: '95%',
+      //             rearLength: 0
+      //         }
+      //     }, {
+      //         id: 'second',
+      //         y: now.seconds,
+      //         dial: {
+      //             radius: '100%',
+      //             baseWidth: 1,
+      //             rearLength: '20%'
+      //         }
+      //     }],
+      //     animation: false,
+      //     dataLabels: {
+      //         enabled: false
+      //     }
+      // }]
+      // }
       
       
     ];
@@ -1214,7 +1215,6 @@ export class ChartBuilderTypeComponent implements OnInit {
 
   nextTab(type:any, identifier: string, e: any,) {
     alert("identifier = " + identifier);
-    alert("type = " + type)
     if(e == 'c'){
     this.chartType = identifier;
     var sum = 0
@@ -1295,21 +1295,23 @@ export class ChartBuilderTypeComponent implements OnInit {
                       var sum = 0
                       sum++;
                       this.isSource = sum;
-                    }else
-                      if(identifier == "Multiple KPI gauge")
-                      {
-                        this.chartType = type;
-                        var sum = 0
-                        sum++;
-                        this.isSource = sum;
-                      }else
-                        if(identifier == "clock gauge")
-                        {
-                          this.chartType = type;
-                          var sum = 0
-                          sum++;
-                          this.isSource = sum;
-                        }
+                    }
+                    // else
+                    //   if(identifier == "Multiple KPI gauge")
+                    //   {
+                    //     this.chartType = type;
+                    //     var sum = 0
+                    //     sum++;
+                    //     this.isSource = sum;
+                    //   }
+                      // else
+                      //   if(identifier == "clock gauge")
+                      //   {
+                      //     this.chartType = type;
+                      //     var sum = 0
+                      //     sum++;
+                      //     this.isSource = sum;
+                      //   }
     }
   }
   toggle() {
@@ -1379,11 +1381,13 @@ export class ChartBuilderTypeComponent implements OnInit {
       type = 17;
     }else if (this.chartType == "Speedometer solid") {
       type = 18;
-    }else if (this.chartType == "Multiple KPI gauge") {
-      type = 19;
-    }else if (this.chartType == "clock gauge") {
-      type = 20;
     }
+    // else if (this.chartType == "Multiple KPI gauge") {
+    //   type = 19;
+    // }
+    // else if (this.chartType == "clock gauge") {
+    //   type = 20;
+    // }
 
 
     if (this.actionType == 'update') {

@@ -108,11 +108,13 @@ export class ChartFromKpiBuilderComponent implements OnInit {
         chartType1= 'Dual Axes Speedometer';
       }else if (this.chartType == 18) {
         chartType1= 'Speedometer solid';
-      }else if (this.chartType == 19) {
-        chartType1= 'Multiple KPI gauge';
-      }else if (this.chartType == 20) {
-        chartType1= 'clock gauge';
       }
+      
+      // else if (this.chartType == 19) {
+      //   chartType1= 'Multiple KPI gauge';
+      // }else if (this.chartType == 20) {
+      //   chartType1= 'clock gauge';
+      // }
 
       if (chartType1 == 'heatmap') {
         this.chartObject.push(
@@ -648,9 +650,7 @@ export class ChartFromKpiBuilderComponent implements OnInit {
           }]
         });
   
-      }  
-      
-      else if(chartType1 == 'Dual Axes Speedometer'){
+      }else if(chartType1 == 'Dual Axes Speedometer'){
         // for (let j = 0; j < this.data[i].records.length; j++) {
         //   this.ids.push(this.data[i].records[i].ID);
         //   this.names.push(Number(this.data[i].records[j].NAME));
@@ -715,7 +715,7 @@ export class ChartFromKpiBuilderComponent implements OnInit {
           }]
         });
   
-      } else if(chartType1 == 'Speedometer solid'){
+      }else if(chartType1 == 'Speedometer solid'){
         // for (let j = 0; j < this.data[i].records.length; j++) {
         //   this.ids.push(this.data[i].records[i].ID);
         //   this.names.push(Number(this.data[i].records[j].NAME));
@@ -778,201 +778,203 @@ export class ChartFromKpiBuilderComponent implements OnInit {
               rearLength: 0
             }
           }]
-        });
-  
-      } else if(chartType1 == 'Multiple KPI gauge'){
-        // for (let j = 0; j < this.data[i].records.length; j++) {
-        //   this.ids.push(this.data[i].records[i].ID);
-        //   this.names.push(Number(this.data[i].records[j].NAME));
-        // }
-        this.chartObject.push
-        ({
-          chart: {
-            renderTo: 'container', // Make sure this matches your container ID
-            type: 'gauge',
-            plotBackgroundColor: null,
-            plotBackgroundImage: null,
-            plotBorderWidth: null,
-            plotShadow: false,
-            height: '200px',
-            identifier: 'Speedometer'
-          },
-          title: {
-            text: 'Speedometer'
-          },
-          pane: {
-            startAngle: 0,
-            endAngle: 360,
-            background: [{ // Track for Conversion
-                outerRadius: '112%',
-                innerRadius: '88%',
-                backgroundColor: trackColors[0],
-                borderWidth: 0
-            }, { // Track for Engagement
-                outerRadius: '87%',
-                innerRadius: '63%',
-                backgroundColor: trackColors[1],
-                borderWidth: 0
-            }, { // Track for Feedback
-                outerRadius: '62%',
-                innerRadius: '38%',
-                backgroundColor: trackColors[2],
-                borderWidth: 0
-            }]
-          },
-          yAxis: {
-            min: 0,
-            max: 200,
-            tickPixelInterval: 30,
-            tickWidth: 2,
-            tickPosition: 'inside',
-            tickLength: 10,
-            labels: {
-              step: 2,
-              rotation: 'auto',
-              style: {
-                fontSize: '10px'
-              }
-            },
-            title: {
-              text: 'km/h',
-              style: {
-                fontSize: '17px'
-              }
-            }
-          },
-          series: [{
-            name: 'Speed',
-            data: [140],
-            dataLabels: {
-              format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
-                '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
-            },
-            dial: {
-              baseWidth: 10,
-              rearLength: 0
-            }
-          }]
-        });
-  
-      } else if(chartType1 == 'clock gauge'){
-        // for (let j = 0; j < this.data[i].records.length; j++) {
-        //   this.ids.push(this.data[i].records[i].ID);
-        //   this.names.push(Number(this.data[i].records[j].NAME));
-        // }
-        this.chartObject.push
-        ({
-          chart: {
-            type: 'gauge',
-            plotBackgroundColor: null,
-            plotBackgroundImage: null,
-            plotBorderWidth: 0,
-            plotShadow: false,
-            height: '80%',
-            identifier:'clock gauge'
-        },
-  
-        credits: {
-            enabled: false
-        },
-  
-        title: {
-            text: 'The Highcharts clock'
-        },
-  
-        pane: {
-          background: [{
-            // default background
-          }, {
-            // reflex for supported browsers
-            backgroundColor: {
-              radialGradient: {
-                cx: 0.5,
-                cy: -0.4,
-                r: 1.9
-              },
-              stops: [
-                [0.5, 'rgba(255, 255, 255, 0.2)'],
-                [0.5, 'rgba(200, 200, 200, 0.2)']
-              ]
-            }
-          }]
-        },
-  
-        yAxis: {
-            labels: {
-                distance: -23,
-                style: {
-                    fontSize: '18px'
-                }
-            },
-            min: 0,
-            max: 12,
-            lineWidth: 0,
-            showFirstLabel: false,
-  
-            minorTickInterval: 'auto',
-            minorTickWidth: 3,
-            minorTickLength: 5,
-            minorTickPosition: 'inside',
-            minorGridLineWidth: 0,
-            minorTickColor: '#666',
-  
-            tickInterval: 1,
-            tickWidth: 4,
-            tickPosition: 'inside',
-            tickLength: 10,
-            tickColor: '#666',
-            title: {
-                // text: 'Powered by<br/>Highcharts',
-                style: {
-                    color: '#BBB',
-                    fontWeight: 'normal',
-                    fontSize: '10px',
-                    lineHeight: '10px'
-                },
-                y: 10
-            }
-        },
-  
-        tooltip: {
-            format: '{series.chart.tooltipText}'
-        },
-  
-        series: [{
-            data: [{
-                id: 'hour',
-                y: now.hours,
-                dial: {
-                    radius: '60%',
-                    baseWidth: 4,
-                    baseLength: '95%',
-                    rearLength: 0
-                }
-            }, {
-                id: 'minute',
-                y: now.minutes,
-                dial: {
-                    baseLength: '95%',
-                    rearLength: 0
-                }
-            }, {
-                id: 'second',
-                y: now.seconds,
-                dial: {
-                    radius: '100%',
-                    baseWidth: 1,
-                    rearLength: '20%'
-                }
-            }],
-            animation: false,
-            dataLabels: {
-                enabled: false
-            }
-        }]
         });
   
       } 
+      
+      // else if(chartType1 == 'Multiple KPI gauge'){
+      //   // for (let j = 0; j < this.data[i].records.length; j++) {
+      //   //   this.ids.push(this.data[i].records[i].ID);
+      //   //   this.names.push(Number(this.data[i].records[j].NAME));
+      //   // }
+      //   this.chartObject.push
+      //   ({
+      //     chart: {
+      //       renderTo: 'container', // Make sure this matches your container ID
+      //       type: 'gauge',
+      //       plotBackgroundColor: null,
+      //       plotBackgroundImage: null,
+      //       plotBorderWidth: null,
+      //       plotShadow: false,
+      //       height: '200px',
+      //       identifier: 'Speedometer'
+      //     },
+      //     title: {
+      //       text: 'Speedometer'
+      //     },
+      //     pane: {
+      //       startAngle: 0,
+      //       endAngle: 360,
+      //       background: [{ // Track for Conversion
+      //           outerRadius: '112%',
+      //           innerRadius: '88%',
+      //           backgroundColor: trackColors[0],
+      //           borderWidth: 0
+      //       }, { // Track for Engagement
+      //           outerRadius: '87%',
+      //           innerRadius: '63%',
+      //           backgroundColor: trackColors[1],
+      //           borderWidth: 0
+      //       }, { // Track for Feedback
+      //           outerRadius: '62%',
+      //           innerRadius: '38%',
+      //           backgroundColor: trackColors[2],
+      //           borderWidth: 0
+      //       }]
+      //     },
+      //     yAxis: {
+      //       min: 0,
+      //       max: 200,
+      //       tickPixelInterval: 30,
+      //       tickWidth: 2,
+      //       tickPosition: 'inside',
+      //       tickLength: 10,
+      //       labels: {
+      //         step: 2,
+      //         rotation: 'auto',
+      //         style: {
+      //           fontSize: '10px'
+      //         }
+      //       },
+      //       title: {
+      //         text: 'km/h',
+      //         style: {
+      //           fontSize: '17px'
+      //         }
+      //       }
+      //     },
+      //     series: [{
+      //       name: 'Speed',
+      //       data: [140],
+      //       dataLabels: {
+      //         format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+      //           '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+      //       },
+      //       dial: {
+      //         baseWidth: 10,
+      //         rearLength: 0
+      //       }
+      //     }]
+      //   });
+  
+      // } else if(chartType1 == 'clock gauge'){
+      //   // for (let j = 0; j < this.data[i].records.length; j++) {
+      //   //   this.ids.push(this.data[i].records[i].ID);
+      //   //   this.names.push(Number(this.data[i].records[j].NAME));
+      //   // }
+      //   this.chartObject.push
+      //   ({
+      //     chart: {
+      //       type: 'gauge',
+      //       plotBackgroundColor: null,
+      //       plotBackgroundImage: null,
+      //       plotBorderWidth: 0,
+      //       plotShadow: false,
+      //       height: '80%',
+      //       identifier:'clock gauge'
+      //   },
+  
+      //   credits: {
+      //       enabled: false
+      //   },
+  
+      //   title: {
+      //       text: 'The Highcharts clock'
+      //   },
+  
+      //   pane: {
+      //     background: [{
+      //       // default background
+      //     }, {
+      //       // reflex for supported browsers
+      //       backgroundColor: {
+      //         radialGradient: {
+      //           cx: 0.5,
+      //           cy: -0.4,
+      //           r: 1.9
+      //         },
+      //         stops: [
+      //           [0.5, 'rgba(255, 255, 255, 0.2)'],
+      //           [0.5, 'rgba(200, 200, 200, 0.2)']
+      //         ]
+      //       }
+      //     }]
+      //   },
+  
+      //   yAxis: {
+      //       labels: {
+      //           distance: -23,
+      //           style: {
+      //               fontSize: '18px'
+      //           }
+      //       },
+      //       min: 0,
+      //       max: 12,
+      //       lineWidth: 0,
+      //       showFirstLabel: false,
+  
+      //       minorTickInterval: 'auto',
+      //       minorTickWidth: 3,
+      //       minorTickLength: 5,
+      //       minorTickPosition: 'inside',
+      //       minorGridLineWidth: 0,
+      //       minorTickColor: '#666',
+  
+      //       tickInterval: 1,
+      //       tickWidth: 4,
+      //       tickPosition: 'inside',
+      //       tickLength: 10,
+      //       tickColor: '#666',
+      //       title: {
+      //           // text: 'Powered by<br/>Highcharts',
+      //           style: {
+      //               color: '#BBB',
+      //               fontWeight: 'normal',
+      //               fontSize: '10px',
+      //               lineHeight: '10px'
+      //           },
+      //           y: 10
+      //       }
+      //   },
+  
+      //   tooltip: {
+      //       format: '{series.chart.tooltipText}'
+      //   },
+  
+      //   series: [{
+      //       data: [{
+      //           id: 'hour',
+      //           y: now.hours,
+      //           dial: {
+      //               radius: '60%',
+      //               baseWidth: 4,
+      //               baseLength: '95%',
+      //               rearLength: 0
+      //           }
+      //       }, {
+      //           id: 'minute',
+      //           y: now.minutes,
+      //           dial: {
+      //               baseLength: '95%',
+      //               rearLength: 0
+      //           }
+      //       }, {
+      //           id: 'second',
+      //           y: now.seconds,
+      //           dial: {
+      //               radius: '100%',
+      //               baseWidth: 1,
+      //               rearLength: '20%'
+      //           }
+      //       }],
+      //       animation: false,
+      //       dataLabels: {
+      //           enabled: false
+      //       }
+      //   }]
+      //   });
+  
+      // } 
       
       
       

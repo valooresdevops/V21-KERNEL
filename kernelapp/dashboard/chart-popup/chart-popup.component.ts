@@ -84,6 +84,7 @@ export class ChartPopupComponent implements OnInit {
         dialogConfig.width = '700px';
         dialogConfig.height = '700px';
 
+        
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',

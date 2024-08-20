@@ -25,6 +25,7 @@ export class GlobalConstants {
 
   public static endPointAddress = window.location.hostname;
 
+  
   // --------------------------------------------------------------------------------
   // -- API Gateways
   // --------------------------------------------------------------------------------

@@ -61,6 +61,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   gridRecords: any[] = [];
   ids: string[] = [];
   names: number[] = [];
+  gaugeValue: any[] = [];
+  gaugeLabel: any[] = [];
+  gaugeTitle: any[] = [];
   chartValue: any[] = [];
   kpiValue: any[] = [];
   allData: any[] = [];
@@ -242,15 +245,17 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
               this.allData[i].stockAd = 0 
        
               this.chartType = 'Speedometer solid';
-            } else if (this.allData[i].data.chartType == 19) {
-              this.allData[i].stockAd = 0 
+            } 
+            // else if (this.allData[i].data.chartType == 19) {
+            //   this.allData[i].stockAd = 0 
        
-              this.chartType = 'Multiple KPI gauge';
-            } else if (this.allData[i].data.chartType == 20) {
-              this.allData[i].stockAd = 0 
+            //   this.chartType = 'Multiple KPI gauge';
+            // } 
+            // else if (this.allData[i].data.chartType == 20) {
+            //   this.allData[i].stockAd = 0 
        
-              this.chartType = 'clock gauge';
-            }
+            //   this.chartType = 'clock gauge';
+            // }
 
             const trackColors = Highcharts.getOptions().colors.map(color =>
               new Highcharts.Color(color).setOpacity(0.3).get());
@@ -1143,15 +1148,19 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 }]}]
               } else if (this.chartType == 'VU solid') {
                 let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                {
+                  this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+                  this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+                  this.gaugeTitle.push(this.allData[i].data.records[j].title);
                 }
                 let data1 = this.names.map((id, index) => {
                   return { name: this.ids[index], y: id };
-                });
-              
-                
+                });              
+                const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+                const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
+
+                console.log("this.allData = " + JSON.stringify(this.allData[i]))
                   this.newChartObject = [{
                     chart: {
                       type: 'solidgauge',
@@ -1162,7 +1171,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   title: {
-                      text: 'VU solid',
+                      text: this.allData[i].data.records[0].title,
                       style: {
                           fontSize: '28px' // Adjusted font size to match the increased size
                       }
@@ -1194,7 +1203,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
               
                   yAxis: {
                       min: -20,
-                      max: 6,
+                      max: 150,
                       stops: [
                           [0.1, '#55BF3B'], // green
                           [0.5, '#DDDF0D'], // yellow
@@ -1210,7 +1219,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           distance: 0 // Increased distance to match new size
                       },
                       title: {
-                          text: 'VU<br/><span style="font-size:20px">Channel A</span>', // Adjusted font size
+                          text: gaugeValueData + '<br/><span style="font-size:20px">' + gaugelabelData + '</span>', // Adjusted font size
                           y: 50 // Adjusted vertical position
                       }
                   },
@@ -1227,8 +1236,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   series: [{
-                      name: 'Channel A',
-                      data: [-20],
+                      name: gaugelabelData,
+                      data: [gaugeValueData - 0],
                       dataLabels: {
                           format: '<div style="text-align:center">' +
                                   '<span style="font-size:50px">{y}</span><br/>' +
@@ -1240,14 +1249,19 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 
               } else if (this.chartType == 'VU meter') {
                 let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
-              
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                  {
+                    this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+                    this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+                    this.gaugeTitle.push(this.allData[i].data.records[j].title);
+                  }
+                  let data1 = this.names.map((id, index) => {
+                    return { name: this.ids[index], y: id };
+                  });
+                  console.log("this.allData = " + JSON.stringify(this.allData[i]))
+                
+                  const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+                  const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
                 
                   this.newChartObject = [{
                     chart:
@@ -1270,7 +1284,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         enabled: false
                     },
                     title: {
-                        text: 'VU meter',
+                        text: this.allData[i].data.records[0].title,
                         style: {
                             fontSize: '14px' // Font size adjusted to match the gauge
                         }
@@ -1293,8 +1307,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     },
                     
                     yAxis: {
-                        min: -20,
-                        max: 6,
+                        min: 0,
+                        max: 220,
                         minorTickPosition: 'outside',
                         tickPosition: 'outside',
                         labels: {
@@ -1302,16 +1316,16 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                             distance: 10 // Adjusted distance to fit the gauge
                         },
                         plotBands: [{
-                            from: 0,
-                            to: 6,
+                            from: 150,
+                            to: 220,
                             color: '#C02316',
                             innerRadius: '100%',
                             outerRadius: '105%'
                         }],
                         title: {
-                            text: 'VU<br/><span style="font-size:10px">Channel A</span>',
-                            y: -10 // Adjusted y position to fit the gauge better
-                        }
+                          text: gaugeValueData + '<br/><span style="font-size:20px">' + gaugelabelData + '</span>', // Adjusted font size
+                          y: -10 // Adjusted vertical position
+                      }
                     },
                     
                     plotOptions: {
@@ -1327,20 +1341,24 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     
                     series: [{
                         name: 'Channel A',
-                        data: [-20]
+                        data: [gaugeValueData - 0]
                     }]
                   }];
                 
               } else if (this.chartType == 'Speedometer') {
                 let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
-              
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                  {
+                    this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+                    this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+                    this.gaugeTitle.push(this.allData[i].data.records[j].title);
+                  }
+                  let data1 = this.names.map((id, index) => {
+                    return { name: this.ids[index], y: id };
+                  });
+                
+                  const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+                  const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
                 
                   this.newChartObject = [{
                     chart: {
@@ -1354,7 +1372,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       identifier: 'Speedometer'
                     },
                     title: {
-                      text: 'Speedometer'
+                      text: this.allData[i].data.records[0].title
                     },
                     credits: {
                         enabled: false
@@ -1384,18 +1402,18 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         }
                       },
                       title: {
-                        text: 'km/h',
+                        // text: this.allData[i].data.records[0].gaugevalue,
                         style: {
                           fontSize: '17px'
                         }
                       }
                     },
                     series: [{
-                      name: 'Speed',
-                      data: [140],
+                      // name: gaugelabelData,
+                      data: [gaugeValueData - 0],
                       dataLabels: {
                         format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
-                          '<div style="opacity:0.4; font-size:12px; text-align:center">km/h</div></div>'
+                          '<div style="opacity:0.4; font-size:12px; text-align:center">' + gaugelabelData + '</div></div>'
                       },
                       dial: {
                         baseWidth: 10,
@@ -1406,15 +1424,19 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 
               } else if (this.chartType == 'Dual Axes Speedometer') {
                 let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
-              
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                  {
+                    this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+                    this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+                    this.gaugeTitle.push(this.allData[i].data.records[j].title);
+                  }
+                  let data1 = this.names.map((id, index) => {
+                    return { name: this.ids[index], y: id };
+                  });
                 
+                  const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+                  const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
+
                   this.newChartObject = [{
                     chart: {
                       type: 'gauge',
@@ -1427,7 +1449,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
             
                   title: {
-                      text: 'Speedometer with Dual Axes'
+                      text: this.allData[i].data.records[0].title
                   },
                   credits: {
                       enabled: false
@@ -1468,15 +1490,15 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           rotation: 'auto'
                       },
                       offset: -20,
-                      endOnTick: false
+                      endOnTick: false,
                   }],
             
                   series: [{
-                      name: 'Speed',
-                      data: [80],
+                      name: gaugelabelData,
+                      data: [gaugeValueData - 0],
                       dataLabels: {
-                          format: '<span style="color:#339">{y} km/h</span><br/>' +
-                              '<span style="color:#933">{(multiply y 0.621):.0f} mph</span>',
+                        format: '<div style="text-align:center"><span style="font-size:25px">{y}</span><br/>' +
+                          '<div style="opacity:0.4; font-size:12px; text-align:center">' + gaugelabelData + '</div></div>',
                           backgroundColor: {
                               linearGradient: {
                                   x1: 0,
@@ -1493,19 +1515,23 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       tooltip: {
                           valueSuffix: ' km/h'
                       }
-                  }]
+                  }],
                   }];
                 
               } else if (this.chartType == 'Speedometer solid') {
                 let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
-              
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                  {
+                    this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+                    this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+                    this.gaugeTitle.push(this.allData[i].data.records[j].title);
+                  }
+                  let data1 = this.names.map((id, index) => {
+                    return { name: this.ids[index], y: id };
+                  });
+                
+                  const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+                  const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
                 
                   this.newChartObject = [{
                     chart: {
@@ -1519,7 +1545,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   title: {
-                      text: 'Speedometer'
+                      text: this.allData[i].data.records[0].title
                   },
                   credits: {
                       enabled: false
@@ -1570,8 +1596,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   series: [{
-                      name: 'Speed',
-                      data: [80],
+                      name: gaugelabelData,
+                      data: [gaugeValueData - 0],
                       tooltip: {
                           valueSuffix: ' km/h'
                       },
@@ -1602,254 +1628,263 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   }]
                   }];
                 
-              } else if (this.chartType == 'Multiple KPI gauge') {
-                let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
+              }
+              //  else if (this.chartType == 'Multiple KPI gauge') {
+              //   let pieData: any[] = [];
+              //   for (let j = 0; j < this.allData[i].data.records.length; j++)
+              //     {
+              //       this.gaugeValue.push(this.allData[i].data.records[j].gaugevalue);
+              //       this.gaugeLabel.push(this.allData[i].data.records[j].gaugelabel);
+              //       this.gaugeTitle.push(this.allData[i].data.records[j].title);
+              //     }
+              //     let data1 = this.names.map((id, index) => {
+              //       return { name: this.ids[index], y: id };
+              //     });
+                
+              //     const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
+              //     const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
+              //     const gaugeTitlelData = this.allData[i].data.records[0].title;
               
                 
-                  this.newChartObject = [{
-                    chart: {
-                      type: 'solidgauge',
-                      height: '85%',
-                      identifier: 'Multiple KPI gauge'
-                      // events: {
-                      //     render: renderIcons
-                      // }
-                  },
+              //     this.newChartObject = [{
+              //       chart: {
+              //         type: 'solidgauge',
+              //         height: '85%',
+              //         identifier: 'Multiple KPI gauge'
+              //         // events: {
+              //         //     render: renderIcons
+              //         // }
+              //     },
             
-                  title: {
-                      text: 'Multiple KPI gauge',
-                      style: {
-                          fontSize: '24px'
-                      }
-                  },
-                  credits: {
-                      enabled: false
-                  },
-                  tooltip: {
-                      borderWidth: 0,
-                      backgroundColor: 'none',
-                      shadow: false,
-                      style: {
-                          fontSize: '16px'
-                      },
-                      valueSuffix: '%',
-                      pointFormat: '{series.name}<br>' +
-                          '<span style="font-size: 2em; color: {point.color}; ' +
-                          'font-weight: bold">{point.y}</span>',
-                      // positioner: function (labelWidth) {
-                      //     return {
-                      //         x: (this.chart.chartWidth - labelWidth) / 2,
-                      //         y: (this.chart.plotHeight / 2) + 15
-                      //     };
-                      // }
-                  },
+              //     title: {
+              //         text: gaugeTitlelData,
+              //         style: {
+              //             fontSize: '24px'
+              //         }
+              //     },
+              //     credits: {
+              //         enabled: false
+              //     },
+              //     tooltip: {
+              //         borderWidth: 0,
+              //         backgroundColor: 'none',
+              //         shadow: false,
+              //         style: {
+              //             fontSize: '16px'
+              //         },
+              //         valueSuffix: '%',
+              //         pointFormat: '{series.name}<br>' +
+              //             '<span style="font-size: 2em; color: {point.color}; ' +
+              //             'font-weight: bold">{point.y}</span>',
+              //         // positioner: function (labelWidth) {
+              //         //     return {
+              //         //         x: (this.chart.chartWidth - labelWidth) / 2,
+              //         //         y: (this.chart.plotHeight / 2) + 15
+              //         //     };
+              //         // }
+              //     },
             
-                  pane: {
-                      startAngle: 0,
-                      endAngle: 360,
-                      background: [{ // Track for Conversion
-                          outerRadius: '112%',
-                          innerRadius: '88%',
-                          backgroundColor: trackColors[0],
-                          borderWidth: 0
-                      }, { // Track for Engagement
-                          outerRadius: '87%',
-                          innerRadius: '63%',
-                          backgroundColor: trackColors[1],
-                          borderWidth: 0
-                      }, { // Track for Feedback
-                          outerRadius: '62%',
-                          innerRadius: '38%',
-                          backgroundColor: trackColors[2],
-                          borderWidth: 0
-                      }]
-                  },
+              //     pane: {
+              //         startAngle: 0,
+              //         endAngle: 360,
+              //         background: [{ // Track for Conversion
+              //             outerRadius: '112%',
+              //             innerRadius: '88%',
+              //             backgroundColor: trackColors[0],
+              //             borderWidth: 0
+              //         }, { // Track for Engagement
+              //             outerRadius: '87%',
+              //             innerRadius: '63%',
+              //             backgroundColor: trackColors[1],
+              //             borderWidth: 0
+              //         }, { // Track for Feedback
+              //             outerRadius: '62%',
+              //             innerRadius: '38%',
+              //             backgroundColor: trackColors[2],
+              //             borderWidth: 0
+              //         }]
+              //     },
             
-                  yAxis: {
-                      min: 0,
-                      max: 100,
-                      lineWidth: 0,
-                      tickPositions: []
-                  },
+              //     yAxis: {
+              //         min: 0,
+              //         max: 100,
+              //         lineWidth: 0,
+              //         tickPositions: []
+              //     },
             
-                  plotOptions: {
-                      solidgauge: {
-                          dataLabels: {
-                              enabled: false
-                          },
-                          linecap: 'round',
-                          stickyTracking: false,
-                          rounded: true
-                      }
-                  },
+              //     plotOptions: {
+              //         solidgauge: {
+              //             dataLabels: {
+              //                 enabled: false
+              //             },
+              //             linecap: 'round',
+              //             stickyTracking: false,
+              //             rounded: true
+              //         }
+              //     },
             
-                  series: [{
-                      name: 'Conversion',
-                      data: [{
-                          color: Highcharts.getOptions().colors[0],
-                          radius: '112%',
-                          innerRadius: '88%',
-                          y: 80
-                      }],
-                      custom: {
-                          icon: 'filter',
-                          iconColor: '#303030'
-                      }
-                  }, {
-                      name: 'Engagement',
-                      data: [{
-                          color: Highcharts.getOptions().colors[1],
-                          radius: '87%',
-                          innerRadius: '63%',
-                          y: 65
-                      }],
-                      custom: {
-                          icon: 'comments-o',
-                          iconColor: '#ffffff'
-                      }
-                  }, {
-                      name: 'Feedback',
-                      data: [{
-                          color: Highcharts.getOptions().colors[2],
-                          radius: '62%',
-                          innerRadius: '38%',
-                          y: 50
-                      }],
-                      custom: {
-                          icon: 'commenting-o',
-                          iconColor: '#303030'
-                      }
-                  }]
-                  }];
+              //     series: [{
+              //         name: gaugelabelData,
+              //         data: [{
+              //             color: Highcharts.getOptions().colors[0],
+              //             radius: '112%',
+              //             innerRadius: '88%',
+              //             y: gaugeValueData,
+              //         }],
+              //         custom: {
+              //             icon: 'filter',
+              //             iconColor: '#303030'
+              //         }
+              //     }, {
+              //         name: 'Engagement',
+              //         data: [{
+              //             color: Highcharts.getOptions().colors[1],
+              //             radius: '87%',
+              //             innerRadius: '63%',
+              //             y: gaugeValueData - 20,
+              //         }],
+              //         custom: {
+              //             icon: 'comments-o',
+              //             iconColor: '#ffffff'
+              //         }
+              //     }, {
+              //         name: 'Feedback',
+              //         data: [{
+              //             color: Highcharts.getOptions().colors[2],
+              //             radius: '62%',
+              //             innerRadius: '38%',
+              //             y: gaugeValueData + 14.5,
+              //         }],
+              //         custom: {
+              //             icon: 'commenting-o',
+              //             iconColor: '#303030'
+              //         }
+              //     }]
+              //     }];
                 
-              } else if (this.chartType == 'clock gauge') {
-                let pieData: any[] = [];
-                for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                  this.ids.push(this.allData[i].data.records[j].NAME);
-                  this.names.push(Number(this.allData[i].data.records[j].Y));
-                }
-                let data1 = this.names.map((id, index) => {
-                  return { name: this.ids[index], y: id };
-                });
+              // } 
+              // else if (this.chartType == 'clock gauge') {
+              //   let pieData: any[] = [];
+              //   for (let j = 0; j < this.allData[i].data.records.length; j++) {
+              //     this.ids.push(this.allData[i].data.records[j].NAME);
+              //     this.names.push(Number(this.allData[i].data.records[j].Y));
+              //   }
+              //   let data1 = this.names.map((id, index) => {
+              //     return { name: this.ids[index], y: id };
+              //   });
               
                 
-                  this.newChartObject = [{
-                    chart: {
-                      type: 'gauge',
-                      plotBackgroundColor: null,
-                      plotBackgroundImage: null,
-                      plotBorderWidth: 0,
-                      plotShadow: false,
-                      height: '85%',
-                      identifier:'clock gauge'
-                  },
-                  credits: {
-                      enabled: false
-                  },
+              //     this.newChartObject = [{
+              //       chart: {
+              //         type: 'gauge',
+              //         plotBackgroundColor: null,
+              //         plotBackgroundImage: null,
+              //         plotBorderWidth: 0,
+              //         plotShadow: false,
+              //         height: '85%',
+              //         identifier:'clock gauge'
+              //     },
+              //     credits: {
+              //         enabled: false
+              //     },
             
-                  title: {
-                      text: 'The Highcharts clock'
-                  },
+              //     title: {
+              //         text: 'The Highcharts clock'
+              //     },
             
-                  pane: {
-                    background: [{
-                      // default background
-                    }, {
-                      // reflex for supported browsers
-                      backgroundColor: {
-                        radialGradient: {
-                          cx: 0.5,
-                          cy: -0.4,
-                          r: 1.9
-                        },
-                        stops: [
-                          [0.5, 'rgba(255, 255, 255, 0.2)'],
-                          [0.5, 'rgba(200, 200, 200, 0.2)']
-                        ]
-                      }
-                    }]
-                  },
-                  yAxis: {
-                      labels: {
-                          distance: -23,
-                          style: {
-                              fontSize: '18px'
-                          }
-                      },
-                      min: 0,
-                      max: 12,
-                      lineWidth: 0,
-                      showFirstLabel: false,
+              //     pane: {
+              //       background: [{
+              //         // default background
+              //       }, {
+              //         // reflex for supported browsers
+              //         backgroundColor: {
+              //           radialGradient: {
+              //             cx: 0.5,
+              //             cy: -0.4,
+              //             r: 1.9
+              //           },
+              //           stops: [
+              //             [0.5, 'rgba(255, 255, 255, 0.2)'],
+              //             [0.5, 'rgba(200, 200, 200, 0.2)']
+              //           ]
+              //         }
+              //       }]
+              //     },
+              //     yAxis: {
+              //         labels: {
+              //             distance: -23,
+              //             style: {
+              //                 fontSize: '18px'
+              //             }
+              //         },
+              //         min: 0,
+              //         max: 12,
+              //         lineWidth: 0,
+              //         showFirstLabel: false,
             
-                      minorTickInterval: 'auto',
-                      minorTickWidth: 3,
-                      minorTickLength: 5,
-                      minorTickPosition: 'inside',
-                      minorGridLineWidth: 0,
-                      minorTickColor: '#666',
+              //         minorTickInterval: 'auto',
+              //         minorTickWidth: 3,
+              //         minorTickLength: 5,
+              //         minorTickPosition: 'inside',
+              //         minorGridLineWidth: 0,
+              //         minorTickColor: '#666',
             
-                      tickInterval: 1,
-                      tickWidth: 4,
-                      tickPosition: 'inside',
-                      tickLength: 10,
-                      tickColor: '#666',
-                      title: {
-                          // text: 'Powered by<br/>Highcharts',
-                          style: {
-                              color: '#BBB',
-                              fontWeight: 'normal',
-                              fontSize: '10px',
-                              lineHeight: '10px'
-                          },
-                          y: 10
-                      }
-                  },
+              //         tickInterval: 1,
+              //         tickWidth: 4,
+              //         tickPosition: 'inside',
+              //         tickLength: 10,
+              //         tickColor: '#666',
+              //         title: {
+              //             // text: 'Powered by<br/>Highcharts',
+              //             style: {
+              //                 color: '#BBB',
+              //                 fontWeight: 'normal',
+              //                 fontSize: '10px',
+              //                 lineHeight: '10px'
+              //             },
+              //             y: 10
+              //         }
+              //     },
             
-                  tooltip: {
-                      format: '{series.chart.tooltipText}'
-                  },
+              //     tooltip: {
+              //         format: '{series.chart.tooltipText}'
+              //     },
             
-                  series: [{
-                      data: [{
-                          id: 'hour',
-                          y: now.hours,
-                          dial: {
-                              radius: '60%',
-                              baseWidth: 4,
-                              baseLength: '95%',
-                              rearLength: 0
-                          }
-                      }, {
-                          id: 'minute',
-                          y: now.minutes,
-                          dial: {
-                              baseLength: '95%',
-                              rearLength: 0
-                          }
-                      }, {
-                          id: 'second',
-                          y: now.seconds,
-                          dial: {
-                              radius: '100%',
-                              baseWidth: 1,
-                              rearLength: '20%'
-                          }
-                      }],
-                      animation: false,
-                      dataLabels: {
-                          enabled: false
-                      }
-                  }]
-                  }];
+              //     series: [{
+              //         data: [{
+              //             id: 'hour',
+              //             y: now.hours,
+              //             dial: {
+              //                 radius: '60%',
+              //                 baseWidth: 4,
+              //                 baseLength: '95%',
+              //                 rearLength: 0
+              //             }
+              //         }, {
+              //             id: 'minute',
+              //             y: now.minutes,
+              //             dial: {
+              //                 baseLength: '95%',
+              //                 rearLength: 0
+              //             }
+              //         }, {
+              //             id: 'second',
+              //             y: now.seconds,
+              //             dial: {
+              //                 radius: '100%',
+              //                 baseWidth: 1,
+              //                 rearLength: '20%'
+              //             }
+              //         }],
+              //         animation: false,
+              //         dataLabels: {
+              //             enabled: false
+              //         }
+              //     }]
+              //     }];
                 
-              } else{
+              // } 
+              else{
               }
               this.ids = [];
               this.names = [];
@@ -1876,31 +1911,18 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.http.post<any>(GlobalConstants.selectChartRelatedToKpi + data.ID, { headers: GlobalConstants.headers }).subscribe(
       (res:any) => {
           this.chartData = res
-  
-//   setTimeout(() => {
-    
-//   const dialogConfig = new MatDialogConfig();
-//   dialogConfig.width = '500px';
-//   dialogConfig.height = '500px';
-  
-//   const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
-//     data: this.chartData,
-//     width: '50%',
-//     height: '60%',
-//   });
-// }, 1000);
 
-setTimeout(() => {
-  const dialogConfig = new MatDialogConfig();
-  dialogConfig.width = '700px';
-  dialogConfig.height = '700px';
+      setTimeout(() => {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.width = '700px';
+        dialogConfig.height = '700px';
 
-  const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
-    data: this.chartData,
-    width: '50%',
-    height: '60%',
-  });
-}, 1000);
+        const dialogRef = this.dialog.open(ChartFromKpiBuilderComponent, {
+          data: this.chartData,
+          width: '50%',
+          height: '60%',
+        });
+      }, 1000);
 });
 
   }
@@ -1955,7 +1977,7 @@ setTimeout(() => {
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',
-          height: '300px',
+          height: '35%',
         });
       });
     } else if (data.type == 'Grid') {
@@ -1978,7 +2000,7 @@ setTimeout(() => {
         const dialogRef = this.dialog.open(GridBuilderPreviewComponent, {
           data: info,
           width: '50%',
-          height: '60%',
+          height: '50%',
         });
 
       }, 1000);

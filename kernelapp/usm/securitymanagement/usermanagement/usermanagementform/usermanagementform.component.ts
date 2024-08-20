@@ -375,14 +375,14 @@ export class Usermanagementform implements OnInit {
           const addUSMUser = from(axios.post(GlobalConstants.addUSMUserApi, formData));
           const addUSMUserUrl = await lastValueFrom(addUSMUser);
           let res = addUSMUserUrl.data;
-
-          if (res.body.status == 'Fail') {
-            this.commonFunctions.alert("alert", res.body.description);
+          console.log("RES>>>>>>>>>>>>",res);
+          if (res.status == 'Fail') {
+            this.commonFunctions.alert("alert", res.description);
           } else {
-            this.commonFunctions.alert("alert", res.body.description);
-            this.userId = res.body.userId;
+            this.commonFunctions.alert("alert", res.description);
+            this.userId = res.userId;
             this.actionType = 'update';
-            this.route.navigateByUrl(this.menuPath + "/form/" + this.actionType + "/" + this.userId);
+            this.route.navigateByUrl("/usm/userMgmt");
             this.fetchUserData();
           }
         } else {

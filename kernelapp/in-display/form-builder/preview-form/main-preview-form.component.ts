@@ -14,6 +14,7 @@ import axios from 'axios';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
 import { FileDownloadService } from 'src/app/Kernel/components/map/Services/FileDownloadService.service';
+import { LoaderService } from 'src/app/Kernel/components/map/Services/loader.service';
 
 @Component({
   selector: 'main-preview-form',
@@ -27,6 +28,7 @@ export class PreviewFormComponent implements OnInit {
   public isGridOptions:any;
   @Input() fromScreenBuilder: String = "0";
   @Input() screenBuilderObjId: any;
+  public newVariableTitle: string = '';
   public mainPreviewDataFromMain:any[]=[];
   public subsVar: Subscription;
   public AllTabs: any = [];
@@ -76,6 +78,7 @@ export class PreviewFormComponent implements OnInit {
   // public getWhereCond: any[] = [];
   public jp:boolean =true;
   isUpdateColsDef: number = 0;
+  public isDialog: boolean = false;
 
 
   constructor(private http: HttpClient,
@@ -86,6 +89,7 @@ export class PreviewFormComponent implements OnInit {
     private dataservice: DataService,
     public informationservice: InformationService,
     private refreshService: RefreshDialogService,
+    public loaderService: LoaderService,
     private fileDownloadService:FileDownloadService
   ) { }
 
@@ -118,7 +122,6 @@ export class PreviewFormComponent implements OnInit {
 }
 
   getAllColums() {
-
     // Filter array on needed data
     let getMainTab = this.AllTabs.filter(function (el: any) {
       return el.isMain == 1;
@@ -550,7 +553,7 @@ export class PreviewFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-   
+    this.loaderService._loading.next(true);
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
 
@@ -607,8 +610,9 @@ export class PreviewFormComponent implements OnInit {
 
             let previousTab = this.informationservice.getPreviousMainTab();
 
-            if (this.informationservice.getMainTab() != null && this.informationservice.getMainTab() != "") {
-
+            if (this.informationservice.getMainTab() != null && this.informationservice.getMainTab() != "")
+            {
+              this.isDialog = true;
               this.informationservice.setPreviousMainTab(this.informationservice.getMainTab())
             }
             if (previousTab) {
@@ -635,6 +639,8 @@ export class PreviewFormComponent implements OnInit {
         this.tableOptions1 = this.tableOptions1.filter(value => value.isMain == '1');
         this.http.get<any>(GlobalConstants.getMenuNameApi + this.objectId).subscribe((data: any) => {
           this.AllTabs = data;
+          let variableTitle = JSON.stringify(data[0].menuName);
+          this.newVariableTitle = variableTitle.replace(/"/g, '');
           this.isGridOptions=this.tableOptions1[0].isGrid;
           console.log("IS GRID OPTIONS>>>>>>>>>>>",this.isGridOptions);
           this.getAllColums();
@@ -647,6 +653,7 @@ export class PreviewFormComponent implements OnInit {
     }, 1000);
 
 
+    this.loaderService._loading.next(false);
   }
 
   onAddClick() {
@@ -1030,6 +1037,10 @@ this.informationservice.setISExport(true);
     this.fileDownloadService.downloadFile('SimulationReport_'+ID+'.html');
   }
  
+  closeDialog()
+  {
+    this.dialog.closeAll();
+  }
 
 }
 
