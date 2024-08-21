@@ -59,8 +59,8 @@ export class InformationService {
   public selectedChart : any = '';
   public navBreadCrumb : any[] =[];
   public vcisrowData : any ;
-
-  
+  public checkParentMenu : number=0;
+  public checkParentMenuFirst : String = "";
   constructor() { }
 
   //authentication still has a localstorage
@@ -559,4 +559,22 @@ export class InformationService {
   getVcisrowData(){
       return this.vcisrowData;
   }
+  getCheckParentMenu(){
+    return this.checkParentMenu;
+  }
+  incrementCheckParentMenu(){
+    this.checkParentMenu++;
+  }
+  decrementCheckParentMenu(){
+  this.checkParentMenu--;
+  }
+  setCheckParentMenu(){
+    this.checkParentMenu=0;
+  }
+getCheckParentMenuFirst(){
+  return this.checkParentMenuFirst;
+}
+setCheckParentMenuFirst(i : String){
+  this.checkParentMenuFirst = i;
+}
 }

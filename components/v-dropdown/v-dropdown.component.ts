@@ -126,7 +126,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
             let dropdownDataPromise: Promise<any>;
   
             if (this.dataBody != '') {
-              dropdownDataPromise = axios.post(this.dataApi, this.dataBody);
+              dropdownDataPromise = axios.get(this.dataApi, this.dataBody);
             } else {
               dropdownDataPromise = axios.get(this.dataApi);
             }

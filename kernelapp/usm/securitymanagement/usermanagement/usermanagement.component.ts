@@ -61,7 +61,6 @@ export class Usermanagement {
         field: 'FULLNAME',
         filter: 'agTextColumnFilter',
         sortable: true,
-        isLink: true,
         linkType:'field',
         link: "/usm/userMgmt/form/update/",
         linkParameters: "ID"

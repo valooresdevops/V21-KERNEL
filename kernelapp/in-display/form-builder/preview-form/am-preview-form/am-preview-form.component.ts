@@ -7600,12 +7600,14 @@ console.log('COLUMN_ID--------------------->',data[i])
         for(let i=0;i<JSON.parse(jsonResponse).length;i++){
           responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i]+"#",JSON.parse(jsonResponse)[i].fieldName);
         }
+        console.log("method id>>>>>>>>>>>>>>",url);
 
         console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
         console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
 
-
-
+           const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,{}));
+           const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
+        console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
        // console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
 
         //  const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));

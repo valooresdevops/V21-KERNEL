@@ -14,6 +14,8 @@ import { KpiRatioPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/kpi-r
 import { GridPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/grid-popup/grid-popup.component';
 import { DashboardPopupComponent } from 'src/app/Kernel/kernelapp/dashboard/dashboard-popup/dashboard-popup.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { from } from 'rxjs';
+import axios from 'axios';
 import { DashboardAccessRightsComponent } from '../../kernelapp/dashboard/dashboard-access-rights/dashboard-access-rights.component';
 
 @Component({
@@ -35,10 +37,13 @@ export class SideNavComponent implements OnInit {
   public menuVariable: String = "";
   public breadCrumbData:any[]=[];
   public userId = this.informationservice.getLogeduserId();
+  public menuName : String = "";
   // public userId = 1;
   public prevParentCode: String = ''; // Used to store the previous parent menu before selecting the child menu
   public appSname: String = '';
+   a: boolean =false;
   user !: SignInData;
+  public goBackSrc: String = "assets/img/goBack.png"
   
   //String to be shown as path
   public customPath: string = '';
@@ -50,13 +55,53 @@ export class SideNavComponent implements OnInit {
   });
 
   @Input() applicationName: any;
+  @Input() bubbleName: any;
   @ViewChild(AppComponent) child: any;
+  isCollapsed: boolean = true; // Initial state of the side navigation, adjust as needed
+
+  checkParent(){
+    alert(111111);
+  }
+
+  decrementParentTabCount(){
+    this.informationservice.decrementCheckParentMenu();
+    if(this.informationservice.getCheckParentMenu() ==1){
+      this.informationservice.setCheckParentMenu();
+    }
+  }
+   // Function to insert selected tabs into the database 
+   insertTab( menuId: String , menuName : String){
+  
+    // alert(11111111111);
+    this.informationservice.incrementCheckParentMenu();
+    // alert(this.informationservice.getCheckParentMenu());
+    if(this.informationservice.getCheckParentMenu()==1){
+      this.informationservice.setCheckParentMenuFirst(menuId);
+    }
+    
+      if (this.informationservice.getCheckParentMenuFirst.length === 1) {
+        menuId ='00' + menuId;
+            } else if(this.informationservice.getCheckParentMenuFirst.length === 2){
+              menuId ='0' + menuId;
+            }
+  
+    const loggedUserId = localStorage.getItem('LogeduserId');
+    // console.log("userId>>>>>>", loggedUserId);
+    const ipAddress = window.location.hostname;
+    // console.log("ip>>>>>",window.location.hostname);
+    const saveToDB = from(axios.post(GlobalConstants.insertSelectedTab + menuId + "/"+loggedUserId + "/"+ipAddress +"/"+menuName));
+    // this.from(GlobalConstants.insertSelectedTab + menuId + "/"+loggedUserId + "/"+ipAddress, { headers: GlobalConstants.headers });
+  saveToDB;
+   }
 
   // Function used to navigate to child menus based on clicked parent
   toggleActiveMenu(menuCode: String, appAbrv: String, childMenusCount: String,menuName:String) {
     console.log("SELECTED MENU NAME>>>>>>>>>",menuName);
+    console.log("Child Menu Count>>>>>>>>>",childMenusCount);
+
     console.log("ROUTER URL>>>>>>>>>>>>",this.router.url);
     console.log("ALL APPLICATIONS>>>>>",this.applicationName);
+    this.menuName = menuName;
 //      let  breadCrumbList: any[] = []; 
 
     /////////////////////////elie new Breadcrumb/////////////////////////////
@@ -176,7 +221,13 @@ export class SideNavComponent implements OnInit {
 
   // Function used to navigate to a page by routing
   onSelect(menuVariable: any, childMenus: any, name: any) {
+    console.log("menuName>>>>>>>",name);
+    console.log("menuVariable>>>>>",menuVariable);
+    console.log("menuChildrens>>>>>>",childMenus);
     //building the path for the custom path used for the apps made by the screen
+    console.log("menuVariable>>>>>>>>>>>>>",menuVariable);
+    console.log("childMenus>>>>>>>>>>>>>",childMenus);
+    console.log("name>>>>>>>>>>>>>",name);
     if (this.customPath != undefined && this.customPath != '') {
       //adding names to the path
       const newPathSegment = " / " + name;
@@ -252,8 +303,8 @@ export class SideNavComponent implements OnInit {
     if(!isFromBreadCrumb){
     setTimeout(() => {
       this.informationservice.getNavBreadCrumb()[this.informationservice.getNavBreadCrumb().length-1].route=this.router.url
-      console.log(this.informationservice.getNavBreadCrumb()[this.informationservice.getNavBreadCrumb().length-1].route);
-      console.log("elieeee>>>>>>>>>>>>>",this.informationservice.getNavBreadCrumb());
+      // console.log(this.informationservice.getNavBreadCrumb()[this.informationservice.getNavBreadCrumb().length-1].route);
+      // console.log("elieeee>>>>>>>>>>>>>",this.informationservice.getNavBreadCrumb());
     }, 500);
   }else{
 
@@ -321,6 +372,7 @@ export class SideNavComponent implements OnInit {
   // Function used to fetch child menus related to a parent menu code
   fetchChildMenus(menuCode: any) {
     var dynamicMenus = new Array()
+    var bubbleMenus = new Array()
     this.http.get(GlobalConstants.fetchMenuApi + menuCode + "/" + this.userId, { headers: GlobalConstants.headers }).subscribe(
       (data) => {
         console.log("FETCH MENUUUU>>>>>>>>>>>",data);
@@ -329,6 +381,8 @@ export class SideNavComponent implements OnInit {
           this.menuVariable = menus[i].menuVariable;
           // fetchUserAccessRights();
           if (menus[i].menuManaged == '1') {
+            if(menus[i].menuType !='10'){
+              this.a=false;
             dynamicMenus.push({
               id: menus[i].menuCode,
               appAbrv: menus[i].appSname,
@@ -340,15 +394,35 @@ export class SideNavComponent implements OnInit {
               menuManaged: menus[i].menuManaged,
               display: menus[i].isDisplay
             });
+          }else if(menus[i].menuType == '10'){
+            this.a=true;
+            bubbleMenus.push({
+              id: menus[i].menuCode,
+              appAbrv: menus[i].appSname,
+              name: menus[i].menuName,
+              icon: menus[i].menuIcon,
+              parentCode: menus[i].prevParentCode,
+              menuVariable: menus[i].menuVariable,
+              childMenus: menus[i].childMenus,
+              menuManaged: menus[i].menuManaged,
+              display: menus[i].isDisplay
+            });
+          }
           }
           this.prevParentCode = menus[i].prevParentCode.toString();
           if(this.prevParentCode === '-1'){
             this.customPath = '';
           }
         }
+      
+      if(this.a == true){
+        this.applicationName = bubbleMenus;
+      }else{
+        this.applicationName = dynamicMenus;
+  
       }
+    }
     );
-    this.applicationName = dynamicMenus;
   }
 
   // Function used to show arrow on menu containing child menus
@@ -361,6 +435,8 @@ export class SideNavComponent implements OnInit {
 
   // Function used to toggle side-nav menu
   toggleSwitch() {
+    this.isCollapsed = !this.isCollapsed;
+
     $(".navigateToChildArrow").css("display", "none");
     if ($(".side-nav").attr("class")?.indexOf("active") != -1) {
       $(".side-nav .body-section").css({ "overflow-y": "auto", "scrollbar-width": "" });
@@ -406,7 +482,7 @@ export class SideNavComponent implements OnInit {
     // In case of application related reset choosenTab control that's found in v-tabs
     // localStorage.removeItem("choosenTab");
     this.informationservice.removeChoosenTab();
-
+    this.informationservice.setCheckParentMenu();
     // Start application with root menus
     this.fetchChildMenus(0);
     this.prevParentCode = '0';

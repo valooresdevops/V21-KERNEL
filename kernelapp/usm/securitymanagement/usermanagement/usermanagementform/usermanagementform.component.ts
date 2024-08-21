@@ -381,7 +381,7 @@ export class Usermanagementform implements OnInit {
           } else {
             this.commonFunctions.alert("alert", res.description);
             this.userId = res.userId;
-            this.actionType = 'update';
+            // this.actionType = 'update';
             this.route.navigateByUrl("/usm/userMgmt");
             this.fetchUserData();
           }
@@ -389,7 +389,6 @@ export class Usermanagementform implements OnInit {
           this.commonFunctions.alert("alert", 'Passwords do not match');
         }
       }
-
       if (this.actionType == 'update') {
         this.showHideTabs = true;
         if (

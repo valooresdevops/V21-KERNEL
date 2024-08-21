@@ -1,8 +1,13 @@
 <form [formGroup]="logsUserForm" id="formRow">
     <div class="row" >
         <div class="col-lg-3">
-            <v-dropdown formControlName="userLogs" placeholder="User" label="User" [parentForm]="logsUserForm"
-                  fieldName="userLogs" required="true" [dataApi]="userLogs">
+            <v-dropdown 
+                formControlName="userLogs"
+                placeholder="User" 
+                label="User" [parentForm]="logsUserForm"
+                fieldName="userLogs" 
+                required="true" 
+                [dataApi]="userLogs">
              </v-dropdown>
         </div>
         <div class="col-lg-3">
@@ -21,10 +26,9 @@
 </form>
 <v-grid *ngIf="isShown"
         allowSideBar="true"
-         
         [agColumns]="agColumns"
         [pagination]="true"
         [paginationPageSize]="15"
-        [dataApi]="userLogsGrid"
+        [staticData]="userLogsGrid"
         agPrimaryKey="id">
 </v-grid>

@@ -60,7 +60,7 @@ export class APIBuilderComponent implements OnInit {
         link: "/dsp/apiBuilder/form/update/",
         linkParameters: "method_id"
       },
-    
+
     ];
     this.agColumns.push(this.agColumnsJson);
   }
@@ -71,7 +71,7 @@ export class APIBuilderComponent implements OnInit {
   }
 
   onUpdateClick() {
-    
+
     this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
     console.log("select row record --- ",this.agGridSelectedNodes);
     if(this.agGridSelectedNodes == '') {
@@ -89,7 +89,7 @@ export class APIBuilderComponent implements OnInit {
 
 
   onDeleteClick() {
-    
+
     this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
     let selectedNodes = this.agGridSelectedNodes;
     if (selectedNodes.length == 0) {
@@ -103,7 +103,7 @@ export class APIBuilderComponent implements OnInit {
           next:(res) => {
             console.log(res);
             this.commonFunctions.alert("alert", 'Deleted Successfully');
-            this.commonFunctions.reloadPage('/dsp/apiBuilder/form/delete');
+            this.commonFunctions.reloadPage('/dsp/apiBuilder');
           },
           error:(error) => {
             console.log(error);
@@ -111,11 +111,11 @@ export class APIBuilderComponent implements OnInit {
          } );
       }
     } else {
-      this.http.delete<any>(GlobalConstants.deleteApiData + selectedNodes,
-        {headers: GlobalConstants.headers}).subscribe({
+      console.log("selectedNodes>>>>>>>>>",selectedNodes);
+      this.http.delete<any>(GlobalConstants.deleteApiData + selectedNodes, {headers: GlobalConstants.headers}).subscribe({
         next:(res) => {
           this.commonFunctions.alert("alert", 'Deleted Successfully');
-          this.commonFunctions.reloadPage('/dsp/apiBuilder/form/delete');
+          this.commonFunctions.reloadPage('/dsp/apiBuilder');
         },
        error:(error) => {
           console.log(error);
@@ -124,6 +124,6 @@ export class APIBuilderComponent implements OnInit {
     }
   }
 }
-  
+
 
 }

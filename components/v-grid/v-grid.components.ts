@@ -1811,7 +1811,7 @@ onCellEditingStopped(event: any) {
 
           try {
             console.log('dataApi----->',this.dataApi);
-            console.log("gridOaram---->",gridParam)
+            console.log("gridParam---->",gridParam)
             const gridDataApi = gridParam === ""
   ? from(axios.get(this.dataApi))
   : from(axios.post(this.dataApi, gridParam));

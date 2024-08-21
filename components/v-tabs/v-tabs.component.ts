@@ -226,6 +226,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
     }else{
       return
     }
+    console.log("tab path>>>>>>>>>>>>>>>>",this.informationservice.getTabpath);
 
   }
 

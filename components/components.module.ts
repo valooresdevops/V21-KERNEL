@@ -83,6 +83,7 @@ import { PropertiesComponent } from './map/component/properties/properties.compo
 import { TimelineComponent } from './map/timeline/timeline.component';
 import { MapOfflineComponent } from './map/map-offline/map-offline.component';
 import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-name-shape.component';
+import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -145,7 +146,8 @@ import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-
         PropertiesComponent,
         TimelineComponent,
         MapOfflineComponent,
-        PopupNameShapeComponent
+        PopupNameShapeComponent,
+        BubbleButtonComponent
 
     ],
     imports: [
@@ -216,7 +218,8 @@ import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-
         PropertiesComponent,
         TimelineComponent,
         MapOfflineComponent,
-        PopupNameShapeComponent
+        PopupNameShapeComponent,
+        BubbleButtonComponent
 
     ],
     schemas: [

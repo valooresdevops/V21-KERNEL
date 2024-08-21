@@ -26,7 +26,7 @@ export class APIBuilderForm implements OnInit {
     private route: Router,
     public informationservice: InformationService
   ) { }
-  
+
   apiBuilderForm = new UntypedFormGroup({
     methodId: new UntypedFormControl(''),
     methodName: new UntypedFormControl(''),
@@ -63,8 +63,7 @@ export class APIBuilderForm implements OnInit {
     const fetchUSMUser = from(axios.post(GlobalConstants.getAPIMethodFormResults + this.apiMethodId));
     const fetchUSMUserUrl = await lastValueFrom(fetchUSMUser);
     let res = fetchUSMUserUrl.data;
-    console.log("res>>>>>>>>",res);
-    
+
     // to fetch regular input
     this.apiBuilderForm.controls['methodId'].setValue(res[0].method_id);
     this.apiBuilderForm.controls['methodName'].setValue(res[0].method_name);
@@ -76,7 +75,7 @@ export class APIBuilderForm implements OnInit {
     this.apiBuilderForm.controls['requestParameter'].setValue(res[0].request_parameter);
     this.apiBuilderForm.controls['responseParameter'].setValue(res[0].response_parameter);
     this.apiBuilderForm.controls['tokeFlag'].setValue(res[0].token_flag);
-    
+
     // to fetch the toggle
     if (res.token == "0") {
       this.apiBuilderForm.controls['token'].setValue(false);
@@ -87,7 +86,6 @@ export class APIBuilderForm implements OnInit {
   }
 
   async submitForm() {
-
     var methodId = this.apiBuilderForm.controls['methodId']?.value;
     var methodName = this.apiBuilderForm.controls['methodName']?.value;
     var url = this.apiBuilderForm.controls['url']?.value;
@@ -110,18 +108,34 @@ export class APIBuilderForm implements OnInit {
     formData.append('request_parameter', requestParameter);
     formData.append('response_parameter',responseParameter);
     formData.append('token_flag', tokeFlag);
-
-    if (this.actionType == 'create'){
+let json={
+  'method_id':methodId,
+  'method_name':methodName,
+  'url':url,
+  'token':token,
+  'header':header,
+  'flag_id':flagId,
+  'method_type':methodType,
+  'request_parameter':requestParameter,
+  'response_parameter':responseParameter,
+  'token_flag':tokeFlag
+}
       if (this.apiBuilderForm.status != 'INVALID') {
         if (this.actionType == 'create') {
-            const insertApiDataApi = from(axios.post(GlobalConstants.insertApiData,formData));
+            const insertApiDataApi = from(axios.post(GlobalConstants.insertApiData,json));
             const insertApiData = await lastValueFrom(insertApiDataApi);
-    } else{
-      const updateApiDataApi = from(axios.post(GlobalConstants.updateApiData,{}));
-      const updateApiData = await lastValueFrom(updateApiDataApi);
+            this.commonFunctions.alert("alert", 'Created Successfully');
 
-    }
+            this.commonFunctions.navigateToPage("/dsp/apiBuilder");
+    } else{
+      const updateApiDataApi = from(axios.post(GlobalConstants.updateApiData+methodId,json));
+      const updateApiData = await lastValueFrom(updateApiDataApi);
+      this.commonFunctions.alert("alert", 'Updated Successfully');
+
+      this.commonFunctions.navigateToPage("/dsp/apiBuilder");
+
+
     }
     }
 }
-} 
+}

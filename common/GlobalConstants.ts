@@ -98,6 +98,7 @@ export class GlobalConstants {
   public static getInvalidLogsApi = GlobalConstants.usmGateway + 'api/getAllInvalidLogs/';
   // public static getApplicationCombo = GlobalConstants.usmGateway + 'api/getApplicationObjectCombo/';
   public static getMenuName = GlobalConstants.usmGateway + 'api/getMenuName/';
+  public static getMenuNameByPCode = GlobalConstants.usmGateway + 'api/getMenuNameByPCode/';
   public static getObjectLogsApi = GlobalConstants.usmGateway + 'api/getAllLogsByObject/';
   public static getFieldHistoryLog = GlobalConstants.usmGateway + 'api/getAllFieldHistoryLog';
   // public static getLogsByHeatmap=GlobalConstants.usmGateway + 'api/getAllLogsByHeatmap';
@@ -113,6 +114,8 @@ export class GlobalConstants {
   public static updateUSMUsersRoleApi = GlobalConstants.usmGateway + 'api/usmUsersRole/';
   public static getUSMAccessRightsApi = GlobalConstants.usmGateway + 'api/getUSMAccessRightsApi/';
   public static getUSMPwdExpPeriodApi = GlobalConstants.usmGateway + 'api/getPwdExpPeriodCombo/';
+  public static insertSelectedTab = GlobalConstants.usmGateway + 'api/insertSelectedTab/';
+
   //public static fetchUSMInvalidLoginApi: any;
   //public static fetchUSMFieldHistoryLog: any;
   //public static fetchUSMUSMApplicationComboApi: any;
@@ -433,17 +436,19 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getApiMethodData = GlobalConstants.inDispGatewat + 'api/getApiMethodData/';
 
 
-  public static getAPIMethodResults =GlobalConstants.inDispGatewat + '/api/GetApiMethodResult/';
-  public static getAPIMethodFormResults = GlobalConstants.inDispGatewat + '/api/GetApiMethodFormResult/';
-  public static insertApiData = GlobalConstants.inDispGatewat + '/api/InsertApiData';
-  public static updateApiData =GlobalConstants.inDispGatewat + '/api/UpdateApiData/';
-  public static deleteApiData =GlobalConstants.inDispGatewat + '/api/DeleteApiData/';
+  public static getAPIMethodResults =GlobalConstants.inDispGatewat + 'api/GetApiMethodResult/';
+  public static getAPIMethodFormResults = GlobalConstants.inDispGatewat + 'api/GetApiMethodFormResult/';
+  public static insertApiData = GlobalConstants.inDispGatewat + 'api/InsertApiData';
+  public static updateApiData =GlobalConstants.inDispGatewat + 'api/UpdateApiData/';
+  public static deleteApiData =GlobalConstants.inDispGatewat + 'api/DeleteApiData/';
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
   public static getSearchType = GlobalConstants.inDispGatewat + 'api/getSearchType/';
   public static getWhereCondition = GlobalConstants.inDispGatewat + 'api/getWhereCondition/';
   public static getThirdDropDown = GlobalConstants.inDispGatewat + 'api/getThirdDropDown/';
+  public static runDynamicBuiltApi = GlobalConstants.inDispGatewat + 'api/RunAPI/';
 
+  
   // public static getLibrary = GlobalConstants.inDispGatewat + 'api/getLibrary/';
 
 

@@ -335,14 +335,14 @@ if(this.UserId!=null){
            console.log("save success !!")
           }
         });
-if(this.menuPath=='/usm/userMgmt'){
+//if(this.menuPath=='/usm/userMgmt'){
   
-  this.commonFunctions.reloadPage('/usm/userMgmt/form/update/'+this.informationservice.getUserId());
-}else{
+this.router.navigateByUrl("/usm/userMgmt/form/update/"+this.informationservice.getAgGidSelectedNode());
+// }else{
   
-  this.commonFunctions.reloadPage('/usm/role/form/update/'+this.informationservice.getUserRoleId());
-}
-console.log("SUCCESSFUL SAVE FINALLY GOOD JOB!!!!!!!!!!!!!!!!!")
+//   this.commonFunctions.reloadPage('/usm/role/form/update/'+this.informationservice.getUserRoleId());
+// }
+//console.log("SUCCESSFUL SAVE FINALLY GOOD JOB!!!!!!!!!!!!!!!!!")
 
   }
 

@@ -3,8 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
-//working exple: user:2(charbel.a) application: 5(insystem) logindate:10-10-2017
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { HttpClient } from '@angular/common/http';
+import axios from 'axios';
+import { from, lastValueFrom } from 'rxjs';
+
 @Component({
   selector: 'app-logsbyuser',
   templateUrl: './logsbyuser.component.html',
@@ -22,9 +25,11 @@ export class LogsbyuserComponent implements OnInit {
   public userLogsGrid: any;
   public id:string = '';
   public isShown: boolean = false ;
+   gridData : any[] = [];
+  gridValue: any[] = [];
 
-  constructor(public datepipe: DatePipe,
-
+  constructor(private http: HttpClient,
+    public datepipe: DatePipe,
     public informationservice: InformationService) {}
 
   logsUserForm = new UntypedFormGroup({
@@ -33,82 +38,160 @@ export class LogsbyuserComponent implements OnInit {
     loginDate : new UntypedFormControl('')
    });
   ngOnInit(): void {
-
     $("#formRow").addClass("vh-100");
-    this.userLogs = GlobalConstants.fetchUserCombo;
+
+    this.userLogs=GlobalConstants.fetchUserCombo;
     this.application = GlobalConstants.fetchUSMRolesAppComboApi;
 
     this.agColumnsJson = [
       {
         headerName: 'Application',
-        field: 'application',
+        field: 'applicationname',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Operation Type',
-        field: 'operationType',
+        field: 'operationtype',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Operation Description',
-        field: 'operationDescription',
+        field: 'operationhint',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Operation Date',
-        field: 'operationDate',
+        field: 'operationdate',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Login Date',
-        field: 'loginDate',
+        field: 'logindate',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Logout Date',
-        field: 'logoutDate',
+        field: 'logoutdate',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'IP',
-        field: 'ip',
+        field: 'logip',
         filter: 'agTextColumnFilter',
         sortable: true
       }
     ];
+    // this.agColumnsJson = [
+    //   {
+    //     headerName: 'Log Id',
+    //     field: 'logId',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Application Code ',
+    //     field: 'applicationCode',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Application Name',
+    //     field: 'applicationName',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Operation Type Id',
+    //     field: 'operationTypeId',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Operation Type',
+    //     field: 'operationType',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Operation Hint',
+    //     field: 'operationHint',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Operation Date',
+    //     field: 'operationDate',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Emp Id',
+    //     field: 'empId',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Log Ip',
+    //     field: 'logIp',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Login Date',
+    //     field: 'loginDate',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Logout Date',
+    //     field: 'logoutDate',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Is Action',
+    //     field: 'isAction',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   },
+    //   {
+    //     headerName: 'Creation Date',
+    //     field: 'creationDate',
+    //     filter: 'agTextColumnFilter',
+    //     sortable: true
+    //   }
+    // ];
+    this.agColumns = [];
     this.agColumns.push(this.agColumnsJson);
   }
 
-  searchForm(){
+  //////////Sigma
+  async searchForm(){
+    const userLogs = this.logsUserForm.get('userLogs').value ;
+    // console.log("typeoffff0000>>>>>>",typeof this.logsUserForm.get('userLogs').value);
+    let application = this.logsUserForm.get('application').value == "" ? "-1" : this.logsUserForm.get('application').value;
+    // console.log("typeoffff1111>>>>>>",typeof this.logsUserForm.get('application').value);
+    const loginDate = this.datepipe.transform(this.logsUserForm.get('loginDate').value, 'MM-dd-yyyy');
+    // console.log("loginDate >>> ", typeof loginDate);
+    const getLogsByUserApi = from(axios.post(GlobalConstants.getLogsByUserApi+ userLogs+"/"+application + "/"+loginDate,{}));
+    const getLogsByUser = await lastValueFrom(getLogsByUserApi);
+    this.userLogsGrid = getLogsByUser.data;
+   console.log("typeoffffffff", typeof this.userLogsGrid);
+   console.log("userLogsGrid>>>>>>>>>>>>  ", this.userLogsGrid);
     if(this.logsUserForm.status != "INVALID")
     {
     $("#formRow").removeClass("vh-100");
     this.isShown = true;
 
-    console.log("userLogs >>> ", this.logsUserForm.get('userLogs').value);
-    console.log("application >>> ", this.logsUserForm.get('application').value);
+    // console.log("userLogs >>> ", this.logsUserForm.get('userLogs')?.value);
+    // console.log("application >>> ", this.logsUserForm.get('application').value);
 
-    const loginDate = this.datepipe.transform(this.logsUserForm.get('loginDate').value, 'dd-MM-YYYY');
-    console.log("loginDate >>> ", loginDate);
-
-    //let application= this.logsUserForm.get('application').value;
-    // if(application.toString().length == 1){
-    //   application = '00'+application;
-    //         }
-    //  if(application.toString().length == 2){
-    //  application = '0'+application;
-    //                 }
-    const userLogs = this.logsUserForm.get('userLogs').value == "" ? "-1" : this.logsUserForm.get('userLogs').value;
-    let application = this.logsUserForm.get('application').value == "" ? "-1" : this.logsUserForm.get('application').value;
-    this.userLogsGrid = GlobalConstants.getLogsByUserApi + userLogs+"/"+ application+ "/"+loginDate;
-
-    console.log("userLogsGrid>>>>>>>>>>>>  ", this.userLogsGrid);
   }
 }
 }

@@ -590,7 +590,7 @@ export class PreviewFormComponent implements OnInit {
 
           ///////// elie  am preview form in main preview form/////////////
           this.mainPreviewDataFromMain= [{
-            objectId: this.objectMain,
+            objectId: this.objectId,
             actionType: this.actionType,
             isFromGridClick: 1,
             primaryColumn: this.columnId,
