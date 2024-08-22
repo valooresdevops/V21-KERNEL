@@ -7565,6 +7565,7 @@ console.log('COLUMN_ID--------------------->',data[i])
       }
       // Call Api
       else if (buttonAction == "3") {
+        let dataa:any=[];
 
         let formData = this.dynamicForm.value;
         if (formData) {
@@ -7602,12 +7603,154 @@ console.log('COLUMN_ID--------------------->',data[i])
         }
         console.log("method id>>>>>>>>>>>>>>",url);
 
+    
         console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
         console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
-
-           const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,{}));
+        let json={"requestJson":requestJsonString,
+                  "responseJson":responseJsonString
+        }
+           const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
            const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
         console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
+        dataa=runDynamicBuilt.data;
+
+        for (let i = 0; i < dataa.length; i++) {
+          this.loaderService.isLoading.next(true);
+          let colName = dataa[i].colName.toUpperCase();
+          let colValue = dataa[i].colValue;
+          let colType = dataa[i].colType;
+          // Remove time from date value
+          if (colType == "date") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = date.toISOString().substring(0, 10);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+
+          if (colType == "date time") {
+            // let date = new Date(colValue.substring(0, 10));
+            // colValue = date.toISOString().slice(0, 16);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "time") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = colValue.toString();
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "checkbox") {
+            //test1
+            //console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
+            if(colValue=="true"){
+
+              colValue=true;
+              //console.log("TRUE CHECKBOX",colValue);
+
+            }else{
+
+              colValue=false;
+              //console.log("FALSE CHECKBOX",colValue);
+
+            }
+          }
+
+          if (colType == "lookup") {
+
+            let occ = 0;
+            if (colValue.includes(",")) {
+              let colArrayVal = colValue.split(",")
+              for (let o = 0; o < colArrayVal.length; o++) {
+                for (let h = 0; h < this.test.length; h++) {
+                  if (this.test[h].query) {
+                    for (let k = 0; k < this.test[h].query.length; k++) {
+                      if (this.test[h].query[k].ID == colArrayVal[o] && this.test[h].name == colName) {
+                        occ = occ + 1;
+                        break;
+                      }
+
+                    }
+                  }
+                }
+                this.handleFormFieldValues(colName, colValue);
+                $('#' + colName + "_lookupName").val("Selected (" + occ + ")");
+
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colValue);
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', "Selected (" + occ + ")");
+                // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_id', colValue);
+                // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_name', "Selected (" + occ + ")");
+
+              }
+            } else {
+
+              let b = false;
+              let colId = '';
+              let fieldName = '';
+              for (let h = 0; h < this.test.length; h++) {
+
+                if (this.test[h].query) {
+
+
+                  for (let k = 0; k < this.test[h].query.length; k++) {
+                    //elie updated
+                    if (this.test[h].query[k].ID == colValue && colName==this.test[h].name) {
+                      b = true;
+                      colId = this.test[h].query[k].ID;
+                      fieldName = colName;
+                      colValue = this.test[h].query[k].NAME;
+                      break;
+                    }
+                  }
+                }
+
+                if (b) {
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colId);
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', colValue);
+                  // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_id', colId);
+                  // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_name', colValue);
+                  break;
+
+                }
+              }
+
+              this.handleFormFieldValues(colName, colId);
+              if(this.dynamicForm.controls[fieldName + "_lookupName"]){
+                this.dynamicForm.controls[fieldName + "_lookupName"].setValue(colValue);
+              }
+               $('#' + fieldName + "_lookupName").val(colValue);
+            }
+          }
+
+
+          if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "hidden") {
+            if (colName == "UPDATE_DATE") {
+              let currentDateTime = this.datepipe.transform((new Date), 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, currentDateTime);
+            } else if (colName == "UPDATED_BY") {
+              this.handleFormFieldValues(colName, this.userId);
+            } else if (colName == "CREATED_BY") {
+              this.handleFormFieldValues(colName, colValue);
+            } else if (colName == "CREATION_DATE") {
+              let date = new Date(colValue);
+              let datee = this.datepipe.transform(date, 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, datee);
+            } else {
+              this.handleFormFieldValues(colName, colValue);
+            }
+          }
+
+          // if (foreignId === colName) {
+          //     this.handleFormFieldValues(colName, colValue);
+          // } else if (colName === this.amInfo.primaryColumn) {
+          //     this.handleFormFieldValues(colName, colValue);
+          //         }
+          this.loaderService.isLoading.next(false);
+        }
+
        // console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
 
         //  const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));

@@ -18,6 +18,7 @@ export class APIBuilderForm implements OnInit {
   public apiMethodId: string = '';
   public actionType: string = '';
   public menuPath: any = this.informationservice.getMenuPath();
+  public showToken: boolean =false;
 
   constructor(
     private _Activatedroute: ActivatedRoute,
@@ -38,6 +39,7 @@ export class APIBuilderForm implements OnInit {
     tokeFlag: new UntypedFormControl(''),
     responseParameter: new UntypedFormControl(''),
     requestParameter: new UntypedFormControl(''),
+    paramType:new UntypedFormControl(''),
   });
 
 
@@ -63,7 +65,7 @@ export class APIBuilderForm implements OnInit {
     const fetchUSMUser = from(axios.post(GlobalConstants.getAPIMethodFormResults + this.apiMethodId));
     const fetchUSMUserUrl = await lastValueFrom(fetchUSMUser);
     let res = fetchUSMUserUrl.data;
-
+console.log(res)
     // to fetch regular input
     this.apiBuilderForm.controls['methodId'].setValue(res[0].method_id);
     this.apiBuilderForm.controls['methodName'].setValue(res[0].method_name);
@@ -75,12 +77,17 @@ export class APIBuilderForm implements OnInit {
     this.apiBuilderForm.controls['requestParameter'].setValue(res[0].request_parameter);
     this.apiBuilderForm.controls['responseParameter'].setValue(res[0].response_parameter);
     this.apiBuilderForm.controls['tokeFlag'].setValue(res[0].token_flag);
+    this.apiBuilderForm.controls['paramType'].setValue(res[0].param_type);
+    this.apiBuilderForm.controls['token'].setValue(res[0].token);
+
 
     // to fetch the toggle
-    if (res.token == "0") {
-      this.apiBuilderForm.controls['token'].setValue(false);
+    if (res[0].token_flag == "0") {
+      this.apiBuilderForm.controls['tokeFlag'].setValue(false);
+      this.showToken=false;
     } else {
-      this.apiBuilderForm.controls['token'].setValue(true);
+      this.apiBuilderForm.controls['tokeFlag'].setValue(true);
+      this.showToken = true;
     }
 
   }
@@ -96,6 +103,7 @@ export class APIBuilderForm implements OnInit {
     var requestParameter = this.apiBuilderForm.controls['requestParameter']?.value;
     var responseParameter = this.apiBuilderForm.controls['responseParameter']?.value;
     var tokeFlag = this.apiBuilderForm.controls['tokeFlag']?.value;
+    var paramType = this.apiBuilderForm.controls['paramType']?.value;
 
     const formData = new FormData();
     formData.append('method_id', methodId);
@@ -108,6 +116,12 @@ export class APIBuilderForm implements OnInit {
     formData.append('request_parameter', requestParameter);
     formData.append('response_parameter',responseParameter);
     formData.append('token_flag', tokeFlag);
+    formData.append('param_type', paramType);
+    if(this.apiBuilderForm.controls['tokeFlag']?.value == true){
+      tokeFlag=1;
+    }else{
+      tokeFlag=0;
+    }
 let json={
   'method_id':methodId,
   'method_name':methodName,
@@ -118,7 +132,8 @@ let json={
   'method_type':methodType,
   'request_parameter':requestParameter,
   'response_parameter':responseParameter,
-  'token_flag':tokeFlag
+  'token_flag':tokeFlag,
+  'param_type':paramType
 }
       if (this.apiBuilderForm.status != 'INVALID') {
         if (this.actionType == 'create') {
@@ -137,5 +152,14 @@ let json={
 
     }
     }
+}
+tokeFlagChange(){
+
+  if(this.apiBuilderForm.get('tokeFlag').value == true){
+this.showToken = true;
+  }else{
+this.showToken = false;
+this.apiBuilderForm.controls['token'].setValue('');
+  }
 }
 }
