@@ -1,0 +1,60 @@
+.time{
+    display: flex;
+    position: fixed;
+    z-index: 9998;
+    left: 150px;
+    bottom:20px;
+    border-radius: 15px;
+    background-color: white;
+    padding: 7px;
+    box-shadow: 0 4pd 8px black;
+    border: 1px solid #ddd;
+    font-family: Arial, sans-serif;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+div button{
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+div button:hover{
+    background-color: #0056b3;
+}
+
+@media(max-width:768px){
+    div{
+        left:2.5px;
+        bottom: 2.5px;
+        padding: 4px;
+        width: calc(50%-10px);
+        margin-left: 70px;
+        margin-bottom: 40px;
+
+    }
+    div > *{
+        flex: 1 1 auto;
+        min-width: 80px;
+    }
+}
+
+@media(max-width:768px){
+    div{
+        left:1px;
+        bottom: 1px;
+        padding: 2.5px;
+        width: calc(50%-4px);
+        margin-left: 70px;
+        margin-bottom: 40px;
+
+    }
+    div > *{
+        min-width: 60px;
+    }
+}

@@ -29,7 +29,7 @@ export class LayerControlComponent implements OnInit {
   @Input() Names: any[] = [];
   @Input() routes: any[] = [];
   @Input() display: boolean=false;
-  @Input() displayclusters: boolean=false;
+  @Input() displayclusters: boolean=true;
   @Input() displaysectors: boolean=false;
   @Input() displayRoute: boolean=false;
 
@@ -46,11 +46,11 @@ routing:boolean=false;
 /* lazy */
 
   public namesdata = this.dataTable;
-  
+ 
   // private dataTableInstance: DataTable;
 
   constructor() { }
-  
+ 
   ngOnInit(): void {
  
     //console.log("routes:::;;",this.routes);
@@ -93,26 +93,26 @@ routing:boolean=false;
   // if(this.Names.length>15){
     this.currentBatch++;
   // }
-  
+ 
   }
 
   performSearch() {
     // Clear any previous search results or selections
     this.loadedNames = [];
     this.currentBatch = 0;
-  
+ 
     // Perform the search on the entire 'books' array
     const filteredNames = this.namesdata.filter(name => name.layer_control.toLowerCase().includes(this.searchQuery.toLowerCase()));
-  
+ 
     // Slice the filtered results to load and display
     const startIndex = this.currentBatch * this.batchSize;
     const endIndex = startIndex + this.batchSize;
     this.loadedNames = filteredNames.slice(startIndex, endIndex);
-  
+ 
     if(this.Names.length>15){
       this.currentBatch++;
     }
-    
+   
   }
 
   onScroll() {
@@ -124,6 +124,9 @@ routing:boolean=false;
 
   /* lazy */
   onTooltipChange(event: any) {
+//  console.log("event in layer control---",event);
+ console.log("event in layer control---",event.target.checked);
+
     this.tooltipChange.emit(event.target.checked);
   }
 
@@ -145,8 +148,8 @@ routing:boolean=false;
   onSectorTechnologychange(event: any,technology:any) {
     this.sectorTechnologychange.emit({event,technology});
   }
-  
-  
+ 
+ 
   ondeviceClustersChange(event:any,name:any) {
     this.isChecked = event.target.checked;
     //console.log("eventt:????????/",this.isChecked);
@@ -164,7 +167,6 @@ routing:boolean=false;
   }
 
   onDateTooltipChange(event: any) {
- 
     this.datetooltipChange.emit(event.target.checked);
   }
   onCellIdchange(event: any,cdrType:any) {
@@ -188,7 +190,7 @@ routing:boolean=false;
    return {checkedCount,namearray};
   }
   onRoutechange(event:any){
-      
+     
       this.Routechange.emit(event);
 
   }

@@ -8,8 +8,8 @@
 
 #formContainer {
     position: absolute;
-    top: 50px; /* Adjust as needed */
-    left: 50px; /* Adjust as needed */
+    top: 80px; /* Adjust as needed */
+    left: 110px; /* Adjust as needed */
     z-index: 10;
     background-color: #fff; /* White background */
     padding: 20px;

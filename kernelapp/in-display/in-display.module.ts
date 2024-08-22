@@ -95,7 +95,8 @@ import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.
         KwgCytoscapeComponent,
         PopupComponent,
         NextLayerFormComponent,
-        ButtonJsonRelationComponent
+        ButtonJsonRelationComponent,
+        KwgCytoscapeComponent
     ],
     imports: [
         InDisplayRoutingModule,
@@ -110,7 +111,7 @@ import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.
         BrowserModule,
         AgGridModule ,
     ] ,
-    exports: [MasterLinkFormComponent,
+    exports: [MasterLinkFormComponent,KwgCytoscapeComponent
     ],
 })
 
