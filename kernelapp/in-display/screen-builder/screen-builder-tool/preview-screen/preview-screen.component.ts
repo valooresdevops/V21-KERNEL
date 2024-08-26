@@ -38,12 +38,12 @@ export class PreviewScreenComponent implements OnInit {
     private http: HttpClient) { }
 
     async ngOnInit() {
-
       this.itemsData = [];
   
       if (this.data == null || this.data == "undefined") {
         this._Activatedroute.paramMap.subscribe(async (params:any) => {
           this.menuVariable = params.get('menuVariable');
+          console.log("this.menuVariable-----",this.menuVariable)
           const itemsDataUrl = from(axios.get(GlobalConstants.getScreenPreviewData + this.menuVariable));
           const itemsDataa = await lastValueFrom(itemsDataUrl);
           console.log("itemsDataa===",itemsDataa);

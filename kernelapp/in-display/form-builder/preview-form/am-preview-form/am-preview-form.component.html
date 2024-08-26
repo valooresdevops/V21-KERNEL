@@ -26,7 +26,7 @@
                       
                             <div *ngIf="tableOption.isAdvancedSearch == 1 ">
                                             <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
-                                                (onSearchSubmit)="onSearchSubmit($event)"></v-dynamic-search> 
+                                                (onSearchSubmit)="onSearchSubmit($event)" isForForm="true"></v-dynamic-search> 
                             </div>
 
             <!-------------------------------------------------------------------------------------------------->
@@ -529,7 +529,7 @@
 
                     <div *ngIf="tableOption.isAdvancedSearch == 1 && isPageGrid && test_1 == '1' ">
                         <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
-                            (onSearchSubmit)="onSearchSubmit($event)"></v-dynamic-search>
+                            (onSearchSubmit)="onSearchSubmit($event)" isForForm="false"></v-dynamic-search>
                     </div>
                     <v-grid *ngIf="isPageGrid && test_1 == '1'" allowSideBar="true" [agPrimaryKey]="columnId"
                         [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [paginationPageSize]="10"

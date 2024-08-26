@@ -1,0 +1,69 @@
+<div class="header-dialog space-between mb-3" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
+    <div></div>
+    <span style="font-size: 15px; letter-spacing: 1px; color: var(--popup-title-color); font-weight: bold;">Search Configuration Form</span>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
+  </div>
+
+    <div class="form-container">
+      <form [formGroup]="searchConfigForm" enctype="multipart/form-data">
+ 
+        <div class="form-group">
+            <v-dropdown formControlName="colName" [dataApi]="getColumnNames" label="Column Name" placeholder=""
+            [parentForm]="searchConfigForm" fieldName="colName" required="true">
+            </v-dropdown>
+            <div class="error-msg" *ngIf="searchConfigForm.get('colName').errors?.['required']"></div>
+        </div>
+        
+        <div class="form-group">
+            <v-dropdown formControlName="colType" [dataApi]="getColumnType" label="Type" placeholder=""
+            [parentForm]="searchConfigForm" fieldName="colType" required="true" (onChangeEvent)="checkIfCombo()"
+            >
+            </v-dropdown>
+            <div class="error-msg" *ngIf="searchConfigForm.get('colType').errors?.['required']"></div>
+        </div>
+        
+        <div *ngIf="isCombo">
+            <v-input formControlName="comboSql" type="textarea" label="Combo Query" placeholder=""
+            [parentForm]="searchConfigForm" fieldName="comboSql" (change)="requireRevalidation()">
+            </v-input>
+            <div class="error-msg" *ngIf="searchConfigForm.get('comboSql').errors?.['required']"></div>
+            
+            <v-button *ngIf="!comboQueryIsValid" btnType="form"  value="Submit" (click)="validateComboQuery()" class="submit-button"></v-button>
+
+          </div>
+        
+          <div>
+            <v-toggle label="Is For Form" formControlName="isForForm" [parentForm]="searchConfigForm"  (toggleChange)="switchMainDropDownValues()"
+                  fieldName="isForForm"> </v-toggle>
+                </div>
+    
+
+        <div>
+        <v-toggle label="Is Mandatory" formControlName="isMandatory" [parentForm]="searchConfigForm"
+              fieldName="isMandatory"> </v-toggle>
+            </div>
+
+            <div>
+                <v-toggle label="Has Default" formControlName="isDefault" [parentForm]="searchConfigForm" (toggleChange)="fieldHasDefault()"
+                      fieldName="isDefault">
+                </v-toggle>
+            </div>
+
+            <div *ngIf="hasDefaultValue">
+
+                <div *ngIf="isCombo && comboQueryIsValid">
+                    <v-dropdown formControlName="defaultValues" [dataJSON]="defaultValuesData" label="Default Values" placeholder=""
+                    [parentForm]="searchConfigForm" fieldName="defaultValues">
+                    </v-dropdown>
+                 </div>
+
+            <div *ngIf="!isCombo">
+                <v-input formControlName="defaultValues" type="text" label="Default Value" placeholder=""
+                [parentForm]="searchConfigForm" fieldName="defaultValues">
+                </v-input></div>
+            </div>
+
+          <v-button btnActionType="submit" btnType="form" [parentForm]="searchConfigForm" value="Submit" (click)="setUpJsonAndSubmit()" [disabled]="!searchConfigForm.valid" class="submit-button"></v-button>
+        </form>
+      </div>
+    

@@ -517,6 +517,11 @@
                 [dataJSON]="actionDecisions" id="step_1" label="Action" [parentForm]="form_onAfterSave"
                 fieldName="step_1"></v-dropdown>
         </div>
+        <div class="col-lg-12 step_8">
+            <v-dropdown formControlName="step_8" [dataApi]="AllMenus" label="Menus" placeholder=""
+                [parentForm]="form_onAfterSave" fieldName="step_8"  id="step_8">
+            </v-dropdown>
+        </div>
         <div class="col-lg-12 step_2">
             <v-input formControlName="step_2" (lookupOnChange)="actionSelection('step_2', selectedRuleAction)"
                 [parentForm]="form_onAfterSave" type="lookup" [lookupDataApi]="getAllProcAndPack" id="step_2"

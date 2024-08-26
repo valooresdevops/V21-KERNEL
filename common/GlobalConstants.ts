@@ -122,6 +122,8 @@ export class GlobalConstants {
   public static fetchUSMUserComboApi: any;
   public static fetchUSMMenuComboApi: any;
   public static getUSMApplicationEvent = GlobalConstants.usmGateway + 'api/getApplicationEvent/';
+  public static getUSMApplicationEventPopup = GlobalConstants.usmGateway + 'api/getUSMApplicationEventPopup/';
+
   static fetchLogsByObject: any;
   static fetchLogsByUser: any;
 
@@ -327,10 +329,20 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
 
   public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
   public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
+  public static getDynamicSearchFields = GlobalConstants.inDispGatewat +'api/getDynamicSearchFields/';
+  public static getColumnsSearchType = GlobalConstants.inDispGatewat +'api/getColumnsSearchType/';
+  public static validateComboQuery = GlobalConstants.inDispGatewat +'api/validateComboQuery/';
+  public static getColumnsForDynamicSearch = GlobalConstants.inDispGatewat +'api/getColumnsForDynamicSearch/';
+  public static insertAdvancedSearchAndFunctions = GlobalConstants.inDispGatewat +'api/insertAdvancedSearchAndFunctions/';
+  public static checkIfAdvacendFormDataExists = GlobalConstants.inDispGatewat +'api/checkIfAdvacendFormDataExists/';
+  public static getAdvancedSearchGridData = GlobalConstants.inDispGatewat +'api/getAdvancedSearchGridData/';
+  public static getAdvancedSearchFunctionData = GlobalConstants.inDispGatewat +'api/getAdvancedSearchFunctionData/';
+  public static getDynamicSearchMainDropDown = GlobalConstants.inDispGatewat +'api/getDynamicSearchMainDropDown/';
+  public static getComboQueryData = GlobalConstants.inDispGatewat +'api/getComboQueryData/';
+  public static getQueryHeadersForAdvancedSearch = GlobalConstants.inDispGatewat +'api/getQueryHeadersForAdvancedSearch/';
 
-
-
-
+  
+  
   // ----------------------IN DISPLAY: SCREEN BUILDER------------------------------------------------------------------------\
   public static getDBRGrid = GlobalConstants.inDispGatewat + 'api/getDBRGrid/';
   public static getDBRGridByRuleActionAndColumnId = GlobalConstants.inDispGatewat + 'api/getDBRGridByRuleActionAndObjectId/';
@@ -341,6 +353,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static callProcedure = GlobalConstants.inDispGatewat + 'api/callProcedure';
   public static updateDRBRule = GlobalConstants.inDispGatewat + 'api/updateDRBRule/';
   public static deleteDRBRule = GlobalConstants.inDispGatewat + 'api/deleteDRBRule/';
+
 
   // ----------------------IN DISPLAY: SCREEN BUILDER------------------------------------------------------------------------\
   public static fetchGridsTableData = GlobalConstants.inDispGatewat + 'api/fetchGridsTableData/';

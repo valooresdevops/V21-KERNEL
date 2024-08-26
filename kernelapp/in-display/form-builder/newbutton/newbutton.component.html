@@ -1,11 +1,14 @@
+<span *ngIf="isFromAdvancedSearchForm ==false">
 <div class="header-dialog space-between mb-3" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
     <div></div>
     <div class="dialogTitle"></div>
     <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
 </div>
+</span>
 
 <form [formGroup]="buttonForm">
     <div class="row">
+        <span *ngIf="isFromAdvancedSearchForm ==false">
         <div class="col-lg-12">
             <v-input formControlName="buttonId" type="hidden" [parentForm]="buttonForm" fieldName="buttonId"></v-input>
         </div>
@@ -28,6 +31,7 @@
                  [parentForm]="buttonForm" fieldName="fieldSet" required="true">
             </v-dropdown>
         </div>
+    </span>
         <div class="col-lg-12">
             <v-input formControlName="nbOfAction" type="number" label="Number of Action" required="true" placeholder=""
                 [parentForm]="buttonForm" fieldName="nbOfAction" (input)="onNbOfActionInput()">
@@ -120,8 +124,8 @@
         </v-input>
         </div>
     </div>
-    <div class="col-lg-12 form-submit text-center">
-        <v-button btnActionType="submit" btnType="form" [parentForm]="buttonForm" value="Save"
+    <div id="saveButtonId" class="col-lg-12 form-submit text-center">
+        <v-button id="buttonSubmitForm" btnActionType="submit" btnType="form" [parentForm]="buttonForm" value="Save"
             (click)="submitForm()"></v-button>
     </div>
 </form>
@@ -129,8 +133,6 @@
 
 
  
-
-
 
 <!-- 
 

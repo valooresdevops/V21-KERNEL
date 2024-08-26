@@ -89,22 +89,25 @@
           fieldName="addSearchProcedure">
       </v-input>
       </div> -->
-      <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+      <!-- <div class="col-lg-4" *ngIf="showAddSearchProcedure">
         <v-toggle label="Call Function On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
         fieldName="callRestApi"> </v-toggle>
-    </div>
+    </div> -->
     
 
 
-    <div class="col-lg-4" *ngIf="showCallApi">
+    <!-- <div class="col-lg-4" *ngIf="showCallApi">
         <v-input formControlName="callRestApi2" type="text" label="End Of Url"  [parentForm]="newTabForm"
         fieldName="callRestApi2"></v-input>
-    </div>
-    <!-- <div class="col-lg-4" *ngIf="showCallApi">
-         <v-dropdown *ngIf="showCallApi" formControlName="callRestApi2"
-            label="Prebuilt Buttons" placeholder="" [parentForm]="newTabForm" [dataApi]="getAllButtonsUnderObject"
-            fieldName="callRestApi2"></v-dropdown>
     </div> -->
+
+     <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-button btnActionType="submit" btnType="form" [parentForm]="newTabForm" value="Advanced Search Configuration"
+        (click)="openFunctionConfiguration()"></v-button>
+         <!-- <v-dropdown *ngIf="showCallApi" formControlName="callRestApi2"
+            label="Prebuilt Buttons" placeholder="" [parentForm]="newTabForm" [dataApi]="getAllButtonsUnderObject"
+            fieldName="callRestApi2"></v-dropdown> -->
+    </div>
 
 
 

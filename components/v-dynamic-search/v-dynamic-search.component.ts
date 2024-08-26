@@ -35,11 +35,12 @@ export class VDynamicSearchComponent implements OnInit {
    public dynamicSearchForm = new UntypedFormGroup({});
    public getWhereCond:any = '-1';
   //  public checkIfFIeldExists:any = 'exists';
-
+  public getDynamicSearchMainDropDown:any='';
 
 
    @Input() public objectId: any;
    @Input() public sourceQuery: any;
+   @Input() public isForForm: any;
 
    @Output() public onSearchSubmit: EventEmitter<any> = new EventEmitter();
   rowData: any;
@@ -52,7 +53,7 @@ export class VDynamicSearchComponent implements OnInit {
      public informationservice: InformationService,) {}
 
   async ngOnInit(): Promise<void> {
-
+    //this.getDynamicSearchMainDropDown=GlobalConstants.getDynamicSearchMainDropDown+this.objectId;
 if(this.sourceQuery == null){
 
   this.sourceQuery = "0";
@@ -62,8 +63,12 @@ if(this.sourceQuery == null){
   this.sourceQuery = "1";
 
 }
-    const getDynamicSearchUrl = from(axios.get(GlobalConstants.getDynamicSearch + this.objectId +"/"+ this.sourceQuery ));
-    const getDynamicSearch = await lastValueFrom(getDynamicSearchUrl);
+    console.log("IS FOR FORM>>>>>>>>>>>>>>>>",this.isForForm);
+    const getDynamicSearchMainDropDownApi = from(axios.get(GlobalConstants.getDynamicSearchMainDropDown + this.objectId+"/"+this.isForForm));
+    const getDynamicSearchMainDropDown = await lastValueFrom(getDynamicSearchMainDropDownApi);
+
+    // const getDynamicSearchUrl = from(axios.get(GlobalConstants.getDynamicSearch + this.objectId +"/"+ this.sourceQuery ));
+    // const getDynamicSearch = await lastValueFrom(getDynamicSearchUrl);
     const getSearchTypeUrl = from(axios.get(GlobalConstants.getSearchType));
     const getSearchType = await lastValueFrom(getSearchTypeUrl);
 
@@ -73,17 +78,21 @@ if(this.sourceQuery == null){
       textControl: [null, Validators.required],
     });
     
-    for (let i = 0; i < getDynamicSearch.data.length; i++) {
+    for (let i = 0; i < getDynamicSearchMainDropDown.data.length; i++) {
       this.fieldsCombo.push({
-        id: getDynamicSearch.data[i].id,
-        name: getDynamicSearch.data[i].name,
-        queryId: getDynamicSearch.data[i].isDropdown,
-        code : getDynamicSearch.data[i].columnTypeCode
+        id: getDynamicSearchMainDropDown.data[i].id,
+        name: getDynamicSearchMainDropDown.data[i].name,
+        colType: getDynamicSearchMainDropDown.data[i].colType,
+        cmbSQL: getDynamicSearchMainDropDown.data[i].cmbSQL,
+        isMandatory: getDynamicSearchMainDropDown.data[i].isMandatory,
+        isDefault: getDynamicSearchMainDropDown.data[i].isDefault,
+        defaultValues: getDynamicSearchMainDropDown.data[i].defaultValues        
       });
-     
+
       this.isDropdownStatus.push(false);
       this.isDate.push(false);
     }
+
     for(let i = 0; i < getSearchType.data.length; i ++) {
       this.firstCombo.push({
         id: getSearchType.data[i].id, 
@@ -141,6 +150,11 @@ if(this.sourceQuery == null){
   }
 
   async onDropdownChange(selectedValue: any, fields: any, DropDownChange: any, index: number): Promise<void> {
+    console.log("selectedValue>>>>>>>>>>>",selectedValue);
+    console.log("fields>>>>>>>>>>>",fields);
+    console.log("DropDownChange>>>>>>>>>>>",DropDownChange);
+    console.log("index>>>>>>>>>>>",index);
+    console.log("FIELDSSSS COMBOOO>>>>>>>>>>>>>>>",this.fieldsCombo);
     fields.selectedValue = selectedValue;
     let keyArray = Object.keys(this.fieldsCombo);
   
@@ -152,7 +166,7 @@ if(this.sourceQuery == null){
     if (this.fieldsCombo[index]) {
       for (let i = 0; i < keyArray.length; i++) {
         if (selectedValue == this.fieldsCombo[i].id) {
-          if (this.fieldsCombo[i].queryId != undefined && this.fieldsCombo[i].code == 'COMBO') {
+          if (this.fieldsCombo[i].colType == 'Combo' || this.fieldsCombo[i].colType == 'COMBO') {
 
             this.isDropdownStatus[index] = true;
             this.isDate[index] = false;
@@ -164,21 +178,31 @@ if(this.sourceQuery == null){
             this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));
             this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
-            const getThirdDropDownUrl = from(axios.post( GlobalConstants.getThirdDropDown + this.fieldsCombo[i].id +"/"+localStorage.getItem('LogeduserId'))  );
-            const getThirdDropDown = await lastValueFrom(getThirdDropDownUrl);   
-              for(let y = 0; y <getThirdDropDown.data.length; y ++) {
+
+            const getComboQueryDataApi = from(axios.get(GlobalConstants.getComboQueryData+this.fieldsCombo[i].cmbSQL));
+            const getComboQueryData = await lastValueFrom(getComboQueryDataApi);   
+              for(let y = 0; y <getComboQueryData.data.length; y++) {
 
               this.thirdCombo.push({
-                id: getThirdDropDown.data[y][0], 
-                name: getThirdDropDown.data[y][1]
+                id: getComboQueryData.data[y].id, 
+                name: getComboQueryData.data[y].name
               });
+
+            // const getThirdDropDownUrl = from(axios.post( GlobalConstants.getThirdDropDown + this.fieldsCombo[i].id +"/"+localStorage.getItem('LogeduserId'))  );
+            // const getThirdDropDown = await lastValueFrom(getThirdDropDownUrl);   
+            //   for(let y = 0; y <getThirdDropDown.data.length; y ++) {
+
+            //   this.thirdCombo.push({
+            //     id: getThirdDropDown.data[y][0], 
+            //     name: getThirdDropDown.data[y][1]
+            //   });
            
           }
 
 fields.thirdDropdownOptions=this.thirdCombo ;
 
 
-          } else if (this.fieldsCombo[i].code == 'DATE') {
+          } else if (this.fieldsCombo[i].colType == 'DATE' || this.fieldsCombo[i].colType == 'Date') {
               this.isDate[index] = true;
               this.isDropdownStatus[index] = false;
               this.isNumber[index] = false;
@@ -192,7 +216,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
               // this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));;
               // this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
-          } else if (this.fieldsCombo[i].code == 'VARCHAR2' || this.fieldsCombo[i].code == 'varchar' ) {
+          } else if (this.fieldsCombo[i].colType == 'Text' || this.fieldsCombo[i].colType == 'TEXT' ) {
               this.isDate[index] = false;
               this.isDropdownStatus[index] = false;
               this.isNumber[index] = false;
@@ -202,7 +226,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
               this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
   
-          } else if (this.fieldsCombo[i].code == 'NUMBER') {
+          } else if (this.fieldsCombo[i].colType == 'NUMBER' || this.fieldsCombo[i].colType == 'Number') {
               this.isNumber[index] = true;
               this.isDate[index] = false;
               this.isDropdownStatus[index] = false;
@@ -245,7 +269,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     let elementSize = 0 ;
     let obj:any;
 
-
+    console.log("FORM ELEM>>>>>>>>>>>>>",this.formElem);
     for (let i = 0; i < this.formElem.length; i++) {
 
       let searchType = this.dynamicSearchForm.controls[this.formElem[i].searchType].value;
@@ -254,6 +278,13 @@ fields.thirdDropdownOptions=this.thirdCombo ;
       let dropdown2  = this.dynamicSearchForm.controls[this.formElem[i].secondDropdown]?.value;
       let dropdown3  = this.dynamicSearchForm.controls[this.formElem[i].thirdDropdown]?.value;
       let sourceQuery = this.sourceQuery ;
+      console.log("searchType>>>>>>>>>",searchType);
+      console.log("text>>>>>>>>>",text);
+      console.log("dropdown>>>>>>>>>",dropdown);
+      console.log("dropdown2>>>>>>>>>",dropdown2);
+      console.log("dropdown3>>>>>>>>>",dropdown3);
+      console.log("sourceQuery>>>>>>>>>",sourceQuery);
+     // console.log("searchType>>>>>>>>>",searchType);
 
       let item1 ;
 
@@ -266,7 +297,8 @@ fields.thirdDropdownOptions=this.thirdCombo ;
           "dropdown2": dropdown2,
           "dropdown3": dropdown3,
           "objectId": this.objectId,
-          "sourceQuery": sourceQuery
+          "sourceQuery": sourceQuery,
+        
       }
 
       }else{
@@ -284,7 +316,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
   
       MyList.push(item1);
     }
-
+    console.log("MY LIST>>>>>>>>>>>>>",MyList);
     if(this.formElemNum <=1 ){
       elementSize = 0;
     }else{
@@ -336,6 +368,13 @@ fields.thirdDropdownOptions=this.thirdCombo ;
   
     this.onSearchSubmit.emit(obj);
   }
+
+
+
+
+
+
+
   filterData(data: any[], searchCriteria: any[]): any[] {
 
     return data.filter(item => {

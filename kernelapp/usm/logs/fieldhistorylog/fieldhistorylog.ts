@@ -2,6 +2,8 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormGroup, UntypedFormControl } from '@angular/forms';
+import axios from 'axios';
+import { from, lastValueFrom } from 'rxjs';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -70,7 +72,7 @@ export class FieldhistorylogComponent implements OnInit {
 
     }
 
-  gridShow(){
+  async gridShow(){
     console.log("value of the actionType is >>> ",this.fieldHistoryLogForm.status);
 
     if(this.fieldHistoryLogForm.status != "INVALID")
@@ -96,7 +98,10 @@ export class FieldhistorylogComponent implements OnInit {
       }
     }
 
-    this.getUSMFieldHistoryLog = GlobalConstants.getFieldHistoryLog + "/" + fieldHistoryApplication+"/"+fieldHistoryMenu+ "/"+ fielHistoryApplicationUser+"/"+fieldHistoryField +"/"+fromdate+"/"+todate;
+    const getLogsByFieldApi = from(axios.post(GlobalConstants.getFieldHistoryLog + "/" + fieldHistoryApplication+"/"+fieldHistoryMenu+ "/"+ fielHistoryApplicationUser+"/"+fieldHistoryField +"/"+fromdate+"/"+todate,{}));
+    const getLogsByField = await lastValueFrom(getLogsByFieldApi);
+    this.getUSMFieldHistoryLog = getLogsByField.data;
+    // this.getUSMFieldHistoryLog = GlobalConstants.getFieldHistoryLog + "/" + fieldHistoryApplication+"/"+fieldHistoryMenu+ "/"+ fielHistoryApplicationUser+"/"+fieldHistoryField +"/"+fromdate+"/"+todate;
 
     console.log("all url is >>>   ", this.getUSMFieldHistoryLog);
 
@@ -107,12 +112,35 @@ export class FieldhistorylogComponent implements OnInit {
     if (value != '') {
 
         const defaultRoleJson = { 'id': value };
-        value = value == 0 ? value : "0" + value;
+        if (value.length === 1) {
+          value ='00' + value;
+              } else if(value.length == 2) {
+                value ='0' + value;
+              }
         this.getMenuApi = GlobalConstants.getMenuName + value;
 
         this.menuNameBody = defaultRoleJson;
     } else {
       this.getMenuApi = "";
+
+    }
+  }
+
+
+  onChangeApplicationMenu(value: any) {
+    if (value != '') {
+
+        const defaultRoleJson = { 'id': value };
+        if (value.length === 1) {
+          value ='00' + value;
+              } else if(value.length == 2) {
+                value ='0' + value;
+              }
+              this.getFieldApi = GlobalConstants.fetchUSMFieldApi + value;
+
+        // this.menuNameBody = defaultRoleJson;
+    } else {
+      this.getFieldApi = "";
 
     }
   }

@@ -303,7 +303,7 @@ export class InputComponent {
   }
 
   onAddButtonForm() {
-    let data = [{ objectId: this.objectId, actionType: 'saveNew' }];
+    let data = [{ objectId: this.objectId, actionType: 'saveNew' ,isForAdvancedSearch:false}];
     const dialogRef = this.dialog.open(NewbuttonComponent, {
       width: "700px",
       height: "500px",
@@ -320,7 +320,7 @@ export class InputComponent {
   }
 
   onUpdateButtonForm(buttonId: number) {
-    let data = [{ objectId: this.objectId, formBtnId: buttonId, actionType: 'update' }];
+    let data = [{ objectId: this.objectId, formBtnId: buttonId, actionType: 'update',isForAdvancedSearch:false }];
     const dialogRef = this.dialog.open(NewbuttonComponent, {
       width: "700px",
       height: "500px",

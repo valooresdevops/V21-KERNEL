@@ -32,7 +32,7 @@
         <div class="body-section scrollbar-width-thin hideElement mt-3">
             <ul>
                 <div *ngIf="prevParentCode != '-1';" class="goBackDiv animate__animated animate__fadeIn"
-                    (click)="toggleActiveMenu(prevParentCode,'', '','Back'); shortenCustomPath(); decrementParentTabCount();">
+                    (click)="toggleActiveMenu(prevParentCode,'', '','Back'); shortenCustomPath();">
                     <span class="title">
                         <i class="fas fa-arrow-circle-left"></i>&nbsp; Back
                     </span>
@@ -57,19 +57,7 @@
     </div>
 
     <!-- Bubble Container -->
-     <div *ngIf="a" >
-    <div class="bubble-container" *ngIf="!isCollapsed">
-        <div *ngFor="let n of applicationName">
-            <span *ngIf="n.menuManaged == '1' && n.display != '0'" id="{{n.id}}"
-                class="bubble-button">
-                <v-bubble-button [imgSrc]="n.icon" (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus, n.name); onSelect(n.menuVariable, n.childMenus, n.name);"></v-bubble-button>
-            </span>
-        </div>
-        
-           <v-bubble-button [imgSrc]="goBackSrc" (click)="toggleActiveMenu(prevParentCode,'', '','Back'); shortenCustomPath();"></v-bubble-button>
-        
-    </div>
-    </div>
+   
 
     <div class="side-nav-body-content">
         <div class="top-section">
@@ -320,8 +308,22 @@
                     </ol>
                 </div>
             </div> -->
-            <ng-content></ng-content>
-        </div>
+            <!-- <div *ngIf="a" >
+                <div class="bubble-container" *ngIf="!isCollapsed">
+                    <div *ngFor="let n of applicationName">
+                        <span *ngIf="n.menuManaged == '1' && n.display != '0'" id="{{n.id}}"
+                            class="bubble-button">
+                            <v-bubble-button [imgSrc]="n.icon" (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus, n.name); onSelect(n.menuVariable, n.childMenus, n.name);"></v-bubble-button>
+                        </span>
+                    </div>
+                    
+                       <v-bubble-button [imgSrc]="goBackSrc" (click)="toggleActiveMenu(prevParentCode,'', '','Back'); shortenCustomPath();"></v-bubble-button>
+                    
+                </div>
+                </div> -->
+                <ng-content></ng-content>
+
+            </div>
     </div>
 
 </body>

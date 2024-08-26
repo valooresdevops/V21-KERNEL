@@ -51,8 +51,8 @@ export class LogsByObjectComponent implements OnInit {
         sortable: true
       },
       {
-        headerName: 'Menu Code',
-        field: 'menucode',
+        headerName: 'Menu',
+        field: 'menu',
         filter: 'agTextColumnFilter',
         sortable: true
       },

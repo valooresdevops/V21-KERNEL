@@ -12,6 +12,8 @@ import { from, lastValueFrom } from 'rxjs';
 
 
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { data } from 'jquery';
+import { AdvancedSearchConfigurationComponent } from './advanced-search-configuration/advanced-search-configuration.component';
 
 @Component({
   selector: 'app-new-tab',
@@ -78,7 +80,7 @@ export class NewTabComponent implements OnInit {
     addSearchProcedure:new UntypedFormControl(''),
     isDynamicTitleEnabled:new UntypedFormControl(''),
     dynamicTitleName:new UntypedFormControl(''),
-    callRestApi:new UntypedFormControl(''),
+   // callRestApi:new UntypedFormControl(''),
     callRestApi2:new UntypedFormControl(''),
     isRowGroup:new UntypedFormControl(''),
     fieldGrouping:new UntypedFormControl(''),
@@ -297,7 +299,7 @@ console.log('data--------->',data)
         let isDynamicTitleEnabled =  this.newTabForm.controls['isDynamicTitleEnabled']?.value;
         let dynamicTitleName =  this.newTabForm.controls['dynamicTitleName']?.value;
         //let canImport = this.newTabForm.controls['canImport']?.value;
-        let callRestApi =  this.newTabForm.controls['callRestApi']?.value;
+       // let callRestApi =  this.newTabForm.controls['callRestApi']?.value;
         let callRestApi2 =  this.newTabForm.controls['callRestApi2']?.value;
         if(condition == undefined){
           condition = 0;
@@ -352,7 +354,7 @@ console.log('data--------->',data)
           isSave: this.newTabForm.controls['isSave']?.value,
           dynamicTitleName: dynamicTitleName,
           isDynamicTitleEnabled: this.newTabForm.controls['isDynamicTitleEnabled']?.value,
-          callRestApi: false,
+         // callRestApi: false,
           //canImport: canImport,
 
 
@@ -410,7 +412,7 @@ console.log('data--------->',data)
           canDelete: canDelete,
           canModify: canModify,
           isDynamicTitleEnabled: isDynamicTitleEnabled,
-          callRestApi:this.newTabForm.controls['callRestApi']?.value,
+         // callRestApi:this.newTabForm.controls['callRestApi']?.value,
           callRestApi2:callRestApi2,
           //canImport: canImport,
           condition: condition,
@@ -485,12 +487,12 @@ console.log('data--------->',data)
         // this.newTabForm.controls['canImport'].setValue(res[0].canImport);
 
         this.newTabForm.controls['callRestApi2'].setValue(res[0].apiFunctionName);
-        if (res[0].isApiEnabled == "0") {
-          this.newTabForm.controls['callRestApi'].setValue(false);
-        } else {
-          this.newTabForm.controls['callRestApi'].setValue(true);
-          this.showCallApi=true;
-        }
+        // if (res[0].isApiEnabled == "0") {
+        //   this.newTabForm.controls['callRestApi'].setValue(false);
+        // } else {
+        //   this.newTabForm.controls['callRestApi'].setValue(true);
+        //   this.showCallApi=true;
+        // }
 
         if (res[0].isGrid == "0") {
           this.newTabForm.controls['isGrid'].setValue(false);
@@ -618,13 +620,13 @@ console.log('data--------->',data)
   isTitleFieldChange(){
   }
 
-  isCallApi(){
-    if(this.newTabForm.get('callRestApi').value==true){
-      this.showCallApi=true;
-    }else{
-      this.showCallApi=false;
-    }
-  }
+  // isCallApi(){
+  //   if(this.newTabForm.get('callRestApi').value==true){
+  //     this.showCallApi=true;
+  //   }else{
+  //     this.showCallApi=false;
+  //   }
+  // }
   isAdvancedSearchChange(){
     if(this.newTabForm.get('isAdvancedSearch').value==true){
       this.showAddSearchProcedure=true;
@@ -643,4 +645,32 @@ console.log('data--------->',data)
     }
   }
 
+  async openFunctionConfiguration(){
+    let configurationOptionType=''
+     const checkIfAdvacendFormDataExistsApi=from(axios.get(GlobalConstants.checkIfAdvacendFormDataExists+this.objectId))
+     const checkIfAdvacendFormDataExists=await lastValueFrom(checkIfAdvacendFormDataExistsApi);
+    if(checkIfAdvacendFormDataExists.data==1){
+      configurationOptionType="update";
+    }else{
+      configurationOptionType="saveNew";
+    }
+
+    let data={
+      objectId:this.objectId,
+      actionType:configurationOptionType
+    }
+    const dialogRef = this.dialog.open(AdvancedSearchConfigurationComponent, {
+      width: "90%",
+      height: "90%",
+      data: data
+    });
+    dialogRef.disableClose = true;
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.informationservice.setChoosenTab(this.objectId);
+
+     // this.commonFunctions.reloadPage("/dsp/augmentedConfig/form/update/" + this.objectPId + "/" + this.objectId + "/tabConfiguration");
+
+    });
+  }
 }

@@ -218,7 +218,8 @@ body {
 }
 
 .side-nav-body-content .top-section .top-section-1 img.active {
-  width: 100%;
+  /* width: 100%; */
+  width: 60%;
   display: block;
   transition: 0.5s all;
 }
@@ -538,22 +539,4 @@ legend {
   font-size: 14px;
   font-family: Calibri;
 }
-.bubble-container {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  /* gap: 20px; */
-  width: 100vw; /* 100% of the viewport width */
-  height: 100vh; /* 100% of the viewport height */
-  margin-top: 4%;
-  background: var(--app-navigation-background-color);
-  position: fixed;
-  
-  z-index: 2; /* Ensure bubble-container is above the main content */
-}
-.bubble-container.hidden {
-  display: none;
-}
-.bubble-button{
-  width: 80vw;
-  margin-left: 10vw;
-}
+

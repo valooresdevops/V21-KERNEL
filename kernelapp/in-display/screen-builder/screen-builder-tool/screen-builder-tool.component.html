@@ -348,6 +348,11 @@
                       fieldName="nextAction">
                     </v-toggle>
                   </div>
+                  <div class="form-group">
+                    <v-toggle label="Is Bubble" formControlName="isBubble" [parentForm]="screenForm"
+                      fieldName="isBubble">
+                    </v-toggle>
+                  </div>
                   <v-button *ngIf="!isUpdate" style="float:right" btnActionType="submit" btnType="form"
                     [parentForm]="screenForm" value="Submit" (click)="submitScreenForm()" [disabled]="!screenForm.valid"
                     class="submit-button"></v-button>

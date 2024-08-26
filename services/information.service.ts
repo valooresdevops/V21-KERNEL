@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -61,12 +62,29 @@ export class InformationService {
   public vcisrowData : any ;
   public checkParentMenu : number=0;
   public checkParentMenuFirst : String = "";
+  public bubbleButton: any;
+  public selectedGridNode : any;
+  public advancedSearchFunctionData:any='';
   constructor() { }
 
+  private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
+  bubbleMenus$ = this.bubbleMenusSubject.asObservable();
+
+  setBubbleMenus(menus: any[]) {
+    this.bubbleMenusSubject.next(menus);
+  }
   //authentication still has a localstorage
   setLogeduserId(logeduserIdVal: string) {
     this.logeduserId = logeduserIdVal;
-  }  
+  }
+  
+  getBubbleButton(){
+    return this.bubbleButton;
+  }
+  setBubbleButton(bubbleButton:any){
+    this.bubbleButton = bubbleButton;
+  }
+
   getSelectedChart(){
     return this.selectedChart;
   }
@@ -559,22 +577,20 @@ export class InformationService {
   getVcisrowData(){
       return this.vcisrowData;
   }
-  getCheckParentMenu(){
-    return this.checkParentMenu;
-  }
-  incrementCheckParentMenu(){
-    this.checkParentMenu++;
-  }
-  decrementCheckParentMenu(){
-  this.checkParentMenu--;
-  }
-  setCheckParentMenu(){
-    this.checkParentMenu=0;
-  }
-getCheckParentMenuFirst(){
-  return this.checkParentMenuFirst;
+
+getSelectedGridNode(){
+  return this.selectedGridNode;
 }
-setCheckParentMenuFirst(i : String){
-  this.checkParentMenuFirst = i;
+setSelectedGridNode(Node : any){
+  this.selectedGridNode = Node;
 }
+
+setAdvancedSearchFunctionData(advancedSearchFunctionData: any) {
+  this.advancedSearchFunctionData = advancedSearchFunctionData;
+}
+
+getAdvancedSearchFunctionData() {
+  return this.advancedSearchFunctionData;
+}
+
 }

@@ -81,7 +81,7 @@ export class ScreenBuilderToolComponent implements OnInit {
   public showKpi: boolean = false;
   public actionType: any = '';
   public gridData: any;
-
+public isBubble: any;
   public objectId: any;
   public multiSelection: any;
   stockAd:number = 0;
@@ -115,6 +115,7 @@ export class ScreenBuilderToolComponent implements OnInit {
   radarRecords: any[] = [];
   chartType: any;
   gridObject: any[] = [];
+
 
   constructor(private sanitizer: DomSanitizer, private dialog: MatDialog,
     private eventEmitterService: EventEmitterService,
@@ -157,6 +158,7 @@ export class ScreenBuilderToolComponent implements OnInit {
     screenParentMenuId: new UntypedFormControl(''),
     screenApplicationId: new UntypedFormControl(''),
     nextAction: new UntypedFormControl(''),
+    isBubble: new UntypedFormControl('')
 
   });
 
@@ -3804,6 +3806,12 @@ export class ScreenBuilderToolComponent implements OnInit {
      } else {
        this.status = 'false';
      };
+
+     if (this.screenForm.get('isBubble').value) {
+      this.isBubble = 1;
+    } else {
+      this.isBubble = 0;
+    };
  
      for (let i = 0; i < this.itemsData.length; i++) {
        this.screenData.push({
@@ -3830,7 +3838,8 @@ export class ScreenBuilderToolComponent implements OnInit {
          parentMenuId: this.screenForm.get('screenParentMenuId').value,
          applicationId: this.screenForm.get('screenApplicationId').value,
          userId: this.informationservice.getLogeduserId(),
-         data: JSON.stringify(this.screenData)
+         data: JSON.stringify(this.screenData),
+         isBubble: this.isBubble
        }
        this.http.post<any>(GlobalConstants.addScreen, chartData, { headers: GlobalConstants.headers }).subscribe(
          (res: any) => {

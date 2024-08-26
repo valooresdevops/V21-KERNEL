@@ -42,6 +42,8 @@ export class DynamicBuilderFormComponent implements OnInit {
   public step2_9: any;
   public step4_1: any;
   public columnTypeCode: any;
+  public AllMenus: any;
+
 
   //Variables needed for certain controls
   public actionType: string = '';
@@ -255,6 +257,7 @@ export class DynamicBuilderFormComponent implements OnInit {
     step_4_5: new UntypedFormControl(''),
     step_4_6: new UntypedFormControl(''),
     step_4_7: new UntypedFormControl(''),
+    step_8: new UntypedFormControl(''),
     // step_4_8
     // step_4_9
   });
@@ -885,7 +888,7 @@ export class DynamicBuilderFormComponent implements OnInit {
 
     let onAfterSave = ['step_1', 'step_2', 'step_2_1', 'step_3', 'step_3_1', 'step_2_0', 'step_2_0_0',
       'step_2_0_1', 'step_2_0_2', 'step_2_1_0', 'step_2_1_1', 'step_2_1_2', 'step_4', 'step_4_1', 'step_4_2', 'step_4_3'
-      , 'step_4_4', 'step_4_5', 'step_4_6', 'step_4_7'];
+      , 'step_4_4', 'step_4_5', 'step_4_6', 'step_4_7', 'step_8'];
     this.showOrHideFields("onAfterSave", onAfterSave, "hide");
 
     $(".onBeforeSave").hide();
@@ -1274,7 +1277,8 @@ export class DynamicBuilderFormComponent implements OnInit {
         { id: 4, name: 'Call Procedure' },
         { id: 5, name: 'Call Rest API' },
         { id: 6, name: 'Form Fields' },
-        { id: 7, name: 'Execute Query' }
+        { id: 7, name: 'Execute Query' },
+        { id: 8, name: 'Form Opening' }
       ];
       this.actionDecisions = newValueSource;
     } else {
@@ -1337,6 +1341,8 @@ export class DynamicBuilderFormComponent implements OnInit {
   //function when i changed value of fields
   async onChangedSteps(value: string, selectedRule: string) {
     let stepValue: string = '';
+    console.log("selectedRule>>>>>>>",value);
+    console.log("selectedRule>>>>>", selectedRule);
     if (selectedRule == "1") {
       // On Change
       stepValue = this.form_onChangeGroup.controls[value]?.value;
@@ -1356,6 +1362,7 @@ export class DynamicBuilderFormComponent implements OnInit {
             this.filterConditionBasedOnField(stepValue);
             $(".onChangeGroup .step_1").hide();
             $(".onChangeGroup .step_2").hide();
+            $(".onChangeGroup .step_8").hide();
             $(".onChangeGroup .step_2_0").hide();
             $(".onChangeGroup .step_2_0_0").hide();
             $(".onChangeGroup .step_2_0_1").hide();
@@ -1893,6 +1900,7 @@ export class DynamicBuilderFormComponent implements OnInit {
     } else if (selectedRule == "4") {
       //onAfterSave changed Fields and make all fields empty when change action
       stepValue = this.form_onAfterSave.controls[value]?.value;
+      console.log("stepsssvalue>>>>>",stepValue);
       if (stepValue != "") {
         if (value == "step_1") {
           let ArrayToNotChanged = ['step_1'];
@@ -1903,6 +1911,8 @@ export class DynamicBuilderFormComponent implements OnInit {
             $(".onAfterSave .step_3").hide();
             $(".onAfterSave .step_3_1").hide();
             $(".onAfterSave .step_4").hide();
+            $(".onAfterSave .step_8").hide();
+
           }
           if (stepValue == "5") {
             $(".onAfterSave .step_2").hide();
@@ -1910,6 +1920,8 @@ export class DynamicBuilderFormComponent implements OnInit {
             $(".onAfterSave .step_3").show();
             $(".onAfterSave .step_3_1").hide();
             $(".onAfterSave .step_4").hide();
+            $(".onAfterSave .step_8").hide();
+
           }
           if (stepValue == "6") {
             $(".onAfterSave .step_2").hide();
@@ -1921,9 +1933,21 @@ export class DynamicBuilderFormComponent implements OnInit {
             $(".onAfterSave .step_4_2").hide();
             $(".onAfterSave .step_4_3").hide();
             $(".onAfterSave .step_4_4").hide();
+            $(".onAfterSave .step_8").hide();
+
           }
           if (stepValue == "7") {
             $(".onAfterSave .step_4_7").show();
+            $(".onAfterSave .step_8").hide();
+
+          }
+          if(stepValue =="8") {
+            $(".onAfterSave .step_8").show();
+            $(".onAfterSave .step_2").hide();
+            $(".onAfterSave .step_3").hide();
+            $(".onAfterSave .step_3_1").hide();
+            $(".onAfterSave .step_4").hide();
+            this.AllMenus = GlobalConstants.getMenusButton;
 
           }
         }
@@ -1966,6 +1990,8 @@ export class DynamicBuilderFormComponent implements OnInit {
           $(".onAfterSave .step_4_6").show();
         }
       }
+    } else if(selectedRule == "8"){
+
     }
   }
 
@@ -4206,7 +4232,8 @@ export class DynamicBuilderFormComponent implements OnInit {
         let step_4_5 = this.form_onAfterSave.controls['step_4_5']?.value;
         let step_4_6 = this.form_onAfterSave.controls['step_4_6']?.value;
         let step_4_7 = this.form_onAfterSave.controls['step_4_7']?.value;
-
+        let step_8 = this.form_onAfterSave.controls['step_8']?.value;
+console.log('step_8>>>>>>>>>>>>>>>>>',step_8)
         ruleData = [
           { step: 1, data: step_1 },
           { step: 2, data: step_2 },
@@ -4220,8 +4247,8 @@ export class DynamicBuilderFormComponent implements OnInit {
           { step: 44, data: step_4_4 },
           { step: 45, data: step_4_5 },
           { step: 46, data: step_4_6 },
-          { step: 47, data: step_4_7 }
-
+          { step: 47, data: step_4_7 },
+          { step: 8,  data: step_8 }
         ];
 
         let excludedToggle = this.form.controls['isExcluded']?.value;

@@ -49,6 +49,8 @@ import { NextLayerFormComponent } from './object-builder/knowledge-graph/execute
 import { ButtonJsonRelationComponent } from './form-builder/newbutton/button-json-relation/button-json-relation.component';
 import { APIBuilderComponent } from './api-builder/api-builder.component';
 import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
+import { AdvancedSearchConfigurationComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration.component';
+import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration-form/advanced-search-configuration-form.component';
 
 @NgModule({
     declarations: [
@@ -95,7 +97,9 @@ import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.
         KwgCytoscapeComponent,
         PopupComponent,
         NextLayerFormComponent,
-        ButtonJsonRelationComponent
+        ButtonJsonRelationComponent,
+        AdvancedSearchConfigurationComponent,
+        AdvancedSearchConfigurationFormComponent
     ],
     imports: [
         InDisplayRoutingModule,

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnInit, Optional } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import axios from 'axios';
@@ -15,6 +15,10 @@ import { ButtonJsonRelationComponent } from './button-json-relation/button-json-
   styleUrls: ['./newbutton.component.css']
 })
 export class NewbuttonComponent implements OnInit {
+  @Input() public isFromAdvancedSearchForm: any=false; 
+  @Input() public advancedSearchFormObjectId: any=null; 
+  @Input() public advancedSearchFormButtonId: any=null; 
+  @Input() public advancedSearchActionType: any="saveNew"; 
 
   public buttonPosition: any;
   public objectId: any;
@@ -43,8 +47,8 @@ export class NewbuttonComponent implements OnInit {
   public getApiBuilderListDropDown = GlobalConstants.getApiBuilderListDropDown;
 
   constructor(private http: HttpClient,
-    @Inject(MAT_DIALOG_DATA) public lookupData: any,
-    private dialogRef: MatDialogRef<NewbuttonComponent>,
+    @Optional()@Inject(MAT_DIALOG_DATA) public lookupData: any,
+    @Optional()private dialogRef: MatDialogRef<NewbuttonComponent>,
     private commonFunctions: CommonFunctions,
     public informationservice: InformationService,
     private dialog: MatDialog) { }
@@ -81,9 +85,16 @@ export class NewbuttonComponent implements OnInit {
      this.ApiSelected = false;
     this.ApiSelected1 = false;
     let ButtonAction : any;
-
+    
+    if(this.isFromAdvancedSearchForm==false){
     this.objectId = this.lookupData[0].objectId;
     this.actionType = this.lookupData[0].actionType;
+    }else{
+      this.objectId=this.advancedSearchFormObjectId;
+      this.actionType=this.advancedSearchActionType;
+      document.getElementById("saveButtonId").style.display="none";
+    }
+
     this.AllMenus = GlobalConstants.getMenusButton;
     this.buttonPosition = GlobalConstants.getButtonPosition;
     this.AllFieldSet = GlobalConstants.getAllFieldSets + this.objectId;
@@ -94,16 +105,33 @@ export class NewbuttonComponent implements OnInit {
     const allColuumsUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
     const allColuums = await lastValueFrom(allColuumsUrl);
     this.ALLcol = allColuums.data;
-    
-    if (this.actionType == "update") {
-      this.buttonId = this.lookupData[0].formBtnId;
+    console.log("advancedSearchActionType>>>>>>>>>>>",this.advancedSearchActionType);
+    console.log("isFromAdvancedSearchForm>>>>>>>>>>>",this.isFromAdvancedSearchForm);
 
-      const buttonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + this.buttonId));
-      const buttonData = await lastValueFrom(buttonDataUrl);
+    if (this.actionType == "update" || this.advancedSearchActionType=="update") {
+      let decodedString='';
+      let data: { columnName: any; orderNo: any; groupId: any; columnId: any; };
+      if(this.isFromAdvancedSearchForm==false){
+        console.log("DATA111111111111111111111");
 
-           let data = buttonData.data;
-          const base64EncodedString = data.blobFile;
-          const decodedString = atob(base64EncodedString);
+        this.buttonId = this.lookupData[0].formBtnId;
+        const buttonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + this.buttonId));
+        const buttonData = await lastValueFrom(buttonDataUrl);
+  
+            data = buttonData.data;
+            const base64EncodedString = buttonData.data.blobFile;
+            decodedString = atob(base64EncodedString);
+      }else{
+      
+        this.buttonId =this.advancedSearchFormButtonId;
+        const getAdvancedSearchFunctionDataApi = from(axios.get(GlobalConstants.getAdvancedSearchFunctionData + this.buttonId));
+        const getAdvancedSearchFunctionData = await lastValueFrom(getAdvancedSearchFunctionDataApi);
+        console.log("getAdvancedSearchFunctionData>>>>>>>>>>>>>>",getAdvancedSearchFunctionData.data);
+        data=getAdvancedSearchFunctionData.data[0];
+        decodedString = getAdvancedSearchFunctionData.data[0].methodFile;
+        console.log("DECODED STRING>>>>>>>>>>",decodedString);
+      }
+
           let nbOfAction = decodedString.split("~N~")[1];
           const parts = decodedString.split('~N~');
           let relevantPart = parts[2];
@@ -118,10 +146,18 @@ export class NewbuttonComponent implements OnInit {
           ButtonAction = part.split("~A~")[1];
           let isMainPreview: any = part.split("~A~")[4];
           this.buttonForm.controls[`ButtonAction${index-1}`]?.setValue(ButtonAction);
-          this.buttonForm.controls["buttonName"].setValue(data.columnName);
-          this.buttonForm.controls["buttonOrder"].setValue(data.orderNo);
-          this.buttonForm.controls["fieldSet"].setValue(data.groupId);
-          this.buttonForm.controls["buttonId"].setValue(data.columnId);
+          if(this.isFromAdvancedSearchForm==false){
+            console.log("DATA>>>>>>>>>>>>>>>",data);
+              this.buttonForm.controls["buttonName"].setValue(data.columnName);
+              this.buttonForm.controls["buttonOrder"].setValue(data.orderNo);
+              this.buttonForm.controls["fieldSet"].setValue(data.groupId);
+              this.buttonForm.controls["buttonId"].setValue(data.columnId);
+          }else{
+                this.buttonForm.controls["buttonName"].setValue('');
+                this.buttonForm.controls["buttonOrder"].setValue('');
+                this.buttonForm.controls["fieldSet"].setValue('');
+                this.buttonForm.controls["buttonId"].setValue('');
+          }
           this.buttonForm.controls["Menus"].setValue(menuId);
           this.buttonForm.controls["ButtonAction"].setValue(ButtonAction);
           if(isMainPreview == "false"){
@@ -388,8 +424,16 @@ export class NewbuttonComponent implements OnInit {
 
 
 submitForm() {
+
+console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm.status);
+console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
+
   if (this.buttonForm.status !== 'INVALID') {
+    console.log("11111111111111111111111");
    if (this.actionType === 'saveNew') {
+
+    console.log("222222222222222222222222");
+
       let buttonName = this.buttonForm.controls['buttonName']?.value;
       let buttonOrder = this.buttonForm.controls['buttonOrder']?.value;
       let fieldSet = this.buttonForm.controls['fieldSet']?.value;
@@ -400,6 +444,7 @@ submitForm() {
 
       for (let i = 0; i < this.buttonActions.length; i++) {
         let buttonAction = this.buttonForm.controls[`ButtonAction${i}`]?.value;
+        console.log("333333333333333333333333");
 
         let objectButtonId = '';
         let selectedCols = '';
@@ -472,6 +517,7 @@ submitForm() {
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             break;
         }
+        console.log("4444444444444444444444");
 
         let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
         objectButtonIds.push(objectButtonIdString);
@@ -485,8 +531,11 @@ submitForm() {
         "createdBy": this.informationservice.getLogeduserId(),
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
-      console.log("BUTTON DATA OBJECT>>>>>>>>>>>>>>>", object);
+    console.log("5555555555555555555555555");
 
+      console.log("BUTTON DATA OBJECT>>>>>>>>>>>>>>>", object);
+if(this.isFromAdvancedSearchForm==false){
+  console.log("IS ADVANCED SEARCH FORM FALSE");
       this.http.post<any>(GlobalConstants.createFormButton + this.objectId, object, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           if (res.status === 'Fail') {
@@ -495,9 +544,21 @@ submitForm() {
             this.commonFunctions.alert("alert", res.description);
           }
         });
+      }else{
+
+//elie
+console.log("IS ADVANCED SEARCH FORM TRUE");
+this.informationservice.setAdvancedSearchFunctionData(object);
+
+console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",object);
+
+      }
     }
+    console.log("6666666666666666666666666");
 
     if (this.actionType === 'update') {
+      console.log("7777777777777777777777777");
+
       let buttonName = this.buttonForm.controls['buttonName']?.value;
       let buttonOrder = this.buttonForm.controls['buttonOrder']?.value;
       let fieldSet = this.buttonForm.controls['fieldSet']?.value;
@@ -519,6 +580,7 @@ submitForm() {
         let thirdCondition = '';
         let alertMessage = '';
         let PATH = '';
+        console.log("888888888888888888888888888");
 
         switch (buttonAction) {
           case 1:
@@ -585,6 +647,7 @@ submitForm() {
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             break;
         }
+        console.log("99999999999999999999999");
 
         let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
         objectButtonIds.push(objectButtonIdString);
@@ -599,6 +662,10 @@ submitForm() {
         "buttonId": buttonId,
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
+    console.log("12121212121212121212121212");
+
+    if(this.isFromAdvancedSearchForm==false){
+      console.log("0000000000000000000000000");
 
       this.http.post<any>(GlobalConstants.updateFormButton + this.objectId, object, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
@@ -608,6 +675,13 @@ submitForm() {
             this.commonFunctions.alert("alert", res.description);
           }
         });
+      }else{
+
+//elie
+        console.log("objectButtonIdString for advanced search on UPDATE>>>>>>>>",object);
+        this.informationservice.setAdvancedSearchFunctionData(object);
+
+      }
     }
   }
 }

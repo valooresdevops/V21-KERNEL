@@ -45,6 +45,11 @@
                 </div>
 
                 <div class="col-lg-4">
+                  <v-input formControlName="url" type="text" label="Url" placeholder="Token"
+                      [parentForm]="apiBuilderForm" fieldName="url"></v-input>
+              </div>
+
+                <div class="col-lg-4">
                     <v-input formControlName="responseParameter" type="textarea" label="Response Parameter" placeholder="Response Parameter"
                         [parentForm]="apiBuilderForm" fieldName="responseParameter"></v-input>
                 </div>

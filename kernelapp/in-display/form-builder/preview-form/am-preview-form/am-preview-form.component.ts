@@ -76,7 +76,7 @@ export class AmPreviewFormComponent implements OnInit {
   public canDelete: string = "";
   public sourceQuery: string = "";
   public toolBar: string = "";
-  // public dialogArray: any[] = [];
+  public dialogArray: any[] = [];
   public update: boolean = false;
   public required_flag: boolean;
   public isMainTab: number;
@@ -1153,7 +1153,10 @@ export class AmPreviewFormComponent implements OnInit {
 
   // After Save Functions
   async dynamicDRBOnAfterSave(objectId: number) {
+    alert(11111111);
+    console.log("entered dynamicDRBOnAfterSave>>>");
     try {
+      let mainTab = this.informationservice.getMainTab();
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/4/0";
       const dynamicDRBOnAfterSaveUrl = from(axios.post(url));
       const dynamicDRBOnAfterSave = await lastValueFrom(dynamicDRBOnAfterSaveUrl);
@@ -1174,6 +1177,7 @@ export class AmPreviewFormComponent implements OnInit {
           let ProcName;
           let ProcParams;
           let executeQuery;
+          let openingForm;
           let ruleData = JSON.parse(dynamicDRBOnAfterSave.data[i].ruleData);
           let isExcluded = JSON.parse(dynamicDRBOnAfterSave.data[i].isExcluded);
 
@@ -1230,6 +1234,9 @@ export class AmPreviewFormComponent implements OnInit {
                 }
                 if (ruleData[i].step == 47) {
                   executeQuery = ruleData[i].data;
+                }
+                if (ruleData[i].step == 8) {
+                  openingForm = ruleData[i].data;
                 }
               }
               //Call Rest Api from Rules
@@ -1471,6 +1478,41 @@ export class AmPreviewFormComponent implements OnInit {
                     });
                   }
                 }
+              }
+              else if(type == 8){
+                let formData = this.dynamicForm.value;
+                let selectedTabName = this.informationservice.getSelectedTabName();
+        
+                if(formData){
+                  this.listOfData = JSON.parse(JSON.stringify(formData));
+                }
+                this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
+               //let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+        
+              //  if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
+              //   params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
+              //  }
+               //console.log("params>>>>>>>>>>>",params);
+                let data = [{
+                  actionType: this.amInfo.actionType,
+                  objectId: openingForm,
+                  isFromGridClick: 0,
+                  primaryColumn: this.columnId,
+                  buttonClick: this.columnTypeCode,
+                 // selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
+                }];
+        
+              //console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+                this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
+                  width: "80%",
+                  height: "80%",
+                  data: data
+                });
+        
+                this.dataservice.PushdialogArray(this.dialogRef);
+                this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+                this.informationservice.setListOFData(this.listOfData);
+                this.dialogRef.disableClose = true;   
               }
             }
           }
@@ -2439,13 +2481,13 @@ export class AmPreviewFormComponent implements OnInit {
                   if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     action = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
                   }
-  
+
                   if (ruleData[i].step == 44) {
                     if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field") {
                       executeOnFieldAdv = ruleData[i].data;
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
-  
+
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
                     else if (action == "Execute Rule Business") {
@@ -2455,7 +2497,7 @@ export class AmPreviewFormComponent implements OnInit {
                     else if (action == "Show Button") {
                     ////elie///////
                     executeOnFieldAdv = ruleData[i].data;
-  
+
                     }
                     //////////
                     else if (action == "Execute Query") {
@@ -2478,7 +2520,7 @@ export class AmPreviewFormComponent implements OnInit {
                   let addList = jsonObject.addList;
                   let secondList = JSON.stringify(addList);
                   let Object = JSON.parse(secondList);
-  
+
                   for (let i = 0; i < Object.length; i++) {
                     let beginCondition = '';
                     let field = '';
@@ -2525,7 +2567,7 @@ export class AmPreviewFormComponent implements OnInit {
                     else if (Object[i].operator != undefined) {
                       operator = Object[i].operator.name;
                     }
-  
+
                     let item = {
                       "beginCondition": beginCondition,
                       "field": field,
@@ -2535,11 +2577,11 @@ export class AmPreviewFormComponent implements OnInit {
                       "operator": operator,
                       "name": name
                     }
-  
+
                     dataParams.push(item);
                   }
-  
-  
+
+
                   for (let i = 0; i < dataParams.length; i++) {
                     let val = dataParams[i].value;
                     let condition = '';
@@ -2601,11 +2643,11 @@ export class AmPreviewFormComponent implements OnInit {
                       case '< CURRENT_DATE':
                       case '> CURRENT_DATE':
                         if (dataParams[i].value = "") {
-  
+
                           let conditionsVar = dataParams[i].condition.split(" ");
-  
-  
-  
+
+
+
                           let field = this.dynamicForm.controls[dataParams[i].field]?.value;
                           let fieldDate = new Date(field);
                           let conditionDate = new Date();
@@ -2616,15 +2658,15 @@ export class AmPreviewFormComponent implements OnInit {
                             finalIfConditions += "'" + fieldDate + "'" + conditionsVar[0] + "'" + conditionDate + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
                           }
                         } else {
-  
+
                           let conditionsVar = dataParams[i].condition.split(" ");
                           let field = this.dynamicForm.controls[dataParams[i].field]?.value;
                           let fieldDate = new Date(field);
                           let conditionDate = new Date();
-  
+
                           if (conditionsVar[0].includes('<')) {
                             let datedif = conditionDate.getFullYear() - fieldDate.getFullYear();
-  
+
                             if (i == 0) {
                               finalIfConditions = datedif + conditionsVar[0] + val + " " + this.DynamicAdvancedOperator(dataParams[i].operator);
                             }
@@ -2680,9 +2722,9 @@ export class AmPreviewFormComponent implements OnInit {
                       for (let i = 0; i < listOfFields.length; i++) {
                         this.dynamicForm.controls[listOfFields[i]].setValue('').change();
                       }
-  
+
                     } else if (action == "Show Field" || action == "Hide Field") {
-  
+
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
                     } else if (action == "Show Button" || action =="Hide Button") {
                       ////elie/////
@@ -2715,7 +2757,7 @@ export class AmPreviewFormComponent implements OnInit {
               else {
   console.log("ruleID >>>>>>>>>",ruleId);
   console.log("ruleData >>>>",ruleData);
-  
+
                 TypeOfAction = ruleData[0].data;
                 console.log("TypeOfAction >>>>>>>>>",TypeOfAction);
 
@@ -2723,7 +2765,7 @@ export class AmPreviewFormComponent implements OnInit {
                   if (TypeOfAction == 2) {
                     if (ruleData[i].step == 1) {
                       if (ruleData[i].data != "") {
-  
+
                           let id = ruleData[i].data;
                           let data = this.test.filter((el: any) => {
                             return el.id === ruleData[i].data;
@@ -2736,18 +2778,18 @@ export class AmPreviewFormComponent implements OnInit {
                                 }
                               }
                           }
-  
+
                       }
                         //console.log("choosenField=",choosenField)
                     } else if (ruleData[i].step == 10 && ruleData[i].data != '') {
                       let queryData = ruleData[i].data;
-  
+
                       let queryResult = queryData == null ? -1 : queryData;
                       let jsonQbe: any[] = [];
                       if (queryResult != -1) {
                         const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + queryResult));
                         const paramNames = await lastValueFrom(paramNamesUrl);
-  
+
                         jsonQbe.push(
                           {
                             queryId: queryResult,
@@ -2766,7 +2808,7 @@ export class AmPreviewFormComponent implements OnInit {
                             whereCond: this.getWhereCond
                           }
                         )
-  
+
                         if (paramNames.data.length > 0) {
                           // Filter ROW_ID information to get only the ones for Grid
                           let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -2849,7 +2891,7 @@ export class AmPreviewFormComponent implements OnInit {
                           }
                         }
                       } else {
-  
+
                         conditionValue = ruleData[i].data;
                       }
                     } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
@@ -2878,7 +2920,7 @@ export class AmPreviewFormComponent implements OnInit {
                         executeQuery = ruleData[i].data;
                         const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + executeQuery));
                         const paramNames = await lastValueFrom(paramNamesUrl);
-  
+
                         let jsonQbe: any[] = [];
                         jsonQbe.push(
                           {
@@ -2898,7 +2940,7 @@ export class AmPreviewFormComponent implements OnInit {
                             whereCond: this.getWhereCond
                           }
                         )
-  
+
                         if (paramNames.data.length > 0) {
                           // Filter ROW_ID information to get only the ones for Grid
                           let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -3000,13 +3042,13 @@ export class AmPreviewFormComponent implements OnInit {
                     }
                     else if (ruleData[i].step == 10 && ruleData[i].data != '') {
                       let queryData = ruleData[i].data;
-  
+
                       let queryResult = queryData == null ? -1 : queryData;
                       let jsonQbe: any[] = [];
                       if (queryResult != -1) {
                         const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + queryResult));
                         const paramNames = await lastValueFrom(paramNamesUrl);
-  
+
                         jsonQbe.push(
                           {
                             queryId: queryResult,
@@ -3025,7 +3067,7 @@ export class AmPreviewFormComponent implements OnInit {
                             whereCond: this.getWhereCond
                           }
                         )
-  
+
                         if (paramNames.data.length > 0) {
                           // Filter ROW_ID information to get only the ones for Grid
                           let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -3076,13 +3118,13 @@ export class AmPreviewFormComponent implements OnInit {
                       executeQuery1 = queryAdd.data[0];
                     }
                   }
-  
+
                 }
-  
+
                 if (ruleAction == "On Search") {
                   // Normal Field Condition
                   if (step0.data == 3) {
-  
+
                     if (this.dynamicIfCondition(this.getValueOfControlName(choosenField), conditionValue, -1, condition)) {
                       if (executeAction == "Show Field" || executeAction == "Show Button") {
                         this.dynamicActionsOnChange(executeAction, executeOnField);
@@ -3108,7 +3150,7 @@ export class AmPreviewFormComponent implements OnInit {
                               } else {
                                 fieldId = executeOnField[u];
                               }
-  
+
                               if ($("#field_" + fieldId)[0]) {
                                 $("#field_" + fieldId).prop('disabled', true);
                                 $("#field_" + fieldId).addClass('disabled-field');
@@ -3124,7 +3166,7 @@ export class AmPreviewFormComponent implements OnInit {
                             } else {
                               fieldId = executeOnField[0];
                             }
-  
+
                             if ($("#field_" + fieldId)) {
                               $("#field_" + fieldId).addClass('disabled-field');
                             } else {
@@ -3134,8 +3176,8 @@ export class AmPreviewFormComponent implements OnInit {
                           }
                         }
                       } else if (executeAction == "Remove Read Only") {
-  
-  
+
+
                         if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
                           if (executeOnField.length >= 1) {
                             for (let u = 0; u < executeOnField.length; u++) {
@@ -3145,19 +3187,19 @@ export class AmPreviewFormComponent implements OnInit {
                               } else {
                                 fieldId = executeOnField[u];
                               }
-  
-  
-  
-  
+
+
+
+
                               if ($("#field_" + fieldId)[0]) {
-  
+
                                 for (let c = 0; c < this.test.length; c++) {
                                   if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
                                     this.test[c].qbeReadOnly = false;
                                     $('#' + this.test[c].name + "_lookupName").prop("readonly", false);
                                     $('#' + this.test[c].name).prop("readonly", false);
-  
-  
+
+
                                     break;
                                   }
                                 }
@@ -3169,22 +3211,22 @@ export class AmPreviewFormComponent implements OnInit {
                               }
                             }
                           } else {
-  
+
                             let fieldId: any;
                             if (executeOnField[0].id) {
                               fieldId = executeOnField[0].id;
                             } else {
                               fieldId = executeOnField[0];
                             }
-  
+
                             if ($("#field_" + fieldId)) {
                               for (let c = 0; c < this.test.length; c++) {
                                 if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
                                   this.test[c].qbeReadOnly = false;
                                   $('#' + this.test[c].name + "_lookupName").prop("readonly", false);
                                   $('#' + this.test[c].name).prop("readonly", false);
-  
-  
+
+
                                   break;
                                 }
                               }
@@ -3198,7 +3240,7 @@ export class AmPreviewFormComponent implements OnInit {
                         }
                       }
                       else if (executeAction == "Rename Field") {
-  
+
                         document.getElementById("lbl_" + executeOnField).innerHTML = renameFieldsearch;
                       }
                       else if (executeAction == "Execute Query") {
@@ -3223,12 +3265,12 @@ export class AmPreviewFormComponent implements OnInit {
                     this.dynamicForm.controls[choosenField]?.setValue(executeQuery1);
                   }
                   if (condition == 'Fill Into') { }
-  
+
                   if (executeAction2 == "Hide Field" || executeAction2 == "Read Only" || executeAction2 == "Required" || executeAction2 == "Optional" || executeAction2 == "Remove Read Only" || executeAction2 == "Rename Field" || executeAction2 == "Show Button" || executeAction2 == "Hide Button") {
                     if (executeQuery1 == checkedValue) {
                       this.dynamicActionsOnChange(executeAction2, executeOnField2);
                     }
-  
+
                   }
                 }
               }
@@ -5161,6 +5203,7 @@ export class AmPreviewFormComponent implements OnInit {
       this.AllTabs = [];
       this.tableOptions1 = [];
       this.test_1 = "0";
+      // let objectId=this.amInfo.objectId;
 
       // $(".nav-tabs").show();
 
@@ -5172,10 +5215,18 @@ export class AmPreviewFormComponent implements OnInit {
         this.actionType == 'update';
       }
 
+      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
+        let part:String [] =this.amInfo.objectId.split('|');
+      this.amInfo.objectId =part[1].trim();
+      }
+
+      // if(this.amInfo.objectId.includes("~N~")){
+      //   let part:String [] =this.amInfo.objectId.split('|');
+      // this.amInfo.objectId =part[1].trim();
+      // }
       const getAllTabsUrl = from(axios.get(GlobalConstants.getAllTabs + this.amInfo.objectId));
       const getAllTabs = await lastValueFrom(getAllTabsUrl);
       this.allTabsTemp=getAllTabs.data;
-      console.log("ALL TABS DATA>>>>>>>>",getAllTabs.data);
       this.loaderService.isLoading.next(true);
       for (let i = 0; i < getAllTabs.data.length; i++) {
 
@@ -5209,13 +5260,11 @@ export class AmPreviewFormComponent implements OnInit {
         // )
 
         let isGrid = 1;
-//console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == 1) {
           isGrid = 0;
         } else {
           isGrid = getAllTabs.data[i].isGrid;
         }
-//console.log("isGrid ========",isGrid);
         // If condition lookup to disable a tab on onload
         let conditionTest: any;
         let condition = getAllTabs.data[i].condition == null ? -1 : getAllTabs.data[i].condition;
@@ -5563,7 +5612,7 @@ export class AmPreviewFormComponent implements OnInit {
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
     }
-
+    console.log("LOOKPU DATA>>>>>>>>>>>>>>",this.lookupData);
     console.log("MAIN PREVIEW DATA INPUT>>>>>>>>>>>>>",this.mainPreviewDataInput);
 
     for (let i = 0; i < localStorage.length; i++) {
@@ -5578,6 +5627,7 @@ export class AmPreviewFormComponent implements OnInit {
     this.roleId = this.informationservice.getUserRoleId();
     if (this.amInfo == undefined) {
       this.amInfo = this.lookupData[0];
+      console.log('data>>>>>>>>>>>>>>',this.lookupData[0])
     }
 
     this.loadAM(false);
@@ -5924,7 +5974,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     console.log("ELIE IS FROM BUTTON CLICK 3333>>>>>>>>>>>>>>>>",this.amInfo.buttonClick);
     console.log("ELIE IS FROM BUTTON CLICK 4444>>>>>>>>>>>>>>>>",getTabConfigurationApi.data[0].isGrid);
 
-    
+
     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
         isGrid = 0;
@@ -7264,7 +7314,7 @@ console.log('COLUMN_ID--------------------->',data[i])
       const decodedString = atob(base64EncodedString);
       let splitedString = decodedString.split("|");
       splitedString.forEach(async (part, index) => {
-    
+
       let procedureName = part.split("~A~")[0];
       let buttonAction: any = part.split("~A~")[1];
       let isMainPreview: any = part.split("~A~")[4];
@@ -7528,19 +7578,23 @@ console.log('COLUMN_ID--------------------->',data[i])
       else if (buttonAction == "1") {
 
         let formData = this.dynamicForm.value;
+        console.log('formData>>>>>>>>>>',formData);
         //test2
         let selectedTabName = this.informationservice.getSelectedTabName();
+        console.log('selectedTabName>>>>>>>>>>',selectedTabName);
 
         if(formData){
           this.listOfData = JSON.parse(JSON.stringify(formData));
+          console.log('listOfData>>>>>>>>>>',this.listOfData);
+
         }
         this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
        let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
 
-       if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
+       if(this.informationservice.getAgGidSelectedNodeRule() != undefined && this.informationservice.getAgGidSelectedNodeRule() != null && this.informationservice.getAgGidSelectedNodeRule() != ''){
         params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
        }
-       //console.log("params>>>>>>>>>>>",params);
+       console.log("params>>>>>>>>>>>",params);
         let data = [{
           actionType: this.amInfo.actionType,
           objectId: this.buttonObjectId,
@@ -7565,26 +7619,25 @@ console.log('COLUMN_ID--------------------->',data[i])
       }
       // Call Api
       else if (buttonAction == "3") {
-        let dataa:any=[];
-
+let dataa:any=[];
         let formData = this.dynamicForm.value;
         if (formData) {
           this.listOfData = JSON.parse(JSON.stringify(formData));
         }
-        // console.log("Button Data>>>>>>>",part);
-        // console.log("button action 1>>>>>>",formData);
-        // console.log("11111>>>>>>",part.split("~A~")[0]);
-        // console.log("22222>>>>>>",part.split("~A~")[1]);
-        // console.log("33333>>>>>>",part.split("~A~")[2]);
-        // console.log("44444>>>>>>",part.split("~A~")[3]);
-        // console.log("55555>>>>>>",part.split("~A~")[5]);
-        // console.log("66666>>>>>>",part.split("~A~")[6]);
-        // console.log("77777>>>>>>",part.split("~A~")[7]);
-        // console.log("88888>>>>>>",part.split("~A~")[8]);
-        // console.log("99999>>>>>>",part.split("~A~")[9]);
-        // console.log("10101010>>>>>>",part.split("~A~")[10]);
-        // console.log("11111111>>>>>>",part.split("~A~")[11]);
-        
+        console.log("Button Data>>>>>>>",part);
+        console.log("button action 1>>>>>>",formData);
+        console.log("11111>>>>>>",part.split("~A~")[0]);
+        console.log("22222>>>>>>",part.split("~A~")[1]);
+        console.log("33333>>>>>>",part.split("~A~")[2]);
+        console.log("44444>>>>>>",part.split("~A~")[3]);
+        console.log("55555>>>>>>",part.split("~A~")[5]);
+        console.log("66666>>>>>>",part.split("~A~")[6]);
+        console.log("77777>>>>>>",part.split("~A~")[7]);
+        console.log("88888>>>>>>",part.split("~A~")[8]);
+        console.log("99999>>>>>>",part.split("~A~")[9]);
+        console.log("10101010>>>>>>",part.split("~A~")[10]);
+        console.log("11111111>>>>>>",part.split("~A~")[11]);
+
         const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
         const getApiJsons = await lastValueFrom(getApiJsonsApi);
 
@@ -7596,14 +7649,15 @@ console.log('COLUMN_ID--------------------->',data[i])
             }
           }
         }
-       
-        let responseJsonString=getApiJsons.data[0].responseJson;
-        for(let i=0;i<JSON.parse(jsonResponse).length;i++){
-          responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i]+"#",JSON.parse(jsonResponse)[i].fieldName);
-        }
-        console.log("method id>>>>>>>>>>>>>>",url);
 
-    
+        let responseJsonString=getApiJsons.data[0].responseJson;
+        // console.log("jspnReponse>>>>>>>>>>>",JSON.parse(jsonResponse));
+        // for(let i=0;i<JSON.parse(jsonResponse).length;i++){
+        //   responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i].jsonParameter+"#",JSON.parse(jsonResponse)[i].fieldName);
+        // }
+        // console.log("method id>>>>>>>>>>>>>>",url);
+
+
         console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
         console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
         let json={"requestJson":requestJsonString,
@@ -7612,9 +7666,11 @@ console.log('COLUMN_ID--------------------->',data[i])
            const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
            const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
         console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
-        dataa=runDynamicBuilt.data;
 
+          dataa=runDynamicBuilt.data;
+        console.log("DATAAAA>>>>>>>>>>>",dataa)
         for (let i = 0; i < dataa.length; i++) {
+          console.log("FETET");
           this.loaderService.isLoading.next(true);
           let colName = dataa[i].colName.toUpperCase();
           let colValue = dataa[i].colValue;
@@ -7723,6 +7779,7 @@ console.log('COLUMN_ID--------------------->',data[i])
 
 
           if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
+            console.log("FETET HON KAMEN");
             this.handleFormFieldValues(colName, colValue);
           }
 
@@ -7750,7 +7807,6 @@ console.log('COLUMN_ID--------------------->',data[i])
           //         }
           this.loaderService.isLoading.next(false);
         }
-
        // console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
 
         //  const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));

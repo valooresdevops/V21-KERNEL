@@ -24,11 +24,11 @@
             <v-grid  *ngIf="isShown"
                     allowSideBar="true"
                      
-                    [dataApi]="getApplicationEvent"
+                    [staticData]="getApplicationEvent"
                     [agColumns]="agColumns"
                     [pagination]="true"
                     [paginationPageSize]="30"
-                    agPrimaryKey="id"></v-grid>
+                    agPrimaryKey="logId"></v-grid>
         </form>
     </v-tab>
 

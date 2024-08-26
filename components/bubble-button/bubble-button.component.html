@@ -1,5 +1,23 @@
-<div class="container">
-    <button class="fab-button" (click)="onBubbleClicked()">
-      <img [src]="imgSrc" alt="Image" class="fab-icon">
-    </button>
+<div class="button-grid">
+  <div class="container" *ngFor="let n of allMenus">
+    <div class="button-wrapper">
+      <button class="fab-button"
+        (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus, n.name); onSelect(n.menuVariable, n.childMenus, n.name);">
+        <img [src]="n.icon" alt="Image" class="fab-icon">
+      </button>
+      <div class="tooltip">{{ n.name }}</div>
+    </div>
   </div>
+</div>
+
+<div class="button-grid" *ngIf="a">
+  <div class="container" *ngFor="let n of bubbleChildMenus">
+    <div class="button-wrapper">
+      <button class="fab-button"
+        (click)="toggleActiveMenu(n.id, n.appAbrv, n.childMenus, n.name); onSelect(n.menuVariable, n.childMenus, n.name);">
+        <img [src]="n.icon" alt="Image" class="fab-icon">
+      </button>
+      <div class="tooltip">{{ n.name }}</div>
+    </div>
+  </div>
+</div>
