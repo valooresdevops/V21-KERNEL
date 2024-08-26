@@ -55,6 +55,9 @@ tr:hover {
   text-align: center;
   height: 30px;
 }
+#pagination a{
+  cursor: pointer;
+}
 
 .input-container {
   display: flex;

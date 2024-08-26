@@ -194,6 +194,8 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
             let deviceselected = params.node.key;
             // this.dataservice.setDHselectedDevice(deviceselected);
             localStorage.setItem('deviceselected', deviceselected);
+     
+
             if(localStorage.getItem('mapType')=='online'){
               $('#RunDeviceHistory1').click();
 
@@ -203,6 +205,15 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
           },
           cssClasses: ['redFont', 'bold'],
         },
+        {
+          name: "Correlation",
+           action: () => {
+     
+             let imsiSelected = params.node.allLeafChildren[0].data.imsi_id;
+             localStorage.setItem('imsiSelected', imsiSelected);
+             $("#OpenCorrelation").click();
+           }
+         },
         {
           // custom item
           name: 'Copy',
@@ -680,7 +691,13 @@ this.dataservice.setDHselectedDevice(this.dataselected);
 }
 
 
-
+canceler(event:MouseEvent){
+  event.preventDefault();
+  let uss=document.getElementById("agGrid").parentElement.parentElement.parentElement;
+  uss.addEventListener("contextmenu",(event:MouseEvent)=>{
+    event.preventDefault();
+  });
+}
 
 }
 

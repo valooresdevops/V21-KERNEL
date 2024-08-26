@@ -108,6 +108,7 @@ export class MapComponent implements OnInit {
   @ViewChild('RCsearch') RCsearch: any;
   @ViewChild(MatMenuTrigger)contextMenu: MatMenuTrigger;
   @ViewChild('prompt') prompt: any;
+  @ViewChild('Correlation') Correlation: any;
   // @Output() senarioIdOutput:any= new EventEmitter<any>();
   @Input() changes:any;
   navbarSimulId:any;
@@ -177,7 +178,6 @@ export class MapComponent implements OnInit {
   nameFormControl: any = new FormControl();
   typeFormControl: any = new FormControl();
   private routedatajson: any;
-
   isSelectMode = false;
   myMarker: any;
   allMarkers: any[]=[];
@@ -194,7 +194,7 @@ export class MapComponent implements OnInit {
   deletingModeEnabled: boolean = false;
   datingModeEnabled: boolean = false;
   MeasurementEnabled: boolean = false;
-
+  showroutebar1: boolean = false;
   isFixedElementsall: any;
   controlLayers: any;
   singledeviceMarkersClusters: L.MarkerClusterGroup;
@@ -458,6 +458,11 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   records: any;
   PropertiesSimulID: any;
   circleDisplay: any;
+  Phone_nbr: any;
+  speedmarker: number=1;
+  showroutedicv: boolean=false;
+  IsTypechanged: number;
+  heatarr: any;
 
   countryCellRenderer(params: ICellRendererParams) {
     const flag =
@@ -1191,7 +1196,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   route1: any;
   currentIndex: number = 0;
   endIndex: number = 0;
-  batchSize: number = 100;
+  batchSize: number = 50;
   startMarker: any;
   person2Marker: any;
   robberymarker: any;
@@ -1282,6 +1287,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   xroutearray:any[]=[];
   indexRoute:number=0;
   speedTimeRoute:number=1;
+  speedTimeRoute1:number=1;
   Senario_reportType:any;
   isDimmed:boolean=false;
   cursorlnglat:any;
@@ -1293,6 +1299,28 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   dateTimeFrom:any;
   dateTimeTo:any;
   headerchangeCounter:number=0;
+  items=[
+    {label:'Start',action:this.startTimeline.bind(this)},
+    {label:'Reverse',action:this.ReverseTimeline.bind(this)},
+    {label:'Reset',action:this.resetTimeline.bind(this)},
+    {label:'Stop',action:this.stopTimeline.bind(this)},
+    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+  ];
+  items2=[
+    {label:'Start',action:this.startRoute.bind(this)},
+    {label:'Stop',action:this.stopRoute.bind(this)},
+    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+  ];
+  items3=[
+    {label:'Start',action:this.startRoute1.bind(this)},
+    {label:'Stop',action:this.stopRoute.bind(this)},
+    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+  ];
+  items4=[
+    {label:'Start',action:this.animateMarker.bind(this)},
+    {label:'Stop',action:this.stopAnimationButton.bind(this)},
+    {label:'Next',action:this.processNextBatchRoute.bind(this)},
+  ];
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -1344,6 +1372,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
 
   
   async ngOnInit(): Promise<void> {
+    this.clearlocalStorage();
     this.usercode=localStorage.getItem("LogeduserId");
     $('.breadcrumb').css('display', 'none');
     $('#refresh').css('display', 'none');
@@ -1355,6 +1384,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
 
     $('.graphtools').css('display', 'none');
     $('#moretools').css('display', 'none');
+    
 
 
     // //console.log('ang window.parent.parent>>>', window.parent.parent);
@@ -1531,13 +1561,13 @@ if(button!=null){
     //      let newLayer= L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     //      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
     //     '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    //     'Imagery Â© <a href="https://www.mapbox.com/">Mapbox</a>',
+    //     'Imagery Ã‚Â© <a href="https://www.mapbox.com/">Mapbox</a>',
     //     maxNativeZoom: 19,
     //     maxZoom: 25,
     //     id: tilelayer, 
     //     tileSize: 512,
     //     zoomOffset: -1,
-    //     accessToken:'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
+    //     accessToken:'pk.eyJ1IjoiemFoZXIzMjExMjMiLCJhIjoiY2x6bW15ajZvMGZjbjJrcXc5eDl4eDZuOCJ9.ZwRMRLGUOPpmNmjRPsG-4g'
     //   })
 
     // //Add new tile layer to the map
@@ -1631,6 +1661,8 @@ console.log("currentWidth----",currentWidth,"---currentHeight---",currentHeight)
 console.log("generateColumns ><<><><>",this.generateColumns('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities'))
 console.log("generateRowData ><<><><>",this.generateRowData('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities',[["\"3CD0A7B8-B53A-4DF3-A10A-9EB9DF6D7F0C\"",2,1,1696712400000,1696712400000,1,1,"LB","Baabda"],["\"a5f497f7-5479-44c7-ade1-77a939555b1b\"",2,1,1696885200000,1696885200000,1,1,"LB","Baabda"]]))
 
+
+    this.addFlowLines();
 }
 
 async loadSimulationTypes() {
@@ -2024,189 +2056,316 @@ this.addnewSenario();
 
    
   }
-   else if (e.layerType == "polygon") {
-      this.PolygonCoordinate(L.featureGroup, e, e.layer._leaflet_id);
+  //  else if (e.layerType == "polygon") {
+  //     this.PolygonCoordinate(L.featureGroup, e, e.layer._leaflet_id);
  
-       e.layer.on('click', (event: any) => {
-              var polygoneArray = [];
-        polygoneArray = e.layer._latlngs[0];
-      for (const e of polygoneArray) {
-        polygoneArray.push([e.lat, e.lng]);
-      }
-      var getCentroid = function (arr: any) {
-        return arr.reduce(function (x: any, y: any) {
-          return [x[0] + y[0] / arr.length, x[1] + y[1] / arr.length]
-        }, [0, 0])
-      }
-      var centerCoords = getCentroid(polygoneArray);
-      var title = '';
-      var tooltip = e.layer.unbindTooltip(`${title}`, {
-        permanent: true,
-        interactive: true,
-        noWrap: true,
-        opacity: 0.9,
-        direction: "center"
-      }).openTooltip();
-      tooltip.on('click', (event: any) => {
-        // this.dialog.open(SaveshapeModalComponent,{
-        //   width: '350px',
-        // });
+  //      e.layer.on('click', (event: any) => {
+  //             var polygoneArray = [];
+  //       polygoneArray = e.layer._latlngs[0];
+  //     for (const e of polygoneArray) {
+  //       polygoneArray.push([e.lat, e.lng]);
+  //     }
+  //     var getCentroid = function (arr: any) {
+  //       return arr.reduce(function (x: any, y: any) {
+  //         return [x[0] + y[0] / arr.length, x[1] + y[1] / arr.length]
+  //       }, [0, 0])
+  //     }
+  //     var centerCoords = getCentroid(polygoneArray);
+  //     var title = '';
+  //     var tooltip = e.layer.unbindTooltip(`${title}`, {
+  //       permanent: true,
+  //       interactive: true,
+  //       noWrap: true,
+  //       opacity: 0.9,
+  //       direction: "center"
+  //     }).openTooltip();
+  //     tooltip.on('click', (event: any) => {
+  //       // this.dialog.open(SaveshapeModalComponent,{
+  //       //   width: '350px',
+  //       // });
 
         
-        if (this.deletingModeEnabled == false) {
-          if (tooltip._tooltip) {
-            this.tooltipName = tooltip._tooltip._content;
-          } else {
-            this.tooltipName = '';
-          }
-          //if(deletStatus == false) {
-          if (this.tooltipName != '' && typeof (this.tooltipName) != "undefined") {
-            //reenter shape name
-            const dialogConfig = new MatDialogConfig();
-            dialogConfig.data = {
-              content: 'Re-Enter Shape Name',
-              value: tooltip._tooltip._content
-            };
-            const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
+  //       if (this.deletingModeEnabled == false) {
+  //         if (tooltip._tooltip) {
+  //           this.tooltipName = tooltip._tooltip._content;
+  //         } else {
+  //           this.tooltipName = '';
+  //         }
+  //         //if(deletStatus == false) {
+  //         if (this.tooltipName != '' && typeof (this.tooltipName) != "undefined") {
+  //           //reenter shape name
+  //           const dialogConfig = new MatDialogConfig();
+  //           dialogConfig.data = {
+  //             content: 'Re-Enter Shape Name',
+  //             value: tooltip._tooltip._content
+  //           };
+  //           const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
 
-            dialogRef.afterClosed().subscribe(result => {
-              this.namingshapes(e);
+  //           dialogRef.afterClosed().subscribe(result => {
+  //             this.namingshapes(e);
 
-            });
+  //           });
 
-          } else {
-            //enter shape name
-            const dialogConfig = new MatDialogConfig();
-            dialogConfig.data = {
-              width: '350px',
-              content: 'Enter Shape Name',
-            };
+  //         } else {
+  //           //enter shape name
+  //           const dialogConfig = new MatDialogConfig();
+  //           dialogConfig.data = {
+  //             width: '350px',
+  //             content: 'Enter Shape Name',
+  //           };
 
-            const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
+  //           const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
 
-            dialogRef.afterClosed().subscribe(result => {
-              this.namingshapes(e);
+  //           dialogRef.afterClosed().subscribe(result => {
+  //             this.namingshapes(e);
 
-            });
+  //           });
 
-          }
-          if (this.map.getZoom() >= this.clickZoom) {
-            var myShapeName = "";
-            // if(namingAccess) {
-            if (e.layer._tooltip) {
-              myShapeName = (e.layer._tooltip._content);
-            }
-            this.isNotRoute = 1;
-            // }
-          } else {
-            this.map.setView(tooltip._latlngs[0][0], this.clickZoom);
-          }
-          //}
-        }
-        else {
-          //this.onselectedShape(e.layer);
-          //          selectedShapesArray.push(coords.find(a => a.Type === "Route"))
-        }
-      });
+  //         }
+  //         if (this.map.getZoom() >= this.clickZoom) {
+  //           var myShapeName = "";
+  //           // if(namingAccess) {
+  //           if (e.layer._tooltip) {
+  //             myShapeName = (e.layer._tooltip._content);
+  //           }
+  //           this.isNotRoute = 1;
+  //           // }
+  //         } else {
+  //           this.map.setView(tooltip._latlngs[0][0], this.clickZoom);
+  //         }
+  //         //}
+  //       }
+  //       else {
+  //         //this.onselectedShape(e.layer);
+  //         //          selectedShapesArray.push(coords.find(a => a.Type === "Route"))
+  //       }
+  //     });
 
-    });
-      tooltip.addEventListener('contextmenu', async (event: any) => {
+  //   });
+  //     tooltip.addEventListener('contextmenu', async (event: any) => {
 
-        // this.modalRef =this.modalService.open(this.date);
-        //console.log("tooltip>>>", tooltip);
-        this.clickedShapeID = tooltip._leaflet_id;
+  //       // this.modalRef =this.modalService.open(this.date);
+  //       //console.log("tooltip>>>", tooltip);
+  //       this.clickedShapeID = tooltip._leaflet_id;
 
-        if (typeof (tooltip._tooltip) != "undefined") {
-          //console.log("tooltip._tooltip>>>", tooltip._tooltip._content);
-          let x = tooltip._tooltip._content;
-          const parts = x.split('<br>');
-          const beginOperation = parts[0].split(': ')[1];
-          const endOperation = parts[1].split(': ')[1];
-          //console.log(beginOperation);
-          //console.log(endOperation);
-          //const dialogConfig = new MatDialogConfig();
-          this.dialogConfig2.disableClose = true;
-          this.dialogConfig2.data = {
-            width: '400px',
-            height: '400px',
-            beginOperation: beginOperation,
-            endOperation: endOperation
-          };
-          this.dataService.setStartDate(beginOperation);
-          this.dataService.setendDate(endOperation);
-
-
-        } else {
-
-          // const dialogConfig = new MatDialogConfig();
-          this.dataService.setStartDate('');
-          this.dataService.setendDate('');
+  //       if (typeof (tooltip._tooltip) != "undefined") {
+  //         //console.log("tooltip._tooltip>>>", tooltip._tooltip._content);
+  //         let x = tooltip._tooltip._content;
+  //         const parts = x.split('<br>');
+  //         const beginOperation = parts[0].split(': ')[1];
+  //         const endOperation = parts[1].split(': ')[1];
+  //         //console.log(beginOperation);
+  //         //console.log(endOperation);
+  //         //const dialogConfig = new MatDialogConfig();
+  //         this.dialogConfig2.disableClose = true;
+  //         this.dialogConfig2.data = {
+  //           width: '400px',
+  //           height: '400px',
+  //           beginOperation: beginOperation,
+  //           endOperation: endOperation
+  //         };
+  //         this.dataService.setStartDate(beginOperation);
+  //         this.dataService.setendDate(endOperation);
 
 
-        }
-        //////////////here 
+  //       } else {
+
+  //         // const dialogConfig = new MatDialogConfig();
+  //         this.dataService.setStartDate('');
+  //         this.dataService.setendDate('');
 
 
-
-
-        const componentfactory =
-          this.componentFactoryResolver.resolveComponentFactory(
-            DatePickerComponent
-          );
-        const componentref =
-          this.viewContainerRef.createComponent(componentfactory);
-        //componentref.instance.rowData = this.rowData;
-        componentref.changeDetectorRef.detectChanges();
-
-        const html1 = componentref.location.nativeElement;
-        await html1;
-
-
-        //console.log('layerrr>>>>', e.layer);
-
-        this.popup2 = this.map.openPopup(html1, [e.layer._latlngs[0][0].lat, e.layer._latlngs[0][1].lng]);
-        //console.log('polygonnn id>>>>>', e.layer._leaflet_id);
-        this.selectedId = e.layer._leaflet_id;
-        this.popup2.on('popupclose', async () => {
-
-          this.map.closePopup(); // Close the Leaflet popup when the close button is clicked
-          componentref.destroy();
-          //console.log("data>>>><<<<", this.dataService.getData());
-          let data = await this.dataService.getData();
-          this.selectedStartDate = data.selectedStartDate;
-          this.selectedEndDate = data.selectedEndDate;
-          //console.log("shape ID=", e.layer._leaflet_id);
-
-
-
-          let x: any = this.Coord.find(a => a.ID === this.selectedId);
-          if (x) {
-            if (typeof (this.selectedStartDate) == "undefined" || this.selectedStartDate == null) {
-              this.selectedStartDate = "";
-            }
-
-            if (typeof (this.selectedEndDate) == "undefined" || this.selectedEndDate == null) {
-              this.selectedEndDate = "";
-            }
-            x.selectedStartDate = this.selectedStartDate;
-            x.selectedEndDate = this.selectedEndDate;
-          }
-          //console.log("x", x);
-
-          if (e.layer._leaflet_id == this.clickedShapeID) {
-            this.DatingShapes(e);
-
-          }
-        });
+  //       }
+  //       //////////////here 
 
 
 
 
+  //       const componentfactory =
+  //         this.componentFactoryResolver.resolveComponentFactory(
+  //           DatePickerComponent
+  //         );
+  //       const componentref =
+  //         this.viewContainerRef.createComponent(componentfactory);
+  //       //componentref.instance.rowData = this.rowData;
+  //       componentref.changeDetectorRef.detectChanges();
 
-      });
+  //       const html1 = componentref.location.nativeElement;
+  //       await html1;
+
+
+  //       //console.log('layerrr>>>>', e.layer);
+
+  //       this.popup2 = this.map.openPopup(html1, [e.layer._latlngs[0][0].lat, e.layer._latlngs[0][1].lng]);
+  //       //console.log('polygonnn id>>>>>', e.layer._leaflet_id);
+  //       this.selectedId = e.layer._leaflet_id;
+  //       this.popup2.on('popupclose', async () => {
+
+  //         this.map.closePopup(); // Close the Leaflet popup when the close button is clicked
+  //         componentref.destroy();
+  //         //console.log("data>>>><<<<", this.dataService.getData());
+  //         let data = await this.dataService.getData();
+  //         this.selectedStartDate = data.selectedStartDate;
+  //         this.selectedEndDate = data.selectedEndDate;
+  //         //console.log("shape ID=", e.layer._leaflet_id);
+
+
+
+  //         let x: any = this.Coord.find(a => a.ID === this.selectedId);
+  //         if (x) {
+  //           if (typeof (this.selectedStartDate) == "undefined" || this.selectedStartDate == null) {
+  //             this.selectedStartDate = "";
+  //           }
+
+  //           if (typeof (this.selectedEndDate) == "undefined" || this.selectedEndDate == null) {
+  //             this.selectedEndDate = "";
+  //           }
+  //           x.selectedStartDate = this.selectedStartDate;
+  //           x.selectedEndDate = this.selectedEndDate;
+  //         }
+  //         //console.log("x", x);
+
+  //         if (e.layer._leaflet_id == this.clickedShapeID) {
+  //           this.DatingShapes(e);
+
+  //         }
+  //       });
+
+
+
+
+
+  //     });
 
    
-   } else if (e.layerType == "rectangle") {
+  //  } 
+  else if (e.layerType == "polygon") {
+    this.PolygonCoordinate(L.featureGroup, e, e.layer._leaflet_id);
+
+    e.layer.on('click', (event: any) => {
+        var polygoneArray = e.layer._latlngs[0];
+        var getCentroid = function (arr: any) {
+            return arr.reduce(function (x: any, y: any) {
+                return [x[0] + y[0] / arr.length, x[1] + y[1] / arr.length];
+            }, [0, 0]);
+        };
+        var centerCoords = getCentroid(polygoneArray);
+        var title = '';
+        var tooltip = e.layer.unbindTooltip(`${title}`, {
+            permanent: true,
+            interactive: true,
+            noWrap: true,
+            opacity: 0.9,
+            direction: "center"
+        }).openTooltip();
+        tooltip.on('click', (event: any) => {
+            // this.dialog.open(SaveshapeModalComponent, {
+            //     width: '350px',
+            // });
+
+            if (this.deletingModeEnabled == false) {
+                if (tooltip._tooltip) {
+                    this.tooltipName = tooltip._tooltip._content;
+                } else {
+                    this.tooltipName = '';
+                }
+                if (this.tooltipName != '' && typeof (this.tooltipName) != "undefined") {
+                    const dialogConfig = new MatDialogConfig();
+                    dialogConfig.data = {
+                        content: 'Re-Enter Shape Name',
+                        value: tooltip._tooltip._content
+                    };
+                    const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
+
+                    dialogRef.afterClosed().subscribe(result => {
+                        this.namingshapes(e);
+                    });
+
+                } else {
+                    const dialogConfig = new MatDialogConfig();
+                    dialogConfig.data = {
+                        width: '350px',
+                        content: 'Enter Shape Name',
+                    };
+
+                    const dialogRef = this.dialog.open(SaveshapeModalComponent, dialogConfig);
+
+                    dialogRef.afterClosed().subscribe(result => {
+                        this.namingshapes(e);
+                    });
+                }
+                if (this.map.getZoom() >= this.clickZoom) {
+                    var myShapeName = "";
+                    if (e.layer._tooltip) {
+                        myShapeName = (e.layer._tooltip._content);
+                    }
+                    this.isNotRoute = 1;
+                } else {
+                    this.map.setView(centerCoords, this.clickZoom);
+                }
+            }
+        });
+      
+
+        tooltip.addEventListener('contextmenu', async (event: any) => {
+            this.clickedShapeID = tooltip._leaflet_id;
+
+            if (typeof (tooltip._tooltip) != "undefined") {
+                let x = tooltip._tooltip._content;
+                const parts = x.split('<br>');
+                const beginOperation = parts[0].split(': ')[1];
+                const endOperation = parts[1].split(': ')[1];
+                this.dialogConfig2.disableClose = true;
+                this.dialogConfig2.data = {
+                    width: '400px',
+                    height: '400px',
+                    beginOperation: beginOperation,
+                    endOperation: endOperation
+                };
+                this.dataService.setStartDate(beginOperation);
+                this.dataService.setendDate(endOperation);
+            } else {
+                this.dataService.setStartDate('');
+                this.dataService.setendDate('');
+            }
+
+            const componentfactory = this.componentFactoryResolver.resolveComponentFactory(DatePickerComponent);
+            const componentref = this.viewContainerRef.createComponent(componentfactory);
+            componentref.changeDetectorRef.detectChanges();
+
+            const html1 = componentref.location.nativeElement;
+            await html1;
+            //console.log('layerrr>>>>', e.layer);
+            this.popup2 = this.map.openPopup(html1, [polygoneArray[0].lat, polygoneArray[0].lng]);
+            this.selectedId = e.layer._leaflet_id;
+            this.popup2.on('popupclose', async () => {
+                this.map.closePopup();
+                componentref.destroy();
+                let data = await this.dataService.getData();
+                this.selectedStartDate = data.selectedStartDate;
+                this.selectedEndDate = data.selectedEndDate;
+               //console.log("shape ID=", e.layer._leaflet_id);
+
+                let x: any = this.Coord.find(a => a.ID === this.selectedId);
+                if (x) {
+                    if (typeof (this.selectedStartDate) == "undefined" || this.selectedStartDate == null) {
+                        this.selectedStartDate = "";
+                    } 
+                     if (typeof (this.selectedEndDate) == "undefined" || this.selectedEndDate == null) {
+                        this.selectedEndDate = "";
+                    }
+                    x.selectedStartDate = this.selectedStartDate;
+                     x.selectedEndDate = this.selectedEndDate;
+                }
+
+                if (e.layer._leaflet_id == this.clickedShapeID) {
+                    this.DatingShapes(e);
+                }
+            });
+        });
+    });
+  }
+  else if (e.layerType == "rectangle") {
       this.RectangleCoordinate(L.featureGroup, e, e.layer._leaflet_id);
      
       // e.layer.on('click', (event: any) => { 
@@ -2582,8 +2741,7 @@ this.addnewSenario();
     //console.log("starttimeline>>>>>>>>>>>>>");
     this.Datatable=[];
     this.Datatablereverse=[];
-    this.openTable=true;
-    //console.log("4444444444444444--------",this.Datatable1.length);
+     //console.log("4444444444444444--------",this.Datatable1.length);
     //console.log("333333333333333333--------",this.index);
 
     this.Datatable1=[...this.Datatable1.slice(0, this.Datatable1.length-this.index)];
@@ -2917,12 +3075,12 @@ if(this.indexTimeline==1){
 
 
   clearShapes() {
-
+    this.showroutebar1=false;
     if(this.flagInQueue == 0){
       this.inQueueArray =[];
       this.executeOfflineId ="";
     }
-    //console.log("in clearshapes>>>>>>")
+    console.log("in clearshapes fixedMarkersArray>>>>>>",this.fixedMarkersArray)
     this.reportName = "";
     this.Coord = [];
     if (typeof this.layerGroup != "undefined") {
@@ -3008,7 +3166,12 @@ if(this.indexTimeline==1){
 
 
     if (this.fixedMarkersArray.length > 0) {
-      this.map.removeLayer(this.fixedMarkersGroup);
+      this.fixedMarkersArray.forEach((element: any, key: any) => {
+        this.map.removeLayer(element);
+  
+  
+      })
+      // this.map.removeLayer(this.fixedMarkersGroup);
       this.fixedMarkersArray = [];
     }
 
@@ -3098,6 +3261,7 @@ if(this.indexTimeline==1){
 
     this.clearlocalStorage();
     //console.log('ang isMapAngular  7 >>', (window.parent.parent.parent[7] as any));
+    
     $('#controlbutton').css('display', 'none');
 
     if (this.layerControl2) {
@@ -3137,7 +3301,7 @@ if(this.indexTimeline==1){
     this.isSimul = false;
     this.markersArray = [];
     this.isFixedElements = false;
-    this.Devices = [];
+    this.Devices = "";
     this.datasource = [];
     this.isSqlCond = "";
     this.Datatable1=[];
@@ -3246,6 +3410,10 @@ this.routedatajson=[];
 // this.dataService.setroutedevices("");
 this.reportType=1;
 this.headerchangeCounter++;
+this.clearRoutes();
+$("#timeline").css("display","none");
+$("#routebar1").css("display","none");
+$("#routebar").css("display","none");
 
   }
 
@@ -3341,10 +3509,10 @@ this.headerchangeCounter++;
 
     // const baseLayers = {
     //   'Street Map': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //     attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    //     attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     //   }),
     //   'Satellite Map': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    //     attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    //     attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     //   })
     // };
 
@@ -4910,9 +5078,22 @@ await this.datacrowdService.getcountry(zz).then((ress:any)=>{
        
  
       }); 
-      let e=  this.byteToJson(this.records);
-       console.log('eeeeeeeee>>>>>> 0', e);
-      return e;
+      try{
+        let e=  this.byteToJson(this.records);
+        console.log('eeeeeeeee>>>>>> 0', e);
+       return e;
+      }
+      catch (error) {        
+        console.log('error>>>>>> 0', error);
+             
+        Swal.fire({
+          text: 'No Data Available',
+          backdrop: false,
+          // showCancelButton: true,
+        });
+
+      }
+    
       
     }
 async getSimulationNextAction(obj: any) { 
@@ -6151,10 +6332,10 @@ console.log('iiiiiii>>>>>> 0', this.records)
 
           const baseLayers = {
             'Street Map': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+              attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
             }),
             'Satellite Map': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-              attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+              attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
             })
           };
 
@@ -6467,7 +6648,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
   }
 
       idtype = "s,h&x";
-      let googleLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=' + idtype + '={x}&y={y}&z={z}', {
+      let googleLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=' + idtype + '={x}&y={y}&z={z}', {
         maxNativeZoom: 19,
         maxZoom: 25,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -6475,12 +6656,12 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
       this.map.addLayer(googleLayer);
     } else if (id == "googleStreets1") {
 
-  // Clean up the map when the component is destroyedd
+  // Clean up the map when the component is destroyed
     if (this.map3d) {
       this.map3d.remove(); // This removes the map instance and its event listeners
     }
       idtype = "m&x";
-      let googleLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=' + idtype + '={x}&y={y}&z={z}', {
+      let googleLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=' + idtype + '={x}&y={y}&z={z}', {
         maxNativeZoom: 19,
         maxZoom: 25,
         subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -6495,7 +6676,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
         style: 'mapbox://styles/mapbox/outdoors-v11',
         center: [35.63931, 33.88153],
         zoom: 7,
-        accessToken: 'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
+        accessToken: ' '
       });
 
       this.map3d.addControl(new mapboxgl.FullscreenControl(), 'bottom-left');
@@ -6508,7 +6689,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
         style: 'mapbox://styles/mapbox/streets-v11',
         center: [35.63931, 33.88153],
         zoom: 7,
-        accessToken: 'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
+        accessToken: 'pk.eyJ1IjoiemFoZXIzMjExMjMiLCJhIjoiY2x6bW15ajZvMGZjbjJrcXc5eDl4eDZuOCJ9.ZwRMRLGUOPpmNmjRPsG-4g'
       });
 
       this.map3d.addControl(new mapboxgl.FullscreenControl(), 'bottom-left');
@@ -6521,7 +6702,7 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
         style: 'mapbox://styles/mapbox/satellite-streets-v11',
         center: [35.63931, 33.88153],
         zoom: 7,
-        accessToken: 'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
+        accessToken: 'pk.eyJ1IjoiemFoZXIzMjExMjMiLCJhIjoiY2x6bW15ajZvMGZjbjJrcXc5eDl4eDZuOCJ9.ZwRMRLGUOPpmNmjRPsG-4g'
       });
 
       this.map3d.addControl(new mapboxgl.FullscreenControl(), 'bottom-left');
@@ -6530,16 +6711,17 @@ if(this.senarioFlag==true && this.senariocount==1 && this.addnewsenariocount==0)
     else {
 
       idtype = 'mapbox/' + id;
+      console.log("idtype",idtype)
       newLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
           '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery Â© <a href="https://www.mapbox.com/">Mapbox</a>',
+          'Imagery Ã‚Â© <a href="https://www.mapbox.com/">Mapbox</a>',
         maxNativeZoom: 19,
         maxZoom: 25,
         id: idtype,
         tileSize: 512,
         zoomOffset: -1,
-        accessToken: 'pk.eyJ1IjoidmFsb29yZXMiLCJhIjoiY2wzd21md3VkMDgxZTNibzhpc2dhOGx0MCJ9.CSG26gI-rCZLv0HV0rJwxw'
+        accessToken: 'pk.eyJ1IjoiemFoZXIzMjExMjMiLCJhIjoiY2x6bW15ajZvMGZjbjJrcXc5eDl4eDZuOCJ9.ZwRMRLGUOPpmNmjRPsG-4g'
       })
 
       // Add new tile layer to the map
@@ -7906,10 +8088,10 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
 
         const baseLayers = {
           'Street Map': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+            attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
           }),
           'Satellite Map': L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Map data Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+            attribution: 'Map data Ã‚Â© <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
           })
         };
 
@@ -8021,7 +8203,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
       // //console.log('arr.length>>>>',arr.length)
 
       for (let i = 0; i < this.AoiIds.length; i++) {
-        this.datacrowdService.getSelectedShape(this.AoiIds[i]).then((res: any) => {
+        this.datacrowdService.getSelectedShapes(this.AoiIds[i]).then((res: any) => {
           //console.log('getSelectedShape>>>>', res);
           this.Aoiresp = res;
           //console.log('myres=', this.Aoiresp);
@@ -8989,6 +9171,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
     this.displaysectors=true;
 
     $('.timeline').css('display', 'flex');
+    $('#timeline').css('display', 'block');
 
     if (this.fixedMarkersGroup) {
       this.map.removeLayer(this.fixedMarkersGroup);
@@ -9070,6 +9253,7 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
       this.map.setView([Number(this.CdrData.BTS[0][0].BTS.LATITUDE), Number(this.CdrData.BTS[0][0].BTS.LONGITUDE)], 20)
 
     }
+    this.displayedColumns = ['Time', 'event', 'Lng', 'lat'];
 
     //console.log('countttttttttttt----------',count);
 
@@ -10033,9 +10217,6 @@ console.log("lon----",lon);
     //let device:any =this.dataService.getDHselectedDevice();
     let device = localStorage.getItem('deviceselected');
     this.selectedType=2;
-    
-
- 
 
 this.test33();
   }
@@ -10072,403 +10253,386 @@ this.test33();
     }
 
   }
-
   controlTooltip(event: any) {
 
     var Tooltip = new L.LayerGroup();
+    console.log("Tooltip---",Tooltip);
 
     if (event == true) {
-      Tooltip.on('add', () => {
-        this.map.eachLayer((l: any) => {
-          if (l.getTooltip) {
-            var toolTip = l.getTooltip();
-            if (toolTip) {
-              this.map.addLayer(toolTip);
-            }
-          }
-        });
-      })
-      Tooltip.on('remove', () => {
-        this.map.eachLayer((l: any) => {
-          if (l.getTooltip) {
-            var toolTip = l.getTooltip();
-            if (toolTip) {
-              this.map.closeTooltip(toolTip);
-            }
-          }
-        });
-      });
-    } else {
-      Tooltip.on('add', () => {
-        this.map.eachLayer((l: any) => {
-          if (l.getTooltip) {
-            var toolTip = l.getTooltip();
-            if (toolTip) {
-              this.map.addLayer(toolTip);
-            }
-          }
-        });
-      })
-      Tooltip.on('remove', () => {
-        this.map.eachLayer((l: any) => {
-          if (l.getTooltip) {
-            var toolTip = l.getTooltip();
-            if (toolTip) {
-              this.map.closeTooltip(toolTip);
-            }
-          }
-        });
-      });
-    }
-  }
-
-  controlClusters(event: any) {
-    if (event == false) {
-      // let activityHotspots = L.layerGroup([this.marker]).addTo(this.map);
-      this.marker.addTo(this.map);
-
-    } else {
-      if (this.marker) {
-        this.map.removeLayer(this.marker);
-
-      }
-    }
-
-
-  }
-
-  controldateTooltip(event: any) {
-    var Tooltip = new L.LayerGroup();
-
-    if (event == false) {
-      // this.tooltipInstance.openTooltip();
-      if (this.tooltipInstanceArray) {
-        for (const tooltipInstance of this.tooltipInstanceArray) {
+      if (this.tooltipInstanceNameArray) {
+        for (const tooltipInstance of this.tooltipInstanceNameArray) {
           tooltipInstance.openTooltip();
         }
 
       }
+   
     } else {
-      this.hideTooltip();
+
+      if (this.tooltipInstanceNameArray) {
+      this.hideTooltipname();
+      }
+
     }
-
-
   }
-  controlArea(event: any) {
+  
+controlClusters(event: any) {
+  if (event == true) {
+    // let activityHotspots = L.layerGroup([this.marker]).addTo(this.map);
+    this.marker.addTo(this.map);
 
-  } 
+  } else {
+    if (this.marker) {
+      this.map.removeLayer(this.marker);
+
+    }
+  }
 
 
-  deviceClusters(eventData: { event: any; name: any; checkedCount: number; namearray: any[] }) {
+}
 
-    let { event, name, checkedCount, namearray } = eventData;
+controldateTooltip(event: any) {
+  var Tooltip = new L.LayerGroup();
 
-    //console.log("event:", event);
-    //console.log("name:", name);
-    //console.log("checkedCount:", checkedCount);
-    //console.log("namearray:", namearray);
-    let checkednames: any = namearray;
+  if (event == true) {
+    // this.tooltipInstance.openTooltip();
+    if (this.tooltipInstanceArray) {
+      for (const tooltipInstance of this.tooltipInstanceArray) {
+        tooltipInstance.openTooltip();
+      }
 
-    //console.log("ifchecikeddddd:::::", event.target.checked);
-    //console.log("nameeventttt:::::", event.target.id);
+    }
+  } else {
+    this.hideTooltip();
+  }
+
+
+}
+
+controlArea(event: any) {
+  
+    if (event == false) {
+    this.map.removeLayer( this.drawnItems);
+    }else{
+      this.map.addLayer( this.drawnItems);
+    }
+}
+
+
+
+
+deviceClusters(eventData: { event: any; name: any; checkedCount: number; namearray: any[] }) {
+
+  let { event, name, checkedCount, namearray } = eventData;
+
+  //console.log("event:", event);
+  //console.log("name:", name);
+  //console.log("checkedCount:", checkedCount);
+  //console.log("namearray:", namearray);
+  let checkednames: any = namearray;
+
+  //console.log("ifchecikeddddd:::::", event.target.checked);
+  //console.log("nameeventttt:::::", event.target.id);
+
+  //console.log("arrayyyyyyyyyyyyy:", checkednames);
+
+  let eventName: any = event.target.id;
+  //console.log("eventName:::::;;::::;", eventName);
+  //console.log("event.target:::::;;::::;", event.target);
+
+  if (event.target.checked === false) {
+    this.markerControlArray.forEach((element: any, key: any) => {
+
+
+      this.map.removeLayer(element);
+
+    });
+    this.markerControlArray = [];
+
+
+    //console.log("this.markerControlArray>>>>>>>>>", this.markerControlArray);
+
+    checkednames = checkednames.filter((item: any) => item.layer_control !== eventName);
+    //console.log("checkednamesfalseeeeeeeeeeeeeee:::::;;::::;", checkednames);
+
+    checkednames.forEach((name: any) => {
+      //console.log("eventttttttttttttt:", event);
+      //console.log("device clusters name:::::::::::", name.layer_control);
+      name = name.layer_control;
+      let x = this.findObjectsByElement4(
+this.datajson, name);
+      //console.log("findObjectsByElement4:::::::::::", x);
+      let data: any = {
+        markerPositions: x
+      };
+      //console.log("final obejctssss:::::::::::", data);
+
+
+      this.markerclusterControl = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+
+      this.rowData = [];
+      data.markerPositions.forEach((element: any, key: any) => {
+        this.myMarker2 = this.binddata(
+          element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
+          element[5],
+          ""
+        );
+        this.myMarker2.lat = element[4];
+        this.myMarker2.lng = element[3]
+        this.myMarker2.timestamp = element[1]
+        this.myMarker2.tel = element[0];
+        this.myMarker2.name = element[2];
+        this.myMarker2.off("click");
+
+
+
+
+        this.markersArray2.push(this.myMarker2);
+        this.markerclusterControl.addLayers(this.myMarker2);
+
+      });
+      // }
+      //console.log('final id of markerclsuter control ', this.markerclusterControl._leaflet_id);
+      //console.log('json ', json);
+
+      var json: any = {
+        id: this.markerclusterControl._leaflet_id,
+        Name: eventName
+      };
+      //console.log('json >>>>', json);
+
+      this.ControlArray.push(json);
+      this.markerclusterControl.addTo(this.map);
+      this.markerControlArray.push(this.markerclusterControl)
+
+    });
+
+
+
+  } else {
+
+    //console.log("checkednamestrueeeeeeeeeeee:::::;;::::;", checkednames);
+
 
     //console.log("arrayyyyyyyyyyyyy:", checkednames);
-
-    let eventName: any = event.target.id;
-    //console.log("eventName:::::;;::::;", eventName);
-    //console.log("event.target:::::;;::::;", event.target);
-
-    if (event.target.checked === false) {
-      this.markerControlArray.forEach((element: any, key: any) => {
-
-
-        this.map.removeLayer(element);
-
-      });
-      this.markerControlArray = [];
+    checkednames.forEach((name: any) => {
+      //console.log("eventttttttttttttt:", event);
+      //console.log("device clusters name:::::::::::", name.layer_control);
+      name = name.layer_control;
+      let x = this.findObjectsByElement4(this.datajson, name);
+      //console.log("findObjectsByElement4:::::::::::", x);
+      let data: any = {
+        markerPositions: x
+      };
+      console.log("final obejctssss:::::::::::", data);
 
 
-      //console.log("this.markerControlArray>>>>>>>>>", this.markerControlArray);
-
-      checkednames = checkednames.filter((item: any) => item.layer_control !== eventName);
-      //console.log("checkednamesfalseeeeeeeeeeeeeee:::::;;::::;", checkednames);
-
-      checkednames.forEach((name: any) => {
-        //console.log("eventttttttttttttt:", event);
-        //console.log("device clusters name:::::::::::", name.layer_control);
-        name = name.layer_control;
-        let x = this.findObjectsByElement4(this.datajson, name);
-        //console.log("findObjectsByElement4:::::::::::", x);
-        let data: any = {
-          markerPositions: x
-        };
-        //console.log("final obejctssss:::::::::::", data);
-
-
-        this.markerclusterControl = L.markerClusterGroup({
-          spiderfyOnMaxZoom: false,
-          animate: true,
-          singleMarkerMode: true,
-        });
-
-        this.rowData = [];
-        data.markerPositions.forEach((element: any, key: any) => {
-          this.myMarker2 = this.binddata(
-            element[0],
-            element[1],
-            element[2],
-            element[3],
-            element[4],
-            element[5],
-            ""
-          );
-          this.myMarker2.lat = element[0];
-          this.myMarker2.lng = element[1];
-          this.myMarker2.timestamp = element[3];
-          this.myMarker2.tel = element[2];
-          this.myMarker2.name = element[4];
-          this.myMarker2.off("click");
-
-
-
-
-          this.markersArray2.push(this.myMarker2);
-          this.markerclusterControl.addLayers(this.myMarker2);
-
-        });
-        // }
-        //console.log('final id of markerclsuter control ', this.markerclusterControl._leaflet_id);
-        //console.log('json ', json);
-
-        var json: any = {
-          id: this.markerclusterControl._leaflet_id,
-          Name: eventName
-        };
-        //console.log('json >>>>', json);
-
-        this.ControlArray.push(json);
-        this.markerclusterControl.addTo(this.map);
-        this.markerControlArray.push(this.markerclusterControl)
-
+      this.markerclusterControl = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
       });
 
+      this.rowData = [];
+      data.markerPositions.forEach((element: any, key: any) => {
+        this.myMarker2 = this.binddata(
+          element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
+          element[5],
+          ""
+        );
+        this.myMarker2.lat = element[4];
+        this.myMarker2.lng = element[3]
+        this.myMarker2.timestamp = element[1]
+        this.myMarker2.tel = element[0];
+        this.myMarker2.name = element[2];
+        this.myMarker2.off("click");
+        this.myMarker2.on("mousedown", async (e: any) => {
+          if (e.originalEvent.buttons == 2) {
+            //console.log("markerChildrensssssss", e.target)
+            this.rowData = [];
+            var jsonaggrid = {
+              Device_id: e.target.tel,
+              Tel: e.target.name,
+              Date: e.target.timestamp,
+              Hits: "1",
+              Coord: e.target.lat + ',' + e.target.lng,
+              // Lat:e.target.lat
+            };
+            this.rowData.push(jsonaggrid);
+
+            const componentfactory =
+              this.componentFactoryResolver.resolveComponentFactory(
+                VAgGridComponent
+              );
+            const componentref =
+              this.viewContainerRef.createComponent(componentfactory);
+            componentref.instance.rowData = this.rowData;
+            componentref.instance.columnDefs = this.columnDefs;
+            componentref.instance.headerHeight = 0;
+            // componentref.instance.selectdevices = true;
+            componentref.instance.Title = "Here On";
+            componentref.instance.distinct = true;
+            componentref.changeDetectorRef.detectChanges();
+            const html2 = componentref.location.nativeElement;
+            componentref.instance.Grid2Type = 'btn-54';
+
+            await html2;
+
+            // /  e.target.openPopup(html2, e.target._latlng);
+            this.map.openPopup(html2, e.target._latlng);
+          } else {
+
+          }
 
 
-    } else {
-
-      //console.log("checkednamestrueeeeeeeeeeee:::::;;::::;", checkednames);
-
-
-      //console.log("arrayyyyyyyyyyyyy:", checkednames);
-      checkednames.forEach((name: any) => {
-        //console.log("eventttttttttttttt:", event);
-        //console.log("device clusters name:::::::::::", name.layer_control);
-        name = name.layer_control;
-        let x = this.findObjectsByElement4(this.datajson, name);
-        //console.log("findObjectsByElement4:::::::::::", x);
-        let data: any = {
-          markerPositions: x
-        };
-        //console.log("final obejctssss:::::::::::", data);
-
-
-        this.markerclusterControl = L.markerClusterGroup({
-          spiderfyOnMaxZoom: false,
-          animate: true,
-          singleMarkerMode: true,
         });
 
-        this.rowData = [];
-        data.markerPositions.forEach((element: any, key: any) => {
-          this.myMarker2 = this.binddata(
-            element[0],
-            element[1],
-            element[2],
-            element[3],
-            element[4],
-            element[5],
-            ""
-          );
-          this.myMarker2.lat = element[0];
-          this.myMarker2.lng = element[1];
-          this.myMarker2.timestamp = element[3];
-          this.myMarker2.tel = element[2];
-          this.myMarker2.name = element[4];
-          this.myMarker2.off("click");
-          this.myMarker2.on("mousedown", async (e: any) => {
-            if (e.originalEvent.buttons == 2) {
-              //console.log("markerChildrensssssss", e.target)
-              this.rowData = [];
+
+        const componentfactory =
+          this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+        const componentref =
+          this.viewContainerRef.createComponent(componentfactory);
+        const html1 = (componentref.location.nativeElement.style.display = "none");
+        componentref.instance.columnDefs = this.columnDefs;
+        componentref.changeDetectorRef.detectChanges();
+        this.markerclusterControl.off("click");
+        this.markerclusterControl.on("clustermousedown", async (e: any) => {
+          if (e.originalEvent.buttons == 2) {
+            var markerChildrens = e.layer.getAllChildMarkers();
+
+            //console.log("markerChildrens>>><<<", markerChildrens)
+            //console.log('rowdata before1>>>>>>', this.rowData)
+
+            this.rowData = [];
+            //console.log('rowdata before2>>>>>>', this.rowData)
+
+            for (var j = 0; j < markerChildrens.length; j++) {
               var jsonaggrid = {
-                Device_id: e.target.tel,
-                Tel: e.target.name,
-                Date: e.target.timestamp,
+                Device_id: markerChildrens[j].tel,
+                Tel: markerChildrens[j].name,
+                Date: markerChildrens[j].timestamp,
                 Hits: "1",
-                Coord: e.target.lat + ',' + e.target.lng,
-                // Lat:e.target.lat
+                Coord: markerChildrens[j].lng + ',' + markerChildrens[j].lat
+                // Lng:markerChildrens[j].lng,
+                // Lat:markerChildrens[j].lat
               };
+              //console.log('rowdata jsonaggrid>>>>', jsonaggrid)
               this.rowData.push(jsonaggrid);
-
-              const componentfactory =
-                this.componentFactoryResolver.resolveComponentFactory(
-                  VAgGridComponent
-                );
-              const componentref =
-                this.viewContainerRef.createComponent(componentfactory);
-              componentref.instance.rowData = this.rowData;
-              componentref.instance.columnDefs = this.columnDefs;
-              componentref.instance.headerHeight = 0;
-              // componentref.instance.selectdevices = true;
-              componentref.instance.Title = "Here On";
-              componentref.instance.distinct = true;
-              componentref.changeDetectorRef.detectChanges();
-              const html2 = componentref.location.nativeElement;
-              componentref.instance.Grid2Type = 'btn-54';
-
-              await html2;
-
-              // /  e.target.openPopup(html2, e.target._latlng);
-              this.map.openPopup(html2, e.target._latlng);
-            } else {
-
             }
+            //console.log('rowdata after>>>>>>', this.rowData)
+            const componentfactory =
+              this.componentFactoryResolver.resolveComponentFactory(
+                VAgGridComponent
+              );
+            const componentref =
+              this.viewContainerRef.createComponent(componentfactory);
+            componentref.instance.rowData = this.rowData;
+            componentref.instance.columnDefs = this.columnDefs;
+            componentref.instance.headerHeight = 0;
+            // componentref.instance.selectdevices = true;
+            componentref.instance.Title = "Here On";
+            componentref.instance.distinct = true;
+            componentref.changeDetectorRef.detectChanges();
+            componentref.instance.pagination = false;
+            componentref.instance.rowGrouping = true;
+            componentref.instance.contextmenu = false;
+            componentref.instance.Grid2Type = 'btn-54';
+
+            const html1 = componentref.location.nativeElement;
+            await html1;
 
 
-          });
+            $('.ag-theme-balham').css('height', ' 250px');
+
+            this.map.openPopup(html1, e.layer.getLatLng());
 
 
-          const componentfactory =
-            this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-          const componentref =
-            this.viewContainerRef.createComponent(componentfactory);
-          const html1 = (componentref.location.nativeElement.style.display = "none");
-          componentref.instance.columnDefs = this.columnDefs;
-          componentref.changeDetectorRef.detectChanges();
-          this.markerclusterControl.off("click");
-          this.markerclusterControl.on("clustermousedown", async (e: any) => {
-            if (e.originalEvent.buttons == 2) {
-              var markerChildrens = e.layer.getAllChildMarkers();
-
-              //console.log("markerChildrens>>><<<", markerChildrens)
-              //console.log('rowdata before1>>>>>>', this.rowData)
-
-              this.rowData = [];
-              //console.log('rowdata before2>>>>>>', this.rowData)
-
-              for (var j = 0; j < markerChildrens.length; j++) {
-                var jsonaggrid = {
-                  Device_id: markerChildrens[j].tel,
-                  Tel: markerChildrens[j].name,
-                  Date: markerChildrens[j].timestamp,
-                  Hits: "1",
-                  Coord: markerChildrens[j].lng + ',' + markerChildrens[j].lat
-                  // Lng:markerChildrens[j].lng,
-                  // Lat:markerChildrens[j].lat
-                };
-                //console.log('rowdata jsonaggrid>>>>', jsonaggrid)
-                this.rowData.push(jsonaggrid);
-              }
-              //console.log('rowdata after>>>>>>', this.rowData)
-              const componentfactory =
-                this.componentFactoryResolver.resolveComponentFactory(
-                  VAgGridComponent
-                );
-              const componentref =
-                this.viewContainerRef.createComponent(componentfactory);
-              componentref.instance.rowData = this.rowData;
-              componentref.instance.columnDefs = this.columnDefs;
-              componentref.instance.headerHeight = 0;
-              // componentref.instance.selectdevices = true;
-              componentref.instance.Title = "Here On";
-              componentref.instance.distinct = true;
-              componentref.changeDetectorRef.detectChanges();
-              componentref.instance.pagination = false;
-              componentref.instance.rowGrouping = true;
-              componentref.instance.contextmenu = false;
-              componentref.instance.Grid2Type = 'btn-54';
-
-              const html1 = componentref.location.nativeElement;
-              await html1;
-
-
-              $('.ag-theme-balham').css('height', ' 250px');
-
-              this.map.openPopup(html1, e.layer.getLatLng());
-
-
-            }
-          });
-
-          this.markersArray2.push(this.myMarker2);
-          this.markerclusterControl.addLayers(this.myMarker2);
-
+          }
         });
-        // }
-        //console.log('final id of markerclsuter control ', this.markerclusterControl._leaflet_id);
-        //console.log('json ', json);
 
-        var json: any = {
-          id: this.markerclusterControl._leaflet_id,
-          Name: eventName
-        };
-        //console.log('json >>>>', json);
-
-        this.ControlArray.push(json);
-        this.markerclusterControl.addTo(this.map);
-        this.markerControlArray.push(this.markerclusterControl)
+        this.markersArray2.push(this.myMarker2);
+        this.markerclusterControl.addLayers(this.myMarker2);
 
       });
+      // }
+      //console.log('final id of markerclsuter control ', this.markerclusterControl._leaflet_id);
+      //console.log('json ', json);
 
-    }
-    //console.log("this.markerclusterControl>>>>>>>>>", this.markerclusterControl);
-    //console.log("this.markerControlArray>>>>>>>>>", this.markerControlArray);
-    //console.log("yhis.myMarker2>>>>", this.myMarker2)
-    //console.log("yhis.markersArray2>>>>", this.markersArray2)
+      var json: any = {
+        id: this.markerclusterControl._leaflet_id,
+        Name: eventName
+      };
+      //console.log('json >>>>', json);
+
+      this.ControlArray.push(json);
+      this.markerclusterControl.addTo(this.map);
+      this.markerControlArray.push(this.markerclusterControl)
+
+    });
 
   }
+  //console.log("this.markerclusterControl>>>>>>>>>", this.markerclusterControl);
+  //console.log("this.markerControlArray>>>>>>>>>", this.markerControlArray);
+  //console.log("yhis.myMarker2>>>>", this.myMarker2)
+  //console.log("yhis.markersArray2>>>>", this.markersArray2)
 
-  filterData22() {
+}
+filterData22() {
+  this.uniqueNames = [];
+  this.display = !this.display;
+  console.log("this.datajson",this.datajson);
+  console.log("this.display",this.display)
+
+  const markerPositions = this.datajson;
+  //console.log("datajson in layerconstrol>>>>>>>", this.datajson);
+
+  //console.log("markerPositions in layerconstrol>>>>>>>", markerPositions);
+  this.uniqueNames = [...new Set(markerPositions.map((item: any) => item[0]))];
+  console.log("uniqueNames::::::", this.uniqueNames);
+  if (this.display === false) {
+    //  this.clusters2=[];
+    //    this.clusterFeatures2=[];
     this.uniqueNames = [];
-    this.display = !this.display;
-    const markerPositions = this.datajson.markerPositions;
-    //console.log("datajson in layerconstrol>>>>>>>", this.datajson);
+  }
+}
 
-    //console.log("markerPositions in layerconstrol>>>>>>>", markerPositions);
-    this.uniqueNames = [...new Set(markerPositions.map((item: any) => item[4]))];
-    //console.log("uniqueNames::::::", this.uniqueNames);
-    if (this.display === false) {
-      //  this.clusters2=[];
-      //    this.clusterFeatures2=[];
-      this.uniqueNames = [];
+
+
+controlHeats(event: any) {
+  if (event == true) {
+    this.heat = L.heatLayer(this.heatarr, {
+      radius: 20
+    });
+    this.heat.addTo(this.map);
+
+  } else {
+    if (this.heat) {
+      this.map.removeLayer(this.heat);
+
     }
   }
 
+}
+findObjectsByElement4(datajson: any, elementValue: string): any[] {
+  return datajson.filter((item: any) => item[0] === elementValue);
+}
 
+setbtsType(type: any) {
+  this.BtsTypeSlected = type;
+  this.dialog.closeAll();
 
-  controlHeats(event: any) {
-    if (event == true) {
-      this.heat = L.heatLayer(this.datajson.heatCoords, {
-        radius: 20
-      });
-      this.heat.addTo(this.map);
-
-    } else {
-      if (this.heat) {
-        this.map.removeLayer(this.heat);
-
-      }
-    }
-
-  }
-  findObjectsByElement4(datajson: any, elementValue: string): any[] {
-    return datajson.markerPositions.filter((item: any) => item[4] === elementValue);
-  }
-
-  setbtsType(type: any) {
-    this.BtsTypeSlected = type;
-    this.dialog.closeAll();
-
-  }
+}
 
 
 
@@ -11021,23 +11185,20 @@ async displayClustersforfixedelements(object:any){
     //console.log("11111111111----",window.parent as any);
     //console.log("hideSimulation----",(window.parent as any).hideSimulation());
    
-    this.displayedColumns = ['Time', 'event', 'Lng', 'lat'];
     // this.openTable = true;
 if($('#tabletest').css('display') === 'block'){
+  this.openTable=false;
 
   $('#tabletest').css('display','none');
 
 }else{
+  this.openTable=true;
   $('#tabletest').css('display','block');
 
 }
 this.ShowHeader=false;
 this.showTextMenu=false;
-    // if ((this.openTable = true)) {
-    //   this.openTable = true;
-    // } else {
-    //   this.openTable = false;
-    // }
+ 
   }
 
 
@@ -12172,7 +12333,7 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
   displayAllCoTraveler(){
   this.dialog.closeAll();
    this.DisplayCoTravelerflag = 1;
-   this.displayCoTravelers();
+  //  this.displayCoTravelers();
    this.loaderService.hide();
 
   }
@@ -12236,26 +12397,30 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
     }
   }
 
-  async displayCoTravelers() {
-    this.deviceIdArr = (window.parent.parent.parent[7] as any).A_deviceIdArr;
-    if (this.deviceIdArr == "null") {
-      this.deviceIdArr = "";
-    }
-    this.coTravelerId = (window.parent.parent.parent[7] as any).A_reportId;
-    if (this.coTravelerId == "null") {
-      this.coTravelerId = "";
-    }
+  async displayCoTravelers(data:any) {
+    console.log("data<>><<>",data);
+    console.log("DisplayCoTravelerflag<>><<>",this.DisplayCoTravelerflag);
+
     if(this.DisplayCoTravelerflag == 1){
-      this.deviceCoordinatesArr = await this.datacrowdService.getAllCoTravelerCommonLocationHits(this.coTravelerId);
+      if(data.length=0){
+       
+        this.deviceCoordinatesArr = await this.datacrowdService.getAllCoTravelerCommonLocationHits(this.coTravelerId);
+      }else{
+       
+        
+
+        this.deviceCoordinatesArr = await this.datacrowdService.getCoTravelerCommonLocationHits(this.simulationid,data[0].COLVALUE);
+      }
+
     }else if(this.DisplayCoTravelerflag == 2){
       this.coTravelerId = this.dataService.getTimelineSimulID(); 
-     this.deviceIdArr = this.dataService.getDeviceCommonLocationHits();
+    //  this.deviceIdArr = this.dataService.getDeviceCommonLocationHits();
      //static
     //  this.deviceIdArr ="1";
     //  this.coTravelerId="727";
-      this.deviceCoordinatesArr = await this.datacrowdService.getCommonLocationHits(this.coTravelerId,this.deviceIdArr);
+      this.deviceCoordinatesArr = await this.datacrowdService.getCommonLocationHits(this.coTravelerId,data[0].COLVALUE);
     }else{
-    this.deviceCoordinatesArr =await this.datacrowdService.getCoTravelerCommonLocationHits(this.coTravelerId,this.deviceIdArr);
+    this.deviceCoordinatesArr =await this.datacrowdService.getCoTravelerCommonLocationHits(this.coTravelerId,data[0].COLVALUE);
     }
     const body = { "deviceIdArr": this.deviceIdArr, "deviceCoordinatesArr": this.deviceCoordinatesArr };
     this.cotravelermarker = new L.MarkerClusterGroup({
@@ -12267,13 +12432,14 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
         var markers = cluster.getAllChildMarkers();
         var html = '<div  class="groupOfPerson"></div>';
         return L.icon({
-          iconUrl: '../assets/img/group.png',
+          iconUrl: '../assets/assets/img/group.png',
           iconSize: [32, 32],
           iconAnchor: [16, 32],
         });
       },
     });
     //console.log('length', this.deviceCoordinatesArr.length);
+
 
     try {
       //console.log("typeof this.deviceCoordinatesArr",typeof this.deviceCoordinatesArr)
@@ -12685,23 +12851,179 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
 
 
 
-  async displayCoRelation() {
+  // async displayCoRelation() {
 
-    this.deviceIdArr = (window.parent.parent.parent[7] as any).A_deviceIdArr;
-    if (this.deviceIdArr == "null") {
-      this.deviceIdArr = "";
-    }
-    this.coRelationId = (window.parent.parent.parent[7] as any).A_reportId;
-    if (this.coRelationId == "null") {
-      this.coRelationId = "";
-    }
-    if(this.DisplayCoRelationflag == 1){
-      this.deviceCoordinatesArr = await this.datacrowdService.getAllCoRelationCommonLocationHits(this.coRelationId);
-    }else{
-    this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId,this.deviceIdArr);
-    }
+  //   this.deviceIdArr = (window.parent.parent.parent[7] as any).A_deviceIdArr;
+  //   if (this.deviceIdArr == "null") {
+  //     this.deviceIdArr = "";
+  //   }
+  //   this.coRelationId = (window.parent.parent.parent[7] as any).A_reportId;
+  //   if (this.coRelationId == "null") {
+  //     this.coRelationId = "";
+  //   }
+  //   if(this.DisplayCoRelationflag == 1){
+  //     this.deviceCoordinatesArr = await this.datacrowdService.getAllCoRelationCommonLocationHits(this.coRelationId);
+  //   }else{
+  //   this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId,this.deviceIdArr);
+  //   }
 
   
+
+  //   this.datajson.markerPositions=this.deviceCoordinatesArr;
+  //   if (this.datajson.markerPositions !== null) {
+  //     this.marker = L.markerClusterGroup({
+  //       spiderfyOnMaxZoom: false,
+  //       animate: true,
+  //       singleMarkerMode: true,
+  //     });
+
+  //     for (var j = 0; j < 1; j++) {
+  //       for (var i = 0; i < this.datajson.markerPositions.length; i++) {
+  //         this.myMarker = L.marker([
+  //           Number(this.datajson.markerPositions[i][0]),
+  //           Number(this.datajson.markerPositions[i][1]),
+  //         ]);
+  //         this.myMarker.off("click");
+  //         this.myMarker.on("mousedown", (e: any) => {
+  //           if (e.originalEvent.buttons == 2) {
+  //             e.target.openPopup();
+  //           }
+  //           if (e.originalEvent.buttons == 1) {
+  //           }
+
+  //         });
+
+  //       }
+
+  //       this.rowData = [];
+  //       //console.log('this.datajson>>>>>>>',this.datajson);
+        
+  //     //  this.datajson.markerPositions.forEach((element: any, key: any) => {
+  //         this.datajson.markerPositions.forEach((element: any, key: any) => {
+
+  //           this.myMarker = this.binddata(
+  //             element[0],
+  //             element[1],
+  //             element[2],
+  //             element[3],
+  //             element[4],
+  //             element[5],
+  //             ""
+  //           );
+  //           this.myMarker.lat = element[0];
+  //           this.myMarker.lng = element[1];
+  //           this.myMarker.timestamp = element[3];
+  //           this.myMarker.tel = element[2];
+  //           this.myMarker.name = element[4];
+  //           this.myMarker.off("click");
+  //           this.myMarker.on("mousedown", async (e: any) => {
+  //             if (e.originalEvent.buttons == 2) {
+  //               this.rowData = [];
+  //               var jsonaggrid = {
+  //                 Device_id: e.target.tel,
+  //                 Tel: e.target.name,
+  //                 Date: e.target.timestamp,
+  //                 Hits: "1",
+  //                 Coord: e.target.lat + ',' + e.target.lng,
+  //               };
+  //               this.rowData.push(jsonaggrid);
+
+  //               const componentfactory =
+  //                 this.componentFactoryResolver.resolveComponentFactory(
+  //                   VAgGridComponent
+  //                 );
+  //               const componentref =
+  //                 this.viewContainerRef.createComponent(componentfactory);
+  //               componentref.instance.rowData = this.rowData;
+  //               componentref.instance.columnDefs = this.columnDefs;
+  //               componentref.instance.headerHeight = 0;
+  //               componentref.instance.Title = "Here On";
+  //               componentref.instance.distinct = true;
+  //               componentref.changeDetectorRef.detectChanges();
+  //               const html2 = componentref.location.nativeElement;
+  //               componentref.instance.Grid2Type = 'btn-54';
+
+  //               await html2;
+  //               $('.ag-theme-balham').css('height', '130px');
+  //               this.map.openPopup(html2, e.target._latlng);
+  //             } else if (e.originalEvent.buttons == 1) {
+  //             }
+  //           });
+  //           this.marker.addLayer(this.myMarker);
+
+  //         })
+
+
+  //       const componentfactory = this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+  //       const componentref = this.viewContainerRef.createComponent(componentfactory);
+  //       const html1 = (componentref.location.nativeElement.style.display = "none");
+  //       componentref.instance.columnDefs = this.columnDefs;
+  //       componentref.changeDetectorRef.detectChanges();
+  //       this.marker.off("click");
+
+  //       this.marker.on("clustermousedown", async (e: any) => {
+  //         if (e.originalEvent.buttons == 2) {
+  //           var markerChildrens = e.layer.getAllChildMarkers();
+
+
+  //           this.rowData = [];
+
+  //           for (var j = 0; j < markerChildrens.length; j++) {
+  //             var jsonaggrid = {
+  //               Device_id: markerChildrens[j].tel,
+  //               Tel: markerChildrens[j].name,
+  //               Date: markerChildrens[j].timestamp,
+  //               Hits: "1",
+  //               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+
+  //             };
+  //             this.rowData.push(jsonaggrid);
+  //           }
+  //           const componentfactory =
+  //             this.componentFactoryResolver.resolveComponentFactory(
+  //               VAgGridComponent
+  //             );
+  //           const componentref =
+  //             this.viewContainerRef.createComponent(componentfactory);
+  //           componentref.instance.rowData = this.rowData;
+  //           componentref.instance.columnDefs = this.columnDefs;
+  //           componentref.instance.headerHeight = 0;
+  //           componentref.instance.Title = "Here On";
+  //           componentref.instance.distinct = true;
+  //           componentref.changeDetectorRef.detectChanges();
+  //           componentref.instance.pagination = false;
+  //           componentref.instance.rowGrouping = true;
+  //           componentref.instance.contextmenu = false;
+  //           componentref.instance.Grid2Type = 'btn-54';
+
+
+  //           const html1 = componentref.location.nativeElement;
+  //           await html1;
+
+
+  //           if (markerChildrens.length < 3) {
+  //             $('.ag-theme-balham').css('height', '130px');
+
+  //           } else {
+  //             $('.ag-theme-balham').css('height', ' 250px ');
+
+  //           }
+
+  //           this.map.openPopup(html1, e.layer.getLatLng());
+  //         }
+  //       });
+
+  //       this.map.addLayer(this.marker);
+  //       this.allMarkers.push(this.marker);
+  //     }
+  //   }
+
+  // }
+
+  async displayCoRelation() {
+    
+     this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.simulationid);
+    
 
     this.datajson.markerPositions=this.deviceCoordinatesArr;
     if (this.datajson.markerPositions !== null) {
@@ -13388,7 +13710,7 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
       this.shapeIdArr = "";
     }
     for (let i = 0; i < this.shapeIdArr.length; i++) {
-      this.datacrowdService.getSelectedShape(this.shapeIdArr[i]).then((res: any) => {
+      this.datacrowdService.getSelectedShapes(this.shapeIdArr[i]).then((res: any) => {
         this.Aoiresp = res;
         this.Coord.push(this.Aoiresp);
         if (this.Aoiresp.Type == "Circle") {
@@ -13484,7 +13806,7 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
   //console.log("this.similutionIdArray>>>>>",this.similutionIdArray);
 
     if(this.count==0){
-      alert("stop prev");
+     
       this.dimmedPrev=true;
     }else{
       this.dimmedPrev=false;
@@ -13511,7 +13833,8 @@ console.log(" this.TcdRowData-------", this.TcdRowData);
   //console.log("this.similutionIdArray>>>>>",this.similutionIdArray);
 
   if(this.count===this.similutionIdArray.length){
-      alert("stop next");
+   
+    
       this.dimmedNext=true;
   }
   else{
@@ -13789,11 +14112,16 @@ DisplayInQueue(){
     //console.log("event>>>>>>>>>>>",event);
     this.simulationid=event;
     this.clearShapes();
+    let BtsTypeSlected:any;
     await this.datacrowdService.getExecutionParam(event).then((res:any)=>{
-        console.log("getExecutionParam111",res);
-        this.Senario_reportType=res.reportType;
+      console.log("getExecutionParam111",res);
+      this.Senario_reportType=res.reportType;
+      this.IsTypechanged++;
+      this.dataService.setheaderType(res.reportType);
+      BtsTypeSlected=res.BtsTypeSlected;
+      this.reportType=res.reportType;
 
-          });
+        });
     if (this.Senario_reportType == "11") {
       await this.datacrowdService.getsimualtion(this.simulationid, this.usercode).then((res: any) => {
         this.datajson = res;
@@ -13812,10 +14140,35 @@ DisplayInQueue(){
       });
       this.scandevices();
       this.displayShapes(event);    }
+      else if(this.Senario_reportType == "8"){
+        // alert(8);
+        await this.datacrowdService
+        .getFixedElementsSenario(parseInt(event))
+        .then(async (res: any) => {
+          console.log('getFixedElementsSenario>>', res);
+          this.displayFixedElements(res);
+      
+        });
+        this.displayShapes(event);
+
+
+      }
     else{
-      this.displayClusters2(event);
-      this.displayShapes(event);
+      if(this.Senario_reportType == "9"){
+
+      await this.datacrowdService
+        .getFixedElementsSenario(parseInt(event))
+        .then(async (res: any) => {
+          console.log('getFixedElementsSenario>>', res);
+          this.displayFixedElements(res);
+      
+        });
+        // alert(9)
+                }
+     await this.displayClusters2(event);
+     await this.displayShapes(event);
   
+    //  this.display=true;
 
     }
  
@@ -14067,7 +14420,8 @@ if(this.deviceIdArr.length< this.templateForms.length){
 }
 
 processNextBatchRoute(){
-
+ 
+ 
   this.endIndex = this.endIndex + this.batchSize;
 
   this.allRoutedatajson.forEach((elt:any)=>{
@@ -14076,16 +14430,17 @@ processNextBatchRoute(){
   let animatemarker:any;
   let routedatajson:any[];
     this.routedatajson=elt;
-    //console.log("elt-----",elt);
+    console.log("elt-----",elt);
 
-    //console.log("animatedmarkerArray-----",this.animatedmarkerArray);
+
+    console.log("animatedmarkerArray-----",this.animatedmarkerArray);
     this.animatedmarkerArray.forEach((dev:any)=>{
-      if(elt[0][2]===dev.deviceId){
+      if(elt[0][0]===dev.deviceId){
         color=dev.color;
         device=dev.deviceId;
         animatemarker=dev;
         routedatajson=elt;
-        //console.log("routedatajson>>>>>>",routedatajson)
+        console.log("routedatajson>>>>>>",routedatajson)
         if(routedatajson.length===this.endIndex){
           this.count++;
         }
@@ -14099,8 +14454,9 @@ processNextBatchRoute(){
 // if(this.count===this.animatedmarkerArray.length){
 //   alert("trueee")
 // }
+ 
 }
-
+ 
 clearRouteTemplate(){
   this.formValues=[];
     this.routedatajson=[];
@@ -14204,7 +14560,7 @@ shortestpathtest() {
   //           const line: any = polyline;
   //           line.on('click',(e:any)=> {
   //             //console.log("e>>",e)
-  //             line.setText('  ►  ', {
+  //             line.setText('  â–º  ', {
   //               repeat: true,
   //               attributes: {
   //                 fill: 'red'
@@ -14813,7 +15169,7 @@ animateMarker() {
      this.pathCoordinates=elt.coord;
      this.animatedmarker=elt;
      let routedata=elt.routedatajson;
-     //console.log('this.animatedmarker>>>>>>',  this.animatedmarker);
+     console.log('this.animatedmarker>>>>>>',  this.animatedmarker);
      //console.log('count>>>>>>',  count);
  
      this.movePersonMarker(elt,elt.coord,routedata);
@@ -14829,28 +15185,9 @@ animateMarker() {
      if (this.currentIndex < pathCoordinates.length && !this.animationStopped) {
          const currentLatLng =pathCoordinates[this.currentIndex];
          animatedmarker.setLatLng(currentLatLng);
-         // routedata.forEach((elt:any)=>{
-         //   //console.log("elt>>>>",elt);
-              
-         //         let lat1:any=elt[0];
-         //         let lng1:string=elt[1];
-         //         let lng2:number=parseFloat(lng1);
-         //         let lat=parseFloat(lat1).toFixed(4); 
-         //         let lng=parseFloat(lng2.toFixed(4));
-         //         if(lat==currentLatLng.lat.toString()){
-         //           if(lng=currentLatLng.lng-0.0001){
-         //           animatedmarker.bindPopup(`<strong>${this.dateTtoDate(elt[3])}</strong>`).openPopup();
-         //           setTimeout(() => {
-         //             animatedmarker.closePopup();
-         //         }, 2000);
-         //          }
-         //         }
-         //     });
-        
-         this.currentIndex++;
-         //console.log(" this.currentIndex++>>>>>>>", this.currentIndex);
- 
-       setTimeout(() =>  this.movePersonMarker(animatedmarker,pathCoordinates,routedata), 10 ); 
+       
+         this.currentIndex++; 
+       setTimeout(() =>  this.movePersonMarker(animatedmarker,pathCoordinates,routedata), 3000/this.speedmarker ); 
  
      } else {
        //console.log('Animation Completed');
@@ -14859,23 +15196,39 @@ animateMarker() {
 
 
   routeDev(){
-
+    this.showroutedicv=false;
     this.count=0;
     this.templates=[];
     this.dimmedTemplate=false;
     $('#approuting').css('display', 'none');
+    $('#leafletroute').css('display', '');
     $("#closedialog").click();
-    //console.log("this.datajson<<<<<<",this.datajson);
+    console.log("this.Devices<<<<<<",this.Devices);
     let devicesProp:any[]=[];
+    // this.deviceIdArr='939A9429-2CDC-49D7-A454-3003C99A4101,08493fef-9645-4062-956f-7ee273362aa3,9CD6F870-EB4D-4BCF-A5EA-B337D8F4754E';
+    if(this.Devices){
+      this.deviceIdArr=this.Devices.split(',');
 
-     this.deviceIdArr.forEach((dev:any)=>{
-    //console.log("dev>>>>>>>>>",dev);
+    }else 
+    if(localStorage.getItem('multiselection').length>0){
+      this.deviceIdArr=localStorage.getItem('multiselection');
+    }
+    console.log("this.deviceIdArr<<<<<<",this.deviceIdArr);
 
-      let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
-      devicesProp.push({ device:dev, color: color });
+    let colorarray=['magenta','cyan','yellow','orange','purple','blue','pink','maroon'];
+     this.deviceIdArr.forEach((dev:any,index:any)=>{
+      if(dev!=='null'){
+        console.log("index>>>>>>>>",index);
+
+        // let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
+  
+        devicesProp.push({ device:dev, color: colorarray[index] });
+      }
+   
     })
 
-    //console.log("devicesProp>>>>>>>>>",devicesProp);
+    console.log("devicesProp>>>>>>>>>",devicesProp);
+    console.log("datajson>>>>>>>>>",this.datajson);
    
 
 this.endIndex = this.endIndex + this.batchSize;
@@ -14883,12 +15236,11 @@ this.endIndex = this.endIndex + this.batchSize;
      devicesProp.forEach((dev:any)=>{
       //console.log("dev<<<<<<",dev);
       let array:any[]=[];
-      array=this.datajson.markerPositions.filter((marker:any)=>{
+      array=this.datajson.filter((marker:any)=>{
         // array=datajson.filter((marker:any)=>{
-        // //console.log("marker[2]<<<<<<",marker[2]);
-        return  marker[2]==dev.device;
+         return  marker[0]==dev.device;
       });
-      //console.log("array<<<<<<",array);
+      console.log("array<<<<<<",array);
   
     this.routedatajson=array;
     this.allRoutedatajson.push(this.routedatajson);
@@ -14903,9 +15255,9 @@ this.endIndex = this.endIndex + this.batchSize;
 
     // this.animatedmarker = L.marker([Number(this.routedatajson[0][0]), Number(this.routedatajson[0][1])], { icon: singlepersonicon }).on('click', e => e.target.remove()).bindPopup(`<strong>${new Date(this.routedatajson[0][3])}</strong>`).addTo(this.map);
    
-    this.animatedmarker = L.marker([Number(this.routedatajson[0][0]), Number(this.routedatajson[0][1])], { icon: singlepersonicon }).addTo(this.map);
+    this.animatedmarker = L.marker([Number(this.routedatajson[0][4]), Number(this.routedatajson[0][3])], { icon: singlepersonicon }).addTo(this.map);
     // this.fixedElementMarker = this.binddataforfixedElements(element[4], element[3], element[1], iconVar).on('click', e => e.target.remove()).bindPopup(`<strong>${element[2]}</strong>`);;
-    this.animatedmarker.deviceId=this.routedatajson[0][2];
+    this.animatedmarker.deviceId=this.routedatajson[0][0];
     this.animatedmarker.color=dev.color;
     this.animatedmarker.routedatajson=array;
 
@@ -14926,14 +15278,15 @@ this.endIndex = this.endIndex + this.batchSize;
     const startIndex = this.currentIndex;
   
   
-    //console.log("startIndex>>>>>>>",startIndex,"this.endIndex>>>>>>>",this.endIndex);
+    console.log("startIndex>>>>>>>",startIndex,"this.endIndex>>>>>>>",this.endIndex);
+    console.log("routedatajson.length>>>>>>>",routedatajson.length);
   
     if(routedatajson.length<this.batchSize){
   
       for (let i = 0; i < routedatajson.length; i++) {
         const element = routedatajson[i];
         if( typeof(element) != 'undefined'){
-        const x = [element[0], element[1]];
+        const x = [element[4], element[3]];
         waypoints.push(x);
         }
       }
@@ -14941,7 +15294,7 @@ this.endIndex = this.endIndex + this.batchSize;
     for (let i = startIndex-1; i < this.endIndex; i++) {
       const element = routedatajson[i];
       if( typeof(element) != 'undefined'){
-      const x = [element[0], element[1]];
+      const x = [element[4], element[3]];
       waypoints.push(x);
       }
     }
@@ -14975,7 +15328,7 @@ this.endIndex = this.endIndex + this.batchSize;
           const line: any = polyline;
           line.on('click',(e:any)=> {
             //console.log("e>>",e)
-            line.setText('  ►  ', {
+            line.setText('  â–º  ', {
               repeat: true,
               attributes: {
                 fill: 'red'
@@ -14994,6 +15347,7 @@ this.endIndex = this.endIndex + this.batchSize;
       routingControl.deviceId=deviceId;
       routingControl.color=color;
       routingControl.addTo(this.map);
+
 
             var routingControlContainer = routingControl.getContainer();
       //console.log("controlContainerParent>>>>>>>>>>>>>>>>>>",routingControlContainer);
@@ -15354,7 +15708,7 @@ toggleColor(){ this.isGreen = !this.isGreen;
       $('#tabletest').css('display', '');
       this.openTable=true
       let array:any=
-     [{"StartTime":"2024-01-13 14:31:10","EndTime":"2024-01-13 14:31:10","Latitude":33.8807529466,"Longitude":35.6250214724,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 14:29:22","EndTime":"2024-01-13 14:47:50","Latitude":33.8807386572,"Longitude":35.6249592998,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 14:19:16","EndTime":"2024-01-13 15:01:34","Latitude":33.8807285918,"Longitude":35.6249400709,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 15:06:50","EndTime":"2024-01-13 15:06:50","Latitude":33.8807208163,"Longitude":35.6249318454,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:07:11","EndTime":"2024-01-13 15:07:11","Latitude":33.8805737491,"Longitude":35.6246455966,"OSM_ID":6642505099,"NodeLatitude":33.8805051,"NodeLongitude":35.6246428,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:07:21","EndTime":"2024-01-13 15:07:21","Latitude":null,"Longitude":null,"OSM_ID":3575436070,"NodeLatitude":33.8804283,"NodeLongitude":35.624445,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:07:31","EndTime":"2024-01-13 15:07:31","Latitude":33.8804068387,"Longitude":35.6243308831,"OSM_ID":2680339883,"NodeLatitude":33.8803938,"NodeLongitude":35.6243672,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:07:51","EndTime":"2024-01-13 15:07:51","Latitude":33.8802467062,"Longitude":35.6240600923,"OSM_ID":6642505100,"NodeLatitude":33.8802373,"NodeLongitude":35.6240621,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:08:28","EndTime":"2024-01-13 15:08:28","Latitude":33.8801935109,"Longitude":35.6238519739,"OSM_ID":7428393020,"NodeLatitude":33.8801393,"NodeLongitude":35.6238943,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:16:23","EndTime":"2024-01-13 15:16:23","Latitude":null,"Longitude":null,"OSM_ID":288840819,"NodeLatitude":33.880072,"NodeLongitude":35.6237791,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:24:19","EndTime":"2024-01-13 15:24:19","Latitude":null,"Longitude":null,"OSM_ID":3575436024,"NodeLatitude":33.8799751,"NodeLongitude":35.6235844,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:32:14","EndTime":"2024-01-13 15:32:14","Latitude":null,"Longitude":null,"OSM_ID":6642505101,"NodeLatitude":33.8799548,"NodeLongitude":35.6235267,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:10","EndTime":"2024-01-13 15:40:10","Latitude":33.8800370494,"Longitude":35.6234306472,"OSM_ID":288840982,"NodeLatitude":33.879937,"NodeLongitude":35.6233734,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:13","EndTime":"2024-01-13 15:40:13","Latitude":null,"Longitude":null,"OSM_ID":3575436012,"NodeLatitude":33.8799369,"NodeLongitude":35.6232706,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:16","EndTime":"2024-01-13 15:40:16","Latitude":null,"Longitude":null,"OSM_ID":6622448672,"NodeLatitude":33.8799147,"NodeLongitude":35.6231728,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:20","EndTime":"2024-01-13 15:40:20","Latitude":null,"Longitude":null,"OSM_ID":9317549100,"NodeLatitude":33.8798886,"NodeLongitude":35.6231029,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:23","EndTime":"2024-01-13 15:40:23","Latitude":null,"Longitude":null,"OSM_ID":3575436006,"NodeLatitude":33.8798508,"NodeLongitude":35.6230395,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:26","EndTime":"2024-01-13 15:40:26","Latitude":null,"Longitude":null,"OSM_ID":3575436002,"NodeLatitude":33.8795996,"NodeLongitude":35.6227271,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:30","EndTime":"2024-01-13 15:40:30","Latitude":33.8795020976,"Longitude":35.6225834317,"OSM_ID":6622448673,"NodeLatitude":33.879502,"NodeLongitude":35.6226174,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:36","EndTime":"2024-01-13 15:40:36","Latitude":null,"Longitude":null,"OSM_ID":290327985,"NodeLatitude":33.8792816,"NodeLongitude":35.6223838,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:43","EndTime":"2024-01-13 15:40:43","Latitude":null,"Longitude":null,"OSM_ID":288840821,"NodeLatitude":33.8788444,"NodeLongitude":35.6217676,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:40:50","EndTime":"2024-01-13 15:40:50","Latitude":33.8788334216,"Longitude":35.6216595044,"OSM_ID":3575435997,"NodeLatitude":33.8787448,"NodeLongitude":35.6216523,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:41:10","EndTime":"2024-01-13 15:41:10","Latitude":33.878777443,"Longitude":35.621618183,"OSM_ID":3575435997,"NodeLatitude":33.8787448,"NodeLongitude":35.6216523,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:14","EndTime":"2024-01-13 15:41:14","Latitude":null,"Longitude":null,"OSM_ID":3575435995,"NodeLatitude":33.8786685,"NodeLongitude":35.6216184,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:18","EndTime":"2024-01-13 15:41:18","Latitude":null,"Longitude":null,"OSM_ID":288840983,"NodeLatitude":33.8786113,"NodeLongitude":35.6216296,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:22","EndTime":"2024-01-13 15:41:22","Latitude":null,"Longitude":null,"OSM_ID":3575435993,"NodeLatitude":33.8785484,"NodeLongitude":35.6216791,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:26","EndTime":"2024-01-13 15:41:26","Latitude":null,"Longitude":null,"OSM_ID":5335223452,"NodeLatitude":33.8781587,"NodeLongitude":35.6219774,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:30","EndTime":"2024-01-13 15:41:30","Latitude":33.877824196,"Longitude":35.6222871761,"OSM_ID":5335223451,"NodeLatitude":33.8778424,"NodeLongitude":35.6222288,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:34","EndTime":"2024-01-13 15:41:34","Latitude":null,"Longitude":null,"OSM_ID":3245723327,"NodeLatitude":33.8776115,"NodeLongitude":35.6224202,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:38","EndTime":"2024-01-13 15:41:38","Latitude":null,"Longitude":null,"OSM_ID":288840825,"NodeLatitude":33.877399,"NodeLongitude":35.6225094,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:42","EndTime":"2024-01-13 15:41:42","Latitude":null,"Longitude":null,"OSM_ID":4507093039,"NodeLatitude":33.8770787,"NodeLongitude":35.622575,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:46","EndTime":"2024-01-13 15:41:46","Latitude":null,"Longitude":null,"OSM_ID":288840826,"NodeLatitude":33.8767702,"NodeLongitude":35.622615,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:50","EndTime":"2024-01-13 15:41:50","Latitude":33.876561644,"Longitude":35.6226335929,"OSM_ID":288840985,"NodeLatitude":33.8765319,"NodeLongitude":35.6226128,"NodeType":"Road Node","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:52","EndTime":"2024-01-13 15:41:52","Latitude":null,"Longitude":null,"OSM_ID":7428392928,"NodeLatitude":33.8762979,"NodeLongitude":35.6225891,"NodeType":"Intermediate","StreetName":"طريق برمانا"},{"StartTime":"2024-01-13 15:41:54","EndTime":"2024-01-13 15:41:54","Latitude":null,"Longitude":null,"OSM_ID":288840986,"NodeLatitude":33.8762411,"NodeLongitude":35.6225833,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:41:56","EndTime":"2024-01-13 15:41:56","Latitude":null,"Longitude":null,"OSM_ID":4507093038,"NodeLatitude":33.8760883,"NodeLongitude":35.622449,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:41:58","EndTime":"2024-01-13 15:41:58","Latitude":null,"Longitude":null,"OSM_ID":4507093032,"NodeLatitude":33.8760776,"NodeLongitude":35.6224232,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:00","EndTime":"2024-01-13 15:42:00","Latitude":null,"Longitude":null,"OSM_ID":5161236358,"NodeLatitude":33.876062,"NodeLongitude":35.6224012,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:02","EndTime":"2024-01-13 15:42:02","Latitude":null,"Longitude":null,"OSM_ID":4507093028,"NodeLatitude":33.8760426,"NodeLongitude":35.6223842,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:04","EndTime":"2024-01-13 15:42:04","Latitude":null,"Longitude":null,"OSM_ID":6068849628,"NodeLatitude":33.8759986,"NodeLongitude":35.6223307,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:06","EndTime":"2024-01-13 15:42:06","Latitude":null,"Longitude":null,"OSM_ID":4507093024,"NodeLatitude":33.8759531,"NodeLongitude":35.6221285,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:08","EndTime":"2024-01-13 15:42:08","Latitude":null,"Longitude":null,"OSM_ID":288840987,"NodeLatitude":33.8758796,"NodeLongitude":35.6219079,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:10","EndTime":"2024-01-13 15:42:10","Latitude":33.8759063713,"Longitude":35.6214844244,"OSM_ID":5335223446,"NodeLatitude":33.8758293,"NodeLongitude":35.6214779,"NodeType":"Road Node","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:12","EndTime":"2024-01-13 15:42:12","Latitude":null,"Longitude":null,"OSM_ID":288840988,"NodeLatitude":33.875808,"NodeLongitude":35.6210248,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:15","EndTime":"2024-01-13 15:42:15","Latitude":null,"Longitude":null,"OSM_ID":5335223445,"NodeLatitude":33.8757781,"NodeLongitude":35.6204867,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:18","EndTime":"2024-01-13 15:42:18","Latitude":null,"Longitude":null,"OSM_ID":6608165952,"NodeLatitude":33.8757594,"NodeLongitude":35.6201582,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:21","EndTime":"2024-01-13 15:42:21","Latitude":null,"Longitude":null,"OSM_ID":5335223444,"NodeLatitude":33.8757558,"NodeLongitude":35.6200951,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:24","EndTime":"2024-01-13 15:42:24","Latitude":null,"Longitude":null,"OSM_ID":288840989,"NodeLatitude":33.875738,"NodeLongitude":35.619949,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:27","EndTime":"2024-01-13 15:42:27","Latitude":null,"Longitude":null,"OSM_ID":6608181033,"NodeLatitude":33.8756968,"NodeLongitude":35.6197438,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:30","EndTime":"2024-01-13 15:42:30","Latitude":33.8757314813,"Longitude":35.6195112304,"OSM_ID":6608181035,"NodeLatitude":33.8756255,"NodeLongitude":35.6194662,"NodeType":"Road Node","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:36","EndTime":"2024-01-13 15:42:36","Latitude":null,"Longitude":null,"OSM_ID":3136623363,"NodeLatitude":33.8753617,"NodeLongitude":35.6184711,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:43","EndTime":"2024-01-13 15:42:43","Latitude":null,"Longitude":null,"OSM_ID":6608181034,"NodeLatitude":33.8752592,"NodeLongitude":35.6179976,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:50","EndTime":"2024-01-13 15:42:50","Latitude":33.8752320555,"Longitude":35.617537643,"OSM_ID":6608180961,"NodeLatitude":33.8751677,"NodeLongitude":35.6175558,"NodeType":"Road Node","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:54","EndTime":"2024-01-13 15:42:54","Latitude":null,"Longitude":null,"OSM_ID":3136623364,"NodeLatitude":33.8751111,"NodeLongitude":35.6172828,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:42:58","EndTime":"2024-01-13 15:42:58","Latitude":null,"Longitude":null,"OSM_ID":3136623362,"NodeLatitude":33.8749207,"NodeLongitude":35.6162596,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:03","EndTime":"2024-01-13 15:43:03","Latitude":null,"Longitude":null,"OSM_ID":6517851983,"NodeLatitude":33.8748116,"NodeLongitude":35.6155682,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:07","EndTime":"2024-01-13 15:43:07","Latitude":null,"Longitude":null,"OSM_ID":6715453113,"NodeLatitude":33.8747744,"NodeLongitude":35.6153873,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:12","EndTime":"2024-01-13 15:43:12","Latitude":null,"Longitude":null,"OSM_ID":4507128361,"NodeLatitude":33.8747105,"NodeLongitude":35.6151831,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:16","EndTime":"2024-01-13 15:43:16","Latitude":null,"Longitude":null,"OSM_ID":6517851982,"NodeLatitude":33.8746546,"NodeLongitude":35.6150257,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:21","EndTime":"2024-01-13 15:43:21","Latitude":null,"Longitude":null,"OSM_ID":3136623369,"NodeLatitude":33.8745807,"NodeLongitude":35.6148734,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:25","EndTime":"2024-01-13 15:43:25","Latitude":null,"Longitude":null,"OSM_ID":3136623365,"NodeLatitude":33.8744531,"NodeLongitude":35.6146375,"NodeType":"Intermediate","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:30","EndTime":"2024-01-13 15:43:30","Latitude":33.8740949945,"Longitude":35.6139648969,"OSM_ID":288840837,"NodeLatitude":33.8738732,"NodeLongitude":35.6137166,"NodeType":"Road Node","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:43:50","EndTime":"2024-01-13 15:43:50","Latitude":33.8734275955,"Longitude":35.6128639498,"OSM_ID":6608180890,"NodeLatitude":33.8735432,"NodeLongitude":35.6131738,"NodeType":"Road Node","StreetName":"برمانا"},{"StartTime":"2024-01-13 15:44:00","EndTime":"2024-01-13 15:44:00","Latitude":null,"Longitude":null,"OSM_ID":288791770,"NodeLatitude":33.8727343,"NodeLongitude":35.6118432,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:44:15","EndTime":"2024-01-13 15:44:15","Latitude":null,"Longitude":null,"OSM_ID":288791770,"NodeLatitude":33.8727343,"NodeLongitude":35.6118432,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:10","EndTime":"2024-01-13 15:44:10","Latitude":33.8727777767,"Longitude":35.6117172461,"OSM_ID":11757423829,"NodeLatitude":33.8727874,"NodeLongitude":35.6116864,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:44:20","EndTime":"2024-01-13 15:44:20","Latitude":null,"Longitude":null,"OSM_ID":3106369727,"NodeLatitude":33.8726264,"NodeLongitude":35.6116656,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:25","EndTime":"2024-01-13 15:44:25","Latitude":null,"Longitude":null,"OSM_ID":3106369728,"NodeLatitude":33.8725482,"NodeLongitude":35.6115762,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:30","EndTime":"2024-01-13 15:44:30","Latitude":33.8718239963,"Longitude":35.6107611448,"OSM_ID":3106369736,"NodeLatitude":33.8719863,"NodeLongitude":35.6109481,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:32","EndTime":"2024-01-13 15:44:32","Latitude":null,"Longitude":null,"OSM_ID":6517851984,"NodeLatitude":33.8714444,"NodeLongitude":35.6104338,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:35","EndTime":"2024-01-13 15:44:35","Latitude":null,"Longitude":null,"OSM_ID":6508979288,"NodeLatitude":33.8712315,"NodeLongitude":35.6102278,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:38","EndTime":"2024-01-13 15:44:38","Latitude":null,"Longitude":null,"OSM_ID":288791771,"NodeLatitude":33.8710748,"NodeLongitude":35.6100798,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:41","EndTime":"2024-01-13 15:44:41","Latitude":null,"Longitude":null,"OSM_ID":6181142047,"NodeLatitude":33.8709211,"NodeLongitude":35.609943,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:44","EndTime":"2024-01-13 15:44:44","Latitude":null,"Longitude":null,"OSM_ID":6181142046,"NodeLatitude":33.8708389,"NodeLongitude":35.609836,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:47","EndTime":"2024-01-13 15:44:47","Latitude":null,"Longitude":null,"OSM_ID":288791453,"NodeLatitude":33.870778,"NodeLongitude":35.6096971,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:50","EndTime":"2024-01-13 15:44:50","Latitude":33.8707796428,"Longitude":35.6094480251,"OSM_ID":288791773,"NodeLatitude":33.8706779,"NodeLongitude":35.6093902,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:52","EndTime":"2024-01-13 15:44:52","Latitude":null,"Longitude":null,"OSM_ID":6181142048,"NodeLatitude":33.8705344,"NodeLongitude":35.6089424,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:54","EndTime":"2024-01-13 15:44:54","Latitude":null,"Longitude":null,"OSM_ID":6508979290,"NodeLatitude":33.8704719,"NodeLongitude":35.6088459,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:56","EndTime":"2024-01-13 15:44:56","Latitude":null,"Longitude":null,"OSM_ID":288791455,"NodeLatitude":33.8703789,"NodeLongitude":35.6087629,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:44:58","EndTime":"2024-01-13 15:44:58","Latitude":null,"Longitude":null,"OSM_ID":6181142049,"NodeLatitude":33.870209,"NodeLongitude":35.6086374,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:01","EndTime":"2024-01-13 15:45:01","Latitude":null,"Longitude":null,"OSM_ID":2680231552,"NodeLatitude":33.8700191,"NodeLongitude":35.6085026,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:03","EndTime":"2024-01-13 15:45:03","Latitude":null,"Longitude":null,"OSM_ID":6715453114,"NodeLatitude":33.8699679,"NodeLongitude":35.6084521,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:05","EndTime":"2024-01-13 15:45:05","Latitude":null,"Longitude":null,"OSM_ID":3147867647,"NodeLatitude":33.8698711,"NodeLongitude":35.6082946,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:07","EndTime":"2024-01-13 15:45:07","Latitude":null,"Longitude":null,"OSM_ID":5161229817,"NodeLatitude":33.8698377,"NodeLongitude":35.608117,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:10","EndTime":"2024-01-13 15:45:10","Latitude":33.8698966074,"Longitude":35.6080299915,"OSM_ID":6426821467,"NodeLatitude":33.8698106,"NodeLongitude":35.6079952,"NodeType":"Road Node","StreetName":"Rond-Point Wakim"},{"StartTime":"2024-01-13 15:45:11","EndTime":"2024-01-13 15:45:11","Latitude":null,"Longitude":null,"OSM_ID":6663199087,"NodeLatitude":33.8698196,"NodeLongitude":35.607956,"NodeType":"Intermediate","StreetName":"Rond-Point Wakim"},{"StartTime":"2024-01-13 15:45:13","EndTime":"2024-01-13 15:45:13","Latitude":null,"Longitude":null,"OSM_ID":4507128302,"NodeLatitude":33.8698174,"NodeLongitude":35.6079132,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:15","EndTime":"2024-01-13 15:45:15","Latitude":null,"Longitude":null,"OSM_ID":5161229816,"NodeLatitude":33.8698667,"NodeLongitude":35.6077845,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:17","EndTime":"2024-01-13 15:45:17","Latitude":null,"Longitude":null,"OSM_ID":6663221676,"NodeLatitude":33.8698961,"NodeLongitude":35.607708,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:19","EndTime":"2024-01-13 15:45:19","Latitude":null,"Longitude":null,"OSM_ID":5161229815,"NodeLatitude":33.8699204,"NodeLongitude":35.6076168,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:20","EndTime":"2024-01-13 15:45:20","Latitude":null,"Longitude":null,"OSM_ID":4507128308,"NodeLatitude":33.8699283,"NodeLongitude":35.6074908,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:22","EndTime":"2024-01-13 15:45:22","Latitude":null,"Longitude":null,"OSM_ID":6663221677,"NodeLatitude":33.869925,"NodeLongitude":35.6074244,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:24","EndTime":"2024-01-13 15:45:24","Latitude":null,"Longitude":null,"OSM_ID":288791459,"NodeLatitude":33.8699145,"NodeLongitude":35.6073627,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:26","EndTime":"2024-01-13 15:45:26","Latitude":null,"Longitude":null,"OSM_ID":6715453115,"NodeLatitude":33.8698885,"NodeLongitude":35.6072603,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:28","EndTime":"2024-01-13 15:45:28","Latitude":null,"Longitude":null,"OSM_ID":3106369754,"NodeLatitude":33.8698616,"NodeLongitude":35.607179,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:30","EndTime":"2024-01-13 15:45:30","Latitude":33.8697675812,"Longitude":35.606725376,"OSM_ID":6662997952,"NodeLatitude":33.8697753,"NodeLongitude":35.6069335,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:32","EndTime":"2024-01-13 15:45:32","Latitude":null,"Longitude":null,"OSM_ID":6662997953,"NodeLatitude":33.8696439,"NodeLongitude":35.6065714,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:35","EndTime":"2024-01-13 15:45:35","Latitude":null,"Longitude":null,"OSM_ID":288791776,"NodeLatitude":33.8695743,"NodeLongitude":35.6063515,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:37","EndTime":"2024-01-13 15:45:37","Latitude":null,"Longitude":null,"OSM_ID":6662997954,"NodeLatitude":33.8695036,"NodeLongitude":35.6060605,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:40","EndTime":"2024-01-13 15:45:40","Latitude":null,"Longitude":null,"OSM_ID":288791461,"NodeLatitude":33.8694284,"NodeLongitude":35.6057956,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:42","EndTime":"2024-01-13 15:45:42","Latitude":null,"Longitude":null,"OSM_ID":6662997955,"NodeLatitude":33.8693577,"NodeLongitude":35.6056186,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:45","EndTime":"2024-01-13 15:45:45","Latitude":null,"Longitude":null,"OSM_ID":6662997957,"NodeLatitude":33.8692391,"NodeLongitude":35.6054067,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:47","EndTime":"2024-01-13 15:45:47","Latitude":null,"Longitude":null,"OSM_ID":9315519299,"NodeLatitude":33.8692141,"NodeLongitude":35.605364,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:50","EndTime":"2024-01-13 15:45:50","Latitude":33.869190484,"Longitude":35.6052279321,"OSM_ID":6662997956,"NodeLatitude":33.8691445,"NodeLongitude":35.6052451,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:45:55","EndTime":"2024-01-13 15:45:55","Latitude":null,"Longitude":null,"OSM_ID":6662997958,"NodeLatitude":33.8690314,"NodeLongitude":35.6050754,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:00","EndTime":"2024-01-13 15:46:00","Latitude":null,"Longitude":null,"OSM_ID":288791462,"NodeLatitude":33.8688677,"NodeLongitude":35.6048334,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:05","EndTime":"2024-01-13 15:46:05","Latitude":null,"Longitude":null,"OSM_ID":3147867666,"NodeLatitude":33.8687852,"NodeLongitude":35.604718,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:10","EndTime":"2024-01-13 15:46:10","Latitude":33.8685513701,"Longitude":35.604288575,"OSM_ID":6662955745,"NodeLatitude":33.8686406,"NodeLongitude":35.6045216,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:13","EndTime":"2024-01-13 15:46:13","Latitude":null,"Longitude":null,"OSM_ID":6662955746,"NodeLatitude":33.8682564,"NodeLongitude":35.6039844,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:16","EndTime":"2024-01-13 15:46:16","Latitude":null,"Longitude":null,"OSM_ID":6662955747,"NodeLatitude":33.8680448,"NodeLongitude":35.6036867,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:20","EndTime":"2024-01-13 15:46:20","Latitude":null,"Longitude":null,"OSM_ID":9318124721,"NodeLatitude":33.8678588,"NodeLongitude":35.6034272,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:23","EndTime":"2024-01-13 15:46:23","Latitude":null,"Longitude":null,"OSM_ID":4453577735,"NodeLatitude":33.8678149,"NodeLongitude":35.6033709,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:26","EndTime":"2024-01-13 15:46:26","Latitude":null,"Longitude":null,"OSM_ID":6662955748,"NodeLatitude":33.867728,"NodeLongitude":35.6032475,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:30","EndTime":"2024-01-13 15:46:30","Latitude":33.8676945917,"Longitude":35.6031140243,"OSM_ID":288791463,"NodeLatitude":33.8676612,"NodeLongitude":35.6031664,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:31","EndTime":"2024-01-13 15:46:31","Latitude":null,"Longitude":null,"OSM_ID":6662955749,"NodeLatitude":33.867605,"NodeLongitude":35.6031094,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:33","EndTime":"2024-01-13 15:46:33","Latitude":null,"Longitude":null,"OSM_ID":6662955750,"NodeLatitude":33.8674647,"NodeLongitude":35.60299,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:35","EndTime":"2024-01-13 15:46:35","Latitude":null,"Longitude":null,"OSM_ID":6662955751,"NodeLatitude":33.8673583,"NodeLongitude":35.6029116,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:37","EndTime":"2024-01-13 15:46:37","Latitude":null,"Longitude":null,"OSM_ID":288791464,"NodeLatitude":33.8672754,"NodeLongitude":35.602868,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:39","EndTime":"2024-01-13 15:46:39","Latitude":null,"Longitude":null,"OSM_ID":6662955752,"NodeLatitude":33.8671395,"NodeLongitude":35.6028163,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:40","EndTime":"2024-01-13 15:46:40","Latitude":null,"Longitude":null,"OSM_ID":288791465,"NodeLatitude":33.8669463,"NodeLongitude":35.6027694,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:42","EndTime":"2024-01-13 15:46:42","Latitude":null,"Longitude":null,"OSM_ID":6662955753,"NodeLatitude":33.8668021,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:44","EndTime":"2024-01-13 15:46:44","Latitude":null,"Longitude":null,"OSM_ID":6660212495,"NodeLatitude":33.866654,"NodeLongitude":35.6027365,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:46","EndTime":"2024-01-13 15:46:46","Latitude":null,"Longitude":null,"OSM_ID":6662955754,"NodeLatitude":33.8665193,"NodeLongitude":35.6027433,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:48","EndTime":"2024-01-13 15:46:48","Latitude":null,"Longitude":null,"OSM_ID":288791777,"NodeLatitude":33.8664268,"NodeLongitude":35.602752,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:50","EndTime":"2024-01-13 15:46:50","Latitude":33.8661589791,"Longitude":35.602735827,"OSM_ID":6662955755,"NodeLatitude":33.8662542,"NodeLongitude":35.6027701,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:51","EndTime":"2024-01-13 15:46:51","Latitude":null,"Longitude":null,"OSM_ID":288791467,"NodeLatitude":33.8659597,"NodeLongitude":35.6027835,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:53","EndTime":"2024-01-13 15:46:53","Latitude":null,"Longitude":null,"OSM_ID":6660212494,"NodeLatitude":33.8656674,"NodeLongitude":35.6027493,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:55","EndTime":"2024-01-13 15:46:55","Latitude":null,"Longitude":null,"OSM_ID":288791778,"NodeLatitude":33.8654892,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:57","EndTime":"2024-01-13 15:46:57","Latitude":null,"Longitude":null,"OSM_ID":6662955758,"NodeLatitude":33.8653511,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:46:59","EndTime":"2024-01-13 15:46:59","Latitude":null,"Longitude":null,"OSM_ID":6662955757,"NodeLatitude":33.8652247,"NodeLongitude":35.6027493,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:00","EndTime":"2024-01-13 15:47:00","Latitude":null,"Longitude":null,"OSM_ID":6662955756,"NodeLatitude":33.8651184,"NodeLongitude":35.6027721,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:02","EndTime":"2024-01-13 15:47:02","Latitude":null,"Longitude":null,"OSM_ID":288791469,"NodeLatitude":33.8650109,"NodeLongitude":35.6028002,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:04","EndTime":"2024-01-13 15:47:04","Latitude":null,"Longitude":null,"OSM_ID":6662955759,"NodeLatitude":33.8649257,"NodeLongitude":35.6028331,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:06","EndTime":"2024-01-13 15:47:06","Latitude":null,"Longitude":null,"OSM_ID":6662955760,"NodeLatitude":33.8648272,"NodeLongitude":35.6028901,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:08","EndTime":"2024-01-13 15:47:08","Latitude":null,"Longitude":null,"OSM_ID":290329778,"NodeLatitude":33.8646896,"NodeLongitude":35.6029847,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:10","EndTime":"2024-01-13 15:47:10","Latitude":33.864504184,"Longitude":35.6031491431,"OSM_ID":5878940098,"NodeLatitude":33.8644836,"NodeLongitude":35.6031496,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:11","EndTime":"2024-01-13 15:47:11","Latitude":null,"Longitude":null,"OSM_ID":6662955763,"NodeLatitude":33.8644396,"NodeLongitude":35.6031838,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:13","EndTime":"2024-01-13 15:47:13","Latitude":null,"Longitude":null,"OSM_ID":5878940097,"NodeLatitude":33.8643767,"NodeLongitude":35.603218,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:14","EndTime":"2024-01-13 15:47:14","Latitude":null,"Longitude":null,"OSM_ID":6662955762,"NodeLatitude":33.8643233,"NodeLongitude":35.6032468,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:16","EndTime":"2024-01-13 15:47:16","Latitude":null,"Longitude":null,"OSM_ID":288791470,"NodeLatitude":33.8642453,"NodeLongitude":35.6032643,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:17","EndTime":"2024-01-13 15:47:17","Latitude":null,"Longitude":null,"OSM_ID":6662955761,"NodeLatitude":33.8641796,"NodeLongitude":35.6032643,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:19","EndTime":"2024-01-13 15:47:19","Latitude":null,"Longitude":null,"OSM_ID":6662955764,"NodeLatitude":33.8641122,"NodeLongitude":35.6032542,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:20","EndTime":"2024-01-13 15:47:20","Latitude":null,"Longitude":null,"OSM_ID":6503616912,"NodeLatitude":33.8638845,"NodeLongitude":35.6031536,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:22","EndTime":"2024-01-13 15:47:22","Latitude":null,"Longitude":null,"OSM_ID":6662955765,"NodeLatitude":33.8637576,"NodeLongitude":35.6031047,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:23","EndTime":"2024-01-13 15:47:23","Latitude":null,"Longitude":null,"OSM_ID":288791779,"NodeLatitude":33.863429,"NodeLongitude":35.6029605,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:25","EndTime":"2024-01-13 15:47:25","Latitude":null,"Longitude":null,"OSM_ID":6662955766,"NodeLatitude":33.8633567,"NodeLongitude":35.6029283,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:26","EndTime":"2024-01-13 15:47:26","Latitude":null,"Longitude":null,"OSM_ID":6662955767,"NodeLatitude":33.8633038,"NodeLongitude":35.6028961,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:28","EndTime":"2024-01-13 15:47:28","Latitude":null,"Longitude":null,"OSM_ID":6662955768,"NodeLatitude":33.8632431,"NodeLongitude":35.6028445,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:30","EndTime":"2024-01-13 15:47:30","Latitude":33.8630287688,"Longitude":35.6025677228,"OSM_ID":6662955769,"NodeLatitude":33.8630916,"NodeLongitude":35.6026943,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:31","EndTime":"2024-01-13 15:47:31","Latitude":null,"Longitude":null,"OSM_ID":6663199086,"NodeLatitude":33.862838,"NodeLongitude":35.6024536,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:32","EndTime":"2024-01-13 15:47:32","Latitude":null,"Longitude":null,"OSM_ID":6662955770,"NodeLatitude":33.8627921,"NodeLongitude":35.60241,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:34","EndTime":"2024-01-13 15:47:34","Latitude":null,"Longitude":null,"OSM_ID":6662955772,"NodeLatitude":33.8625081,"NodeLongitude":35.6021639,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:35","EndTime":"2024-01-13 15:47:35","Latitude":null,"Longitude":null,"OSM_ID":288791473,"NodeLatitude":33.8622133,"NodeLongitude":35.6018983,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:36","EndTime":"2024-01-13 15:47:36","Latitude":null,"Longitude":null,"OSM_ID":6662955775,"NodeLatitude":33.8621712,"NodeLongitude":35.6018501,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:38","EndTime":"2024-01-13 15:47:38","Latitude":null,"Longitude":null,"OSM_ID":6715453116,"NodeLatitude":33.8621429,"NodeLongitude":35.6018034,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:39","EndTime":"2024-01-13 15:47:39","Latitude":null,"Longitude":null,"OSM_ID":6662955776,"NodeLatitude":33.8621205,"NodeLongitude":35.6017468,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:40","EndTime":"2024-01-13 15:47:40","Latitude":null,"Longitude":null,"OSM_ID":6662955774,"NodeLatitude":33.8621024,"NodeLongitude":35.6016891,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:42","EndTime":"2024-01-13 15:47:42","Latitude":null,"Longitude":null,"OSM_ID":6662955777,"NodeLatitude":33.8620916,"NodeLongitude":35.6016295,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:43","EndTime":"2024-01-13 15:47:43","Latitude":null,"Longitude":null,"OSM_ID":6662955773,"NodeLatitude":33.8620896,"NodeLongitude":35.6015638,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:44","EndTime":"2024-01-13 15:47:44","Latitude":null,"Longitude":null,"OSM_ID":288791780,"NodeLatitude":33.8620921,"NodeLongitude":35.6015068,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:46","EndTime":"2024-01-13 15:47:46","Latitude":null,"Longitude":null,"OSM_ID":2680319964,"NodeLatitude":33.8620977,"NodeLongitude":35.6014417,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:47","EndTime":"2024-01-13 15:47:47","Latitude":null,"Longitude":null,"OSM_ID":6662955778,"NodeLatitude":33.8621072,"NodeLongitude":35.6013646,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:48","EndTime":"2024-01-13 15:47:48","Latitude":null,"Longitude":null,"OSM_ID":6664980632,"NodeLatitude":33.8621512,"NodeLongitude":35.6012908,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:50","EndTime":"2024-01-13 15:47:50","Latitude":33.8621998832,"Longitude":35.6012866368,"OSM_ID":6664980631,"NodeLatitude":33.8621935,"NodeLongitude":35.6012285,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:52","EndTime":"2024-01-13 15:47:52","Latitude":null,"Longitude":null,"OSM_ID":6664980630,"NodeLatitude":33.8622144,"NodeLongitude":35.6011882,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:54","EndTime":"2024-01-13 15:47:54","Latitude":null,"Longitude":null,"OSM_ID":6664980629,"NodeLatitude":33.8622311,"NodeLongitude":35.601138,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:56","EndTime":"2024-01-13 15:47:56","Latitude":null,"Longitude":null,"OSM_ID":2680235441,"NodeLatitude":33.8623566,"NodeLongitude":35.6012185,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:47:58","EndTime":"2024-01-13 15:47:58","Latitude":null,"Longitude":null,"OSM_ID":6662955784,"NodeLatitude":33.8624791,"NodeLongitude":35.601264,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:01","EndTime":"2024-01-13 15:48:01","Latitude":null,"Longitude":null,"OSM_ID":6662955783,"NodeLatitude":33.8626362,"NodeLongitude":35.601317,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:03","EndTime":"2024-01-13 15:48:03","Latitude":null,"Longitude":null,"OSM_ID":288791476,"NodeLatitude":33.8627943,"NodeLongitude":35.6013505,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:05","EndTime":"2024-01-13 15:48:05","Latitude":null,"Longitude":null,"OSM_ID":6662992185,"NodeLatitude":33.8632097,"NodeLongitude":35.6014001,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:07","EndTime":"2024-01-13 15:48:07","Latitude":null,"Longitude":null,"OSM_ID":6663135796,"NodeLatitude":33.8635072,"NodeLongitude":35.601421,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:10","EndTime":"2024-01-13 15:48:10","Latitude":33.8635959458,"Longitude":35.6014050592,"OSM_ID":4453577705,"NodeLatitude":33.8636696,"NodeLongitude":35.6014283,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:12","EndTime":"2024-01-13 15:48:12","Latitude":null,"Longitude":null,"OSM_ID":6662999433,"NodeLatitude":33.8637261,"NodeLongitude":35.6014388,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:14","EndTime":"2024-01-13 15:48:14","Latitude":null,"Longitude":null,"OSM_ID":288791781,"NodeLatitude":33.8638132,"NodeLongitude":35.6014551,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:16","EndTime":"2024-01-13 15:48:16","Latitude":null,"Longitude":null,"OSM_ID":6662992186,"NodeLatitude":33.8640493,"NodeLongitude":35.6015369,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:18","EndTime":"2024-01-13 15:48:18","Latitude":null,"Longitude":null,"OSM_ID":6503616907,"NodeLatitude":33.864232,"NodeLongitude":35.6016013,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:21","EndTime":"2024-01-13 15:48:21","Latitude":null,"Longitude":null,"OSM_ID":288791782,"NodeLatitude":33.8646206,"NodeLongitude":35.6017448,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:23","EndTime":"2024-01-13 15:48:23","Latitude":null,"Longitude":null,"OSM_ID":6662992188,"NodeLatitude":33.8648656,"NodeLongitude":35.6018092,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:25","EndTime":"2024-01-13 15:48:25","Latitude":null,"Longitude":null,"OSM_ID":288791479,"NodeLatitude":33.8650939,"NodeLongitude":35.6018427,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:27","EndTime":"2024-01-13 15:48:27","Latitude":null,"Longitude":null,"OSM_ID":6662992189,"NodeLatitude":33.8652709,"NodeLongitude":35.6018414,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:30","EndTime":"2024-01-13 15:48:30","Latitude":33.8654005032,"Longitude":35.6018460734,"OSM_ID":6662992190,"NodeLatitude":33.8654625,"NodeLongitude":35.6018333,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:32","EndTime":"2024-01-13 15:48:32","Latitude":null,"Longitude":null,"OSM_ID":288791480,"NodeLatitude":33.8656206,"NodeLongitude":35.6018025,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:35","EndTime":"2024-01-13 15:48:35","Latitude":null,"Longitude":null,"OSM_ID":6662992191,"NodeLatitude":33.8658767,"NodeLongitude":35.6017341,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:38","EndTime":"2024-01-13 15:48:38","Latitude":null,"Longitude":null,"OSM_ID":6662992192,"NodeLatitude":33.8660059,"NodeLongitude":35.6016885,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:41","EndTime":"2024-01-13 15:48:41","Latitude":null,"Longitude":null,"OSM_ID":288791481,"NodeLatitude":33.8661663,"NodeLongitude":35.601616,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:44","EndTime":"2024-01-13 15:48:44","Latitude":null,"Longitude":null,"OSM_ID":6662992193,"NodeLatitude":33.8665432,"NodeLongitude":35.6014109,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:47","EndTime":"2024-01-13 15:48:47","Latitude":null,"Longitude":null,"OSM_ID":6662992194,"NodeLatitude":33.8670616,"NodeLongitude":35.6011426,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:50","EndTime":"2024-01-13 15:48:50","Latitude":33.8672885929,"Longitude":35.6010368849,"OSM_ID":6715453117,"NodeLatitude":33.8672466,"NodeLongitude":35.6010453,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:51","EndTime":"2024-01-13 15:48:51","Latitude":null,"Longitude":null,"OSM_ID":288791482,"NodeLatitude":33.8676317,"NodeLongitude":35.6008335,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:52","EndTime":"2024-01-13 15:48:52","Latitude":null,"Longitude":null,"OSM_ID":6662992195,"NodeLatitude":33.8678088,"NodeLongitude":35.600743,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:53","EndTime":"2024-01-13 15:48:53","Latitude":null,"Longitude":null,"OSM_ID":288791483,"NodeLatitude":33.8679029,"NodeLongitude":35.6007148,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:54","EndTime":"2024-01-13 15:48:54","Latitude":null,"Longitude":null,"OSM_ID":6662992201,"NodeLatitude":33.8680125,"NodeLongitude":35.6007162,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:55","EndTime":"2024-01-13 15:48:55","Latitude":null,"Longitude":null,"OSM_ID":6662992200,"NodeLatitude":33.8680916,"NodeLongitude":35.6007336,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:56","EndTime":"2024-01-13 15:48:56","Latitude":null,"Longitude":null,"OSM_ID":6662992196,"NodeLatitude":33.8681222,"NodeLongitude":35.600747,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:57","EndTime":"2024-01-13 15:48:57","Latitude":null,"Longitude":null,"OSM_ID":6662992198,"NodeLatitude":33.8681562,"NodeLongitude":35.6007671,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:58","EndTime":"2024-01-13 15:48:58","Latitude":null,"Longitude":null,"OSM_ID":6662992199,"NodeLatitude":33.8682224,"NodeLongitude":35.6008295,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:48:59","EndTime":"2024-01-13 15:48:59","Latitude":null,"Longitude":null,"OSM_ID":6662992197,"NodeLatitude":33.8682881,"NodeLongitude":35.6008764,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:00","EndTime":"2024-01-13 15:49:00","Latitude":null,"Longitude":null,"OSM_ID":288791783,"NodeLatitude":33.8683476,"NodeLongitude":35.6009112,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:01","EndTime":"2024-01-13 15:49:01","Latitude":null,"Longitude":null,"OSM_ID":6659922632,"NodeLatitude":33.868409,"NodeLongitude":35.6009321,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:02","EndTime":"2024-01-13 15:49:02","Latitude":null,"Longitude":null,"OSM_ID":3136599024,"NodeLatitude":33.8684585,"NodeLongitude":35.6009421,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:03","EndTime":"2024-01-13 15:49:03","Latitude":null,"Longitude":null,"OSM_ID":6659922631,"NodeLatitude":33.8684891,"NodeLongitude":35.6009381,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:04","EndTime":"2024-01-13 15:49:04","Latitude":null,"Longitude":null,"OSM_ID":288794091,"NodeLatitude":33.8685181,"NodeLongitude":35.6009307,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:05","EndTime":"2024-01-13 15:49:05","Latitude":null,"Longitude":null,"OSM_ID":6659922633,"NodeLatitude":33.8685548,"NodeLongitude":35.6009207,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:06","EndTime":"2024-01-13 15:49:06","Latitude":null,"Longitude":null,"OSM_ID":6660212496,"NodeLatitude":33.868581,"NodeLongitude":35.6008999,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:07","EndTime":"2024-01-13 15:49:07","Latitude":null,"Longitude":null,"OSM_ID":6659922634,"NodeLatitude":33.8685955,"NodeLongitude":35.6008838,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:08","EndTime":"2024-01-13 15:49:08","Latitude":null,"Longitude":null,"OSM_ID":6659922635,"NodeLatitude":33.8686183,"NodeLongitude":35.6008429,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:09","EndTime":"2024-01-13 15:49:09","Latitude":null,"Longitude":null,"OSM_ID":290329851,"NodeLatitude":33.8686339,"NodeLongitude":35.6007919,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:10","EndTime":"2024-01-13 15:49:10","Latitude":33.8686899224,"Longitude":35.6007017949,"OSM_ID":6659922636,"NodeLatitude":33.8686439,"NodeLongitude":35.6007256,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:11","EndTime":"2024-01-13 15:49:11","Latitude":null,"Longitude":null,"OSM_ID":6659922637,"NodeLatitude":33.8686489,"NodeLongitude":35.6006666,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:12","EndTime":"2024-01-13 15:49:12","Latitude":null,"Longitude":null,"OSM_ID":288791485,"NodeLatitude":33.8686467,"NodeLongitude":35.6005874,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:13","EndTime":"2024-01-13 15:49:13","Latitude":null,"Longitude":null,"OSM_ID":6659922638,"NodeLatitude":33.8686256,"NodeLongitude":35.6005036,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:14","EndTime":"2024-01-13 15:49:14","Latitude":null,"Longitude":null,"OSM_ID":288791784,"NodeLatitude":33.8685738,"NodeLongitude":35.6003554,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:15","EndTime":"2024-01-13 15:49:15","Latitude":null,"Longitude":null,"OSM_ID":6659922639,"NodeLatitude":33.8685248,"NodeLongitude":35.6002602,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:16","EndTime":"2024-01-13 15:49:16","Latitude":null,"Longitude":null,"OSM_ID":288794092,"NodeLatitude":33.8684713,"NodeLongitude":35.6001703,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:17","EndTime":"2024-01-13 15:49:17","Latitude":null,"Longitude":null,"OSM_ID":6660212497,"NodeLatitude":33.8684346,"NodeLongitude":35.6001341,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:18","EndTime":"2024-01-13 15:49:18","Latitude":null,"Longitude":null,"OSM_ID":6659922640,"NodeLatitude":33.8683889,"NodeLongitude":35.6001019,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:19","EndTime":"2024-01-13 15:49:19","Latitude":null,"Longitude":null,"OSM_ID":6659518721,"NodeLatitude":33.8683299,"NodeLongitude":35.6000738,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:20","EndTime":"2024-01-13 15:49:20","Latitude":null,"Longitude":null,"OSM_ID":288791785,"NodeLatitude":33.868262,"NodeLongitude":35.6000456,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:21","EndTime":"2024-01-13 15:49:21","Latitude":null,"Longitude":null,"OSM_ID":6659518724,"NodeLatitude":33.8681818,"NodeLongitude":35.6000148,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:22","EndTime":"2024-01-13 15:49:22","Latitude":null,"Longitude":null,"OSM_ID":6659518723,"NodeLatitude":33.8680691,"NodeLongitude":35.5999831,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:23","EndTime":"2024-01-13 15:49:23","Latitude":null,"Longitude":null,"OSM_ID":6659518722,"NodeLatitude":33.8679623,"NodeLongitude":35.5999651,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:24","EndTime":"2024-01-13 15:49:24","Latitude":null,"Longitude":null,"OSM_ID":6715453118,"NodeLatitude":33.8678563,"NodeLongitude":35.5999497,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:25","EndTime":"2024-01-13 15:49:25","Latitude":null,"Longitude":null,"OSM_ID":288791488,"NodeLatitude":33.8677616,"NodeLongitude":35.5999424,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:26","EndTime":"2024-01-13 15:49:26","Latitude":null,"Longitude":null,"OSM_ID":6659518725,"NodeLatitude":33.8676845,"NodeLongitude":35.5999375,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:27","EndTime":"2024-01-13 15:49:27","Latitude":null,"Longitude":null,"OSM_ID":6659518726,"NodeLatitude":33.8675618,"NodeLongitude":35.599937,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:28","EndTime":"2024-01-13 15:49:28","Latitude":null,"Longitude":null,"OSM_ID":6659518727,"NodeLatitude":33.8674615,"NodeLongitude":35.5999539,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:29","EndTime":"2024-01-13 15:49:29","Latitude":null,"Longitude":null,"OSM_ID":3227075364,"NodeLatitude":33.8673455,"NodeLongitude":35.5999799,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:30","EndTime":"2024-01-13 15:49:30","Latitude":33.8671035364,"Longitude":35.6000603218,"OSM_ID":288791489,"NodeLatitude":33.867194,"NodeLongitude":35.6000255,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:31","EndTime":"2024-01-13 15:49:31","Latitude":null,"Longitude":null,"OSM_ID":6659518714,"NodeLatitude":33.8667008,"NodeLongitude":35.60022,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:32","EndTime":"2024-01-13 15:49:32","Latitude":null,"Longitude":null,"OSM_ID":288791786,"NodeLatitude":33.8663043,"NodeLongitude":35.6003688,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:34","EndTime":"2024-01-13 15:49:34","Latitude":null,"Longitude":null,"OSM_ID":6659518715,"NodeLatitude":33.8661735,"NodeLongitude":35.6004124,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:35","EndTime":"2024-01-13 15:49:35","Latitude":null,"Longitude":null,"OSM_ID":6663000367,"NodeLatitude":33.8660905,"NodeLongitude":35.6004345,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:37","EndTime":"2024-01-13 15:49:37","Latitude":null,"Longitude":null,"OSM_ID":4453577730,"NodeLatitude":33.8660031,"NodeLongitude":35.6004433,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:38","EndTime":"2024-01-13 15:49:38","Latitude":null,"Longitude":null,"OSM_ID":6659518716,"NodeLatitude":33.8658739,"NodeLongitude":35.6004533,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:40","EndTime":"2024-01-13 15:49:40","Latitude":null,"Longitude":null,"OSM_ID":288791491,"NodeLatitude":33.8657498,"NodeLongitude":35.6004547,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:41","EndTime":"2024-01-13 15:49:41","Latitude":null,"Longitude":null,"OSM_ID":6659518718,"NodeLatitude":33.8656646,"NodeLongitude":35.6004473,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:42","EndTime":"2024-01-13 15:49:42","Latitude":null,"Longitude":null,"OSM_ID":6659518717,"NodeLatitude":33.8655835,"NodeLongitude":35.6004443,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:44","EndTime":"2024-01-13 15:49:44","Latitude":null,"Longitude":null,"OSM_ID":6659518719,"NodeLatitude":33.8654243,"NodeLongitude":35.6004308,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:45","EndTime":"2024-01-13 15:49:45","Latitude":null,"Longitude":null,"OSM_ID":6663000366,"NodeLatitude":33.8653716,"NodeLongitude":35.6004238,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:47","EndTime":"2024-01-13 15:49:47","Latitude":null,"Longitude":null,"OSM_ID":288791787,"NodeLatitude":33.8653088,"NodeLongitude":35.6004093,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:48","EndTime":"2024-01-13 15:49:48","Latitude":null,"Longitude":null,"OSM_ID":6659518720,"NodeLatitude":33.8652283,"NodeLongitude":35.6003863,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:50","EndTime":"2024-01-13 15:49:50","Latitude":33.8652269256,"Longitude":35.600272685,"OSM_ID":4453577729,"NodeLatitude":33.8651668,"NodeLongitude":35.6003288,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:51","EndTime":"2024-01-13 15:49:51","Latitude":null,"Longitude":null,"OSM_ID":6659518729,"NodeLatitude":33.8650935,"NodeLongitude":35.6002354,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:52","EndTime":"2024-01-13 15:49:52","Latitude":null,"Longitude":null,"OSM_ID":288791493,"NodeLatitude":33.8650303,"NodeLongitude":35.600125,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:53","EndTime":"2024-01-13 15:49:53","Latitude":null,"Longitude":null,"OSM_ID":4453577724,"NodeLatitude":33.8649836,"NodeLongitude":35.6000056,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:54","EndTime":"2024-01-13 15:49:54","Latitude":null,"Longitude":null,"OSM_ID":6659518728,"NodeLatitude":33.8649452,"NodeLongitude":35.5998683,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:55","EndTime":"2024-01-13 15:49:55","Latitude":null,"Longitude":null,"OSM_ID":3136598998,"NodeLatitude":33.8649312,"NodeLongitude":35.5997408,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:57","EndTime":"2024-01-13 15:49:57","Latitude":null,"Longitude":null,"OSM_ID":288791788,"NodeLatitude":33.8649324,"NodeLongitude":35.5996138,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:58","EndTime":"2024-01-13 15:49:58","Latitude":null,"Longitude":null,"OSM_ID":4453577723,"NodeLatitude":33.8649357,"NodeLongitude":35.5993536,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:49:59","EndTime":"2024-01-13 15:49:59","Latitude":null,"Longitude":null,"OSM_ID":6659518731,"NodeLatitude":33.8649321,"NodeLongitude":35.5992634,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:00","EndTime":"2024-01-13 15:50:00","Latitude":null,"Longitude":null,"OSM_ID":4453577727,"NodeLatitude":33.8649221,"NodeLongitude":35.5991974,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:01","EndTime":"2024-01-13 15:50:01","Latitude":null,"Longitude":null,"OSM_ID":6659518730,"NodeLatitude":33.8649048,"NodeLongitude":35.5991571,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:02","EndTime":"2024-01-13 15:50:02","Latitude":null,"Longitude":null,"OSM_ID":288791789,"NodeLatitude":33.8648879,"NodeLongitude":35.5991149,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:04","EndTime":"2024-01-13 15:50:04","Latitude":null,"Longitude":null,"OSM_ID":4453577728,"NodeLatitude":33.8648595,"NodeLongitude":35.5990626,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:05","EndTime":"2024-01-13 15:50:05","Latitude":null,"Longitude":null,"OSM_ID":4453577725,"NodeLatitude":33.8648166,"NodeLongitude":35.5990076,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:06","EndTime":"2024-01-13 15:50:06","Latitude":null,"Longitude":null,"OSM_ID":6659518732,"NodeLatitude":33.8647415,"NodeLongitude":35.5989627,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:07","EndTime":"2024-01-13 15:50:07","Latitude":null,"Longitude":null,"OSM_ID":4453577726,"NodeLatitude":33.8646546,"NodeLongitude":35.5989244,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:08","EndTime":"2024-01-13 15:50:08","Latitude":null,"Longitude":null,"OSM_ID":288791496,"NodeLatitude":33.8645755,"NodeLongitude":35.598905,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:10","EndTime":"2024-01-13 15:50:10","Latitude":33.8642019556,"Longitude":35.5988572249,"OSM_ID":288791497,"NodeLatitude":33.8641629,"NodeLongitude":35.5988402,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:11","EndTime":"2024-01-13 15:50:11","Latitude":null,"Longitude":null,"OSM_ID":6659518734,"NodeLatitude":33.8640509,"NodeLongitude":35.5988214,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:12","EndTime":"2024-01-13 15:50:12","Latitude":null,"Longitude":null,"OSM_ID":6659518733,"NodeLatitude":33.863991,"NodeLongitude":35.5988083,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:13","EndTime":"2024-01-13 15:50:13","Latitude":null,"Longitude":null,"OSM_ID":3136599025,"NodeLatitude":33.863943,"NodeLongitude":35.5987671,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:15","EndTime":"2024-01-13 15:50:15","Latitude":null,"Longitude":null,"OSM_ID":6659518736,"NodeLatitude":33.8639145,"NodeLongitude":35.5987193,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:16","EndTime":"2024-01-13 15:50:16","Latitude":null,"Longitude":null,"OSM_ID":6659518737,"NodeLatitude":33.863894,"NodeLongitude":35.5986275,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:17","EndTime":"2024-01-13 15:50:17","Latitude":null,"Longitude":null,"OSM_ID":288791790,"NodeLatitude":33.8638923,"NodeLongitude":35.598512,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:18","EndTime":"2024-01-13 15:50:18","Latitude":null,"Longitude":null,"OSM_ID":6133596880,"NodeLatitude":33.8638974,"NodeLongitude":35.5984606,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:20","EndTime":"2024-01-13 15:50:20","Latitude":null,"Longitude":null,"OSM_ID":6659518739,"NodeLatitude":33.8639107,"NodeLongitude":35.5983258,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:21","EndTime":"2024-01-13 15:50:21","Latitude":null,"Longitude":null,"OSM_ID":6659518740,"NodeLatitude":33.8639307,"NodeLongitude":35.5982061,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:22","EndTime":"2024-01-13 15:50:22","Latitude":null,"Longitude":null,"OSM_ID":6659518738,"NodeLatitude":33.8639451,"NodeLongitude":35.5981193,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:23","EndTime":"2024-01-13 15:50:23","Latitude":null,"Longitude":null,"OSM_ID":288791791,"NodeLatitude":33.8639612,"NodeLongitude":35.5980353,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:25","EndTime":"2024-01-13 15:50:25","Latitude":null,"Longitude":null,"OSM_ID":6659518741,"NodeLatitude":33.8639563,"NodeLongitude":35.5979041,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:26","EndTime":"2024-01-13 15:50:26","Latitude":null,"Longitude":null,"OSM_ID":6659518742,"NodeLatitude":33.8639403,"NodeLongitude":35.5977805,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:27","EndTime":"2024-01-13 15:50:27","Latitude":null,"Longitude":null,"OSM_ID":288791792,"NodeLatitude":33.8639083,"NodeLongitude":35.5976068,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:28","EndTime":"2024-01-13 15:50:28","Latitude":null,"Longitude":null,"OSM_ID":6659518743,"NodeLatitude":33.8638594,"NodeLongitude":35.5973849,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:30","EndTime":"2024-01-13 15:50:30","Latitude":33.863855055,"Longitude":35.5970200225,"OSM_ID":6659518744,"NodeLatitude":33.8637809,"NodeLongitude":35.5970104,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:32","EndTime":"2024-01-13 15:50:32","Latitude":null,"Longitude":null,"OSM_ID":6659884403,"NodeLatitude":33.8637552,"NodeLongitude":35.5968753,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:34","EndTime":"2024-01-13 15:50:34","Latitude":null,"Longitude":null,"OSM_ID":6659518745,"NodeLatitude":33.8637108,"NodeLongitude":35.5965353,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:36","EndTime":"2024-01-13 15:50:36","Latitude":null,"Longitude":null,"OSM_ID":6659518746,"NodeLatitude":33.8636733,"NodeLongitude":35.5963703,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:38","EndTime":"2024-01-13 15:50:38","Latitude":null,"Longitude":null,"OSM_ID":6715415223,"NodeLatitude":33.8636006,"NodeLongitude":35.5961541,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:41","EndTime":"2024-01-13 15:50:41","Latitude":null,"Longitude":null,"OSM_ID":288791793,"NodeLatitude":33.8635228,"NodeLongitude":35.5960239,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:43","EndTime":"2024-01-13 15:50:43","Latitude":null,"Longitude":null,"OSM_ID":288791794,"NodeLatitude":33.8632745,"NodeLongitude":35.5956204,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:45","EndTime":"2024-01-13 15:50:45","Latitude":null,"Longitude":null,"OSM_ID":6659518747,"NodeLatitude":33.8632163,"NodeLongitude":35.595516,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:47","EndTime":"2024-01-13 15:50:47","Latitude":null,"Longitude":null,"OSM_ID":3136607848,"NodeLatitude":33.8631626,"NodeLongitude":35.5954289,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:50","EndTime":"2024-01-13 15:50:50","Latitude":33.8631627891,"Longitude":35.5953454495,"OSM_ID":6659518748,"NodeLatitude":33.8631211,"NodeLongitude":35.5953762,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:51","EndTime":"2024-01-13 15:50:51","Latitude":null,"Longitude":null,"OSM_ID":5334623446,"NodeLatitude":33.8630834,"NodeLongitude":35.5953401,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:52","EndTime":"2024-01-13 15:50:52","Latitude":null,"Longitude":null,"OSM_ID":6659518749,"NodeLatitude":33.8630401,"NodeLongitude":35.5953132,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:54","EndTime":"2024-01-13 15:50:54","Latitude":null,"Longitude":null,"OSM_ID":288791503,"NodeLatitude":33.8629869,"NodeLongitude":35.5952891,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:55","EndTime":"2024-01-13 15:50:55","Latitude":null,"Longitude":null,"OSM_ID":6659518750,"NodeLatitude":33.8629402,"NodeLongitude":35.5952767,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:57","EndTime":"2024-01-13 15:50:57","Latitude":null,"Longitude":null,"OSM_ID":5334623445,"NodeLatitude":33.8628879,"NodeLongitude":35.5952689,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:50:58","EndTime":"2024-01-13 15:50:58","Latitude":null,"Longitude":null,"OSM_ID":6659518751,"NodeLatitude":33.8628491,"NodeLongitude":35.5952689,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:00","EndTime":"2024-01-13 15:51:00","Latitude":null,"Longitude":null,"OSM_ID":5334623444,"NodeLatitude":33.8627952,"NodeLongitude":35.5952745,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:01","EndTime":"2024-01-13 15:51:01","Latitude":null,"Longitude":null,"OSM_ID":288791795,"NodeLatitude":33.8626033,"NodeLongitude":35.5953155,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:02","EndTime":"2024-01-13 15:51:02","Latitude":null,"Longitude":null,"OSM_ID":6659884391,"NodeLatitude":33.8625042,"NodeLongitude":35.5953363,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:04","EndTime":"2024-01-13 15:51:04","Latitude":null,"Longitude":null,"OSM_ID":6659518752,"NodeLatitude":33.8624435,"NodeLongitude":35.5953491,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:05","EndTime":"2024-01-13 15:51:05","Latitude":null,"Longitude":null,"OSM_ID":4453577696,"NodeLatitude":33.862211,"NodeLongitude":35.5954032,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:07","EndTime":"2024-01-13 15:51:07","Latitude":null,"Longitude":null,"OSM_ID":3128749518,"NodeLatitude":33.8618903,"NodeLongitude":35.595487,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:08","EndTime":"2024-01-13 15:51:08","Latitude":null,"Longitude":null,"OSM_ID":288791505,"NodeLatitude":33.8616795,"NodeLongitude":35.5955502,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:10","EndTime":"2024-01-13 15:51:10","Latitude":33.8614944515,"Longitude":35.5956115592,"OSM_ID":4507423363,"NodeLatitude":33.8614763,"NodeLongitude":35.5956193,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:11","EndTime":"2024-01-13 15:51:11","Latitude":null,"Longitude":null,"OSM_ID":6659518753,"NodeLatitude":33.861434,"NodeLongitude":35.5956267,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:13","EndTime":"2024-01-13 15:51:13","Latitude":null,"Longitude":null,"OSM_ID":4507423362,"NodeLatitude":33.8613868,"NodeLongitude":35.5956215,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:15","EndTime":"2024-01-13 15:51:15","Latitude":null,"Longitude":null,"OSM_ID":6659518754,"NodeLatitude":33.8613509,"NodeLongitude":35.5956051,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:16","EndTime":"2024-01-13 15:51:16","Latitude":null,"Longitude":null,"OSM_ID":288791506,"NodeLatitude":33.8613167,"NodeLongitude":35.5955767,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:18","EndTime":"2024-01-13 15:51:18","Latitude":null,"Longitude":null,"OSM_ID":6659518755,"NodeLatitude":33.8612969,"NodeLongitude":35.5955474,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:20","EndTime":"2024-01-13 15:51:20","Latitude":null,"Longitude":null,"OSM_ID":4507423360,"NodeLatitude":33.8612753,"NodeLongitude":35.5955033,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:21","EndTime":"2024-01-13 15:51:21","Latitude":null,"Longitude":null,"OSM_ID":3106369640,"NodeLatitude":33.8612491,"NodeLongitude":35.5954289,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:23","EndTime":"2024-01-13 15:51:23","Latitude":null,"Longitude":null,"OSM_ID":288791796,"NodeLatitude":33.8612063,"NodeLongitude":35.5952592,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:25","EndTime":"2024-01-13 15:51:25","Latitude":null,"Longitude":null,"OSM_ID":6659518756,"NodeLatitude":33.8611227,"NodeLongitude":35.5949092,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:26","EndTime":"2024-01-13 15:51:26","Latitude":null,"Longitude":null,"OSM_ID":6715415224,"NodeLatitude":33.8610258,"NodeLongitude":35.5944984,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:28","EndTime":"2024-01-13 15:51:28","Latitude":null,"Longitude":null,"OSM_ID":288791797,"NodeLatitude":33.8609401,"NodeLongitude":35.5941381,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:30","EndTime":"2024-01-13 15:51:30","Latitude":33.8608796989,"Longitude":35.5936039626,"OSM_ID":6659518757,"NodeLatitude":33.8607998,"NodeLongitude":35.5935895,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:32","EndTime":"2024-01-13 15:51:32","Latitude":null,"Longitude":null,"OSM_ID":6659518758,"NodeLatitude":33.8606723,"NodeLongitude":35.5931792,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:34","EndTime":"2024-01-13 15:51:34","Latitude":null,"Longitude":null,"OSM_ID":288791509,"NodeLatitude":33.8606171,"NodeLongitude":35.5930417,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:36","EndTime":"2024-01-13 15:51:36","Latitude":null,"Longitude":null,"OSM_ID":6659518759,"NodeLatitude":33.8605353,"NodeLongitude":35.5928928,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:38","EndTime":"2024-01-13 15:51:38","Latitude":null,"Longitude":null,"OSM_ID":6659518760,"NodeLatitude":33.8604512,"NodeLongitude":35.5927661,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:41","EndTime":"2024-01-13 15:51:41","Latitude":null,"Longitude":null,"OSM_ID":288791798,"NodeLatitude":33.8603131,"NodeLongitude":35.5925743,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:43","EndTime":"2024-01-13 15:51:43","Latitude":null,"Longitude":null,"OSM_ID":6643759835,"NodeLatitude":33.8600959,"NodeLongitude":35.592286,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:45","EndTime":"2024-01-13 15:51:45","Latitude":null,"Longitude":null,"OSM_ID":6643904945,"NodeLatitude":33.860066,"NodeLongitude":35.592241,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:47","EndTime":"2024-01-13 15:51:47","Latitude":null,"Longitude":null,"OSM_ID":4507423348,"NodeLatitude":33.85992,"NodeLongitude":35.5920218,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:50","EndTime":"2024-01-13 15:51:50","Latitude":33.8598334021,"Longitude":35.5917674702,"OSM_ID":6643759836,"NodeLatitude":33.8597741,"NodeLongitude":35.5918233,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:51","EndTime":"2024-01-13 15:51:51","Latitude":null,"Longitude":null,"OSM_ID":288791511,"NodeLatitude":33.8595998,"NodeLongitude":35.5915792,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:53","EndTime":"2024-01-13 15:51:53","Latitude":null,"Longitude":null,"OSM_ID":6643759833,"NodeLatitude":33.8595347,"NodeLongitude":35.5915001,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:54","EndTime":"2024-01-13 15:51:54","Latitude":null,"Longitude":null,"OSM_ID":3106361528,"NodeLatitude":33.8594255,"NodeLongitude":35.5913814,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:56","EndTime":"2024-01-13 15:51:56","Latitude":null,"Longitude":null,"OSM_ID":6643759832,"NodeLatitude":33.8593955,"NodeLongitude":35.5913533,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:57","EndTime":"2024-01-13 15:51:57","Latitude":null,"Longitude":null,"OSM_ID":6643759837,"NodeLatitude":33.8593643,"NodeLongitude":35.5913372,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:51:59","EndTime":"2024-01-13 15:51:59","Latitude":null,"Longitude":null,"OSM_ID":6643759834,"NodeLatitude":33.8593086,"NodeLongitude":35.591311,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:00","EndTime":"2024-01-13 15:52:00","Latitude":null,"Longitude":null,"OSM_ID":288791799,"NodeLatitude":33.8592323,"NodeLongitude":35.5912875,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:02","EndTime":"2024-01-13 15:52:02","Latitude":null,"Longitude":null,"OSM_ID":6643759831,"NodeLatitude":33.8591438,"NodeLongitude":35.5912681,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:03","EndTime":"2024-01-13 15:52:03","Latitude":null,"Longitude":null,"OSM_ID":6643759838,"NodeLatitude":33.8590369,"NodeLongitude":35.5912346,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:05","EndTime":"2024-01-13 15:52:05","Latitude":null,"Longitude":null,"OSM_ID":2407057492,"NodeLatitude":33.858851,"NodeLongitude":35.5911775,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:06","EndTime":"2024-01-13 15:52:06","Latitude":null,"Longitude":null,"OSM_ID":288791800,"NodeLatitude":33.8587196,"NodeLongitude":35.591129,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:08","EndTime":"2024-01-13 15:52:08","Latitude":null,"Longitude":null,"OSM_ID":6715415225,"NodeLatitude":33.8586499,"NodeLongitude":35.5910958,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:10","EndTime":"2024-01-13 15:52:10","Latitude":33.858583185,"Longitude":35.5910189553,"OSM_ID":4507423340,"NodeLatitude":33.8585524,"NodeLongitude":35.5910495,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:11","EndTime":"2024-01-13 15:52:11","Latitude":null,"Longitude":null,"OSM_ID":6643759840,"NodeLatitude":33.8584121,"NodeLongitude":35.5909824,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:13","EndTime":"2024-01-13 15:52:13","Latitude":null,"Longitude":null,"OSM_ID":288791514,"NodeLatitude":33.8582907,"NodeLongitude":35.5909073,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:15","EndTime":"2024-01-13 15:52:15","Latitude":null,"Longitude":null,"OSM_ID":6643759839,"NodeLatitude":33.8581671,"NodeLongitude":35.5908054,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:16","EndTime":"2024-01-13 15:52:16","Latitude":null,"Longitude":null,"OSM_ID":6663124810,"NodeLatitude":33.8580802,"NodeLongitude":35.5907102,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:18","EndTime":"2024-01-13 15:52:18","Latitude":null,"Longitude":null,"OSM_ID":6643759841,"NodeLatitude":33.8580023,"NodeLongitude":35.5905868,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:20","EndTime":"2024-01-13 15:52:20","Latitude":null,"Longitude":null,"OSM_ID":6643759842,"NodeLatitude":33.8579588,"NodeLongitude":35.5904929,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:21","EndTime":"2024-01-13 15:52:21","Latitude":null,"Longitude":null,"OSM_ID":288791801,"NodeLatitude":33.8578786,"NodeLongitude":35.5903186,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:23","EndTime":"2024-01-13 15:52:23","Latitude":null,"Longitude":null,"OSM_ID":6643759843,"NodeLatitude":33.8578152,"NodeLongitude":35.5901439,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:25","EndTime":"2024-01-13 15:52:25","Latitude":null,"Longitude":null,"OSM_ID":6663124811,"NodeLatitude":33.8577798,"NodeLongitude":35.5900349,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:26","EndTime":"2024-01-13 15:52:26","Latitude":null,"Longitude":null,"OSM_ID":6643759844,"NodeLatitude":33.8577517,"NodeLongitude":35.589923,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:28","EndTime":"2024-01-13 15:52:28","Latitude":null,"Longitude":null,"OSM_ID":288791802,"NodeLatitude":33.8576993,"NodeLongitude":35.5896226,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:30","EndTime":"2024-01-13 15:52:30","Latitude":33.8577629333,"Longitude":35.5894751352,"OSM_ID":6643759830,"NodeLatitude":33.8576648,"NodeLongitude":35.5894298,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:31","EndTime":"2024-01-13 15:52:31","Latitude":null,"Longitude":null,"OSM_ID":6663124812,"NodeLatitude":33.8576439,"NodeLongitude":35.5892953,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:33","EndTime":"2024-01-13 15:52:33","Latitude":null,"Longitude":null,"OSM_ID":6643759829,"NodeLatitude":33.8576127,"NodeLongitude":35.5891478,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:35","EndTime":"2024-01-13 15:52:35","Latitude":null,"Longitude":null,"OSM_ID":6663124813,"NodeLatitude":33.8575813,"NodeLongitude":35.5890392,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:36","EndTime":"2024-01-13 15:52:36","Latitude":null,"Longitude":null,"OSM_ID":288791803,"NodeLatitude":33.8574888,"NodeLongitude":35.5888085,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:38","EndTime":"2024-01-13 15:52:38","Latitude":null,"Longitude":null,"OSM_ID":4443311188,"NodeLatitude":33.8573674,"NodeLongitude":35.5886234,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:40","EndTime":"2024-01-13 15:52:40","Latitude":null,"Longitude":null,"OSM_ID":6663124814,"NodeLatitude":33.8573006,"NodeLongitude":35.5885604,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:41","EndTime":"2024-01-13 15:52:41","Latitude":null,"Longitude":null,"OSM_ID":288791804,"NodeLatitude":33.8571973,"NodeLongitude":35.5884638,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:43","EndTime":"2024-01-13 15:52:43","Latitude":null,"Longitude":null,"OSM_ID":6663124815,"NodeLatitude":33.8570668,"NodeLongitude":35.5883753,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:45","EndTime":"2024-01-13 15:52:45","Latitude":null,"Longitude":null,"OSM_ID":6133596884,"NodeLatitude":33.8569819,"NodeLongitude":35.5883124,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:46","EndTime":"2024-01-13 15:52:46","Latitude":null,"Longitude":null,"OSM_ID":288791805,"NodeLatitude":33.8569186,"NodeLongitude":35.5882654,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:48","EndTime":"2024-01-13 15:52:48","Latitude":null,"Longitude":null,"OSM_ID":6663124816,"NodeLatitude":33.8568073,"NodeLongitude":35.5881701,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:50","EndTime":"2024-01-13 15:52:50","Latitude":33.8566822344,"Longitude":35.5879122679,"OSM_ID":6663124817,"NodeLatitude":33.8566257,"NodeLongitude":35.5879797,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:51","EndTime":"2024-01-13 15:52:51","Latitude":null,"Longitude":null,"OSM_ID":6663124818,"NodeLatitude":33.8565745,"NodeLongitude":35.5879113,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:53","EndTime":"2024-01-13 15:52:53","Latitude":null,"Longitude":null,"OSM_ID":288791806,"NodeLatitude":33.8565144,"NodeLongitude":35.5878406,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:55","EndTime":"2024-01-13 15:52:55","Latitude":null,"Longitude":null,"OSM_ID":3070046403,"NodeLatitude":33.8564623,"NodeLongitude":35.5877976,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:56","EndTime":"2024-01-13 15:52:56","Latitude":null,"Longitude":null,"OSM_ID":6663124819,"NodeLatitude":33.8563498,"NodeLongitude":35.5877517,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:52:58","EndTime":"2024-01-13 15:52:58","Latitude":null,"Longitude":null,"OSM_ID":288791521,"NodeLatitude":33.856109,"NodeLongitude":35.5877095,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:00","EndTime":"2024-01-13 15:53:00","Latitude":null,"Longitude":null,"OSM_ID":4453577695,"NodeLatitude":33.8560137,"NodeLongitude":35.5876894,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:01","EndTime":"2024-01-13 15:53:01","Latitude":null,"Longitude":null,"OSM_ID":3106361548,"NodeLatitude":33.8559046,"NodeLongitude":35.5876565,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:03","EndTime":"2024-01-13 15:53:03","Latitude":null,"Longitude":null,"OSM_ID":4453577694,"NodeLatitude":33.8557882,"NodeLongitude":35.5875874,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:05","EndTime":"2024-01-13 15:53:05","Latitude":null,"Longitude":null,"OSM_ID":288791807,"NodeLatitude":33.8556958,"NodeLongitude":35.5874902,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:06","EndTime":"2024-01-13 15:53:06","Latitude":null,"Longitude":null,"OSM_ID":3136607880,"NodeLatitude":33.8556362,"NodeLongitude":35.5873755,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:08","EndTime":"2024-01-13 15:53:08","Latitude":null,"Longitude":null,"OSM_ID":6663124820,"NodeLatitude":33.8555889,"NodeLongitude":35.5872019,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:10","EndTime":"2024-01-13 15:53:10","Latitude":33.8555949427,"Longitude":35.5869395408,"OSM_ID":288791523,"NodeLatitude":33.855546,"NodeLongitude":35.5869987,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:12","EndTime":"2024-01-13 15:53:12","Latitude":null,"Longitude":null,"OSM_ID":6133596985,"NodeLatitude":33.8555053,"NodeLongitude":35.5867606,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:15","EndTime":"2024-01-13 15:53:15","Latitude":null,"Longitude":null,"OSM_ID":288791524,"NodeLatitude":33.8554212,"NodeLongitude":35.5862028,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:17","EndTime":"2024-01-13 15:53:17","Latitude":null,"Longitude":null,"OSM_ID":6663124822,"NodeLatitude":33.855419,"NodeLongitude":35.5860794,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:20","EndTime":"2024-01-13 15:53:20","Latitude":null,"Longitude":null,"OSM_ID":724318446,"NodeLatitude":33.8553528,"NodeLongitude":35.5857617,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:22","EndTime":"2024-01-13 15:53:22","Latitude":null,"Longitude":null,"OSM_ID":6663124823,"NodeLatitude":33.855324,"NodeLongitude":35.5856609,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:25","EndTime":"2024-01-13 15:53:25","Latitude":null,"Longitude":null,"OSM_ID":6772686530,"NodeLatitude":33.8552751,"NodeLongitude":35.5854447,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:27","EndTime":"2024-01-13 15:53:27","Latitude":null,"Longitude":null,"OSM_ID":6663124824,"NodeLatitude":33.8552431,"NodeLongitude":35.5853454,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:30","EndTime":"2024-01-13 15:53:30","Latitude":33.8552670112,"Longitude":35.585148419,"OSM_ID":288791525,"NodeLatitude":33.8552102,"NodeLongitude":35.5851345,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:31","EndTime":"2024-01-13 15:53:31","Latitude":null,"Longitude":null,"OSM_ID":6663124825,"NodeLatitude":33.8551913,"NodeLongitude":35.5848644,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:33","EndTime":"2024-01-13 15:53:33","Latitude":null,"Longitude":null,"OSM_ID":6663124826,"NodeLatitude":33.8551744,"NodeLongitude":35.584497,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:35","EndTime":"2024-01-13 15:53:35","Latitude":null,"Longitude":null,"OSM_ID":6663124827,"NodeLatitude":33.855161,"NodeLongitude":35.5841071,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:36","EndTime":"2024-01-13 15:53:36","Latitude":null,"Longitude":null,"OSM_ID":288791808,"NodeLatitude":33.855151,"NodeLongitude":35.5838659,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:38","EndTime":"2024-01-13 15:53:38","Latitude":null,"Longitude":null,"OSM_ID":6663124828,"NodeLatitude":33.8551595,"NodeLongitude":35.5837445,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:40","EndTime":"2024-01-13 15:53:40","Latitude":null,"Longitude":null,"OSM_ID":6663124829,"NodeLatitude":33.855184,"NodeLongitude":35.5836344,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:41","EndTime":"2024-01-13 15:53:41","Latitude":null,"Longitude":null,"OSM_ID":9041386606,"NodeLatitude":33.8552042,"NodeLongitude":35.5835819,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:43","EndTime":"2024-01-13 15:53:43","Latitude":null,"Longitude":null,"OSM_ID":2675311927,"NodeLatitude":33.8552287,"NodeLongitude":35.5835185,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:45","EndTime":"2024-01-13 15:53:45","Latitude":null,"Longitude":null,"OSM_ID":6663124830,"NodeLatitude":33.8552625,"NodeLongitude":35.5834524,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:46","EndTime":"2024-01-13 15:53:46","Latitude":null,"Longitude":null,"OSM_ID":3070045389,"NodeLatitude":33.8553137,"NodeLongitude":35.5833648,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:48","EndTime":"2024-01-13 15:53:48","Latitude":null,"Longitude":null,"OSM_ID":288791527,"NodeLatitude":33.8554029,"NodeLongitude":35.583257,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:50","EndTime":"2024-01-13 15:53:50","Latitude":33.8556231895,"Longitude":35.5831457968,"OSM_ID":6663124831,"NodeLatitude":33.8555939,"NodeLongitude":35.583088,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:51","EndTime":"2024-01-13 15:53:51","Latitude":null,"Longitude":null,"OSM_ID":6663124832,"NodeLatitude":33.8558695,"NodeLongitude":35.582858,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:53","EndTime":"2024-01-13 15:53:53","Latitude":null,"Longitude":null,"OSM_ID":7428241070,"NodeLatitude":33.8560783,"NodeLongitude":35.5826955,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:54","EndTime":"2024-01-13 15:53:54","Latitude":null,"Longitude":null,"OSM_ID":6663124833,"NodeLatitude":33.8562237,"NodeLongitude":35.5825824,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:56","EndTime":"2024-01-13 15:53:56","Latitude":null,"Longitude":null,"OSM_ID":288791809,"NodeLatitude":33.8564464,"NodeLongitude":35.5824081,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:57","EndTime":"2024-01-13 15:53:57","Latitude":null,"Longitude":null,"OSM_ID":2675311925,"NodeLatitude":33.8565467,"NodeLongitude":35.5822659,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:53:59","EndTime":"2024-01-13 15:53:59","Latitude":null,"Longitude":null,"OSM_ID":6663124834,"NodeLatitude":33.8565751,"NodeLongitude":35.5821848,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:00","EndTime":"2024-01-13 15:54:00","Latitude":null,"Longitude":null,"OSM_ID":3072876595,"NodeLatitude":33.8565923,"NodeLongitude":35.5820594,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:02","EndTime":"2024-01-13 15:54:02","Latitude":null,"Longitude":null,"OSM_ID":6663124835,"NodeLatitude":33.8565884,"NodeLongitude":35.5819474,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:03","EndTime":"2024-01-13 15:54:03","Latitude":null,"Longitude":null,"OSM_ID":288791529,"NodeLatitude":33.8565684,"NodeLongitude":35.5818663,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:05","EndTime":"2024-01-13 15:54:05","Latitude":null,"Longitude":null,"OSM_ID":6501811399,"NodeLatitude":33.8564915,"NodeLongitude":35.5816772,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:14","EndTime":"2024-01-13 15:54:14","Latitude":null,"Longitude":null,"OSM_ID":6501811399,"NodeLatitude":33.8564915,"NodeLongitude":35.5816772,"NodeType":"Intermediate","StreetName":"شارع 43"},{"StartTime":"2024-01-13 15:54:06","EndTime":"2024-01-13 15:54:06","Latitude":null,"Longitude":null,"OSM_ID":6663288779,"NodeLatitude":33.8565141,"NodeLongitude":35.5816889,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:12","EndTime":"2024-01-13 15:54:12","Latitude":null,"Longitude":null,"OSM_ID":6663288779,"NodeLatitude":33.8565141,"NodeLongitude":35.5816889,"NodeType":"Intermediate","StreetName":"شارع 43"},{"StartTime":"2024-01-13 15:54:08","EndTime":"2024-01-13 15:54:08","Latitude":null,"Longitude":null,"OSM_ID":6663288780,"NodeLatitude":33.8565411,"NodeLongitude":35.5817064,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:11","EndTime":"2024-01-13 15:54:11","Latitude":null,"Longitude":null,"OSM_ID":6663288780,"NodeLatitude":33.8565411,"NodeLongitude":35.5817064,"NodeType":"Intermediate","StreetName":"شارع 43"},{"StartTime":"2024-01-13 15:54:10","EndTime":"2024-01-13 15:54:10","Latitude":33.8565887813,"Longitude":35.5816841531,"OSM_ID":6663288781,"NodeLatitude":33.8565675,"NodeLongitude":35.5817251,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:54:15","EndTime":"2024-01-13 15:54:15","Latitude":null,"Longitude":null,"OSM_ID":288791810,"NodeLatitude":33.8564047,"NodeLongitude":35.5815209,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:16","EndTime":"2024-01-13 15:54:16","Latitude":null,"Longitude":null,"OSM_ID":3106361394,"NodeLatitude":33.8563523,"NodeLongitude":35.5814264,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:18","EndTime":"2024-01-13 15:54:18","Latitude":null,"Longitude":null,"OSM_ID":6663124836,"NodeLatitude":33.8562899,"NodeLongitude":35.5813131,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:19","EndTime":"2024-01-13 15:54:19","Latitude":null,"Longitude":null,"OSM_ID":3072876585,"NodeLatitude":33.8561942,"NodeLongitude":35.5811501,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:20","EndTime":"2024-01-13 15:54:20","Latitude":null,"Longitude":null,"OSM_ID":3070031569,"NodeLatitude":33.8561686,"NodeLongitude":35.5811099,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:22","EndTime":"2024-01-13 15:54:22","Latitude":null,"Longitude":null,"OSM_ID":288791531,"NodeLatitude":33.8560978,"NodeLongitude":35.5809952,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:23","EndTime":"2024-01-13 15:54:23","Latitude":null,"Longitude":null,"OSM_ID":6663124837,"NodeLatitude":33.856021,"NodeLongitude":35.5809014,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:24","EndTime":"2024-01-13 15:54:24","Latitude":null,"Longitude":null,"OSM_ID":2675268469,"NodeLatitude":33.8559252,"NodeLongitude":35.580835,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:26","EndTime":"2024-01-13 15:54:26","Latitude":null,"Longitude":null,"OSM_ID":6663124838,"NodeLatitude":33.8558183,"NodeLongitude":35.5807994,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:27","EndTime":"2024-01-13 15:54:27","Latitude":null,"Longitude":null,"OSM_ID":288791532,"NodeLatitude":33.8557103,"NodeLongitude":35.5807961,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:28","EndTime":"2024-01-13 15:54:28","Latitude":null,"Longitude":null,"OSM_ID":3070045379,"NodeLatitude":33.8555677,"NodeLongitude":35.5808169,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:30","EndTime":"2024-01-13 15:54:30","Latitude":33.8553929915,"Longitude":35.580876611,"OSM_ID":6663124839,"NodeLatitude":33.8553511,"NodeLongitude":35.5808806,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:33","EndTime":"2024-01-13 15:54:33","Latitude":null,"Longitude":null,"OSM_ID":6664065838,"NodeLatitude":33.8553231,"NodeLongitude":35.5808885,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:36","EndTime":"2024-01-13 15:54:36","Latitude":null,"Longitude":null,"OSM_ID":3070031488,"NodeLatitude":33.8550899,"NodeLongitude":35.5809543,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:40","EndTime":"2024-01-13 15:54:40","Latitude":null,"Longitude":null,"OSM_ID":3106355311,"NodeLatitude":33.854998,"NodeLongitude":35.5809778,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:43","EndTime":"2024-01-13 15:54:43","Latitude":null,"Longitude":null,"OSM_ID":6663124840,"NodeLatitude":33.8548065,"NodeLongitude":35.5810227,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:46","EndTime":"2024-01-13 15:54:46","Latitude":null,"Longitude":null,"OSM_ID":288791811,"NodeLatitude":33.8545253,"NodeLongitude":35.5810938,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:50","EndTime":"2024-01-13 15:54:50","Latitude":33.8541031551,"Longitude":35.5812115783,"OSM_ID":6663124842,"NodeLatitude":33.8542012,"NodeLongitude":35.5811749,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:51","EndTime":"2024-01-13 15:54:51","Latitude":null,"Longitude":null,"OSM_ID":6663124841,"NodeLatitude":33.8538593,"NodeLongitude":35.581246,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:53","EndTime":"2024-01-13 15:54:53","Latitude":null,"Longitude":null,"OSM_ID":4518138187,"NodeLatitude":33.8537373,"NodeLongitude":35.5812588,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:54","EndTime":"2024-01-13 15:54:54","Latitude":null,"Longitude":null,"OSM_ID":4015037728,"NodeLatitude":33.853683,"NodeLongitude":35.5812618,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:56","EndTime":"2024-01-13 15:54:56","Latitude":null,"Longitude":null,"OSM_ID":288791534,"NodeLatitude":33.8535984,"NodeLongitude":35.5812745,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:57","EndTime":"2024-01-13 15:54:57","Latitude":null,"Longitude":null,"OSM_ID":6663812982,"NodeLatitude":33.8535293,"NodeLongitude":35.5812557,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:54:59","EndTime":"2024-01-13 15:54:59","Latitude":null,"Longitude":null,"OSM_ID":4518138174,"NodeLatitude":33.853512,"NodeLongitude":35.581249,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:00","EndTime":"2024-01-13 15:55:00","Latitude":null,"Longitude":null,"OSM_ID":4518138175,"NodeLatitude":33.8534653,"NodeLongitude":35.5812417,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:02","EndTime":"2024-01-13 15:55:02","Latitude":null,"Longitude":null,"OSM_ID":6663812980,"NodeLatitude":33.8534346,"NodeLongitude":35.5812343,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:03","EndTime":"2024-01-13 15:55:03","Latitude":null,"Longitude":null,"OSM_ID":4518138176,"NodeLatitude":33.8534135,"NodeLongitude":35.5812215,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:05","EndTime":"2024-01-13 15:55:05","Latitude":null,"Longitude":null,"OSM_ID":4518138177,"NodeLatitude":33.8533957,"NodeLongitude":35.5812132,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:06","EndTime":"2024-01-13 15:55:06","Latitude":null,"Longitude":null,"OSM_ID":4518138178,"NodeLatitude":33.8533731,"NodeLongitude":35.5811887,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:08","EndTime":"2024-01-13 15:55:08","Latitude":null,"Longitude":null,"OSM_ID":4518138179,"NodeLatitude":33.8533622,"NodeLongitude":35.5811508,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:10","EndTime":"2024-01-13 15:55:10","Latitude":null,"Longitude":null,"OSM_ID":4518138180,"NodeLatitude":33.853357,"NodeLongitude":35.5811253,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:11","EndTime":"2024-01-13 15:55:11","Latitude":null,"Longitude":null,"OSM_ID":2668434068,"NodeLatitude":33.8533562,"NodeLongitude":35.5811122,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:13","EndTime":"2024-01-13 15:55:13","Latitude":null,"Longitude":null,"OSM_ID":6426496852,"NodeLatitude":33.853358,"NodeLongitude":35.5810933,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:14","EndTime":"2024-01-13 15:55:14","Latitude":null,"Longitude":null,"OSM_ID":288791535,"NodeLatitude":33.853376,"NodeLongitude":35.5810532,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:16","EndTime":"2024-01-13 15:55:16","Latitude":null,"Longitude":null,"OSM_ID":3070031487,"NodeLatitude":33.8535936,"NodeLongitude":35.5806102,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:17","EndTime":"2024-01-13 15:55:17","Latitude":null,"Longitude":null,"OSM_ID":288791536,"NodeLatitude":33.85384,"NodeLongitude":35.5801233,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:19","EndTime":"2024-01-13 15:55:19","Latitude":null,"Longitude":null,"OSM_ID":6661445942,"NodeLatitude":33.8538765,"NodeLongitude":35.5800182,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:20","EndTime":"2024-01-13 15:55:20","Latitude":null,"Longitude":null,"OSM_ID":6661445943,"NodeLatitude":33.8539138,"NodeLongitude":35.5798768,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:22","EndTime":"2024-01-13 15:55:22","Latitude":null,"Longitude":null,"OSM_ID":3070031485,"NodeLatitude":33.8539506,"NodeLongitude":35.5797178,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:23","EndTime":"2024-01-13 15:55:23","Latitude":null,"Longitude":null,"OSM_ID":6661445944,"NodeLatitude":33.8539762,"NodeLongitude":35.5795951,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:25","EndTime":"2024-01-13 15:55:25","Latitude":null,"Longitude":null,"OSM_ID":288791537,"NodeLatitude":33.8539883,"NodeLongitude":35.579475,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:26","EndTime":"2024-01-13 15:55:26","Latitude":null,"Longitude":null,"OSM_ID":3070031510,"NodeLatitude":33.8539291,"NodeLongitude":35.5781049,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:28","EndTime":"2024-01-13 15:55:28","Latitude":null,"Longitude":null,"OSM_ID":288791538,"NodeLatitude":33.8539184,"NodeLongitude":35.5778177,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:30","EndTime":"2024-01-13 15:55:30","Latitude":33.8539951136,"Longitude":35.5778090297,"OSM_ID":5299108494,"NodeLatitude":33.8539254,"NodeLongitude":35.5777765,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:30","EndTime":"2024-01-13 15:55:30","Latitude":null,"Longitude":null,"OSM_ID":5299108491,"NodeLatitude":33.8539345,"NodeLongitude":35.5777353,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:31","EndTime":"2024-01-13 15:55:31","Latitude":null,"Longitude":null,"OSM_ID":3128765058,"NodeLatitude":33.8539618,"NodeLongitude":35.5776528,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:32","EndTime":"2024-01-13 15:55:32","Latitude":null,"Longitude":null,"OSM_ID":5299108493,"NodeLatitude":33.8539893,"NodeLongitude":35.5775902,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:33","EndTime":"2024-01-13 15:55:33","Latitude":null,"Longitude":null,"OSM_ID":5299108492,"NodeLatitude":33.8540212,"NodeLongitude":35.5775344,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:34","EndTime":"2024-01-13 15:55:34","Latitude":null,"Longitude":null,"OSM_ID":5299108495,"NodeLatitude":33.8540564,"NodeLongitude":35.5774772,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:35","EndTime":"2024-01-13 15:55:35","Latitude":null,"Longitude":null,"OSM_ID":288791539,"NodeLatitude":33.8540917,"NodeLongitude":35.5774267,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:36","EndTime":"2024-01-13 15:55:36","Latitude":null,"Longitude":null,"OSM_ID":3128011153,"NodeLatitude":33.8542826,"NodeLongitude":35.5772033,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:37","EndTime":"2024-01-13 15:55:37","Latitude":null,"Longitude":null,"OSM_ID":4507423322,"NodeLatitude":33.8543322,"NodeLongitude":35.5771452,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:38","EndTime":"2024-01-13 15:55:38","Latitude":null,"Longitude":null,"OSM_ID":3128011152,"NodeLatitude":33.8544115,"NodeLongitude":35.5770524,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:39","EndTime":"2024-01-13 15:55:39","Latitude":null,"Longitude":null,"OSM_ID":3070031509,"NodeLatitude":33.8547107,"NodeLongitude":35.5767027,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:55:40","EndTime":"2024-01-13 15:55:40","Latitude":null,"Longitude":null,"OSM_ID":288791541,"NodeLatitude":33.8547261,"NodeLongitude":35.5766836,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:41","EndTime":"2024-01-13 15:55:41","Latitude":null,"Longitude":null,"OSM_ID":4518096566,"NodeLatitude":33.8547899,"NodeLongitude":35.5765945,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:42","EndTime":"2024-01-13 15:55:42","Latitude":null,"Longitude":null,"OSM_ID":4518096565,"NodeLatitude":33.8548155,"NodeLongitude":35.5765524,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:43","EndTime":"2024-01-13 15:55:43","Latitude":null,"Longitude":null,"OSM_ID":4518096564,"NodeLatitude":33.8548528,"NodeLongitude":35.5764998,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:44","EndTime":"2024-01-13 15:55:44","Latitude":null,"Longitude":null,"OSM_ID":3843369997,"NodeLatitude":33.8548822,"NodeLongitude":35.5764633,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:45","EndTime":"2024-01-13 15:55:45","Latitude":null,"Longitude":null,"OSM_ID":4518096563,"NodeLatitude":33.8549405,"NodeLongitude":35.5763987,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:46","EndTime":"2024-01-13 15:55:46","Latitude":null,"Longitude":null,"OSM_ID":4518096560,"NodeLatitude":33.8549924,"NodeLongitude":35.5763475,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:47","EndTime":"2024-01-13 15:55:47","Latitude":null,"Longitude":null,"OSM_ID":4518096561,"NodeLatitude":33.8551445,"NodeLongitude":35.5762121,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:48","EndTime":"2024-01-13 15:55:48","Latitude":null,"Longitude":null,"OSM_ID":4518096562,"NodeLatitude":33.8551917,"NodeLongitude":35.5761658,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:49","EndTime":"2024-01-13 15:55:49","Latitude":null,"Longitude":null,"OSM_ID":2666923701,"NodeLatitude":33.8552502,"NodeLongitude":35.5761054,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:50","EndTime":"2024-01-13 15:55:50","Latitude":33.8553540073,"Longitude":35.576019029,"OSM_ID":4518096577,"NodeLatitude":33.8553231,"NodeLongitude":35.5760198,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:55:52","EndTime":"2024-01-13 15:55:52","Latitude":null,"Longitude":null,"OSM_ID":4518096576,"NodeLatitude":33.8553965,"NodeLongitude":35.5759272,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:55","EndTime":"2024-01-13 15:55:55","Latitude":null,"Longitude":null,"OSM_ID":292879468,"NodeLatitude":33.8555682,"NodeLongitude":35.5757604,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:55:58","EndTime":"2024-01-13 15:55:58","Latitude":null,"Longitude":null,"OSM_ID":6661370576,"NodeLatitude":33.8561023,"NodeLongitude":35.5751668,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:01","EndTime":"2024-01-13 15:56:01","Latitude":null,"Longitude":null,"OSM_ID":292879400,"NodeLatitude":33.856165,"NodeLongitude":35.5750857,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:04","EndTime":"2024-01-13 15:56:04","Latitude":null,"Longitude":null,"OSM_ID":6661370577,"NodeLatitude":33.856222,"NodeLongitude":35.5749934,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:07","EndTime":"2024-01-13 15:56:07","Latitude":null,"Longitude":null,"OSM_ID":4507423323,"NodeLatitude":33.8562894,"NodeLongitude":35.5748584,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:10","EndTime":"2024-01-13 15:56:10","Latitude":33.8564113701,"Longitude":35.5745630374,"OSM_ID":292879685,"NodeLatitude":33.8563573,"NodeLongitude":35.5746532,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:11","EndTime":"2024-01-13 15:56:11","Latitude":null,"Longitude":null,"OSM_ID":10264363672,"NodeLatitude":33.8563853,"NodeLongitude":35.5744402,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:13","EndTime":"2024-01-13 15:56:13","Latitude":null,"Longitude":null,"OSM_ID":4507423324,"NodeLatitude":33.856395,"NodeLongitude":35.5743376,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:15","EndTime":"2024-01-13 15:56:15","Latitude":null,"Longitude":null,"OSM_ID":292879405,"NodeLatitude":33.8563963,"NodeLongitude":35.5742294,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:17","EndTime":"2024-01-13 15:56:17","Latitude":null,"Longitude":null,"OSM_ID":6661445945,"NodeLatitude":33.8563796,"NodeLongitude":35.5740591,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:19","EndTime":"2024-01-13 15:56:19","Latitude":null,"Longitude":null,"OSM_ID":3106361393,"NodeLatitude":33.856354,"NodeLongitude":35.5738928,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:20","EndTime":"2024-01-13 15:56:20","Latitude":null,"Longitude":null,"OSM_ID":292879471,"NodeLatitude":33.8563184,"NodeLongitude":35.573764,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:22","EndTime":"2024-01-13 15:56:22","Latitude":null,"Longitude":null,"OSM_ID":3096871172,"NodeLatitude":33.8562499,"NodeLongitude":35.5735726,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:24","EndTime":"2024-01-13 15:56:24","Latitude":null,"Longitude":null,"OSM_ID":6661445946,"NodeLatitude":33.8562137,"NodeLongitude":35.5734744,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:26","EndTime":"2024-01-13 15:56:26","Latitude":null,"Longitude":null,"OSM_ID":6715598423,"NodeLatitude":33.8561577,"NodeLongitude":35.5733503,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:28","EndTime":"2024-01-13 15:56:28","Latitude":null,"Longitude":null,"OSM_ID":9050189159,"NodeLatitude":33.8560123,"NodeLongitude":35.5730279,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:30","EndTime":"2024-01-13 15:56:30","Latitude":33.8559122795,"Longitude":35.5726877415,"OSM_ID":292879472,"NodeLatitude":33.8558428,"NodeLongitude":35.5726519,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:35","EndTime":"2024-01-13 15:56:35","Latitude":null,"Longitude":null,"OSM_ID":6715598434,"NodeLatitude":33.8557676,"NodeLongitude":35.5725605,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:40","EndTime":"2024-01-13 15:56:40","Latitude":null,"Longitude":null,"OSM_ID":3228696185,"NodeLatitude":33.8556346,"NodeLongitude":35.5722485,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:45","EndTime":"2024-01-13 15:56:45","Latitude":null,"Longitude":null,"OSM_ID":6661445949,"NodeLatitude":33.855482,"NodeLongitude":35.5719079,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:50","EndTime":"2024-01-13 15:56:50","Latitude":33.8552510233,"Longitude":35.5712564908,"OSM_ID":3106358821,"NodeLatitude":33.8552761,"NodeLongitude":35.5714728,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:56:55","EndTime":"2024-01-13 15:56:55","Latitude":null,"Longitude":null,"OSM_ID":6661445950,"NodeLatitude":33.8551078,"NodeLongitude":35.5710777,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:00","EndTime":"2024-01-13 15:57:00","Latitude":null,"Longitude":null,"OSM_ID":6661445951,"NodeLatitude":33.8548828,"NodeLongitude":35.5705467,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:05","EndTime":"2024-01-13 15:57:05","Latitude":null,"Longitude":null,"OSM_ID":6661445952,"NodeLatitude":33.8546801,"NodeLongitude":35.5699781,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:10","EndTime":"2024-01-13 15:57:10","Latitude":33.8546762608,"Longitude":35.5697783574,"OSM_ID":6661493040,"NodeLatitude":33.8546315,"NodeLongitude":35.5698152,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:14","EndTime":"2024-01-13 15:57:14","Latitude":null,"Longitude":null,"OSM_ID":292879686,"NodeLatitude":33.8544541,"NodeLongitude":35.5692702,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:18","EndTime":"2024-01-13 15:57:18","Latitude":null,"Longitude":null,"OSM_ID":6513280054,"NodeLatitude":33.8543764,"NodeLongitude":35.5690267,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:22","EndTime":"2024-01-13 15:57:22","Latitude":null,"Longitude":null,"OSM_ID":292879413,"NodeLatitude":33.8542665,"NodeLongitude":35.5686777,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:26","EndTime":"2024-01-13 15:57:26","Latitude":null,"Longitude":null,"OSM_ID":6511715722,"NodeLatitude":33.8535229,"NodeLongitude":35.5661747,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:30","EndTime":"2024-01-13 15:57:30","Latitude":null,"Longitude":null,"OSM_ID":292879416,"NodeLatitude":33.8534661,"NodeLongitude":35.5659655,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:34","EndTime":"2024-01-13 15:57:34","Latitude":null,"Longitude":null,"OSM_ID":6518578265,"NodeLatitude":33.8534427,"NodeLongitude":35.5658541,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:38","EndTime":"2024-01-13 15:57:38","Latitude":null,"Longitude":null,"OSM_ID":4508895333,"NodeLatitude":33.8534266,"NodeLongitude":35.5657514,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:42","EndTime":"2024-01-13 15:57:42","Latitude":null,"Longitude":null,"OSM_ID":6511715720,"NodeLatitude":33.8534138,"NodeLongitude":35.565578,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:46","EndTime":"2024-01-13 15:57:46","Latitude":null,"Longitude":null,"OSM_ID":292879417,"NodeLatitude":33.8534229,"NodeLongitude":35.5653953,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:50","EndTime":"2024-01-13 15:57:50","Latitude":33.8535192708,"Longitude":35.5653750599,"OSM_ID":6513576120,"NodeLatitude":33.8534694,"NodeLongitude":35.5652976,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:51","EndTime":"2024-01-13 15:57:51","Latitude":null,"Longitude":null,"OSM_ID":6513576125,"NodeLatitude":33.8534895,"NodeLongitude":35.5652238,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:52","EndTime":"2024-01-13 15:57:52","Latitude":null,"Longitude":null,"OSM_ID":4508895334,"NodeLatitude":33.8535185,"NodeLongitude":35.5651192,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:54","EndTime":"2024-01-13 15:57:54","Latitude":null,"Longitude":null,"OSM_ID":6513576121,"NodeLatitude":33.8535536,"NodeLongitude":35.5649804,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:55","EndTime":"2024-01-13 15:57:55","Latitude":null,"Longitude":null,"OSM_ID":292879687,"NodeLatitude":33.8535827,"NodeLongitude":35.5648949,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:57","EndTime":"2024-01-13 15:57:57","Latitude":null,"Longitude":null,"OSM_ID":6513576126,"NodeLatitude":33.8536001,"NodeLongitude":35.5648454,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:57:58","EndTime":"2024-01-13 15:57:58","Latitude":null,"Longitude":null,"OSM_ID":6513576122,"NodeLatitude":33.8536166,"NodeLongitude":35.564803,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:00","EndTime":"2024-01-13 15:58:00","Latitude":null,"Longitude":null,"OSM_ID":6513576127,"NodeLatitude":33.8536721,"NodeLongitude":35.56468,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:01","EndTime":"2024-01-13 15:58:01","Latitude":null,"Longitude":null,"OSM_ID":6518612186,"NodeLatitude":33.8537107,"NodeLongitude":35.5646053,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:02","EndTime":"2024-01-13 15:58:02","Latitude":null,"Longitude":null,"OSM_ID":6518612188,"NodeLatitude":33.8537417,"NodeLongitude":35.5645492,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:04","EndTime":"2024-01-13 15:58:04","Latitude":null,"Longitude":null,"OSM_ID":292879419,"NodeLatitude":33.8537667,"NodeLongitude":35.5644798,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:05","EndTime":"2024-01-13 15:58:05","Latitude":null,"Longitude":null,"OSM_ID":3096870561,"NodeLatitude":33.8538622,"NodeLongitude":35.5643726,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:07","EndTime":"2024-01-13 15:58:07","Latitude":null,"Longitude":null,"OSM_ID":6518605183,"NodeLatitude":33.8540146,"NodeLongitude":35.5642558,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:08","EndTime":"2024-01-13 15:58:08","Latitude":null,"Longitude":null,"OSM_ID":6518605184,"NodeLatitude":33.8541618,"NodeLongitude":35.5641641,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:10","EndTime":"2024-01-13 15:58:10","Latitude":33.8544317821,"Longitude":35.5641032933,"OSM_ID":292879421,"NodeLatitude":33.854354,"NodeLongitude":35.5640911,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:12","EndTime":"2024-01-13 15:58:12","Latitude":null,"Longitude":null,"OSM_ID":3147888391,"NodeLatitude":33.8545099,"NodeLongitude":35.5640557,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:15","EndTime":"2024-01-13 15:58:15","Latitude":null,"Longitude":null,"OSM_ID":3133673154,"NodeLatitude":33.8549133,"NodeLongitude":35.5639785,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:17","EndTime":"2024-01-13 15:58:17","Latitude":null,"Longitude":null,"OSM_ID":6715620819,"NodeLatitude":33.8551099,"NodeLongitude":35.5639472,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:20","EndTime":"2024-01-13 15:58:20","Latitude":null,"Longitude":null,"OSM_ID":292879423,"NodeLatitude":33.8552787,"NodeLongitude":35.5639118,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:22","EndTime":"2024-01-13 15:58:22","Latitude":null,"Longitude":null,"OSM_ID":4508895335,"NodeLatitude":33.8554432,"NodeLongitude":35.5638388,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:25","EndTime":"2024-01-13 15:58:25","Latitude":null,"Longitude":null,"OSM_ID":6511715721,"NodeLatitude":33.855554,"NodeLongitude":35.5637554,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:27","EndTime":"2024-01-13 15:58:27","Latitude":null,"Longitude":null,"OSM_ID":6511715723,"NodeLatitude":33.8556702,"NodeLongitude":35.5636507,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:30","EndTime":"2024-01-13 15:58:30","Latitude":33.8559897982,"Longitude":35.5633688971,"OSM_ID":292879424,"NodeLatitude":33.855874,"NodeLongitude":35.5634228,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:50","EndTime":"2024-01-13 15:58:50","Latitude":33.8572803202,"Longitude":35.5617419534,"OSM_ID":292879688,"NodeLatitude":33.8573531,"NodeLongitude":35.5615451,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:53","EndTime":"2024-01-13 15:58:53","Latitude":null,"Longitude":null,"OSM_ID":2709382688,"NodeLatitude":33.8576267,"NodeLongitude":35.561174,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:58:56","EndTime":"2024-01-13 15:58:56","Latitude":null,"Longitude":null,"OSM_ID":6715620820,"NodeLatitude":33.8577514,"NodeLongitude":35.5609801,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:00","EndTime":"2024-01-13 15:59:00","Latitude":null,"Longitude":null,"OSM_ID":292879743,"NodeLatitude":33.8581894,"NodeLongitude":35.5601733,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:03","EndTime":"2024-01-13 15:59:03","Latitude":null,"Longitude":null,"OSM_ID":6661437930,"NodeLatitude":33.8583842,"NodeLongitude":35.5598219,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:06","EndTime":"2024-01-13 15:59:06","Latitude":null,"Longitude":null,"OSM_ID":6661437929,"NodeLatitude":33.858509,"NodeLongitude":35.55961,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:10","EndTime":"2024-01-13 15:59:10","Latitude":33.858629406,"Longitude":35.5595319756,"OSM_ID":292879691,"NodeLatitude":33.858617,"NodeLongitude":35.5594155,"NodeType":"Road Node","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:11","EndTime":"2024-01-13 15:59:11","Latitude":null,"Longitude":null,"OSM_ID":6715620821,"NodeLatitude":33.8588492,"NodeLongitude":35.5590909,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:13","EndTime":"2024-01-13 15:59:13","Latitude":null,"Longitude":null,"OSM_ID":6661437928,"NodeLatitude":33.8589355,"NodeLongitude":35.558977,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:15","EndTime":"2024-01-13 15:59:15","Latitude":null,"Longitude":null,"OSM_ID":292879483,"NodeLatitude":33.8591009,"NodeLongitude":35.5587959,"NodeType":"Intermediate","StreetName":"شارع 4"},{"StartTime":"2024-01-13 15:59:16","EndTime":"2024-01-13 15:59:16","Latitude":null,"Longitude":null,"OSM_ID":292879679,"NodeLatitude":33.859408,"NodeLongitude":35.5584855,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:18","EndTime":"2024-01-13 15:59:18","Latitude":null,"Longitude":null,"OSM_ID":6738908541,"NodeLatitude":33.8594811,"NodeLongitude":35.5584545,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:20","EndTime":"2024-01-13 15:59:20","Latitude":null,"Longitude":null,"OSM_ID":4454605832,"NodeLatitude":33.8595763,"NodeLongitude":35.558389,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:21","EndTime":"2024-01-13 15:59:21","Latitude":null,"Longitude":null,"OSM_ID":4454605812,"NodeLatitude":33.8596079,"NodeLongitude":35.5583699,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:23","EndTime":"2024-01-13 15:59:23","Latitude":null,"Longitude":null,"OSM_ID":4454605833,"NodeLatitude":33.85967,"NodeLongitude":35.5583256,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:25","EndTime":"2024-01-13 15:59:25","Latitude":null,"Longitude":null,"OSM_ID":292879433,"NodeLatitude":33.8597206,"NodeLongitude":35.5582859,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:26","EndTime":"2024-01-13 15:59:26","Latitude":null,"Longitude":null,"OSM_ID":292879741,"NodeLatitude":33.8597748,"NodeLongitude":35.5582104,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:28","EndTime":"2024-01-13 15:59:28","Latitude":null,"Longitude":null,"OSM_ID":4454605869,"NodeLatitude":33.8598072,"NodeLongitude":35.5581367,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:30","EndTime":"2024-01-13 15:59:30","Latitude":33.8598932193,"Longitude":35.5580597351,"OSM_ID":4454605870,"NodeLatitude":33.8598342,"NodeLongitude":35.5580534,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:59:31","EndTime":"2024-01-13 15:59:31","Latitude":null,"Longitude":null,"OSM_ID":4454605871,"NodeLatitude":33.8598561,"NodeLongitude":35.5579761,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:33","EndTime":"2024-01-13 15:59:33","Latitude":null,"Longitude":null,"OSM_ID":4454605872,"NodeLatitude":33.8598713,"NodeLongitude":35.5578623,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:35","EndTime":"2024-01-13 15:59:35","Latitude":null,"Longitude":null,"OSM_ID":4454605873,"NodeLatitude":33.8598814,"NodeLongitude":35.557783,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:37","EndTime":"2024-01-13 15:59:37","Latitude":null,"Longitude":null,"OSM_ID":4454605861,"NodeLatitude":33.8598872,"NodeLongitude":35.5577114,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:39","EndTime":"2024-01-13 15:59:39","Latitude":null,"Longitude":null,"OSM_ID":4454605858,"NodeLatitude":33.8598932,"NodeLongitude":35.5575429,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:40","EndTime":"2024-01-13 15:59:40","Latitude":null,"Longitude":null,"OSM_ID":6416654156,"NodeLatitude":33.8599055,"NodeLongitude":35.5572349,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:42","EndTime":"2024-01-13 15:59:42","Latitude":null,"Longitude":null,"OSM_ID":4454605857,"NodeLatitude":33.8599149,"NodeLongitude":35.5568991,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:44","EndTime":"2024-01-13 15:59:44","Latitude":null,"Longitude":null,"OSM_ID":4454605856,"NodeLatitude":33.8599115,"NodeLongitude":35.5568173,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:46","EndTime":"2024-01-13 15:59:46","Latitude":null,"Longitude":null,"OSM_ID":4454605838,"NodeLatitude":33.8599046,"NodeLongitude":35.5565997,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:48","EndTime":"2024-01-13 15:59:48","Latitude":null,"Longitude":null,"OSM_ID":6666578971,"NodeLatitude":33.8599167,"NodeLongitude":35.5563935,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:52","EndTime":"2024-01-13 15:59:52","Latitude":null,"Longitude":null,"OSM_ID":6666578971,"NodeLatitude":33.8599167,"NodeLongitude":35.5563935,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:50","EndTime":"2024-01-13 15:59:50","Latitude":33.8600023638,"Longitude":35.5562761384,"OSM_ID":3249764714,"NodeLatitude":33.8600353,"NodeLongitude":35.5562906,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:59:55","EndTime":"2024-01-13 15:59:55","Latitude":null,"Longitude":null,"OSM_ID":6661620128,"NodeLatitude":33.8599267,"NodeLongitude":35.5562223,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 15:59:57","EndTime":"2024-01-13 15:59:57","Latitude":null,"Longitude":null,"OSM_ID":6661620129,"NodeLatitude":33.8599339,"NodeLongitude":35.5558629,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:00","EndTime":"2024-01-13 16:00:00","Latitude":null,"Longitude":null,"OSM_ID":288791575,"NodeLatitude":33.8599278,"NodeLongitude":35.5554137,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:02","EndTime":"2024-01-13 16:00:02","Latitude":null,"Longitude":null,"OSM_ID":6661293902,"NodeLatitude":33.8599111,"NodeLongitude":35.5551548,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:05","EndTime":"2024-01-13 16:00:05","Latitude":null,"Longitude":null,"OSM_ID":6661293903,"NodeLatitude":33.859881,"NodeLongitude":35.5548987,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:07","EndTime":"2024-01-13 16:00:07","Latitude":null,"Longitude":null,"OSM_ID":3047538492,"NodeLatitude":33.8598042,"NodeLongitude":35.5543971,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:10","EndTime":"2024-01-13 16:00:10","Latitude":33.8598694603,"Longitude":35.554132141,"OSM_ID":6661293904,"NodeLatitude":33.8597964,"NodeLongitude":35.554204,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:12","EndTime":"2024-01-13 16:00:12","Latitude":null,"Longitude":null,"OSM_ID":288791829,"NodeLatitude":33.8597886,"NodeLongitude":35.5539975,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:15","EndTime":"2024-01-13 16:00:15","Latitude":null,"Longitude":null,"OSM_ID":6661293905,"NodeLatitude":33.8598186,"NodeLongitude":35.5536669,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:17","EndTime":"2024-01-13 16:00:17","Latitude":null,"Longitude":null,"OSM_ID":10131809264,"NodeLatitude":33.8598231,"NodeLongitude":35.5536451,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:20","EndTime":"2024-01-13 16:00:20","Latitude":null,"Longitude":null,"OSM_ID":288791577,"NodeLatitude":33.8599017,"NodeLongitude":35.55326,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:22","EndTime":"2024-01-13 16:00:22","Latitude":null,"Longitude":null,"OSM_ID":6661293906,"NodeLatitude":33.8599932,"NodeLongitude":35.5529162,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:25","EndTime":"2024-01-13 16:00:25","Latitude":null,"Longitude":null,"OSM_ID":288791830,"NodeLatitude":33.860115,"NodeLongitude":35.55254,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:27","EndTime":"2024-01-13 16:00:27","Latitude":null,"Longitude":null,"OSM_ID":5244584484,"NodeLatitude":33.8602842,"NodeLongitude":35.5522084,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:30","EndTime":"2024-01-13 16:00:30","Latitude":33.8607379478,"Longitude":35.5516606215,"OSM_ID":288791579,"NodeLatitude":33.8604504,"NodeLongitude":35.5519597,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:32","EndTime":"2024-01-13 16:00:32","Latitude":null,"Longitude":null,"OSM_ID":288791831,"NodeLatitude":33.8612627,"NodeLongitude":35.5507909,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:00:35","EndTime":"2024-01-13 16:00:35","Latitude":null,"Longitude":null,"OSM_ID":2696639920,"NodeLatitude":33.8614253,"NodeLongitude":35.5505495,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:05","EndTime":"2024-01-13 16:01:05","Latitude":null,"Longitude":null,"OSM_ID":2696639920,"NodeLatitude":33.8614253,"NodeLongitude":35.5505495,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:37","EndTime":"2024-01-13 16:00:37","Latitude":null,"Longitude":null,"OSM_ID":6661696520,"NodeLatitude":33.8614273,"NodeLongitude":35.5504509,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:02","EndTime":"2024-01-13 16:01:02","Latitude":null,"Longitude":null,"OSM_ID":6661696520,"NodeLatitude":33.8614273,"NodeLongitude":35.5504509,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:40","EndTime":"2024-01-13 16:00:40","Latitude":null,"Longitude":null,"OSM_ID":6697269016,"NodeLatitude":33.8614368,"NodeLongitude":35.5503503,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:00","EndTime":"2024-01-13 16:01:00","Latitude":null,"Longitude":null,"OSM_ID":6697269016,"NodeLatitude":33.8614368,"NodeLongitude":35.5503503,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:42","EndTime":"2024-01-13 16:00:42","Latitude":null,"Longitude":null,"OSM_ID":6661696521,"NodeLatitude":33.8614513,"NodeLongitude":35.5502652,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:57","EndTime":"2024-01-13 16:00:57","Latitude":null,"Longitude":null,"OSM_ID":6661696521,"NodeLatitude":33.8614513,"NodeLongitude":35.5502652,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:45","EndTime":"2024-01-13 16:00:45","Latitude":null,"Longitude":null,"OSM_ID":6697269017,"NodeLatitude":33.8614763,"NodeLongitude":35.550174,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:55","EndTime":"2024-01-13 16:00:55","Latitude":null,"Longitude":null,"OSM_ID":6697269017,"NodeLatitude":33.8614763,"NodeLongitude":35.550174,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:47","EndTime":"2024-01-13 16:00:47","Latitude":null,"Longitude":null,"OSM_ID":6661696522,"NodeLatitude":33.8614997,"NodeLongitude":35.5501036,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:52","EndTime":"2024-01-13 16:00:52","Latitude":null,"Longitude":null,"OSM_ID":6661696522,"NodeLatitude":33.8614997,"NodeLongitude":35.5501036,"NodeType":"Intermediate","StreetName":"شارع 407"},{"StartTime":"2024-01-13 16:00:50","EndTime":"2024-01-13 16:00:50","Latitude":33.861814115,"Longitude":35.550111291,"OSM_ID":2696639921,"NodeLatitude":33.8615871,"NodeLongitude":35.5499071,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:01:07","EndTime":"2024-01-13 16:01:07","Latitude":null,"Longitude":null,"OSM_ID":3047538512,"NodeLatitude":33.862262,"NodeLongitude":35.5493063,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:10","EndTime":"2024-01-13 16:01:10","Latitude":33.8629260384,"Longitude":35.5484770997,"OSM_ID":11638173692,"NodeLatitude":33.8626611,"NodeLongitude":35.5487344,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:15","EndTime":"2024-01-13 16:01:15","Latitude":null,"Longitude":null,"OSM_ID":288791581,"NodeLatitude":33.863655,"NodeLongitude":35.54731,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:20","EndTime":"2024-01-13 16:01:20","Latitude":null,"Longitude":null,"OSM_ID":3047538464,"NodeLatitude":33.8638961,"NodeLongitude":35.5470525,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:25","EndTime":"2024-01-13 16:01:25","Latitude":null,"Longitude":null,"OSM_ID":288791832,"NodeLatitude":33.8641011,"NodeLongitude":35.5468954,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:30","EndTime":"2024-01-13 16:01:30","Latitude":33.8644894337,"Longitude":35.5467136242,"OSM_ID":3096735759,"NodeLatitude":33.8641709,"NodeLongitude":35.5468407,"NodeType":"Road Node","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:34","EndTime":"2024-01-13 16:01:34","Latitude":null,"Longitude":null,"OSM_ID":2730939308,"NodeLatitude":33.8651158,"NodeLongitude":35.5461433,"NodeType":"Intermediate","StreetName":"طريق برمانا الرئيسية"},{"StartTime":"2024-01-13 16:01:38","EndTime":"2024-01-13 16:01:38","Latitude":null,"Longitude":null,"OSM_ID":2671704019,"NodeLatitude":33.8652138,"NodeLongitude":35.5460788,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:42","EndTime":"2024-01-13 16:01:42","Latitude":null,"Longitude":null,"OSM_ID":9377183478,"NodeLatitude":33.8654168,"NodeLongitude":35.5459669,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:46","EndTime":"2024-01-13 16:01:46","Latitude":null,"Longitude":null,"OSM_ID":3298998008,"NodeLatitude":33.8656781,"NodeLongitude":35.545808,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:50","EndTime":"2024-01-13 16:01:50","Latitude":33.8657784285,"Longitude":35.5457498692,"OSM_ID":4947302469,"NodeLatitude":33.8657094,"NodeLongitude":35.5457839,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:02:00","EndTime":"2024-01-13 16:02:00","Latitude":null,"Longitude":null,"OSM_ID":3298998007,"NodeLatitude":33.8658419,"NodeLongitude":35.5456819,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:02:10","EndTime":"2024-01-13 16:02:10","Latitude":33.8671285702,"Longitude":35.5447731108,"OSM_ID":3298998004,"NodeLatitude":33.8667172,"NodeLongitude":35.5450474,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:02:12","EndTime":"2024-01-13 16:02:12","Latitude":null,"Longitude":null,"OSM_ID":3298998002,"NodeLatitude":33.8675323,"NodeLongitude":35.5444385,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:02:15","EndTime":"2024-01-13 16:02:15","Latitude":null,"Longitude":null,"OSM_ID":3133684470,"NodeLatitude":33.8678006,"NodeLongitude":35.5442131,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:17","EndTime":"2024-01-13 16:02:17","Latitude":null,"Longitude":null,"OSM_ID":4403883408,"NodeLatitude":33.867962,"NodeLongitude":35.5441337,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:20","EndTime":"2024-01-13 16:02:20","Latitude":null,"Longitude":null,"OSM_ID":4403883407,"NodeLatitude":33.8681233,"NodeLongitude":35.5440219,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:22","EndTime":"2024-01-13 16:02:22","Latitude":null,"Longitude":null,"OSM_ID":4403883421,"NodeLatitude":33.8682539,"NodeLongitude":35.543919,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:25","EndTime":"2024-01-13 16:02:25","Latitude":null,"Longitude":null,"OSM_ID":2985957771,"NodeLatitude":33.8683852,"NodeLongitude":35.5437656,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:27","EndTime":"2024-01-13 16:02:27","Latitude":null,"Longitude":null,"OSM_ID":4403883409,"NodeLatitude":33.8685168,"NodeLongitude":35.5436267,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:30","EndTime":"2024-01-13 16:02:30","Latitude":33.8685876708,"Longitude":35.5435155048,"OSM_ID":4403883405,"NodeLatitude":33.8686483,"NodeLongitude":35.5434473,"NodeType":"Road Node","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:30","EndTime":"2024-01-13 16:02:30","Latitude":null,"Longitude":null,"OSM_ID":4403883406,"NodeLatitude":33.8687563,"NodeLongitude":35.5432678,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:31","EndTime":"2024-01-13 16:02:31","Latitude":null,"Longitude":null,"OSM_ID":2985957772,"NodeLatitude":33.8688753,"NodeLongitude":35.5431026,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:32","EndTime":"2024-01-13 16:02:32","Latitude":null,"Longitude":null,"OSM_ID":11637585833,"NodeLatitude":33.8688834,"NodeLongitude":35.5430913,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:33","EndTime":"2024-01-13 16:02:33","Latitude":null,"Longitude":null,"OSM_ID":11637585834,"NodeLatitude":33.8689067,"NodeLongitude":35.5430589,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:34","EndTime":"2024-01-13 16:02:34","Latitude":null,"Longitude":null,"OSM_ID":11640646372,"NodeLatitude":33.8689503,"NodeLongitude":35.5429983,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:35","EndTime":"2024-01-13 16:02:35","Latitude":null,"Longitude":null,"OSM_ID":4403936131,"NodeLatitude":33.8690239,"NodeLongitude":35.5429657,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:36","EndTime":"2024-01-13 16:02:36","Latitude":null,"Longitude":null,"OSM_ID":4403936144,"NodeLatitude":33.869053,"NodeLongitude":35.542967,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:36","EndTime":"2024-01-13 16:02:36","Latitude":null,"Longitude":null,"OSM_ID":4403936145,"NodeLatitude":33.8691582,"NodeLongitude":35.5429675,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:37","EndTime":"2024-01-13 16:02:37","Latitude":null,"Longitude":null,"OSM_ID":4403936117,"NodeLatitude":33.869258,"NodeLongitude":35.5429271,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:38","EndTime":"2024-01-13 16:02:38","Latitude":null,"Longitude":null,"OSM_ID":11637585838,"NodeLatitude":33.8692803,"NodeLongitude":35.5429092,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:39","EndTime":"2024-01-13 16:02:39","Latitude":null,"Longitude":null,"OSM_ID":4403936146,"NodeLatitude":33.869311,"NodeLongitude":35.5428845,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:40","EndTime":"2024-01-13 16:02:40","Latitude":null,"Longitude":null,"OSM_ID":4403936120,"NodeLatitude":33.8693561,"NodeLongitude":35.5428302,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:41","EndTime":"2024-01-13 16:02:41","Latitude":null,"Longitude":null,"OSM_ID":4403936126,"NodeLatitude":33.8693877,"NodeLongitude":35.5427742,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:42","EndTime":"2024-01-13 16:02:42","Latitude":null,"Longitude":null,"OSM_ID":4403936147,"NodeLatitude":33.8694224,"NodeLongitude":35.5426608,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:43","EndTime":"2024-01-13 16:02:43","Latitude":null,"Longitude":null,"OSM_ID":4403936123,"NodeLatitude":33.8694264,"NodeLongitude":35.5425401,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:43","EndTime":"2024-01-13 16:02:43","Latitude":null,"Longitude":null,"OSM_ID":4403936136,"NodeLatitude":33.8693935,"NodeLongitude":35.5424092,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:44","EndTime":"2024-01-13 16:02:44","Latitude":null,"Longitude":null,"OSM_ID":4403936137,"NodeLatitude":33.869325,"NodeLongitude":35.5423003,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:45","EndTime":"2024-01-13 16:02:45","Latitude":null,"Longitude":null,"OSM_ID":11637585825,"NodeLatitude":33.8692992,"NodeLongitude":35.5422805,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:46","EndTime":"2024-01-13 16:02:46","Latitude":null,"Longitude":null,"OSM_ID":4403936129,"NodeLatitude":33.8692292,"NodeLongitude":35.5422268,"NodeType":"Intermediate","StreetName":"دوار المكلس"},{"StartTime":"2024-01-13 16:02:47","EndTime":"2024-01-13 16:02:47","Latitude":null,"Longitude":null,"OSM_ID":4403936130,"NodeLatitude":33.8692018,"NodeLongitude":35.5422149,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:48","EndTime":"2024-01-13 16:02:48","Latitude":null,"Longitude":null,"OSM_ID":2985957780,"NodeLatitude":33.8692574,"NodeLongitude":35.5419729,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:49","EndTime":"2024-01-13 16:02:49","Latitude":null,"Longitude":null,"OSM_ID":2985957735,"NodeLatitude":33.86932,"NodeLongitude":35.5416371,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:50","EndTime":"2024-01-13 16:02:50","Latitude":33.8694312068,"Longitude":35.5411322791,"OSM_ID":4403883415,"NodeLatitude":33.8694232,"NodeLongitude":35.5412027,"NodeType":"Road Node","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:52","EndTime":"2024-01-13 16:02:52","Latitude":null,"Longitude":null,"OSM_ID":2985957781,"NodeLatitude":33.8694926,"NodeLongitude":35.5407845,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:55","EndTime":"2024-01-13 16:02:55","Latitude":null,"Longitude":null,"OSM_ID":4403883417,"NodeLatitude":33.8695702,"NodeLongitude":35.5402202,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:58","EndTime":"2024-01-13 16:02:58","Latitude":null,"Longitude":null,"OSM_ID":4403883418,"NodeLatitude":33.8695827,"NodeLongitude":35.5400591,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:01","EndTime":"2024-01-13 16:03:01","Latitude":null,"Longitude":null,"OSM_ID":2985957782,"NodeLatitude":33.8695816,"NodeLongitude":35.5398008,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:04","EndTime":"2024-01-13 16:03:04","Latitude":null,"Longitude":null,"OSM_ID":2671707927,"NodeLatitude":33.8696464,"NodeLongitude":35.5393397,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:07","EndTime":"2024-01-13 16:03:07","Latitude":null,"Longitude":null,"OSM_ID":6735461233,"NodeLatitude":33.8696925,"NodeLongitude":35.5390977,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:10","EndTime":"2024-01-13 16:03:10","Latitude":33.8698653613,"Longitude":35.538535216,"OSM_ID":4368147992,"NodeLatitude":33.8697936,"NodeLongitude":35.5385601,"NodeType":"Road Node","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:13","EndTime":"2024-01-13 16:03:13","Latitude":null,"Longitude":null,"OSM_ID":292660720,"NodeLatitude":33.8699719,"NodeLongitude":35.5376265,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:16","EndTime":"2024-01-13 16:03:16","Latitude":null,"Longitude":null,"OSM_ID":4515999427,"NodeLatitude":33.8701357,"NodeLongitude":35.5367333,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:20","EndTime":"2024-01-13 16:03:20","Latitude":null,"Longitude":null,"OSM_ID":292366548,"NodeLatitude":33.8701597,"NodeLongitude":35.5367367,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:23","EndTime":"2024-01-13 16:03:23","Latitude":null,"Longitude":null,"OSM_ID":292366496,"NodeLatitude":33.8701837,"NodeLongitude":35.5367359,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:26","EndTime":"2024-01-13 16:03:26","Latitude":null,"Longitude":null,"OSM_ID":292366549,"NodeLatitude":33.8702075,"NodeLongitude":35.5367309,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:30","EndTime":"2024-01-13 16:03:30","Latitude":33.8702605658,"Longitude":35.5367730319,"OSM_ID":292366345,"NodeLatitude":33.8702303,"NodeLongitude":35.5367219,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:03:34","EndTime":"2024-01-13 16:03:34","Latitude":null,"Longitude":null,"OSM_ID":292366550,"NodeLatitude":33.8702519,"NodeLongitude":35.536709,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:38","EndTime":"2024-01-13 16:03:38","Latitude":null,"Longitude":null,"OSM_ID":292366499,"NodeLatitude":33.8702717,"NodeLongitude":35.5366924,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:43","EndTime":"2024-01-13 16:03:43","Latitude":null,"Longitude":null,"OSM_ID":292366500,"NodeLatitude":33.8702893,"NodeLongitude":35.5366726,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:47","EndTime":"2024-01-13 16:03:47","Latitude":null,"Longitude":null,"OSM_ID":4515999426,"NodeLatitude":33.8704451,"NodeLongitude":35.536627,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:52","EndTime":"2024-01-13 16:03:52","Latitude":null,"Longitude":null,"OSM_ID":4515975989,"NodeLatitude":33.8711466,"NodeLongitude":35.5367159,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:56","EndTime":"2024-01-13 16:03:56","Latitude":null,"Longitude":null,"OSM_ID":2677441047,"NodeLatitude":33.8719895,"NodeLongitude":35.5368453,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:01","EndTime":"2024-01-13 16:04:01","Latitude":null,"Longitude":null,"OSM_ID":2677441050,"NodeLatitude":33.8724494,"NodeLongitude":35.5370062,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:05","EndTime":"2024-01-13 16:04:05","Latitude":null,"Longitude":null,"OSM_ID":4086672898,"NodeLatitude":33.8727834,"NodeLongitude":35.5371712,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:10","EndTime":"2024-01-13 16:04:10","Latitude":33.8741818656,"Longitude":35.5379831173,"OSM_ID":4515999424,"NodeLatitude":33.8739882,"NodeLongitude":35.5379537,"NodeType":"Road Node","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:15","EndTime":"2024-01-13 16:04:15","Latitude":null,"Longitude":null,"OSM_ID":2677441049,"NodeLatitude":33.8755971,"NodeLongitude":35.538978,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:20","EndTime":"2024-01-13 16:04:20","Latitude":null,"Longitude":null,"OSM_ID":2677441048,"NodeLatitude":33.8761505,"NodeLongitude":35.5393115,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:25","EndTime":"2024-01-13 16:04:25","Latitude":null,"Longitude":null,"OSM_ID":6727429663,"NodeLatitude":33.8763468,"NodeLongitude":35.5393777,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:30","EndTime":"2024-01-13 16:04:30","Latitude":33.8768019483,"Longitude":35.5396286008,"OSM_ID":4488515681,"NodeLatitude":33.8767217,"NodeLongitude":35.5396124,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:04:31","EndTime":"2024-01-13 16:04:31","Latitude":null,"Longitude":null,"OSM_ID":6727429662,"NodeLatitude":33.8770648,"NodeLongitude":35.5398261,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:32","EndTime":"2024-01-13 16:04:32","Latitude":null,"Longitude":null,"OSM_ID":2580634724,"NodeLatitude":33.8771998,"NodeLongitude":35.5399096,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:34","EndTime":"2024-01-13 16:04:34","Latitude":null,"Longitude":null,"OSM_ID":4488515678,"NodeLatitude":33.8773253,"NodeLongitude":35.5400001,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:35","EndTime":"2024-01-13 16:04:35","Latitude":null,"Longitude":null,"OSM_ID":4488515679,"NodeLatitude":33.877396,"NodeLongitude":35.5400672,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:37","EndTime":"2024-01-13 16:04:37","Latitude":null,"Longitude":null,"OSM_ID":4488515680,"NodeLatitude":33.8774316,"NodeLongitude":35.5400986,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:38","EndTime":"2024-01-13 16:04:38","Latitude":null,"Longitude":null,"OSM_ID":2580634738,"NodeLatitude":33.8774583,"NodeLongitude":35.5401265,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:40","EndTime":"2024-01-13 16:04:40","Latitude":null,"Longitude":null,"OSM_ID":4488515677,"NodeLatitude":33.8775153,"NodeLongitude":35.5401889,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:41","EndTime":"2024-01-13 16:04:41","Latitude":null,"Longitude":null,"OSM_ID":4488515676,"NodeLatitude":33.877562,"NodeLongitude":35.5402531,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:42","EndTime":"2024-01-13 16:04:42","Latitude":null,"Longitude":null,"OSM_ID":2580634734,"NodeLatitude":33.8776305,"NodeLongitude":35.5403533,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:44","EndTime":"2024-01-13 16:04:44","Latitude":null,"Longitude":null,"OSM_ID":4488515672,"NodeLatitude":33.8776754,"NodeLongitude":35.5404204,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:45","EndTime":"2024-01-13 16:04:45","Latitude":null,"Longitude":null,"OSM_ID":2580634748,"NodeLatitude":33.8777189,"NodeLongitude":35.5405016,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:47","EndTime":"2024-01-13 16:04:47","Latitude":null,"Longitude":null,"OSM_ID":4488515675,"NodeLatitude":33.8777481,"NodeLongitude":35.5405585,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:48","EndTime":"2024-01-13 16:04:48","Latitude":null,"Longitude":null,"OSM_ID":4488515674,"NodeLatitude":33.8777714,"NodeLongitude":35.5406153,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:50","EndTime":"2024-01-13 16:04:50","Latitude":null,"Longitude":null,"OSM_ID":4488515673,"NodeLatitude":33.8778121,"NodeLongitude":35.5407325,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:51","EndTime":"2024-01-13 16:04:51","Latitude":null,"Longitude":null,"OSM_ID":2107230289,"NodeLatitude":33.8778808,"NodeLongitude":35.5409855,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:52","EndTime":"2024-01-13 16:04:52","Latitude":null,"Longitude":null,"OSM_ID":4550691373,"NodeLatitude":33.8779322,"NodeLongitude":35.541199,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:54","EndTime":"2024-01-13 16:04:54","Latitude":null,"Longitude":null,"OSM_ID":5617698312,"NodeLatitude":33.8780433,"NodeLongitude":35.5415241,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:55","EndTime":"2024-01-13 16:04:55","Latitude":null,"Longitude":null,"OSM_ID":5617698313,"NodeLatitude":33.8781643,"NodeLongitude":35.5418164,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:57","EndTime":"2024-01-13 16:04:57","Latitude":null,"Longitude":null,"OSM_ID":4502638765,"NodeLatitude":33.8783153,"NodeLongitude":35.5421185,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:58","EndTime":"2024-01-13 16:04:58","Latitude":null,"Longitude":null,"OSM_ID":4515711396,"NodeLatitude":33.8784947,"NodeLongitude":35.5424178,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:00","EndTime":"2024-01-13 16:05:00","Latitude":null,"Longitude":null,"OSM_ID":2669684798,"NodeLatitude":33.8786254,"NodeLongitude":35.542576,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:01","EndTime":"2024-01-13 16:05:01","Latitude":null,"Longitude":null,"OSM_ID":292382779,"NodeLatitude":33.878838,"NodeLongitude":35.542775,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:02","EndTime":"2024-01-13 16:05:02","Latitude":null,"Longitude":null,"OSM_ID":292382780,"NodeLatitude":33.8792102,"NodeLongitude":35.5431046,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:04","EndTime":"2024-01-13 16:05:04","Latitude":null,"Longitude":null,"OSM_ID":11637585839,"NodeLatitude":33.8793577,"NodeLongitude":35.5432003,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:05","EndTime":"2024-01-13 16:05:05","Latitude":null,"Longitude":null,"OSM_ID":11637585844,"NodeLatitude":33.8794059,"NodeLongitude":35.5432315,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:07","EndTime":"2024-01-13 16:05:07","Latitude":null,"Longitude":null,"OSM_ID":4132959100,"NodeLatitude":33.8794678,"NodeLongitude":35.5432717,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:08","EndTime":"2024-01-13 16:05:08","Latitude":null,"Longitude":null,"OSM_ID":292653078,"NodeLatitude":33.8795412,"NodeLongitude":35.5433129,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:10","EndTime":"2024-01-13 16:05:10","Latitude":33.8797067291,"Longitude":35.5433749948,"OSM_ID":4488441564,"NodeLatitude":33.8797026,"NodeLongitude":35.5433831,"NodeType":"Road Node","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:12","EndTime":"2024-01-13 16:05:12","Latitude":null,"Longitude":null,"OSM_ID":4488437980,"NodeLatitude":33.8798107,"NodeLongitude":35.5434311,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:14","EndTime":"2024-01-13 16:05:14","Latitude":null,"Longitude":null,"OSM_ID":292653106,"NodeLatitude":33.8803478,"NodeLongitude":35.5436105,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:16","EndTime":"2024-01-13 16:05:16","Latitude":null,"Longitude":null,"OSM_ID":5478819510,"NodeLatitude":33.8804905,"NodeLongitude":35.5436341,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:18","EndTime":"2024-01-13 16:05:18","Latitude":null,"Longitude":null,"OSM_ID":3126296929,"NodeLatitude":33.8806496,"NodeLongitude":35.5436524,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:21","EndTime":"2024-01-13 16:05:21","Latitude":null,"Longitude":null,"OSM_ID":4488441563,"NodeLatitude":33.8807038,"NodeLongitude":35.5436559,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:23","EndTime":"2024-01-13 16:05:23","Latitude":null,"Longitude":null,"OSM_ID":292653107,"NodeLatitude":33.880888,"NodeLongitude":35.5436485,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:25","EndTime":"2024-01-13 16:05:25","Latitude":null,"Longitude":null,"OSM_ID":4515735249,"NodeLatitude":33.8811942,"NodeLongitude":35.5436123,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:27","EndTime":"2024-01-13 16:05:27","Latitude":null,"Longitude":null,"OSM_ID":4515763607,"NodeLatitude":33.8812923,"NodeLongitude":35.543587,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:30","EndTime":"2024-01-13 16:05:30","Latitude":33.8814537782,"Longitude":35.5436380246,"OSM_ID":292653109,"NodeLatitude":33.8814271,"NodeLongitude":35.5435551,"NodeType":"Road Node","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:34","EndTime":"2024-01-13 16:05:34","Latitude":null,"Longitude":null,"OSM_ID":3610267598,"NodeLatitude":33.8817866,"NodeLongitude":35.5433965,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:38","EndTime":"2024-01-13 16:05:38","Latitude":null,"Longitude":null,"OSM_ID":3610267611,"NodeLatitude":33.8819016,"NodeLongitude":35.5433315,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:43","EndTime":"2024-01-13 16:05:43","Latitude":null,"Longitude":null,"OSM_ID":4515735245,"NodeLatitude":33.882017,"NodeLongitude":35.5432669,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:47","EndTime":"2024-01-13 16:05:47","Latitude":null,"Longitude":null,"OSM_ID":4451391462,"NodeLatitude":33.8821602,"NodeLongitude":35.5431787,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:51","EndTime":"2024-01-13 16:05:51","Latitude":null,"Longitude":null,"OSM_ID":3610267618,"NodeLatitude":33.8824585,"NodeLongitude":35.5430321,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:05:56","EndTime":"2024-01-13 16:05:56","Latitude":null,"Longitude":null,"OSM_ID":3610267594,"NodeLatitude":33.8825859,"NodeLongitude":35.5429507,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:00","EndTime":"2024-01-13 16:06:00","Latitude":null,"Longitude":null,"OSM_ID":4451391486,"NodeLatitude":33.8826211,"NodeLongitude":35.5429367,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:04","EndTime":"2024-01-13 16:06:04","Latitude":null,"Longitude":null,"OSM_ID":3610267595,"NodeLatitude":33.8826615,"NodeLongitude":35.542932,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:09","EndTime":"2024-01-13 16:06:09","Latitude":null,"Longitude":null,"OSM_ID":4451391487,"NodeLatitude":33.8826957,"NodeLongitude":35.5429332,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:13","EndTime":"2024-01-13 16:06:13","Latitude":null,"Longitude":null,"OSM_ID":292653092,"NodeLatitude":33.8827248,"NodeLongitude":35.5429483,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:17","EndTime":"2024-01-13 16:06:17","Latitude":null,"Longitude":null,"OSM_ID":5503509757,"NodeLatitude":33.8837061,"NodeLongitude":35.544581,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:22","EndTime":"2024-01-13 16:06:22","Latitude":null,"Longitude":null,"OSM_ID":7432104515,"NodeLatitude":33.8838802,"NodeLongitude":35.5448662,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:26","EndTime":"2024-01-13 16:06:26","Latitude":null,"Longitude":null,"OSM_ID":5503509756,"NodeLatitude":33.8841536,"NodeLongitude":35.5453323,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:30","EndTime":"2024-01-13 16:06:30","Latitude":null,"Longitude":null,"OSM_ID":3143704905,"NodeLatitude":33.8847071,"NodeLongitude":35.5462612,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:35","EndTime":"2024-01-13 16:06:35","Latitude":null,"Longitude":null,"OSM_ID":289195954,"NodeLatitude":33.885725,"NodeLongitude":35.5479437,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:39","EndTime":"2024-01-13 16:06:39","Latitude":null,"Longitude":null,"OSM_ID":2107230255,"NodeLatitude":33.8866243,"NodeLongitude":35.549457,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:43","EndTime":"2024-01-13 16:06:43","Latitude":null,"Longitude":null,"OSM_ID":290326714,"NodeLatitude":33.8875412,"NodeLongitude":35.5510465,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:48","EndTime":"2024-01-13 16:06:48","Latitude":null,"Longitude":null,"OSM_ID":11041713447,"NodeLatitude":33.8877383,"NodeLongitude":35.5513726,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:52","EndTime":"2024-01-13 16:06:52","Latitude":null,"Longitude":null,"OSM_ID":7428152981,"NodeLatitude":33.8888669,"NodeLongitude":35.5532401,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:56","EndTime":"2024-01-13 16:06:56","Latitude":null,"Longitude":null,"OSM_ID":4451591494,"NodeLatitude":33.8892946,"NodeLongitude":35.5539531,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:01","EndTime":"2024-01-13 16:07:01","Latitude":null,"Longitude":null,"OSM_ID":6499227932,"NodeLatitude":33.8894445,"NodeLongitude":35.5541894,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:14","EndTime":"2024-01-13 16:07:14","Latitude":null,"Longitude":null,"OSM_ID":6499227932,"NodeLatitude":33.8894445,"NodeLongitude":35.5541894,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:05","EndTime":"2024-01-13 16:07:05","Latitude":null,"Longitude":null,"OSM_ID":4516216029,"NodeLatitude":33.889485,"NodeLongitude":35.5542546,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:16","EndTime":"2024-01-13 16:07:16","Latitude":null,"Longitude":null,"OSM_ID":4516216029,"NodeLatitude":33.889485,"NodeLongitude":35.5542546,"NodeType":"Intermediate","StreetName":"Rue Ste. Mere Teresa"},{"StartTime":"2024-01-13 16:07:10","EndTime":"2024-01-13 16:07:10","Latitude":33.8895821817,"Longitude":35.554237217,"OSM_ID":6514118079,"NodeLatitude":33.8896203,"NodeLongitude":35.554181,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:12","EndTime":"2024-01-13 16:07:12","Latitude":null,"Longitude":null,"OSM_ID":2105757650,"NodeLatitude":33.8895813,"NodeLongitude":35.5541174,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:18","EndTime":"2024-01-13 16:07:18","Latitude":null,"Longitude":null,"OSM_ID":4451591487,"NodeLatitude":33.8895706,"NodeLongitude":35.5543924,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:01","EndTime":"2024-01-13 16:38:01","Latitude":null,"Longitude":null,"OSM_ID":4451591487,"NodeLatitude":33.8895706,"NodeLongitude":35.5543924,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:21","EndTime":"2024-01-13 16:07:21","Latitude":null,"Longitude":null,"OSM_ID":4451591480,"NodeLatitude":33.8896413,"NodeLongitude":35.5545087,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:05","EndTime":"2024-01-13 16:38:05","Latitude":null,"Longitude":null,"OSM_ID":4451591480,"NodeLatitude":33.8896413,"NodeLongitude":35.5545087,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:23","EndTime":"2024-01-13 16:07:23","Latitude":null,"Longitude":null,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:23","EndTime":"2024-01-13 16:07:23","Latitude":null,"Longitude":null,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:10","EndTime":"2024-01-13 16:38:10","Latitude":33.8899211314,"Longitude":35.5547243352,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:10","EndTime":"2024-01-13 16:38:10","Latitude":33.8899211314,"Longitude":35.5547243352,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:31","EndTime":"2024-01-13 16:38:31","Latitude":33.8898701818,"Longitude":35.5546511023,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:31","EndTime":"2024-01-13 16:38:31","Latitude":33.8898701818,"Longitude":35.5546511023,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:25","EndTime":"2024-01-13 16:07:25","Latitude":null,"Longitude":null,"OSM_ID":3052025669,"NodeLatitude":33.8908958,"NodeLongitude":35.5566333,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:27","EndTime":"2024-01-13 16:07:27","Latitude":null,"Longitude":null,"OSM_ID":6582793619,"NodeLatitude":33.8913517,"NodeLongitude":35.557379,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:30","EndTime":"2024-01-13 16:07:30","Latitude":null,"Longitude":null,"OSM_ID":11221840110,"NodeLatitude":33.8914239,"NodeLongitude":35.5574972,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:32","EndTime":"2024-01-13 16:07:32","Latitude":null,"Longitude":null,"OSM_ID":11221840112,"NodeLatitude":33.8917164,"NodeLongitude":35.5579762,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:34","EndTime":"2024-01-13 16:07:34","Latitude":null,"Longitude":null,"OSM_ID":4451613982,"NodeLatitude":33.8920094,"NodeLongitude":35.5584549,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:36","EndTime":"2024-01-13 16:07:36","Latitude":null,"Longitude":null,"OSM_ID":4451614394,"NodeLatitude":33.8921568,"NodeLongitude":35.5586999,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:38","EndTime":"2024-01-13 16:07:38","Latitude":null,"Longitude":null,"OSM_ID":4451614395,"NodeLatitude":33.8921617,"NodeLongitude":35.5586636,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:41","EndTime":"2024-01-13 16:07:41","Latitude":null,"Longitude":null,"OSM_ID":4451614396,"NodeLatitude":33.8921676,"NodeLongitude":35.5586141,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:43","EndTime":"2024-01-13 16:07:43","Latitude":null,"Longitude":null,"OSM_ID":4451614397,"NodeLatitude":33.892169,"NodeLongitude":35.5585734,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:45","EndTime":"2024-01-13 16:07:45","Latitude":null,"Longitude":null,"OSM_ID":4451614398,"NodeLatitude":33.8921646,"NodeLongitude":35.558538,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:47","EndTime":"2024-01-13 16:07:47","Latitude":null,"Longitude":null,"OSM_ID":4451614399,"NodeLatitude":33.8921543,"NodeLongitude":35.558499,"NodeType":"Intermediate","StreetName":"طريق ميرنا الشالوحي"},{"StartTime":"2024-01-13 16:07:50","EndTime":"2024-01-13 16:07:50","Latitude":33.8920739937,"Longitude":35.5583495827,"OSM_ID":4451613960,"NodeLatitude":33.892133,"NodeLongitude":35.5584373,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:00","EndTime":"2024-01-13 16:08:00","Latitude":null,"Longitude":null,"OSM_ID":11221840097,"NodeLatitude":33.8920073,"NodeLongitude":35.5582245,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:10","EndTime":"2024-01-13 16:08:10","Latitude":33.8916522756,"Longitude":35.5574814991,"OSM_ID":11221840099,"NodeLatitude":33.8916198,"NodeLongitude":35.5575687,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:17","EndTime":"2024-01-13 16:08:17","Latitude":null,"Longitude":null,"OSM_ID":11221840101,"NodeLatitude":33.8915412,"NodeLongitude":35.5574357,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:24","EndTime":"2024-01-13 16:08:24","Latitude":null,"Longitude":null,"OSM_ID":11221840103,"NodeLatitude":33.8914506,"NodeLongitude":35.5572823,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:32","EndTime":"2024-01-13 16:08:32","Latitude":33.8914587669,"Longitude":35.557069729,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:09:43","EndTime":"2024-01-13 16:09:43","Latitude":33.891546869,"Longitude":35.5571216503,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:12:18","EndTime":"2024-01-13 16:12:18","Latitude":33.8914875788,"Longitude":35.5571409105,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:12:27","EndTime":"2024-01-13 16:12:29","Latitude":33.8914541303,"Longitude":35.5571730354,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:12:30","EndTime":"2024-01-13 16:12:36","Latitude":33.8914002232,"Longitude":35.5571961779,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:08:58","EndTime":"2024-01-13 16:12:51","Latitude":33.8914858392,"Longitude":35.5570646272,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:13:13","EndTime":"2024-01-13 16:13:13","Latitude":33.8915188924,"Longitude":35.5569755808,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:13:01","EndTime":"2024-01-13 16:13:39","Latitude":33.8915253324,"Longitude":35.5570085651,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:09:14","EndTime":"2024-01-13 16:13:48","Latitude":33.891523558,"Longitude":35.557032492,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:13:54","EndTime":"2024-01-13 16:13:54","Latitude":33.891537492,"Longitude":35.5570388715,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:19:16","EndTime":"2024-01-13 16:19:16","Latitude":33.8915105667,"Longitude":35.5569682531,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:34:11","EndTime":"2024-01-13 16:34:11","Latitude":33.8915153199,"Longitude":35.5571256162,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:36:02","EndTime":"2024-01-13 16:36:02","Latitude":33.891494159,"Longitude":35.5570689391,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:36:04","EndTime":"2024-01-13 16:36:07","Latitude":33.8915116138,"Longitude":35.5570757835,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:36:19","EndTime":"2024-01-13 16:36:26","Latitude":33.8915343307,"Longitude":35.5571583695,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:36:37","EndTime":"2024-01-13 16:36:37","Latitude":33.8915069465,"Longitude":35.5571775116,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:37:15","EndTime":"2024-01-13 16:37:15","Latitude":33.8914748089,"Longitude":35.5570419488,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:37:38","EndTime":"2024-01-13 16:37:40","Latitude":33.8914290016,"Longitude":35.557092902,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:44","EndTime":"2024-01-13 16:37:44","Latitude":null,"Longitude":null,"OSM_ID":6601898956,"NodeLatitude":33.8910164,"NodeLongitude":35.5565463,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:48","EndTime":"2024-01-13 16:37:48","Latitude":null,"Longitude":null,"OSM_ID":11221840109,"NodeLatitude":33.8906856,"NodeLongitude":35.5559871,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:52","EndTime":"2024-01-13 16:37:52","Latitude":null,"Longitude":null,"OSM_ID":4220971866,"NodeLatitude":33.8905318,"NodeLongitude":35.5557272,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:57","EndTime":"2024-01-13 16:37:57","Latitude":null,"Longitude":null,"OSM_ID":4516213592,"NodeLatitude":33.8896577,"NodeLongitude":35.5542466,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:39:00","EndTime":"2024-01-13 16:39:00","Latitude":null,"Longitude":null,"OSM_ID":6736336516,"NodeLatitude":33.889516,"NodeLongitude":35.554898,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:39:30","EndTime":"2024-01-13 16:39:30","Latitude":33.8899947614,"Longitude":35.5551917469,"OSM_ID":6736336511,"NodeLatitude":33.8895782,"NodeLongitude":35.5551202,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:39:38","EndTime":"2024-01-13 16:39:38","Latitude":null,"Longitude":null,"OSM_ID":6736336522,"NodeLatitude":33.8892271,"NodeLongitude":35.5553409,"NodeType":"Intermediate","StreetName":"شارع بربر أبو جودة"},{"StartTime":"2024-01-13 16:39:46","EndTime":"2024-01-13 16:39:46","Latitude":null,"Longitude":null,"OSM_ID":6697197342,"NodeLatitude":33.889748,"NodeLongitude":35.5562112,"NodeType":"Intermediate","StreetName":"شارع بربر أبو جودة"},{"StartTime":"2024-01-13 16:39:54","EndTime":"2024-01-13 16:39:54","Latitude":null,"Longitude":null,"OSM_ID":3052025667,"NodeLatitude":33.889882,"NodeLongitude":35.5564351,"NodeType":"Intermediate","StreetName":"شارع بربر أبو جودة"},{"StartTime":"2024-01-13 16:40:02","EndTime":"2024-01-13 16:40:02","Latitude":null,"Longitude":null,"OSM_ID":290325906,"NodeLatitude":33.889991,"NodeLongitude":35.5566306,"NodeType":"Intermediate","StreetName":"شارع بربر أبو جودة"},{"StartTime":"2024-01-13 16:40:10","EndTime":"2024-01-13 16:40:10","Latitude":33.890203638,"Longitude":35.5571126191,"OSM_ID":11356639101,"NodeLatitude":33.8903598,"NodeLongitude":35.5572447,"NodeType":"Road Node","StreetName":"شارع بربر أبو جودة"},{"StartTime":"2024-01-13 16:40:30","EndTime":"2024-01-13 16:40:30","Latitude":null,"Longitude":null,"OSM_ID":6601898954,"NodeLatitude":33.8907716,"NodeLongitude":35.5579305,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:40:50","EndTime":"2024-01-13 16:40:50","Latitude":33.8901674571,"Longitude":35.5584061206,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:41:10","EndTime":"2024-01-13 16:41:10","Latitude":33.8903928095,"Longitude":35.5583563324,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:41:31","EndTime":"2024-01-13 16:41:31","Latitude":33.8904500146,"Longitude":35.5583727214,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:42:30","EndTime":"2024-01-13 16:42:30","Latitude":33.8902613072,"Longitude":35.5585384024,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:40:34","EndTime":"2024-01-13 16:42:36","Latitude":33.8902402999,"Longitude":35.5584394595,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:40:33","EndTime":"2024-01-13 16:42:53","Latitude":33.8902787508,"Longitude":35.558412612,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:43:15","EndTime":"2024-01-13 16:43:15","Latitude":33.8902935483,"Longitude":35.558390164,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:45:20","EndTime":"2024-01-13 16:45:20","Latitude":33.8903269505,"Longitude":35.558124824,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:04:53","EndTime":"2024-01-13 17:04:53","Latitude":33.89030069,"Longitude":35.5583799134,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:07:22","EndTime":"2024-01-13 17:07:22","Latitude":33.8902502896,"Longitude":35.5583796602,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:06:28","EndTime":"2024-01-13 17:08:06","Latitude":33.8902360819,"Longitude":35.5584080239,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 17:06:08","EndTime":"2024-01-13 17:08:39","Latitude":33.8902549801,"Longitude":35.5584208122,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 17:10:35","EndTime":"2024-01-13 17:10:35","Latitude":33.8901297633,"Longitude":35.5585364843,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:30:37","EndTime":"2024-01-13 17:30:37","Latitude":33.8900718059,"Longitude":35.5583689847,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null}]
+     [{"StartTime":"2024-01-13 14:31:10","EndTime":"2024-01-13 14:31:10","Latitude":33.8807529466,"Longitude":35.6250214724,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 14:29:22","EndTime":"2024-01-13 14:47:50","Latitude":33.8807386572,"Longitude":35.6249592998,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 14:19:16","EndTime":"2024-01-13 15:01:34","Latitude":33.8807285918,"Longitude":35.6249400709,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 15:06:50","EndTime":"2024-01-13 15:06:50","Latitude":33.8807208163,"Longitude":35.6249318454,"OSM_ID":288840818,"NodeLatitude":33.880646,"NodeLongitude":35.6249198,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:07:11","EndTime":"2024-01-13 15:07:11","Latitude":33.8805737491,"Longitude":35.6246455966,"OSM_ID":6642505099,"NodeLatitude":33.8805051,"NodeLongitude":35.6246428,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:07:21","EndTime":"2024-01-13 15:07:21","Latitude":null,"Longitude":null,"OSM_ID":3575436070,"NodeLatitude":33.8804283,"NodeLongitude":35.624445,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:07:31","EndTime":"2024-01-13 15:07:31","Latitude":33.8804068387,"Longitude":35.6243308831,"OSM_ID":2680339883,"NodeLatitude":33.8803938,"NodeLongitude":35.6243672,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:07:51","EndTime":"2024-01-13 15:07:51","Latitude":33.8802467062,"Longitude":35.6240600923,"OSM_ID":6642505100,"NodeLatitude":33.8802373,"NodeLongitude":35.6240621,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:08:28","EndTime":"2024-01-13 15:08:28","Latitude":33.8801935109,"Longitude":35.6238519739,"OSM_ID":7428393020,"NodeLatitude":33.8801393,"NodeLongitude":35.6238943,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:16:23","EndTime":"2024-01-13 15:16:23","Latitude":null,"Longitude":null,"OSM_ID":288840819,"NodeLatitude":33.880072,"NodeLongitude":35.6237791,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:24:19","EndTime":"2024-01-13 15:24:19","Latitude":null,"Longitude":null,"OSM_ID":3575436024,"NodeLatitude":33.8799751,"NodeLongitude":35.6235844,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:32:14","EndTime":"2024-01-13 15:32:14","Latitude":null,"Longitude":null,"OSM_ID":6642505101,"NodeLatitude":33.8799548,"NodeLongitude":35.6235267,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:10","EndTime":"2024-01-13 15:40:10","Latitude":33.8800370494,"Longitude":35.6234306472,"OSM_ID":288840982,"NodeLatitude":33.879937,"NodeLongitude":35.6233734,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:13","EndTime":"2024-01-13 15:40:13","Latitude":null,"Longitude":null,"OSM_ID":3575436012,"NodeLatitude":33.8799369,"NodeLongitude":35.6232706,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:16","EndTime":"2024-01-13 15:40:16","Latitude":null,"Longitude":null,"OSM_ID":6622448672,"NodeLatitude":33.8799147,"NodeLongitude":35.6231728,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:20","EndTime":"2024-01-13 15:40:20","Latitude":null,"Longitude":null,"OSM_ID":9317549100,"NodeLatitude":33.8798886,"NodeLongitude":35.6231029,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:23","EndTime":"2024-01-13 15:40:23","Latitude":null,"Longitude":null,"OSM_ID":3575436006,"NodeLatitude":33.8798508,"NodeLongitude":35.6230395,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:26","EndTime":"2024-01-13 15:40:26","Latitude":null,"Longitude":null,"OSM_ID":3575436002,"NodeLatitude":33.8795996,"NodeLongitude":35.6227271,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:30","EndTime":"2024-01-13 15:40:30","Latitude":33.8795020976,"Longitude":35.6225834317,"OSM_ID":6622448673,"NodeLatitude":33.879502,"NodeLongitude":35.6226174,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:36","EndTime":"2024-01-13 15:40:36","Latitude":null,"Longitude":null,"OSM_ID":290327985,"NodeLatitude":33.8792816,"NodeLongitude":35.6223838,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:43","EndTime":"2024-01-13 15:40:43","Latitude":null,"Longitude":null,"OSM_ID":288840821,"NodeLatitude":33.8788444,"NodeLongitude":35.6217676,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:40:50","EndTime":"2024-01-13 15:40:50","Latitude":33.8788334216,"Longitude":35.6216595044,"OSM_ID":3575435997,"NodeLatitude":33.8787448,"NodeLongitude":35.6216523,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:41:10","EndTime":"2024-01-13 15:41:10","Latitude":33.878777443,"Longitude":35.621618183,"OSM_ID":3575435997,"NodeLatitude":33.8787448,"NodeLongitude":35.6216523,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:14","EndTime":"2024-01-13 15:41:14","Latitude":null,"Longitude":null,"OSM_ID":3575435995,"NodeLatitude":33.8786685,"NodeLongitude":35.6216184,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:18","EndTime":"2024-01-13 15:41:18","Latitude":null,"Longitude":null,"OSM_ID":288840983,"NodeLatitude":33.8786113,"NodeLongitude":35.6216296,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:22","EndTime":"2024-01-13 15:41:22","Latitude":null,"Longitude":null,"OSM_ID":3575435993,"NodeLatitude":33.8785484,"NodeLongitude":35.6216791,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:26","EndTime":"2024-01-13 15:41:26","Latitude":null,"Longitude":null,"OSM_ID":5335223452,"NodeLatitude":33.8781587,"NodeLongitude":35.6219774,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:30","EndTime":"2024-01-13 15:41:30","Latitude":33.877824196,"Longitude":35.6222871761,"OSM_ID":5335223451,"NodeLatitude":33.8778424,"NodeLongitude":35.6222288,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:34","EndTime":"2024-01-13 15:41:34","Latitude":null,"Longitude":null,"OSM_ID":3245723327,"NodeLatitude":33.8776115,"NodeLongitude":35.6224202,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:38","EndTime":"2024-01-13 15:41:38","Latitude":null,"Longitude":null,"OSM_ID":288840825,"NodeLatitude":33.877399,"NodeLongitude":35.6225094,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:42","EndTime":"2024-01-13 15:41:42","Latitude":null,"Longitude":null,"OSM_ID":4507093039,"NodeLatitude":33.8770787,"NodeLongitude":35.622575,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:46","EndTime":"2024-01-13 15:41:46","Latitude":null,"Longitude":null,"OSM_ID":288840826,"NodeLatitude":33.8767702,"NodeLongitude":35.622615,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:50","EndTime":"2024-01-13 15:41:50","Latitude":33.876561644,"Longitude":35.6226335929,"OSM_ID":288840985,"NodeLatitude":33.8765319,"NodeLongitude":35.6226128,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:52","EndTime":"2024-01-13 15:41:52","Latitude":null,"Longitude":null,"OSM_ID":7428392928,"NodeLatitude":33.8762979,"NodeLongitude":35.6225891,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:41:54","EndTime":"2024-01-13 15:41:54","Latitude":null,"Longitude":null,"OSM_ID":288840986,"NodeLatitude":33.8762411,"NodeLongitude":35.6225833,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:41:56","EndTime":"2024-01-13 15:41:56","Latitude":null,"Longitude":null,"OSM_ID":4507093038,"NodeLatitude":33.8760883,"NodeLongitude":35.622449,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:41:58","EndTime":"2024-01-13 15:41:58","Latitude":null,"Longitude":null,"OSM_ID":4507093032,"NodeLatitude":33.8760776,"NodeLongitude":35.6224232,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:00","EndTime":"2024-01-13 15:42:00","Latitude":null,"Longitude":null,"OSM_ID":5161236358,"NodeLatitude":33.876062,"NodeLongitude":35.6224012,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:02","EndTime":"2024-01-13 15:42:02","Latitude":null,"Longitude":null,"OSM_ID":4507093028,"NodeLatitude":33.8760426,"NodeLongitude":35.6223842,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:04","EndTime":"2024-01-13 15:42:04","Latitude":null,"Longitude":null,"OSM_ID":6068849628,"NodeLatitude":33.8759986,"NodeLongitude":35.6223307,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:06","EndTime":"2024-01-13 15:42:06","Latitude":null,"Longitude":null,"OSM_ID":4507093024,"NodeLatitude":33.8759531,"NodeLongitude":35.6221285,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:42:08","EndTime":"2024-01-13 15:42:08","Latitude":null,"Longitude":null,"OSM_ID":288840987,"NodeLatitude":33.8758796,"NodeLongitude":35.6219079,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:10","EndTime":"2024-01-13 15:42:10","Latitude":33.8759063713,"Longitude":35.6214844244,"OSM_ID":5335223446,"NodeLatitude":33.8758293,"NodeLongitude":35.6214779,"NodeType":"Road Node","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:12","EndTime":"2024-01-13 15:42:12","Latitude":null,"Longitude":null,"OSM_ID":288840988,"NodeLatitude":33.875808,"NodeLongitude":35.6210248,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:15","EndTime":"2024-01-13 15:42:15","Latitude":null,"Longitude":null,"OSM_ID":5335223445,"NodeLatitude":33.8757781,"NodeLongitude":35.6204867,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:18","EndTime":"2024-01-13 15:42:18","Latitude":null,"Longitude":null,"OSM_ID":6608165952,"NodeLatitude":33.8757594,"NodeLongitude":35.6201582,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:21","EndTime":"2024-01-13 15:42:21","Latitude":null,"Longitude":null,"OSM_ID":5335223444,"NodeLatitude":33.8757558,"NodeLongitude":35.6200951,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:24","EndTime":"2024-01-13 15:42:24","Latitude":null,"Longitude":null,"OSM_ID":288840989,"NodeLatitude":33.875738,"NodeLongitude":35.619949,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:27","EndTime":"2024-01-13 15:42:27","Latitude":null,"Longitude":null,"OSM_ID":6608181033,"NodeLatitude":33.8756968,"NodeLongitude":35.6197438,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:30","EndTime":"2024-01-13 15:42:30","Latitude":33.8757314813,"Longitude":35.6195112304,"OSM_ID":6608181035,"NodeLatitude":33.8756255,"NodeLongitude":35.6194662,"NodeType":"Road Node","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:36","EndTime":"2024-01-13 15:42:36","Latitude":null,"Longitude":null,"OSM_ID":3136623363,"NodeLatitude":33.8753617,"NodeLongitude":35.6184711,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:43","EndTime":"2024-01-13 15:42:43","Latitude":null,"Longitude":null,"OSM_ID":6608181034,"NodeLatitude":33.8752592,"NodeLongitude":35.6179976,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:50","EndTime":"2024-01-13 15:42:50","Latitude":33.8752320555,"Longitude":35.617537643,"OSM_ID":6608180961,"NodeLatitude":33.8751677,"NodeLongitude":35.6175558,"NodeType":"Road Node","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:54","EndTime":"2024-01-13 15:42:54","Latitude":null,"Longitude":null,"OSM_ID":3136623364,"NodeLatitude":33.8751111,"NodeLongitude":35.6172828,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:42:58","EndTime":"2024-01-13 15:42:58","Latitude":null,"Longitude":null,"OSM_ID":3136623362,"NodeLatitude":33.8749207,"NodeLongitude":35.6162596,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:03","EndTime":"2024-01-13 15:43:03","Latitude":null,"Longitude":null,"OSM_ID":6517851983,"NodeLatitude":33.8748116,"NodeLongitude":35.6155682,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:07","EndTime":"2024-01-13 15:43:07","Latitude":null,"Longitude":null,"OSM_ID":6715453113,"NodeLatitude":33.8747744,"NodeLongitude":35.6153873,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:12","EndTime":"2024-01-13 15:43:12","Latitude":null,"Longitude":null,"OSM_ID":4507128361,"NodeLatitude":33.8747105,"NodeLongitude":35.6151831,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:16","EndTime":"2024-01-13 15:43:16","Latitude":null,"Longitude":null,"OSM_ID":6517851982,"NodeLatitude":33.8746546,"NodeLongitude":35.6150257,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:21","EndTime":"2024-01-13 15:43:21","Latitude":null,"Longitude":null,"OSM_ID":3136623369,"NodeLatitude":33.8745807,"NodeLongitude":35.6148734,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:25","EndTime":"2024-01-13 15:43:25","Latitude":null,"Longitude":null,"OSM_ID":3136623365,"NodeLatitude":33.8744531,"NodeLongitude":35.6146375,"NodeType":"Intermediate","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:30","EndTime":"2024-01-13 15:43:30","Latitude":33.8740949945,"Longitude":35.6139648969,"OSM_ID":288840837,"NodeLatitude":33.8738732,"NodeLongitude":35.6137166,"NodeType":"Road Node","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:43:50","EndTime":"2024-01-13 15:43:50","Latitude":33.8734275955,"Longitude":35.6128639498,"OSM_ID":6608180890,"NodeLatitude":33.8735432,"NodeLongitude":35.6131738,"NodeType":"Road Node","StreetName":"Ø¨Ø±Ù…Ø§Ù†Ø§"},{"StartTime":"2024-01-13 15:44:00","EndTime":"2024-01-13 15:44:00","Latitude":null,"Longitude":null,"OSM_ID":288791770,"NodeLatitude":33.8727343,"NodeLongitude":35.6118432,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:44:15","EndTime":"2024-01-13 15:44:15","Latitude":null,"Longitude":null,"OSM_ID":288791770,"NodeLatitude":33.8727343,"NodeLongitude":35.6118432,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:10","EndTime":"2024-01-13 15:44:10","Latitude":33.8727777767,"Longitude":35.6117172461,"OSM_ID":11757423829,"NodeLatitude":33.8727874,"NodeLongitude":35.6116864,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:44:20","EndTime":"2024-01-13 15:44:20","Latitude":null,"Longitude":null,"OSM_ID":3106369727,"NodeLatitude":33.8726264,"NodeLongitude":35.6116656,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:25","EndTime":"2024-01-13 15:44:25","Latitude":null,"Longitude":null,"OSM_ID":3106369728,"NodeLatitude":33.8725482,"NodeLongitude":35.6115762,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:30","EndTime":"2024-01-13 15:44:30","Latitude":33.8718239963,"Longitude":35.6107611448,"OSM_ID":3106369736,"NodeLatitude":33.8719863,"NodeLongitude":35.6109481,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:32","EndTime":"2024-01-13 15:44:32","Latitude":null,"Longitude":null,"OSM_ID":6517851984,"NodeLatitude":33.8714444,"NodeLongitude":35.6104338,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:35","EndTime":"2024-01-13 15:44:35","Latitude":null,"Longitude":null,"OSM_ID":6508979288,"NodeLatitude":33.8712315,"NodeLongitude":35.6102278,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:38","EndTime":"2024-01-13 15:44:38","Latitude":null,"Longitude":null,"OSM_ID":288791771,"NodeLatitude":33.8710748,"NodeLongitude":35.6100798,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:41","EndTime":"2024-01-13 15:44:41","Latitude":null,"Longitude":null,"OSM_ID":6181142047,"NodeLatitude":33.8709211,"NodeLongitude":35.609943,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:44","EndTime":"2024-01-13 15:44:44","Latitude":null,"Longitude":null,"OSM_ID":6181142046,"NodeLatitude":33.8708389,"NodeLongitude":35.609836,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:47","EndTime":"2024-01-13 15:44:47","Latitude":null,"Longitude":null,"OSM_ID":288791453,"NodeLatitude":33.870778,"NodeLongitude":35.6096971,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:50","EndTime":"2024-01-13 15:44:50","Latitude":33.8707796428,"Longitude":35.6094480251,"OSM_ID":288791773,"NodeLatitude":33.8706779,"NodeLongitude":35.6093902,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:52","EndTime":"2024-01-13 15:44:52","Latitude":null,"Longitude":null,"OSM_ID":6181142048,"NodeLatitude":33.8705344,"NodeLongitude":35.6089424,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:54","EndTime":"2024-01-13 15:44:54","Latitude":null,"Longitude":null,"OSM_ID":6508979290,"NodeLatitude":33.8704719,"NodeLongitude":35.6088459,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:56","EndTime":"2024-01-13 15:44:56","Latitude":null,"Longitude":null,"OSM_ID":288791455,"NodeLatitude":33.8703789,"NodeLongitude":35.6087629,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:44:58","EndTime":"2024-01-13 15:44:58","Latitude":null,"Longitude":null,"OSM_ID":6181142049,"NodeLatitude":33.870209,"NodeLongitude":35.6086374,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:01","EndTime":"2024-01-13 15:45:01","Latitude":null,"Longitude":null,"OSM_ID":2680231552,"NodeLatitude":33.8700191,"NodeLongitude":35.6085026,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:03","EndTime":"2024-01-13 15:45:03","Latitude":null,"Longitude":null,"OSM_ID":6715453114,"NodeLatitude":33.8699679,"NodeLongitude":35.6084521,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:05","EndTime":"2024-01-13 15:45:05","Latitude":null,"Longitude":null,"OSM_ID":3147867647,"NodeLatitude":33.8698711,"NodeLongitude":35.6082946,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:07","EndTime":"2024-01-13 15:45:07","Latitude":null,"Longitude":null,"OSM_ID":5161229817,"NodeLatitude":33.8698377,"NodeLongitude":35.608117,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:10","EndTime":"2024-01-13 15:45:10","Latitude":33.8698966074,"Longitude":35.6080299915,"OSM_ID":6426821467,"NodeLatitude":33.8698106,"NodeLongitude":35.6079952,"NodeType":"Road Node","StreetName":"Rond-Point Wakim"},{"StartTime":"2024-01-13 15:45:11","EndTime":"2024-01-13 15:45:11","Latitude":null,"Longitude":null,"OSM_ID":6663199087,"NodeLatitude":33.8698196,"NodeLongitude":35.607956,"NodeType":"Intermediate","StreetName":"Rond-Point Wakim"},{"StartTime":"2024-01-13 15:45:13","EndTime":"2024-01-13 15:45:13","Latitude":null,"Longitude":null,"OSM_ID":4507128302,"NodeLatitude":33.8698174,"NodeLongitude":35.6079132,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:15","EndTime":"2024-01-13 15:45:15","Latitude":null,"Longitude":null,"OSM_ID":5161229816,"NodeLatitude":33.8698667,"NodeLongitude":35.6077845,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:17","EndTime":"2024-01-13 15:45:17","Latitude":null,"Longitude":null,"OSM_ID":6663221676,"NodeLatitude":33.8698961,"NodeLongitude":35.607708,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:19","EndTime":"2024-01-13 15:45:19","Latitude":null,"Longitude":null,"OSM_ID":5161229815,"NodeLatitude":33.8699204,"NodeLongitude":35.6076168,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:20","EndTime":"2024-01-13 15:45:20","Latitude":null,"Longitude":null,"OSM_ID":4507128308,"NodeLatitude":33.8699283,"NodeLongitude":35.6074908,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:22","EndTime":"2024-01-13 15:45:22","Latitude":null,"Longitude":null,"OSM_ID":6663221677,"NodeLatitude":33.869925,"NodeLongitude":35.6074244,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:24","EndTime":"2024-01-13 15:45:24","Latitude":null,"Longitude":null,"OSM_ID":288791459,"NodeLatitude":33.8699145,"NodeLongitude":35.6073627,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:45:26","EndTime":"2024-01-13 15:45:26","Latitude":null,"Longitude":null,"OSM_ID":6715453115,"NodeLatitude":33.8698885,"NodeLongitude":35.6072603,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:28","EndTime":"2024-01-13 15:45:28","Latitude":null,"Longitude":null,"OSM_ID":3106369754,"NodeLatitude":33.8698616,"NodeLongitude":35.607179,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:30","EndTime":"2024-01-13 15:45:30","Latitude":33.8697675812,"Longitude":35.606725376,"OSM_ID":6662997952,"NodeLatitude":33.8697753,"NodeLongitude":35.6069335,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:32","EndTime":"2024-01-13 15:45:32","Latitude":null,"Longitude":null,"OSM_ID":6662997953,"NodeLatitude":33.8696439,"NodeLongitude":35.6065714,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:35","EndTime":"2024-01-13 15:45:35","Latitude":null,"Longitude":null,"OSM_ID":288791776,"NodeLatitude":33.8695743,"NodeLongitude":35.6063515,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:37","EndTime":"2024-01-13 15:45:37","Latitude":null,"Longitude":null,"OSM_ID":6662997954,"NodeLatitude":33.8695036,"NodeLongitude":35.6060605,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:40","EndTime":"2024-01-13 15:45:40","Latitude":null,"Longitude":null,"OSM_ID":288791461,"NodeLatitude":33.8694284,"NodeLongitude":35.6057956,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:42","EndTime":"2024-01-13 15:45:42","Latitude":null,"Longitude":null,"OSM_ID":6662997955,"NodeLatitude":33.8693577,"NodeLongitude":35.6056186,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:45","EndTime":"2024-01-13 15:45:45","Latitude":null,"Longitude":null,"OSM_ID":6662997957,"NodeLatitude":33.8692391,"NodeLongitude":35.6054067,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:47","EndTime":"2024-01-13 15:45:47","Latitude":null,"Longitude":null,"OSM_ID":9315519299,"NodeLatitude":33.8692141,"NodeLongitude":35.605364,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:50","EndTime":"2024-01-13 15:45:50","Latitude":33.869190484,"Longitude":35.6052279321,"OSM_ID":6662997956,"NodeLatitude":33.8691445,"NodeLongitude":35.6052451,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:45:55","EndTime":"2024-01-13 15:45:55","Latitude":null,"Longitude":null,"OSM_ID":6662997958,"NodeLatitude":33.8690314,"NodeLongitude":35.6050754,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:00","EndTime":"2024-01-13 15:46:00","Latitude":null,"Longitude":null,"OSM_ID":288791462,"NodeLatitude":33.8688677,"NodeLongitude":35.6048334,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:05","EndTime":"2024-01-13 15:46:05","Latitude":null,"Longitude":null,"OSM_ID":3147867666,"NodeLatitude":33.8687852,"NodeLongitude":35.604718,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:10","EndTime":"2024-01-13 15:46:10","Latitude":33.8685513701,"Longitude":35.604288575,"OSM_ID":6662955745,"NodeLatitude":33.8686406,"NodeLongitude":35.6045216,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:13","EndTime":"2024-01-13 15:46:13","Latitude":null,"Longitude":null,"OSM_ID":6662955746,"NodeLatitude":33.8682564,"NodeLongitude":35.6039844,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:16","EndTime":"2024-01-13 15:46:16","Latitude":null,"Longitude":null,"OSM_ID":6662955747,"NodeLatitude":33.8680448,"NodeLongitude":35.6036867,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:20","EndTime":"2024-01-13 15:46:20","Latitude":null,"Longitude":null,"OSM_ID":9318124721,"NodeLatitude":33.8678588,"NodeLongitude":35.6034272,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:23","EndTime":"2024-01-13 15:46:23","Latitude":null,"Longitude":null,"OSM_ID":4453577735,"NodeLatitude":33.8678149,"NodeLongitude":35.6033709,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:26","EndTime":"2024-01-13 15:46:26","Latitude":null,"Longitude":null,"OSM_ID":6662955748,"NodeLatitude":33.867728,"NodeLongitude":35.6032475,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:30","EndTime":"2024-01-13 15:46:30","Latitude":33.8676945917,"Longitude":35.6031140243,"OSM_ID":288791463,"NodeLatitude":33.8676612,"NodeLongitude":35.6031664,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:31","EndTime":"2024-01-13 15:46:31","Latitude":null,"Longitude":null,"OSM_ID":6662955749,"NodeLatitude":33.867605,"NodeLongitude":35.6031094,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:33","EndTime":"2024-01-13 15:46:33","Latitude":null,"Longitude":null,"OSM_ID":6662955750,"NodeLatitude":33.8674647,"NodeLongitude":35.60299,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:35","EndTime":"2024-01-13 15:46:35","Latitude":null,"Longitude":null,"OSM_ID":6662955751,"NodeLatitude":33.8673583,"NodeLongitude":35.6029116,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:37","EndTime":"2024-01-13 15:46:37","Latitude":null,"Longitude":null,"OSM_ID":288791464,"NodeLatitude":33.8672754,"NodeLongitude":35.602868,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:39","EndTime":"2024-01-13 15:46:39","Latitude":null,"Longitude":null,"OSM_ID":6662955752,"NodeLatitude":33.8671395,"NodeLongitude":35.6028163,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:40","EndTime":"2024-01-13 15:46:40","Latitude":null,"Longitude":null,"OSM_ID":288791465,"NodeLatitude":33.8669463,"NodeLongitude":35.6027694,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:42","EndTime":"2024-01-13 15:46:42","Latitude":null,"Longitude":null,"OSM_ID":6662955753,"NodeLatitude":33.8668021,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:44","EndTime":"2024-01-13 15:46:44","Latitude":null,"Longitude":null,"OSM_ID":6660212495,"NodeLatitude":33.866654,"NodeLongitude":35.6027365,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:46","EndTime":"2024-01-13 15:46:46","Latitude":null,"Longitude":null,"OSM_ID":6662955754,"NodeLatitude":33.8665193,"NodeLongitude":35.6027433,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:48","EndTime":"2024-01-13 15:46:48","Latitude":null,"Longitude":null,"OSM_ID":288791777,"NodeLatitude":33.8664268,"NodeLongitude":35.602752,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:50","EndTime":"2024-01-13 15:46:50","Latitude":33.8661589791,"Longitude":35.602735827,"OSM_ID":6662955755,"NodeLatitude":33.8662542,"NodeLongitude":35.6027701,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:51","EndTime":"2024-01-13 15:46:51","Latitude":null,"Longitude":null,"OSM_ID":288791467,"NodeLatitude":33.8659597,"NodeLongitude":35.6027835,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:53","EndTime":"2024-01-13 15:46:53","Latitude":null,"Longitude":null,"OSM_ID":6660212494,"NodeLatitude":33.8656674,"NodeLongitude":35.6027493,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:55","EndTime":"2024-01-13 15:46:55","Latitude":null,"Longitude":null,"OSM_ID":288791778,"NodeLatitude":33.8654892,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:57","EndTime":"2024-01-13 15:46:57","Latitude":null,"Longitude":null,"OSM_ID":6662955758,"NodeLatitude":33.8653511,"NodeLongitude":35.6027412,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:46:59","EndTime":"2024-01-13 15:46:59","Latitude":null,"Longitude":null,"OSM_ID":6662955757,"NodeLatitude":33.8652247,"NodeLongitude":35.6027493,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:00","EndTime":"2024-01-13 15:47:00","Latitude":null,"Longitude":null,"OSM_ID":6662955756,"NodeLatitude":33.8651184,"NodeLongitude":35.6027721,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:02","EndTime":"2024-01-13 15:47:02","Latitude":null,"Longitude":null,"OSM_ID":288791469,"NodeLatitude":33.8650109,"NodeLongitude":35.6028002,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:04","EndTime":"2024-01-13 15:47:04","Latitude":null,"Longitude":null,"OSM_ID":6662955759,"NodeLatitude":33.8649257,"NodeLongitude":35.6028331,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:06","EndTime":"2024-01-13 15:47:06","Latitude":null,"Longitude":null,"OSM_ID":6662955760,"NodeLatitude":33.8648272,"NodeLongitude":35.6028901,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:08","EndTime":"2024-01-13 15:47:08","Latitude":null,"Longitude":null,"OSM_ID":290329778,"NodeLatitude":33.8646896,"NodeLongitude":35.6029847,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:10","EndTime":"2024-01-13 15:47:10","Latitude":33.864504184,"Longitude":35.6031491431,"OSM_ID":5878940098,"NodeLatitude":33.8644836,"NodeLongitude":35.6031496,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:11","EndTime":"2024-01-13 15:47:11","Latitude":null,"Longitude":null,"OSM_ID":6662955763,"NodeLatitude":33.8644396,"NodeLongitude":35.6031838,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:13","EndTime":"2024-01-13 15:47:13","Latitude":null,"Longitude":null,"OSM_ID":5878940097,"NodeLatitude":33.8643767,"NodeLongitude":35.603218,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:14","EndTime":"2024-01-13 15:47:14","Latitude":null,"Longitude":null,"OSM_ID":6662955762,"NodeLatitude":33.8643233,"NodeLongitude":35.6032468,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:16","EndTime":"2024-01-13 15:47:16","Latitude":null,"Longitude":null,"OSM_ID":288791470,"NodeLatitude":33.8642453,"NodeLongitude":35.6032643,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:17","EndTime":"2024-01-13 15:47:17","Latitude":null,"Longitude":null,"OSM_ID":6662955761,"NodeLatitude":33.8641796,"NodeLongitude":35.6032643,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:19","EndTime":"2024-01-13 15:47:19","Latitude":null,"Longitude":null,"OSM_ID":6662955764,"NodeLatitude":33.8641122,"NodeLongitude":35.6032542,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:20","EndTime":"2024-01-13 15:47:20","Latitude":null,"Longitude":null,"OSM_ID":6503616912,"NodeLatitude":33.8638845,"NodeLongitude":35.6031536,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:22","EndTime":"2024-01-13 15:47:22","Latitude":null,"Longitude":null,"OSM_ID":6662955765,"NodeLatitude":33.8637576,"NodeLongitude":35.6031047,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:23","EndTime":"2024-01-13 15:47:23","Latitude":null,"Longitude":null,"OSM_ID":288791779,"NodeLatitude":33.863429,"NodeLongitude":35.6029605,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:25","EndTime":"2024-01-13 15:47:25","Latitude":null,"Longitude":null,"OSM_ID":6662955766,"NodeLatitude":33.8633567,"NodeLongitude":35.6029283,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:26","EndTime":"2024-01-13 15:47:26","Latitude":null,"Longitude":null,"OSM_ID":6662955767,"NodeLatitude":33.8633038,"NodeLongitude":35.6028961,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:28","EndTime":"2024-01-13 15:47:28","Latitude":null,"Longitude":null,"OSM_ID":6662955768,"NodeLatitude":33.8632431,"NodeLongitude":35.6028445,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:30","EndTime":"2024-01-13 15:47:30","Latitude":33.8630287688,"Longitude":35.6025677228,"OSM_ID":6662955769,"NodeLatitude":33.8630916,"NodeLongitude":35.6026943,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:31","EndTime":"2024-01-13 15:47:31","Latitude":null,"Longitude":null,"OSM_ID":6663199086,"NodeLatitude":33.862838,"NodeLongitude":35.6024536,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:32","EndTime":"2024-01-13 15:47:32","Latitude":null,"Longitude":null,"OSM_ID":6662955770,"NodeLatitude":33.8627921,"NodeLongitude":35.60241,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:34","EndTime":"2024-01-13 15:47:34","Latitude":null,"Longitude":null,"OSM_ID":6662955772,"NodeLatitude":33.8625081,"NodeLongitude":35.6021639,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:35","EndTime":"2024-01-13 15:47:35","Latitude":null,"Longitude":null,"OSM_ID":288791473,"NodeLatitude":33.8622133,"NodeLongitude":35.6018983,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:36","EndTime":"2024-01-13 15:47:36","Latitude":null,"Longitude":null,"OSM_ID":6662955775,"NodeLatitude":33.8621712,"NodeLongitude":35.6018501,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:38","EndTime":"2024-01-13 15:47:38","Latitude":null,"Longitude":null,"OSM_ID":6715453116,"NodeLatitude":33.8621429,"NodeLongitude":35.6018034,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:39","EndTime":"2024-01-13 15:47:39","Latitude":null,"Longitude":null,"OSM_ID":6662955776,"NodeLatitude":33.8621205,"NodeLongitude":35.6017468,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:40","EndTime":"2024-01-13 15:47:40","Latitude":null,"Longitude":null,"OSM_ID":6662955774,"NodeLatitude":33.8621024,"NodeLongitude":35.6016891,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:42","EndTime":"2024-01-13 15:47:42","Latitude":null,"Longitude":null,"OSM_ID":6662955777,"NodeLatitude":33.8620916,"NodeLongitude":35.6016295,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:43","EndTime":"2024-01-13 15:47:43","Latitude":null,"Longitude":null,"OSM_ID":6662955773,"NodeLatitude":33.8620896,"NodeLongitude":35.6015638,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:44","EndTime":"2024-01-13 15:47:44","Latitude":null,"Longitude":null,"OSM_ID":288791780,"NodeLatitude":33.8620921,"NodeLongitude":35.6015068,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:46","EndTime":"2024-01-13 15:47:46","Latitude":null,"Longitude":null,"OSM_ID":2680319964,"NodeLatitude":33.8620977,"NodeLongitude":35.6014417,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:47","EndTime":"2024-01-13 15:47:47","Latitude":null,"Longitude":null,"OSM_ID":6662955778,"NodeLatitude":33.8621072,"NodeLongitude":35.6013646,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:48","EndTime":"2024-01-13 15:47:48","Latitude":null,"Longitude":null,"OSM_ID":6664980632,"NodeLatitude":33.8621512,"NodeLongitude":35.6012908,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:50","EndTime":"2024-01-13 15:47:50","Latitude":33.8621998832,"Longitude":35.6012866368,"OSM_ID":6664980631,"NodeLatitude":33.8621935,"NodeLongitude":35.6012285,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:52","EndTime":"2024-01-13 15:47:52","Latitude":null,"Longitude":null,"OSM_ID":6664980630,"NodeLatitude":33.8622144,"NodeLongitude":35.6011882,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:54","EndTime":"2024-01-13 15:47:54","Latitude":null,"Longitude":null,"OSM_ID":6664980629,"NodeLatitude":33.8622311,"NodeLongitude":35.601138,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:56","EndTime":"2024-01-13 15:47:56","Latitude":null,"Longitude":null,"OSM_ID":2680235441,"NodeLatitude":33.8623566,"NodeLongitude":35.6012185,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:47:58","EndTime":"2024-01-13 15:47:58","Latitude":null,"Longitude":null,"OSM_ID":6662955784,"NodeLatitude":33.8624791,"NodeLongitude":35.601264,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:01","EndTime":"2024-01-13 15:48:01","Latitude":null,"Longitude":null,"OSM_ID":6662955783,"NodeLatitude":33.8626362,"NodeLongitude":35.601317,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:03","EndTime":"2024-01-13 15:48:03","Latitude":null,"Longitude":null,"OSM_ID":288791476,"NodeLatitude":33.8627943,"NodeLongitude":35.6013505,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:05","EndTime":"2024-01-13 15:48:05","Latitude":null,"Longitude":null,"OSM_ID":6662992185,"NodeLatitude":33.8632097,"NodeLongitude":35.6014001,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:07","EndTime":"2024-01-13 15:48:07","Latitude":null,"Longitude":null,"OSM_ID":6663135796,"NodeLatitude":33.8635072,"NodeLongitude":35.601421,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:10","EndTime":"2024-01-13 15:48:10","Latitude":33.8635959458,"Longitude":35.6014050592,"OSM_ID":4453577705,"NodeLatitude":33.8636696,"NodeLongitude":35.6014283,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:12","EndTime":"2024-01-13 15:48:12","Latitude":null,"Longitude":null,"OSM_ID":6662999433,"NodeLatitude":33.8637261,"NodeLongitude":35.6014388,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:14","EndTime":"2024-01-13 15:48:14","Latitude":null,"Longitude":null,"OSM_ID":288791781,"NodeLatitude":33.8638132,"NodeLongitude":35.6014551,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:16","EndTime":"2024-01-13 15:48:16","Latitude":null,"Longitude":null,"OSM_ID":6662992186,"NodeLatitude":33.8640493,"NodeLongitude":35.6015369,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:18","EndTime":"2024-01-13 15:48:18","Latitude":null,"Longitude":null,"OSM_ID":6503616907,"NodeLatitude":33.864232,"NodeLongitude":35.6016013,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:21","EndTime":"2024-01-13 15:48:21","Latitude":null,"Longitude":null,"OSM_ID":288791782,"NodeLatitude":33.8646206,"NodeLongitude":35.6017448,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:23","EndTime":"2024-01-13 15:48:23","Latitude":null,"Longitude":null,"OSM_ID":6662992188,"NodeLatitude":33.8648656,"NodeLongitude":35.6018092,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:25","EndTime":"2024-01-13 15:48:25","Latitude":null,"Longitude":null,"OSM_ID":288791479,"NodeLatitude":33.8650939,"NodeLongitude":35.6018427,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:27","EndTime":"2024-01-13 15:48:27","Latitude":null,"Longitude":null,"OSM_ID":6662992189,"NodeLatitude":33.8652709,"NodeLongitude":35.6018414,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:30","EndTime":"2024-01-13 15:48:30","Latitude":33.8654005032,"Longitude":35.6018460734,"OSM_ID":6662992190,"NodeLatitude":33.8654625,"NodeLongitude":35.6018333,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:32","EndTime":"2024-01-13 15:48:32","Latitude":null,"Longitude":null,"OSM_ID":288791480,"NodeLatitude":33.8656206,"NodeLongitude":35.6018025,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:35","EndTime":"2024-01-13 15:48:35","Latitude":null,"Longitude":null,"OSM_ID":6662992191,"NodeLatitude":33.8658767,"NodeLongitude":35.6017341,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:38","EndTime":"2024-01-13 15:48:38","Latitude":null,"Longitude":null,"OSM_ID":6662992192,"NodeLatitude":33.8660059,"NodeLongitude":35.6016885,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:41","EndTime":"2024-01-13 15:48:41","Latitude":null,"Longitude":null,"OSM_ID":288791481,"NodeLatitude":33.8661663,"NodeLongitude":35.601616,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:44","EndTime":"2024-01-13 15:48:44","Latitude":null,"Longitude":null,"OSM_ID":6662992193,"NodeLatitude":33.8665432,"NodeLongitude":35.6014109,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:47","EndTime":"2024-01-13 15:48:47","Latitude":null,"Longitude":null,"OSM_ID":6662992194,"NodeLatitude":33.8670616,"NodeLongitude":35.6011426,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:50","EndTime":"2024-01-13 15:48:50","Latitude":33.8672885929,"Longitude":35.6010368849,"OSM_ID":6715453117,"NodeLatitude":33.8672466,"NodeLongitude":35.6010453,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:51","EndTime":"2024-01-13 15:48:51","Latitude":null,"Longitude":null,"OSM_ID":288791482,"NodeLatitude":33.8676317,"NodeLongitude":35.6008335,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:52","EndTime":"2024-01-13 15:48:52","Latitude":null,"Longitude":null,"OSM_ID":6662992195,"NodeLatitude":33.8678088,"NodeLongitude":35.600743,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:53","EndTime":"2024-01-13 15:48:53","Latitude":null,"Longitude":null,"OSM_ID":288791483,"NodeLatitude":33.8679029,"NodeLongitude":35.6007148,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:54","EndTime":"2024-01-13 15:48:54","Latitude":null,"Longitude":null,"OSM_ID":6662992201,"NodeLatitude":33.8680125,"NodeLongitude":35.6007162,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:55","EndTime":"2024-01-13 15:48:55","Latitude":null,"Longitude":null,"OSM_ID":6662992200,"NodeLatitude":33.8680916,"NodeLongitude":35.6007336,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:56","EndTime":"2024-01-13 15:48:56","Latitude":null,"Longitude":null,"OSM_ID":6662992196,"NodeLatitude":33.8681222,"NodeLongitude":35.600747,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:57","EndTime":"2024-01-13 15:48:57","Latitude":null,"Longitude":null,"OSM_ID":6662992198,"NodeLatitude":33.8681562,"NodeLongitude":35.6007671,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:58","EndTime":"2024-01-13 15:48:58","Latitude":null,"Longitude":null,"OSM_ID":6662992199,"NodeLatitude":33.8682224,"NodeLongitude":35.6008295,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:48:59","EndTime":"2024-01-13 15:48:59","Latitude":null,"Longitude":null,"OSM_ID":6662992197,"NodeLatitude":33.8682881,"NodeLongitude":35.6008764,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:00","EndTime":"2024-01-13 15:49:00","Latitude":null,"Longitude":null,"OSM_ID":288791783,"NodeLatitude":33.8683476,"NodeLongitude":35.6009112,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:01","EndTime":"2024-01-13 15:49:01","Latitude":null,"Longitude":null,"OSM_ID":6659922632,"NodeLatitude":33.868409,"NodeLongitude":35.6009321,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:02","EndTime":"2024-01-13 15:49:02","Latitude":null,"Longitude":null,"OSM_ID":3136599024,"NodeLatitude":33.8684585,"NodeLongitude":35.6009421,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:03","EndTime":"2024-01-13 15:49:03","Latitude":null,"Longitude":null,"OSM_ID":6659922631,"NodeLatitude":33.8684891,"NodeLongitude":35.6009381,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:04","EndTime":"2024-01-13 15:49:04","Latitude":null,"Longitude":null,"OSM_ID":288794091,"NodeLatitude":33.8685181,"NodeLongitude":35.6009307,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:05","EndTime":"2024-01-13 15:49:05","Latitude":null,"Longitude":null,"OSM_ID":6659922633,"NodeLatitude":33.8685548,"NodeLongitude":35.6009207,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:06","EndTime":"2024-01-13 15:49:06","Latitude":null,"Longitude":null,"OSM_ID":6660212496,"NodeLatitude":33.868581,"NodeLongitude":35.6008999,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:07","EndTime":"2024-01-13 15:49:07","Latitude":null,"Longitude":null,"OSM_ID":6659922634,"NodeLatitude":33.8685955,"NodeLongitude":35.6008838,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:08","EndTime":"2024-01-13 15:49:08","Latitude":null,"Longitude":null,"OSM_ID":6659922635,"NodeLatitude":33.8686183,"NodeLongitude":35.6008429,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:09","EndTime":"2024-01-13 15:49:09","Latitude":null,"Longitude":null,"OSM_ID":290329851,"NodeLatitude":33.8686339,"NodeLongitude":35.6007919,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:10","EndTime":"2024-01-13 15:49:10","Latitude":33.8686899224,"Longitude":35.6007017949,"OSM_ID":6659922636,"NodeLatitude":33.8686439,"NodeLongitude":35.6007256,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:11","EndTime":"2024-01-13 15:49:11","Latitude":null,"Longitude":null,"OSM_ID":6659922637,"NodeLatitude":33.8686489,"NodeLongitude":35.6006666,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:12","EndTime":"2024-01-13 15:49:12","Latitude":null,"Longitude":null,"OSM_ID":288791485,"NodeLatitude":33.8686467,"NodeLongitude":35.6005874,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:13","EndTime":"2024-01-13 15:49:13","Latitude":null,"Longitude":null,"OSM_ID":6659922638,"NodeLatitude":33.8686256,"NodeLongitude":35.6005036,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:14","EndTime":"2024-01-13 15:49:14","Latitude":null,"Longitude":null,"OSM_ID":288791784,"NodeLatitude":33.8685738,"NodeLongitude":35.6003554,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:15","EndTime":"2024-01-13 15:49:15","Latitude":null,"Longitude":null,"OSM_ID":6659922639,"NodeLatitude":33.8685248,"NodeLongitude":35.6002602,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:16","EndTime":"2024-01-13 15:49:16","Latitude":null,"Longitude":null,"OSM_ID":288794092,"NodeLatitude":33.8684713,"NodeLongitude":35.6001703,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:17","EndTime":"2024-01-13 15:49:17","Latitude":null,"Longitude":null,"OSM_ID":6660212497,"NodeLatitude":33.8684346,"NodeLongitude":35.6001341,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:18","EndTime":"2024-01-13 15:49:18","Latitude":null,"Longitude":null,"OSM_ID":6659922640,"NodeLatitude":33.8683889,"NodeLongitude":35.6001019,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:19","EndTime":"2024-01-13 15:49:19","Latitude":null,"Longitude":null,"OSM_ID":6659518721,"NodeLatitude":33.8683299,"NodeLongitude":35.6000738,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:20","EndTime":"2024-01-13 15:49:20","Latitude":null,"Longitude":null,"OSM_ID":288791785,"NodeLatitude":33.868262,"NodeLongitude":35.6000456,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:21","EndTime":"2024-01-13 15:49:21","Latitude":null,"Longitude":null,"OSM_ID":6659518724,"NodeLatitude":33.8681818,"NodeLongitude":35.6000148,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:22","EndTime":"2024-01-13 15:49:22","Latitude":null,"Longitude":null,"OSM_ID":6659518723,"NodeLatitude":33.8680691,"NodeLongitude":35.5999831,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:23","EndTime":"2024-01-13 15:49:23","Latitude":null,"Longitude":null,"OSM_ID":6659518722,"NodeLatitude":33.8679623,"NodeLongitude":35.5999651,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:24","EndTime":"2024-01-13 15:49:24","Latitude":null,"Longitude":null,"OSM_ID":6715453118,"NodeLatitude":33.8678563,"NodeLongitude":35.5999497,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:25","EndTime":"2024-01-13 15:49:25","Latitude":null,"Longitude":null,"OSM_ID":288791488,"NodeLatitude":33.8677616,"NodeLongitude":35.5999424,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:26","EndTime":"2024-01-13 15:49:26","Latitude":null,"Longitude":null,"OSM_ID":6659518725,"NodeLatitude":33.8676845,"NodeLongitude":35.5999375,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:27","EndTime":"2024-01-13 15:49:27","Latitude":null,"Longitude":null,"OSM_ID":6659518726,"NodeLatitude":33.8675618,"NodeLongitude":35.599937,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:28","EndTime":"2024-01-13 15:49:28","Latitude":null,"Longitude":null,"OSM_ID":6659518727,"NodeLatitude":33.8674615,"NodeLongitude":35.5999539,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:29","EndTime":"2024-01-13 15:49:29","Latitude":null,"Longitude":null,"OSM_ID":3227075364,"NodeLatitude":33.8673455,"NodeLongitude":35.5999799,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:30","EndTime":"2024-01-13 15:49:30","Latitude":33.8671035364,"Longitude":35.6000603218,"OSM_ID":288791489,"NodeLatitude":33.867194,"NodeLongitude":35.6000255,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:31","EndTime":"2024-01-13 15:49:31","Latitude":null,"Longitude":null,"OSM_ID":6659518714,"NodeLatitude":33.8667008,"NodeLongitude":35.60022,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:32","EndTime":"2024-01-13 15:49:32","Latitude":null,"Longitude":null,"OSM_ID":288791786,"NodeLatitude":33.8663043,"NodeLongitude":35.6003688,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:34","EndTime":"2024-01-13 15:49:34","Latitude":null,"Longitude":null,"OSM_ID":6659518715,"NodeLatitude":33.8661735,"NodeLongitude":35.6004124,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:35","EndTime":"2024-01-13 15:49:35","Latitude":null,"Longitude":null,"OSM_ID":6663000367,"NodeLatitude":33.8660905,"NodeLongitude":35.6004345,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:37","EndTime":"2024-01-13 15:49:37","Latitude":null,"Longitude":null,"OSM_ID":4453577730,"NodeLatitude":33.8660031,"NodeLongitude":35.6004433,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:38","EndTime":"2024-01-13 15:49:38","Latitude":null,"Longitude":null,"OSM_ID":6659518716,"NodeLatitude":33.8658739,"NodeLongitude":35.6004533,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:40","EndTime":"2024-01-13 15:49:40","Latitude":null,"Longitude":null,"OSM_ID":288791491,"NodeLatitude":33.8657498,"NodeLongitude":35.6004547,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:41","EndTime":"2024-01-13 15:49:41","Latitude":null,"Longitude":null,"OSM_ID":6659518718,"NodeLatitude":33.8656646,"NodeLongitude":35.6004473,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:42","EndTime":"2024-01-13 15:49:42","Latitude":null,"Longitude":null,"OSM_ID":6659518717,"NodeLatitude":33.8655835,"NodeLongitude":35.6004443,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:44","EndTime":"2024-01-13 15:49:44","Latitude":null,"Longitude":null,"OSM_ID":6659518719,"NodeLatitude":33.8654243,"NodeLongitude":35.6004308,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:45","EndTime":"2024-01-13 15:49:45","Latitude":null,"Longitude":null,"OSM_ID":6663000366,"NodeLatitude":33.8653716,"NodeLongitude":35.6004238,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:47","EndTime":"2024-01-13 15:49:47","Latitude":null,"Longitude":null,"OSM_ID":288791787,"NodeLatitude":33.8653088,"NodeLongitude":35.6004093,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:48","EndTime":"2024-01-13 15:49:48","Latitude":null,"Longitude":null,"OSM_ID":6659518720,"NodeLatitude":33.8652283,"NodeLongitude":35.6003863,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:50","EndTime":"2024-01-13 15:49:50","Latitude":33.8652269256,"Longitude":35.600272685,"OSM_ID":4453577729,"NodeLatitude":33.8651668,"NodeLongitude":35.6003288,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:51","EndTime":"2024-01-13 15:49:51","Latitude":null,"Longitude":null,"OSM_ID":6659518729,"NodeLatitude":33.8650935,"NodeLongitude":35.6002354,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:52","EndTime":"2024-01-13 15:49:52","Latitude":null,"Longitude":null,"OSM_ID":288791493,"NodeLatitude":33.8650303,"NodeLongitude":35.600125,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:53","EndTime":"2024-01-13 15:49:53","Latitude":null,"Longitude":null,"OSM_ID":4453577724,"NodeLatitude":33.8649836,"NodeLongitude":35.6000056,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:54","EndTime":"2024-01-13 15:49:54","Latitude":null,"Longitude":null,"OSM_ID":6659518728,"NodeLatitude":33.8649452,"NodeLongitude":35.5998683,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:55","EndTime":"2024-01-13 15:49:55","Latitude":null,"Longitude":null,"OSM_ID":3136598998,"NodeLatitude":33.8649312,"NodeLongitude":35.5997408,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:57","EndTime":"2024-01-13 15:49:57","Latitude":null,"Longitude":null,"OSM_ID":288791788,"NodeLatitude":33.8649324,"NodeLongitude":35.5996138,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:58","EndTime":"2024-01-13 15:49:58","Latitude":null,"Longitude":null,"OSM_ID":4453577723,"NodeLatitude":33.8649357,"NodeLongitude":35.5993536,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:49:59","EndTime":"2024-01-13 15:49:59","Latitude":null,"Longitude":null,"OSM_ID":6659518731,"NodeLatitude":33.8649321,"NodeLongitude":35.5992634,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:00","EndTime":"2024-01-13 15:50:00","Latitude":null,"Longitude":null,"OSM_ID":4453577727,"NodeLatitude":33.8649221,"NodeLongitude":35.5991974,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:01","EndTime":"2024-01-13 15:50:01","Latitude":null,"Longitude":null,"OSM_ID":6659518730,"NodeLatitude":33.8649048,"NodeLongitude":35.5991571,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:02","EndTime":"2024-01-13 15:50:02","Latitude":null,"Longitude":null,"OSM_ID":288791789,"NodeLatitude":33.8648879,"NodeLongitude":35.5991149,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:04","EndTime":"2024-01-13 15:50:04","Latitude":null,"Longitude":null,"OSM_ID":4453577728,"NodeLatitude":33.8648595,"NodeLongitude":35.5990626,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:05","EndTime":"2024-01-13 15:50:05","Latitude":null,"Longitude":null,"OSM_ID":4453577725,"NodeLatitude":33.8648166,"NodeLongitude":35.5990076,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:06","EndTime":"2024-01-13 15:50:06","Latitude":null,"Longitude":null,"OSM_ID":6659518732,"NodeLatitude":33.8647415,"NodeLongitude":35.5989627,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:07","EndTime":"2024-01-13 15:50:07","Latitude":null,"Longitude":null,"OSM_ID":4453577726,"NodeLatitude":33.8646546,"NodeLongitude":35.5989244,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:08","EndTime":"2024-01-13 15:50:08","Latitude":null,"Longitude":null,"OSM_ID":288791496,"NodeLatitude":33.8645755,"NodeLongitude":35.598905,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:10","EndTime":"2024-01-13 15:50:10","Latitude":33.8642019556,"Longitude":35.5988572249,"OSM_ID":288791497,"NodeLatitude":33.8641629,"NodeLongitude":35.5988402,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:11","EndTime":"2024-01-13 15:50:11","Latitude":null,"Longitude":null,"OSM_ID":6659518734,"NodeLatitude":33.8640509,"NodeLongitude":35.5988214,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:12","EndTime":"2024-01-13 15:50:12","Latitude":null,"Longitude":null,"OSM_ID":6659518733,"NodeLatitude":33.863991,"NodeLongitude":35.5988083,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:13","EndTime":"2024-01-13 15:50:13","Latitude":null,"Longitude":null,"OSM_ID":3136599025,"NodeLatitude":33.863943,"NodeLongitude":35.5987671,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:15","EndTime":"2024-01-13 15:50:15","Latitude":null,"Longitude":null,"OSM_ID":6659518736,"NodeLatitude":33.8639145,"NodeLongitude":35.5987193,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:16","EndTime":"2024-01-13 15:50:16","Latitude":null,"Longitude":null,"OSM_ID":6659518737,"NodeLatitude":33.863894,"NodeLongitude":35.5986275,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:17","EndTime":"2024-01-13 15:50:17","Latitude":null,"Longitude":null,"OSM_ID":288791790,"NodeLatitude":33.8638923,"NodeLongitude":35.598512,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:18","EndTime":"2024-01-13 15:50:18","Latitude":null,"Longitude":null,"OSM_ID":6133596880,"NodeLatitude":33.8638974,"NodeLongitude":35.5984606,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:20","EndTime":"2024-01-13 15:50:20","Latitude":null,"Longitude":null,"OSM_ID":6659518739,"NodeLatitude":33.8639107,"NodeLongitude":35.5983258,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:21","EndTime":"2024-01-13 15:50:21","Latitude":null,"Longitude":null,"OSM_ID":6659518740,"NodeLatitude":33.8639307,"NodeLongitude":35.5982061,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:22","EndTime":"2024-01-13 15:50:22","Latitude":null,"Longitude":null,"OSM_ID":6659518738,"NodeLatitude":33.8639451,"NodeLongitude":35.5981193,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:23","EndTime":"2024-01-13 15:50:23","Latitude":null,"Longitude":null,"OSM_ID":288791791,"NodeLatitude":33.8639612,"NodeLongitude":35.5980353,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:25","EndTime":"2024-01-13 15:50:25","Latitude":null,"Longitude":null,"OSM_ID":6659518741,"NodeLatitude":33.8639563,"NodeLongitude":35.5979041,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:26","EndTime":"2024-01-13 15:50:26","Latitude":null,"Longitude":null,"OSM_ID":6659518742,"NodeLatitude":33.8639403,"NodeLongitude":35.5977805,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:27","EndTime":"2024-01-13 15:50:27","Latitude":null,"Longitude":null,"OSM_ID":288791792,"NodeLatitude":33.8639083,"NodeLongitude":35.5976068,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:28","EndTime":"2024-01-13 15:50:28","Latitude":null,"Longitude":null,"OSM_ID":6659518743,"NodeLatitude":33.8638594,"NodeLongitude":35.5973849,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:30","EndTime":"2024-01-13 15:50:30","Latitude":33.863855055,"Longitude":35.5970200225,"OSM_ID":6659518744,"NodeLatitude":33.8637809,"NodeLongitude":35.5970104,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:32","EndTime":"2024-01-13 15:50:32","Latitude":null,"Longitude":null,"OSM_ID":6659884403,"NodeLatitude":33.8637552,"NodeLongitude":35.5968753,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:34","EndTime":"2024-01-13 15:50:34","Latitude":null,"Longitude":null,"OSM_ID":6659518745,"NodeLatitude":33.8637108,"NodeLongitude":35.5965353,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:36","EndTime":"2024-01-13 15:50:36","Latitude":null,"Longitude":null,"OSM_ID":6659518746,"NodeLatitude":33.8636733,"NodeLongitude":35.5963703,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:38","EndTime":"2024-01-13 15:50:38","Latitude":null,"Longitude":null,"OSM_ID":6715415223,"NodeLatitude":33.8636006,"NodeLongitude":35.5961541,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:41","EndTime":"2024-01-13 15:50:41","Latitude":null,"Longitude":null,"OSM_ID":288791793,"NodeLatitude":33.8635228,"NodeLongitude":35.5960239,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:43","EndTime":"2024-01-13 15:50:43","Latitude":null,"Longitude":null,"OSM_ID":288791794,"NodeLatitude":33.8632745,"NodeLongitude":35.5956204,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:45","EndTime":"2024-01-13 15:50:45","Latitude":null,"Longitude":null,"OSM_ID":6659518747,"NodeLatitude":33.8632163,"NodeLongitude":35.595516,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:47","EndTime":"2024-01-13 15:50:47","Latitude":null,"Longitude":null,"OSM_ID":3136607848,"NodeLatitude":33.8631626,"NodeLongitude":35.5954289,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:50","EndTime":"2024-01-13 15:50:50","Latitude":33.8631627891,"Longitude":35.5953454495,"OSM_ID":6659518748,"NodeLatitude":33.8631211,"NodeLongitude":35.5953762,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:51","EndTime":"2024-01-13 15:50:51","Latitude":null,"Longitude":null,"OSM_ID":5334623446,"NodeLatitude":33.8630834,"NodeLongitude":35.5953401,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:52","EndTime":"2024-01-13 15:50:52","Latitude":null,"Longitude":null,"OSM_ID":6659518749,"NodeLatitude":33.8630401,"NodeLongitude":35.5953132,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:54","EndTime":"2024-01-13 15:50:54","Latitude":null,"Longitude":null,"OSM_ID":288791503,"NodeLatitude":33.8629869,"NodeLongitude":35.5952891,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:55","EndTime":"2024-01-13 15:50:55","Latitude":null,"Longitude":null,"OSM_ID":6659518750,"NodeLatitude":33.8629402,"NodeLongitude":35.5952767,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:57","EndTime":"2024-01-13 15:50:57","Latitude":null,"Longitude":null,"OSM_ID":5334623445,"NodeLatitude":33.8628879,"NodeLongitude":35.5952689,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:50:58","EndTime":"2024-01-13 15:50:58","Latitude":null,"Longitude":null,"OSM_ID":6659518751,"NodeLatitude":33.8628491,"NodeLongitude":35.5952689,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:00","EndTime":"2024-01-13 15:51:00","Latitude":null,"Longitude":null,"OSM_ID":5334623444,"NodeLatitude":33.8627952,"NodeLongitude":35.5952745,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:01","EndTime":"2024-01-13 15:51:01","Latitude":null,"Longitude":null,"OSM_ID":288791795,"NodeLatitude":33.8626033,"NodeLongitude":35.5953155,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:02","EndTime":"2024-01-13 15:51:02","Latitude":null,"Longitude":null,"OSM_ID":6659884391,"NodeLatitude":33.8625042,"NodeLongitude":35.5953363,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:04","EndTime":"2024-01-13 15:51:04","Latitude":null,"Longitude":null,"OSM_ID":6659518752,"NodeLatitude":33.8624435,"NodeLongitude":35.5953491,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:05","EndTime":"2024-01-13 15:51:05","Latitude":null,"Longitude":null,"OSM_ID":4453577696,"NodeLatitude":33.862211,"NodeLongitude":35.5954032,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:07","EndTime":"2024-01-13 15:51:07","Latitude":null,"Longitude":null,"OSM_ID":3128749518,"NodeLatitude":33.8618903,"NodeLongitude":35.595487,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:08","EndTime":"2024-01-13 15:51:08","Latitude":null,"Longitude":null,"OSM_ID":288791505,"NodeLatitude":33.8616795,"NodeLongitude":35.5955502,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:10","EndTime":"2024-01-13 15:51:10","Latitude":33.8614944515,"Longitude":35.5956115592,"OSM_ID":4507423363,"NodeLatitude":33.8614763,"NodeLongitude":35.5956193,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:11","EndTime":"2024-01-13 15:51:11","Latitude":null,"Longitude":null,"OSM_ID":6659518753,"NodeLatitude":33.861434,"NodeLongitude":35.5956267,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:13","EndTime":"2024-01-13 15:51:13","Latitude":null,"Longitude":null,"OSM_ID":4507423362,"NodeLatitude":33.8613868,"NodeLongitude":35.5956215,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:15","EndTime":"2024-01-13 15:51:15","Latitude":null,"Longitude":null,"OSM_ID":6659518754,"NodeLatitude":33.8613509,"NodeLongitude":35.5956051,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:16","EndTime":"2024-01-13 15:51:16","Latitude":null,"Longitude":null,"OSM_ID":288791506,"NodeLatitude":33.8613167,"NodeLongitude":35.5955767,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:18","EndTime":"2024-01-13 15:51:18","Latitude":null,"Longitude":null,"OSM_ID":6659518755,"NodeLatitude":33.8612969,"NodeLongitude":35.5955474,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:20","EndTime":"2024-01-13 15:51:20","Latitude":null,"Longitude":null,"OSM_ID":4507423360,"NodeLatitude":33.8612753,"NodeLongitude":35.5955033,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:21","EndTime":"2024-01-13 15:51:21","Latitude":null,"Longitude":null,"OSM_ID":3106369640,"NodeLatitude":33.8612491,"NodeLongitude":35.5954289,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:23","EndTime":"2024-01-13 15:51:23","Latitude":null,"Longitude":null,"OSM_ID":288791796,"NodeLatitude":33.8612063,"NodeLongitude":35.5952592,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:25","EndTime":"2024-01-13 15:51:25","Latitude":null,"Longitude":null,"OSM_ID":6659518756,"NodeLatitude":33.8611227,"NodeLongitude":35.5949092,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:26","EndTime":"2024-01-13 15:51:26","Latitude":null,"Longitude":null,"OSM_ID":6715415224,"NodeLatitude":33.8610258,"NodeLongitude":35.5944984,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:28","EndTime":"2024-01-13 15:51:28","Latitude":null,"Longitude":null,"OSM_ID":288791797,"NodeLatitude":33.8609401,"NodeLongitude":35.5941381,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:30","EndTime":"2024-01-13 15:51:30","Latitude":33.8608796989,"Longitude":35.5936039626,"OSM_ID":6659518757,"NodeLatitude":33.8607998,"NodeLongitude":35.5935895,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:32","EndTime":"2024-01-13 15:51:32","Latitude":null,"Longitude":null,"OSM_ID":6659518758,"NodeLatitude":33.8606723,"NodeLongitude":35.5931792,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:34","EndTime":"2024-01-13 15:51:34","Latitude":null,"Longitude":null,"OSM_ID":288791509,"NodeLatitude":33.8606171,"NodeLongitude":35.5930417,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:36","EndTime":"2024-01-13 15:51:36","Latitude":null,"Longitude":null,"OSM_ID":6659518759,"NodeLatitude":33.8605353,"NodeLongitude":35.5928928,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:38","EndTime":"2024-01-13 15:51:38","Latitude":null,"Longitude":null,"OSM_ID":6659518760,"NodeLatitude":33.8604512,"NodeLongitude":35.5927661,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:41","EndTime":"2024-01-13 15:51:41","Latitude":null,"Longitude":null,"OSM_ID":288791798,"NodeLatitude":33.8603131,"NodeLongitude":35.5925743,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:43","EndTime":"2024-01-13 15:51:43","Latitude":null,"Longitude":null,"OSM_ID":6643759835,"NodeLatitude":33.8600959,"NodeLongitude":35.592286,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:45","EndTime":"2024-01-13 15:51:45","Latitude":null,"Longitude":null,"OSM_ID":6643904945,"NodeLatitude":33.860066,"NodeLongitude":35.592241,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:47","EndTime":"2024-01-13 15:51:47","Latitude":null,"Longitude":null,"OSM_ID":4507423348,"NodeLatitude":33.85992,"NodeLongitude":35.5920218,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:50","EndTime":"2024-01-13 15:51:50","Latitude":33.8598334021,"Longitude":35.5917674702,"OSM_ID":6643759836,"NodeLatitude":33.8597741,"NodeLongitude":35.5918233,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:51","EndTime":"2024-01-13 15:51:51","Latitude":null,"Longitude":null,"OSM_ID":288791511,"NodeLatitude":33.8595998,"NodeLongitude":35.5915792,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:53","EndTime":"2024-01-13 15:51:53","Latitude":null,"Longitude":null,"OSM_ID":6643759833,"NodeLatitude":33.8595347,"NodeLongitude":35.5915001,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:54","EndTime":"2024-01-13 15:51:54","Latitude":null,"Longitude":null,"OSM_ID":3106361528,"NodeLatitude":33.8594255,"NodeLongitude":35.5913814,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:56","EndTime":"2024-01-13 15:51:56","Latitude":null,"Longitude":null,"OSM_ID":6643759832,"NodeLatitude":33.8593955,"NodeLongitude":35.5913533,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:57","EndTime":"2024-01-13 15:51:57","Latitude":null,"Longitude":null,"OSM_ID":6643759837,"NodeLatitude":33.8593643,"NodeLongitude":35.5913372,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:51:59","EndTime":"2024-01-13 15:51:59","Latitude":null,"Longitude":null,"OSM_ID":6643759834,"NodeLatitude":33.8593086,"NodeLongitude":35.591311,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:00","EndTime":"2024-01-13 15:52:00","Latitude":null,"Longitude":null,"OSM_ID":288791799,"NodeLatitude":33.8592323,"NodeLongitude":35.5912875,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:02","EndTime":"2024-01-13 15:52:02","Latitude":null,"Longitude":null,"OSM_ID":6643759831,"NodeLatitude":33.8591438,"NodeLongitude":35.5912681,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:03","EndTime":"2024-01-13 15:52:03","Latitude":null,"Longitude":null,"OSM_ID":6643759838,"NodeLatitude":33.8590369,"NodeLongitude":35.5912346,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:05","EndTime":"2024-01-13 15:52:05","Latitude":null,"Longitude":null,"OSM_ID":2407057492,"NodeLatitude":33.858851,"NodeLongitude":35.5911775,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:06","EndTime":"2024-01-13 15:52:06","Latitude":null,"Longitude":null,"OSM_ID":288791800,"NodeLatitude":33.8587196,"NodeLongitude":35.591129,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:08","EndTime":"2024-01-13 15:52:08","Latitude":null,"Longitude":null,"OSM_ID":6715415225,"NodeLatitude":33.8586499,"NodeLongitude":35.5910958,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:10","EndTime":"2024-01-13 15:52:10","Latitude":33.858583185,"Longitude":35.5910189553,"OSM_ID":4507423340,"NodeLatitude":33.8585524,"NodeLongitude":35.5910495,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:11","EndTime":"2024-01-13 15:52:11","Latitude":null,"Longitude":null,"OSM_ID":6643759840,"NodeLatitude":33.8584121,"NodeLongitude":35.5909824,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:13","EndTime":"2024-01-13 15:52:13","Latitude":null,"Longitude":null,"OSM_ID":288791514,"NodeLatitude":33.8582907,"NodeLongitude":35.5909073,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:15","EndTime":"2024-01-13 15:52:15","Latitude":null,"Longitude":null,"OSM_ID":6643759839,"NodeLatitude":33.8581671,"NodeLongitude":35.5908054,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:16","EndTime":"2024-01-13 15:52:16","Latitude":null,"Longitude":null,"OSM_ID":6663124810,"NodeLatitude":33.8580802,"NodeLongitude":35.5907102,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:18","EndTime":"2024-01-13 15:52:18","Latitude":null,"Longitude":null,"OSM_ID":6643759841,"NodeLatitude":33.8580023,"NodeLongitude":35.5905868,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:20","EndTime":"2024-01-13 15:52:20","Latitude":null,"Longitude":null,"OSM_ID":6643759842,"NodeLatitude":33.8579588,"NodeLongitude":35.5904929,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:21","EndTime":"2024-01-13 15:52:21","Latitude":null,"Longitude":null,"OSM_ID":288791801,"NodeLatitude":33.8578786,"NodeLongitude":35.5903186,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:23","EndTime":"2024-01-13 15:52:23","Latitude":null,"Longitude":null,"OSM_ID":6643759843,"NodeLatitude":33.8578152,"NodeLongitude":35.5901439,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:25","EndTime":"2024-01-13 15:52:25","Latitude":null,"Longitude":null,"OSM_ID":6663124811,"NodeLatitude":33.8577798,"NodeLongitude":35.5900349,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:26","EndTime":"2024-01-13 15:52:26","Latitude":null,"Longitude":null,"OSM_ID":6643759844,"NodeLatitude":33.8577517,"NodeLongitude":35.589923,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:28","EndTime":"2024-01-13 15:52:28","Latitude":null,"Longitude":null,"OSM_ID":288791802,"NodeLatitude":33.8576993,"NodeLongitude":35.5896226,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:30","EndTime":"2024-01-13 15:52:30","Latitude":33.8577629333,"Longitude":35.5894751352,"OSM_ID":6643759830,"NodeLatitude":33.8576648,"NodeLongitude":35.5894298,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:31","EndTime":"2024-01-13 15:52:31","Latitude":null,"Longitude":null,"OSM_ID":6663124812,"NodeLatitude":33.8576439,"NodeLongitude":35.5892953,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:33","EndTime":"2024-01-13 15:52:33","Latitude":null,"Longitude":null,"OSM_ID":6643759829,"NodeLatitude":33.8576127,"NodeLongitude":35.5891478,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:35","EndTime":"2024-01-13 15:52:35","Latitude":null,"Longitude":null,"OSM_ID":6663124813,"NodeLatitude":33.8575813,"NodeLongitude":35.5890392,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:36","EndTime":"2024-01-13 15:52:36","Latitude":null,"Longitude":null,"OSM_ID":288791803,"NodeLatitude":33.8574888,"NodeLongitude":35.5888085,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:38","EndTime":"2024-01-13 15:52:38","Latitude":null,"Longitude":null,"OSM_ID":4443311188,"NodeLatitude":33.8573674,"NodeLongitude":35.5886234,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:40","EndTime":"2024-01-13 15:52:40","Latitude":null,"Longitude":null,"OSM_ID":6663124814,"NodeLatitude":33.8573006,"NodeLongitude":35.5885604,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:41","EndTime":"2024-01-13 15:52:41","Latitude":null,"Longitude":null,"OSM_ID":288791804,"NodeLatitude":33.8571973,"NodeLongitude":35.5884638,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:43","EndTime":"2024-01-13 15:52:43","Latitude":null,"Longitude":null,"OSM_ID":6663124815,"NodeLatitude":33.8570668,"NodeLongitude":35.5883753,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:45","EndTime":"2024-01-13 15:52:45","Latitude":null,"Longitude":null,"OSM_ID":6133596884,"NodeLatitude":33.8569819,"NodeLongitude":35.5883124,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:46","EndTime":"2024-01-13 15:52:46","Latitude":null,"Longitude":null,"OSM_ID":288791805,"NodeLatitude":33.8569186,"NodeLongitude":35.5882654,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:48","EndTime":"2024-01-13 15:52:48","Latitude":null,"Longitude":null,"OSM_ID":6663124816,"NodeLatitude":33.8568073,"NodeLongitude":35.5881701,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:50","EndTime":"2024-01-13 15:52:50","Latitude":33.8566822344,"Longitude":35.5879122679,"OSM_ID":6663124817,"NodeLatitude":33.8566257,"NodeLongitude":35.5879797,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:51","EndTime":"2024-01-13 15:52:51","Latitude":null,"Longitude":null,"OSM_ID":6663124818,"NodeLatitude":33.8565745,"NodeLongitude":35.5879113,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:53","EndTime":"2024-01-13 15:52:53","Latitude":null,"Longitude":null,"OSM_ID":288791806,"NodeLatitude":33.8565144,"NodeLongitude":35.5878406,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:55","EndTime":"2024-01-13 15:52:55","Latitude":null,"Longitude":null,"OSM_ID":3070046403,"NodeLatitude":33.8564623,"NodeLongitude":35.5877976,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:56","EndTime":"2024-01-13 15:52:56","Latitude":null,"Longitude":null,"OSM_ID":6663124819,"NodeLatitude":33.8563498,"NodeLongitude":35.5877517,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:52:58","EndTime":"2024-01-13 15:52:58","Latitude":null,"Longitude":null,"OSM_ID":288791521,"NodeLatitude":33.856109,"NodeLongitude":35.5877095,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:00","EndTime":"2024-01-13 15:53:00","Latitude":null,"Longitude":null,"OSM_ID":4453577695,"NodeLatitude":33.8560137,"NodeLongitude":35.5876894,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:01","EndTime":"2024-01-13 15:53:01","Latitude":null,"Longitude":null,"OSM_ID":3106361548,"NodeLatitude":33.8559046,"NodeLongitude":35.5876565,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:03","EndTime":"2024-01-13 15:53:03","Latitude":null,"Longitude":null,"OSM_ID":4453577694,"NodeLatitude":33.8557882,"NodeLongitude":35.5875874,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:05","EndTime":"2024-01-13 15:53:05","Latitude":null,"Longitude":null,"OSM_ID":288791807,"NodeLatitude":33.8556958,"NodeLongitude":35.5874902,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:06","EndTime":"2024-01-13 15:53:06","Latitude":null,"Longitude":null,"OSM_ID":3136607880,"NodeLatitude":33.8556362,"NodeLongitude":35.5873755,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:08","EndTime":"2024-01-13 15:53:08","Latitude":null,"Longitude":null,"OSM_ID":6663124820,"NodeLatitude":33.8555889,"NodeLongitude":35.5872019,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:10","EndTime":"2024-01-13 15:53:10","Latitude":33.8555949427,"Longitude":35.5869395408,"OSM_ID":288791523,"NodeLatitude":33.855546,"NodeLongitude":35.5869987,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:12","EndTime":"2024-01-13 15:53:12","Latitude":null,"Longitude":null,"OSM_ID":6133596985,"NodeLatitude":33.8555053,"NodeLongitude":35.5867606,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:15","EndTime":"2024-01-13 15:53:15","Latitude":null,"Longitude":null,"OSM_ID":288791524,"NodeLatitude":33.8554212,"NodeLongitude":35.5862028,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:17","EndTime":"2024-01-13 15:53:17","Latitude":null,"Longitude":null,"OSM_ID":6663124822,"NodeLatitude":33.855419,"NodeLongitude":35.5860794,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:20","EndTime":"2024-01-13 15:53:20","Latitude":null,"Longitude":null,"OSM_ID":724318446,"NodeLatitude":33.8553528,"NodeLongitude":35.5857617,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:22","EndTime":"2024-01-13 15:53:22","Latitude":null,"Longitude":null,"OSM_ID":6663124823,"NodeLatitude":33.855324,"NodeLongitude":35.5856609,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:25","EndTime":"2024-01-13 15:53:25","Latitude":null,"Longitude":null,"OSM_ID":6772686530,"NodeLatitude":33.8552751,"NodeLongitude":35.5854447,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:27","EndTime":"2024-01-13 15:53:27","Latitude":null,"Longitude":null,"OSM_ID":6663124824,"NodeLatitude":33.8552431,"NodeLongitude":35.5853454,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:30","EndTime":"2024-01-13 15:53:30","Latitude":33.8552670112,"Longitude":35.585148419,"OSM_ID":288791525,"NodeLatitude":33.8552102,"NodeLongitude":35.5851345,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:31","EndTime":"2024-01-13 15:53:31","Latitude":null,"Longitude":null,"OSM_ID":6663124825,"NodeLatitude":33.8551913,"NodeLongitude":35.5848644,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:33","EndTime":"2024-01-13 15:53:33","Latitude":null,"Longitude":null,"OSM_ID":6663124826,"NodeLatitude":33.8551744,"NodeLongitude":35.584497,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:35","EndTime":"2024-01-13 15:53:35","Latitude":null,"Longitude":null,"OSM_ID":6663124827,"NodeLatitude":33.855161,"NodeLongitude":35.5841071,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:36","EndTime":"2024-01-13 15:53:36","Latitude":null,"Longitude":null,"OSM_ID":288791808,"NodeLatitude":33.855151,"NodeLongitude":35.5838659,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:38","EndTime":"2024-01-13 15:53:38","Latitude":null,"Longitude":null,"OSM_ID":6663124828,"NodeLatitude":33.8551595,"NodeLongitude":35.5837445,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:40","EndTime":"2024-01-13 15:53:40","Latitude":null,"Longitude":null,"OSM_ID":6663124829,"NodeLatitude":33.855184,"NodeLongitude":35.5836344,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:41","EndTime":"2024-01-13 15:53:41","Latitude":null,"Longitude":null,"OSM_ID":9041386606,"NodeLatitude":33.8552042,"NodeLongitude":35.5835819,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:43","EndTime":"2024-01-13 15:53:43","Latitude":null,"Longitude":null,"OSM_ID":2675311927,"NodeLatitude":33.8552287,"NodeLongitude":35.5835185,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:45","EndTime":"2024-01-13 15:53:45","Latitude":null,"Longitude":null,"OSM_ID":6663124830,"NodeLatitude":33.8552625,"NodeLongitude":35.5834524,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:46","EndTime":"2024-01-13 15:53:46","Latitude":null,"Longitude":null,"OSM_ID":3070045389,"NodeLatitude":33.8553137,"NodeLongitude":35.5833648,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:48","EndTime":"2024-01-13 15:53:48","Latitude":null,"Longitude":null,"OSM_ID":288791527,"NodeLatitude":33.8554029,"NodeLongitude":35.583257,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:50","EndTime":"2024-01-13 15:53:50","Latitude":33.8556231895,"Longitude":35.5831457968,"OSM_ID":6663124831,"NodeLatitude":33.8555939,"NodeLongitude":35.583088,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:51","EndTime":"2024-01-13 15:53:51","Latitude":null,"Longitude":null,"OSM_ID":6663124832,"NodeLatitude":33.8558695,"NodeLongitude":35.582858,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:53","EndTime":"2024-01-13 15:53:53","Latitude":null,"Longitude":null,"OSM_ID":7428241070,"NodeLatitude":33.8560783,"NodeLongitude":35.5826955,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:54","EndTime":"2024-01-13 15:53:54","Latitude":null,"Longitude":null,"OSM_ID":6663124833,"NodeLatitude":33.8562237,"NodeLongitude":35.5825824,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:56","EndTime":"2024-01-13 15:53:56","Latitude":null,"Longitude":null,"OSM_ID":288791809,"NodeLatitude":33.8564464,"NodeLongitude":35.5824081,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:57","EndTime":"2024-01-13 15:53:57","Latitude":null,"Longitude":null,"OSM_ID":2675311925,"NodeLatitude":33.8565467,"NodeLongitude":35.5822659,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:53:59","EndTime":"2024-01-13 15:53:59","Latitude":null,"Longitude":null,"OSM_ID":6663124834,"NodeLatitude":33.8565751,"NodeLongitude":35.5821848,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:00","EndTime":"2024-01-13 15:54:00","Latitude":null,"Longitude":null,"OSM_ID":3072876595,"NodeLatitude":33.8565923,"NodeLongitude":35.5820594,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:02","EndTime":"2024-01-13 15:54:02","Latitude":null,"Longitude":null,"OSM_ID":6663124835,"NodeLatitude":33.8565884,"NodeLongitude":35.5819474,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:03","EndTime":"2024-01-13 15:54:03","Latitude":null,"Longitude":null,"OSM_ID":288791529,"NodeLatitude":33.8565684,"NodeLongitude":35.5818663,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:05","EndTime":"2024-01-13 15:54:05","Latitude":null,"Longitude":null,"OSM_ID":6501811399,"NodeLatitude":33.8564915,"NodeLongitude":35.5816772,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:14","EndTime":"2024-01-13 15:54:14","Latitude":null,"Longitude":null,"OSM_ID":6501811399,"NodeLatitude":33.8564915,"NodeLongitude":35.5816772,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 43"},{"StartTime":"2024-01-13 15:54:06","EndTime":"2024-01-13 15:54:06","Latitude":null,"Longitude":null,"OSM_ID":6663288779,"NodeLatitude":33.8565141,"NodeLongitude":35.5816889,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:12","EndTime":"2024-01-13 15:54:12","Latitude":null,"Longitude":null,"OSM_ID":6663288779,"NodeLatitude":33.8565141,"NodeLongitude":35.5816889,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 43"},{"StartTime":"2024-01-13 15:54:08","EndTime":"2024-01-13 15:54:08","Latitude":null,"Longitude":null,"OSM_ID":6663288780,"NodeLatitude":33.8565411,"NodeLongitude":35.5817064,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:54:11","EndTime":"2024-01-13 15:54:11","Latitude":null,"Longitude":null,"OSM_ID":6663288780,"NodeLatitude":33.8565411,"NodeLongitude":35.5817064,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 43"},{"StartTime":"2024-01-13 15:54:10","EndTime":"2024-01-13 15:54:10","Latitude":33.8565887813,"Longitude":35.5816841531,"OSM_ID":6663288781,"NodeLatitude":33.8565675,"NodeLongitude":35.5817251,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:54:15","EndTime":"2024-01-13 15:54:15","Latitude":null,"Longitude":null,"OSM_ID":288791810,"NodeLatitude":33.8564047,"NodeLongitude":35.5815209,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:16","EndTime":"2024-01-13 15:54:16","Latitude":null,"Longitude":null,"OSM_ID":3106361394,"NodeLatitude":33.8563523,"NodeLongitude":35.5814264,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:18","EndTime":"2024-01-13 15:54:18","Latitude":null,"Longitude":null,"OSM_ID":6663124836,"NodeLatitude":33.8562899,"NodeLongitude":35.5813131,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:19","EndTime":"2024-01-13 15:54:19","Latitude":null,"Longitude":null,"OSM_ID":3072876585,"NodeLatitude":33.8561942,"NodeLongitude":35.5811501,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:20","EndTime":"2024-01-13 15:54:20","Latitude":null,"Longitude":null,"OSM_ID":3070031569,"NodeLatitude":33.8561686,"NodeLongitude":35.5811099,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:22","EndTime":"2024-01-13 15:54:22","Latitude":null,"Longitude":null,"OSM_ID":288791531,"NodeLatitude":33.8560978,"NodeLongitude":35.5809952,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:23","EndTime":"2024-01-13 15:54:23","Latitude":null,"Longitude":null,"OSM_ID":6663124837,"NodeLatitude":33.856021,"NodeLongitude":35.5809014,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:24","EndTime":"2024-01-13 15:54:24","Latitude":null,"Longitude":null,"OSM_ID":2675268469,"NodeLatitude":33.8559252,"NodeLongitude":35.580835,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:26","EndTime":"2024-01-13 15:54:26","Latitude":null,"Longitude":null,"OSM_ID":6663124838,"NodeLatitude":33.8558183,"NodeLongitude":35.5807994,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:27","EndTime":"2024-01-13 15:54:27","Latitude":null,"Longitude":null,"OSM_ID":288791532,"NodeLatitude":33.8557103,"NodeLongitude":35.5807961,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:54:28","EndTime":"2024-01-13 15:54:28","Latitude":null,"Longitude":null,"OSM_ID":3070045379,"NodeLatitude":33.8555677,"NodeLongitude":35.5808169,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:30","EndTime":"2024-01-13 15:54:30","Latitude":33.8553929915,"Longitude":35.580876611,"OSM_ID":6663124839,"NodeLatitude":33.8553511,"NodeLongitude":35.5808806,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:33","EndTime":"2024-01-13 15:54:33","Latitude":null,"Longitude":null,"OSM_ID":6664065838,"NodeLatitude":33.8553231,"NodeLongitude":35.5808885,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:36","EndTime":"2024-01-13 15:54:36","Latitude":null,"Longitude":null,"OSM_ID":3070031488,"NodeLatitude":33.8550899,"NodeLongitude":35.5809543,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:40","EndTime":"2024-01-13 15:54:40","Latitude":null,"Longitude":null,"OSM_ID":3106355311,"NodeLatitude":33.854998,"NodeLongitude":35.5809778,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:43","EndTime":"2024-01-13 15:54:43","Latitude":null,"Longitude":null,"OSM_ID":6663124840,"NodeLatitude":33.8548065,"NodeLongitude":35.5810227,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:46","EndTime":"2024-01-13 15:54:46","Latitude":null,"Longitude":null,"OSM_ID":288791811,"NodeLatitude":33.8545253,"NodeLongitude":35.5810938,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:50","EndTime":"2024-01-13 15:54:50","Latitude":33.8541031551,"Longitude":35.5812115783,"OSM_ID":6663124842,"NodeLatitude":33.8542012,"NodeLongitude":35.5811749,"NodeType":"Road Node","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:51","EndTime":"2024-01-13 15:54:51","Latitude":null,"Longitude":null,"OSM_ID":6663124841,"NodeLatitude":33.8538593,"NodeLongitude":35.581246,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:53","EndTime":"2024-01-13 15:54:53","Latitude":null,"Longitude":null,"OSM_ID":4518138187,"NodeLatitude":33.8537373,"NodeLongitude":35.5812588,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:54","EndTime":"2024-01-13 15:54:54","Latitude":null,"Longitude":null,"OSM_ID":4015037728,"NodeLatitude":33.853683,"NodeLongitude":35.5812618,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:56","EndTime":"2024-01-13 15:54:56","Latitude":null,"Longitude":null,"OSM_ID":288791534,"NodeLatitude":33.8535984,"NodeLongitude":35.5812745,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:57","EndTime":"2024-01-13 15:54:57","Latitude":null,"Longitude":null,"OSM_ID":6663812982,"NodeLatitude":33.8535293,"NodeLongitude":35.5812557,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:54:59","EndTime":"2024-01-13 15:54:59","Latitude":null,"Longitude":null,"OSM_ID":4518138174,"NodeLatitude":33.853512,"NodeLongitude":35.581249,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:00","EndTime":"2024-01-13 15:55:00","Latitude":null,"Longitude":null,"OSM_ID":4518138175,"NodeLatitude":33.8534653,"NodeLongitude":35.5812417,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:02","EndTime":"2024-01-13 15:55:02","Latitude":null,"Longitude":null,"OSM_ID":6663812980,"NodeLatitude":33.8534346,"NodeLongitude":35.5812343,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:03","EndTime":"2024-01-13 15:55:03","Latitude":null,"Longitude":null,"OSM_ID":4518138176,"NodeLatitude":33.8534135,"NodeLongitude":35.5812215,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:05","EndTime":"2024-01-13 15:55:05","Latitude":null,"Longitude":null,"OSM_ID":4518138177,"NodeLatitude":33.8533957,"NodeLongitude":35.5812132,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:06","EndTime":"2024-01-13 15:55:06","Latitude":null,"Longitude":null,"OSM_ID":4518138178,"NodeLatitude":33.8533731,"NodeLongitude":35.5811887,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:08","EndTime":"2024-01-13 15:55:08","Latitude":null,"Longitude":null,"OSM_ID":4518138179,"NodeLatitude":33.8533622,"NodeLongitude":35.5811508,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:10","EndTime":"2024-01-13 15:55:10","Latitude":null,"Longitude":null,"OSM_ID":4518138180,"NodeLatitude":33.853357,"NodeLongitude":35.5811253,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:11","EndTime":"2024-01-13 15:55:11","Latitude":null,"Longitude":null,"OSM_ID":2668434068,"NodeLatitude":33.8533562,"NodeLongitude":35.5811122,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:13","EndTime":"2024-01-13 15:55:13","Latitude":null,"Longitude":null,"OSM_ID":6426496852,"NodeLatitude":33.853358,"NodeLongitude":35.5810933,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:14","EndTime":"2024-01-13 15:55:14","Latitude":null,"Longitude":null,"OSM_ID":288791535,"NodeLatitude":33.853376,"NodeLongitude":35.5810532,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:16","EndTime":"2024-01-13 15:55:16","Latitude":null,"Longitude":null,"OSM_ID":3070031487,"NodeLatitude":33.8535936,"NodeLongitude":35.5806102,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:17","EndTime":"2024-01-13 15:55:17","Latitude":null,"Longitude":null,"OSM_ID":288791536,"NodeLatitude":33.85384,"NodeLongitude":35.5801233,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:19","EndTime":"2024-01-13 15:55:19","Latitude":null,"Longitude":null,"OSM_ID":6661445942,"NodeLatitude":33.8538765,"NodeLongitude":35.5800182,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:20","EndTime":"2024-01-13 15:55:20","Latitude":null,"Longitude":null,"OSM_ID":6661445943,"NodeLatitude":33.8539138,"NodeLongitude":35.5798768,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:22","EndTime":"2024-01-13 15:55:22","Latitude":null,"Longitude":null,"OSM_ID":3070031485,"NodeLatitude":33.8539506,"NodeLongitude":35.5797178,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:23","EndTime":"2024-01-13 15:55:23","Latitude":null,"Longitude":null,"OSM_ID":6661445944,"NodeLatitude":33.8539762,"NodeLongitude":35.5795951,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:25","EndTime":"2024-01-13 15:55:25","Latitude":null,"Longitude":null,"OSM_ID":288791537,"NodeLatitude":33.8539883,"NodeLongitude":35.579475,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:26","EndTime":"2024-01-13 15:55:26","Latitude":null,"Longitude":null,"OSM_ID":3070031510,"NodeLatitude":33.8539291,"NodeLongitude":35.5781049,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù?Ø?Ø?Ù?Ø?Ù?Ø?"},{"StartTime":"2024-01-13 15:55:28","EndTime":"2024-01-13 15:55:28","Latitude":null,"Longitude":null,"OSM_ID":288791538,"NodeLatitude":33.8539184,"NodeLongitude":35.5778177,"NodeType":"Intermediate","StreetName":"Ø?Ø?Ù?Ù? Ø?Ø?Ù?Ø?Ù?Ø? Ø?Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:30","EndTime":"2024-01-13 15:55:30","Latitude":33.8539951136,"Longitude":35.5778090297,"OSM_ID":5299108494,"NodeLatitude":33.8539254,"NodeLongitude":35.5777765,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:30","EndTime":"2024-01-13 15:55:30","Latitude":null,"Longitude":null,"OSM_ID":5299108491,"NodeLatitude":33.8539345,"NodeLongitude":35.5777353,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:31","EndTime":"2024-01-13 15:55:31","Latitude":null,"Longitude":null,"OSM_ID":3128765058,"NodeLatitude":33.8539618,"NodeLongitude":35.5776528,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:32","EndTime":"2024-01-13 15:55:32","Latitude":null,"Longitude":null,"OSM_ID":5299108493,"NodeLatitude":33.8539893,"NodeLongitude":35.5775902,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:33","EndTime":"2024-01-13 15:55:33","Latitude":null,"Longitude":null,"OSM_ID":5299108492,"NodeLatitude":33.8540212,"NodeLongitude":35.5775344,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:34","EndTime":"2024-01-13 15:55:34","Latitude":null,"Longitude":null,"OSM_ID":5299108495,"NodeLatitude":33.8540564,"NodeLongitude":35.5774772,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:35","EndTime":"2024-01-13 15:55:35","Latitude":null,"Longitude":null,"OSM_ID":288791539,"NodeLatitude":33.8540917,"NodeLongitude":35.5774267,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:36","EndTime":"2024-01-13 15:55:36","Latitude":null,"Longitude":null,"OSM_ID":3128011153,"NodeLatitude":33.8542826,"NodeLongitude":35.5772033,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:37","EndTime":"2024-01-13 15:55:37","Latitude":null,"Longitude":null,"OSM_ID":4507423322,"NodeLatitude":33.8543322,"NodeLongitude":35.5771452,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:38","EndTime":"2024-01-13 15:55:38","Latitude":null,"Longitude":null,"OSM_ID":3128011152,"NodeLatitude":33.8544115,"NodeLongitude":35.5770524,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:39","EndTime":"2024-01-13 15:55:39","Latitude":null,"Longitude":null,"OSM_ID":3070031509,"NodeLatitude":33.8547107,"NodeLongitude":35.5767027,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:55:40","EndTime":"2024-01-13 15:55:40","Latitude":null,"Longitude":null,"OSM_ID":288791541,"NodeLatitude":33.8547261,"NodeLongitude":35.5766836,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:41","EndTime":"2024-01-13 15:55:41","Latitude":null,"Longitude":null,"OSM_ID":4518096566,"NodeLatitude":33.8547899,"NodeLongitude":35.5765945,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:42","EndTime":"2024-01-13 15:55:42","Latitude":null,"Longitude":null,"OSM_ID":4518096565,"NodeLatitude":33.8548155,"NodeLongitude":35.5765524,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:43","EndTime":"2024-01-13 15:55:43","Latitude":null,"Longitude":null,"OSM_ID":4518096564,"NodeLatitude":33.8548528,"NodeLongitude":35.5764998,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:44","EndTime":"2024-01-13 15:55:44","Latitude":null,"Longitude":null,"OSM_ID":3843369997,"NodeLatitude":33.8548822,"NodeLongitude":35.5764633,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:45","EndTime":"2024-01-13 15:55:45","Latitude":null,"Longitude":null,"OSM_ID":4518096563,"NodeLatitude":33.8549405,"NodeLongitude":35.5763987,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:46","EndTime":"2024-01-13 15:55:46","Latitude":null,"Longitude":null,"OSM_ID":4518096560,"NodeLatitude":33.8549924,"NodeLongitude":35.5763475,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:47","EndTime":"2024-01-13 15:55:47","Latitude":null,"Longitude":null,"OSM_ID":4518096561,"NodeLatitude":33.8551445,"NodeLongitude":35.5762121,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:48","EndTime":"2024-01-13 15:55:48","Latitude":null,"Longitude":null,"OSM_ID":4518096562,"NodeLatitude":33.8551917,"NodeLongitude":35.5761658,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:49","EndTime":"2024-01-13 15:55:49","Latitude":null,"Longitude":null,"OSM_ID":2666923701,"NodeLatitude":33.8552502,"NodeLongitude":35.5761054,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:50","EndTime":"2024-01-13 15:55:50","Latitude":33.8553540073,"Longitude":35.576019029,"OSM_ID":4518096577,"NodeLatitude":33.8553231,"NodeLongitude":35.5760198,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:55:52","EndTime":"2024-01-13 15:55:52","Latitude":null,"Longitude":null,"OSM_ID":4518096576,"NodeLatitude":33.8553965,"NodeLongitude":35.5759272,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:55:55","EndTime":"2024-01-13 15:55:55","Latitude":null,"Longitude":null,"OSM_ID":292879468,"NodeLatitude":33.8555682,"NodeLongitude":35.5757604,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:55:58","EndTime":"2024-01-13 15:55:58","Latitude":null,"Longitude":null,"OSM_ID":6661370576,"NodeLatitude":33.8561023,"NodeLongitude":35.5751668,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:01","EndTime":"2024-01-13 15:56:01","Latitude":null,"Longitude":null,"OSM_ID":292879400,"NodeLatitude":33.856165,"NodeLongitude":35.5750857,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:04","EndTime":"2024-01-13 15:56:04","Latitude":null,"Longitude":null,"OSM_ID":6661370577,"NodeLatitude":33.856222,"NodeLongitude":35.5749934,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:07","EndTime":"2024-01-13 15:56:07","Latitude":null,"Longitude":null,"OSM_ID":4507423323,"NodeLatitude":33.8562894,"NodeLongitude":35.5748584,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:10","EndTime":"2024-01-13 15:56:10","Latitude":33.8564113701,"Longitude":35.5745630374,"OSM_ID":292879685,"NodeLatitude":33.8563573,"NodeLongitude":35.5746532,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:11","EndTime":"2024-01-13 15:56:11","Latitude":null,"Longitude":null,"OSM_ID":10264363672,"NodeLatitude":33.8563853,"NodeLongitude":35.5744402,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:13","EndTime":"2024-01-13 15:56:13","Latitude":null,"Longitude":null,"OSM_ID":4507423324,"NodeLatitude":33.856395,"NodeLongitude":35.5743376,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:15","EndTime":"2024-01-13 15:56:15","Latitude":null,"Longitude":null,"OSM_ID":292879405,"NodeLatitude":33.8563963,"NodeLongitude":35.5742294,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:17","EndTime":"2024-01-13 15:56:17","Latitude":null,"Longitude":null,"OSM_ID":6661445945,"NodeLatitude":33.8563796,"NodeLongitude":35.5740591,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:19","EndTime":"2024-01-13 15:56:19","Latitude":null,"Longitude":null,"OSM_ID":3106361393,"NodeLatitude":33.856354,"NodeLongitude":35.5738928,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:20","EndTime":"2024-01-13 15:56:20","Latitude":null,"Longitude":null,"OSM_ID":292879471,"NodeLatitude":33.8563184,"NodeLongitude":35.573764,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:22","EndTime":"2024-01-13 15:56:22","Latitude":null,"Longitude":null,"OSM_ID":3096871172,"NodeLatitude":33.8562499,"NodeLongitude":35.5735726,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:24","EndTime":"2024-01-13 15:56:24","Latitude":null,"Longitude":null,"OSM_ID":6661445946,"NodeLatitude":33.8562137,"NodeLongitude":35.5734744,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:26","EndTime":"2024-01-13 15:56:26","Latitude":null,"Longitude":null,"OSM_ID":6715598423,"NodeLatitude":33.8561577,"NodeLongitude":35.5733503,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:28","EndTime":"2024-01-13 15:56:28","Latitude":null,"Longitude":null,"OSM_ID":9050189159,"NodeLatitude":33.8560123,"NodeLongitude":35.5730279,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:30","EndTime":"2024-01-13 15:56:30","Latitude":33.8559122795,"Longitude":35.5726877415,"OSM_ID":292879472,"NodeLatitude":33.8558428,"NodeLongitude":35.5726519,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:35","EndTime":"2024-01-13 15:56:35","Latitude":null,"Longitude":null,"OSM_ID":6715598434,"NodeLatitude":33.8557676,"NodeLongitude":35.5725605,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:40","EndTime":"2024-01-13 15:56:40","Latitude":null,"Longitude":null,"OSM_ID":3228696185,"NodeLatitude":33.8556346,"NodeLongitude":35.5722485,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:45","EndTime":"2024-01-13 15:56:45","Latitude":null,"Longitude":null,"OSM_ID":6661445949,"NodeLatitude":33.855482,"NodeLongitude":35.5719079,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:50","EndTime":"2024-01-13 15:56:50","Latitude":33.8552510233,"Longitude":35.5712564908,"OSM_ID":3106358821,"NodeLatitude":33.8552761,"NodeLongitude":35.5714728,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:56:55","EndTime":"2024-01-13 15:56:55","Latitude":null,"Longitude":null,"OSM_ID":6661445950,"NodeLatitude":33.8551078,"NodeLongitude":35.5710777,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:00","EndTime":"2024-01-13 15:57:00","Latitude":null,"Longitude":null,"OSM_ID":6661445951,"NodeLatitude":33.8548828,"NodeLongitude":35.5705467,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:05","EndTime":"2024-01-13 15:57:05","Latitude":null,"Longitude":null,"OSM_ID":6661445952,"NodeLatitude":33.8546801,"NodeLongitude":35.5699781,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:10","EndTime":"2024-01-13 15:57:10","Latitude":33.8546762608,"Longitude":35.5697783574,"OSM_ID":6661493040,"NodeLatitude":33.8546315,"NodeLongitude":35.5698152,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:14","EndTime":"2024-01-13 15:57:14","Latitude":null,"Longitude":null,"OSM_ID":292879686,"NodeLatitude":33.8544541,"NodeLongitude":35.5692702,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:18","EndTime":"2024-01-13 15:57:18","Latitude":null,"Longitude":null,"OSM_ID":6513280054,"NodeLatitude":33.8543764,"NodeLongitude":35.5690267,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:22","EndTime":"2024-01-13 15:57:22","Latitude":null,"Longitude":null,"OSM_ID":292879413,"NodeLatitude":33.8542665,"NodeLongitude":35.5686777,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:26","EndTime":"2024-01-13 15:57:26","Latitude":null,"Longitude":null,"OSM_ID":6511715722,"NodeLatitude":33.8535229,"NodeLongitude":35.5661747,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:30","EndTime":"2024-01-13 15:57:30","Latitude":null,"Longitude":null,"OSM_ID":292879416,"NodeLatitude":33.8534661,"NodeLongitude":35.5659655,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:34","EndTime":"2024-01-13 15:57:34","Latitude":null,"Longitude":null,"OSM_ID":6518578265,"NodeLatitude":33.8534427,"NodeLongitude":35.5658541,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:38","EndTime":"2024-01-13 15:57:38","Latitude":null,"Longitude":null,"OSM_ID":4508895333,"NodeLatitude":33.8534266,"NodeLongitude":35.5657514,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:42","EndTime":"2024-01-13 15:57:42","Latitude":null,"Longitude":null,"OSM_ID":6511715720,"NodeLatitude":33.8534138,"NodeLongitude":35.565578,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:46","EndTime":"2024-01-13 15:57:46","Latitude":null,"Longitude":null,"OSM_ID":292879417,"NodeLatitude":33.8534229,"NodeLongitude":35.5653953,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:50","EndTime":"2024-01-13 15:57:50","Latitude":33.8535192708,"Longitude":35.5653750599,"OSM_ID":6513576120,"NodeLatitude":33.8534694,"NodeLongitude":35.5652976,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:51","EndTime":"2024-01-13 15:57:51","Latitude":null,"Longitude":null,"OSM_ID":6513576125,"NodeLatitude":33.8534895,"NodeLongitude":35.5652238,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:52","EndTime":"2024-01-13 15:57:52","Latitude":null,"Longitude":null,"OSM_ID":4508895334,"NodeLatitude":33.8535185,"NodeLongitude":35.5651192,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:54","EndTime":"2024-01-13 15:57:54","Latitude":null,"Longitude":null,"OSM_ID":6513576121,"NodeLatitude":33.8535536,"NodeLongitude":35.5649804,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:55","EndTime":"2024-01-13 15:57:55","Latitude":null,"Longitude":null,"OSM_ID":292879687,"NodeLatitude":33.8535827,"NodeLongitude":35.5648949,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:57","EndTime":"2024-01-13 15:57:57","Latitude":null,"Longitude":null,"OSM_ID":6513576126,"NodeLatitude":33.8536001,"NodeLongitude":35.5648454,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:57:58","EndTime":"2024-01-13 15:57:58","Latitude":null,"Longitude":null,"OSM_ID":6513576122,"NodeLatitude":33.8536166,"NodeLongitude":35.564803,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:00","EndTime":"2024-01-13 15:58:00","Latitude":null,"Longitude":null,"OSM_ID":6513576127,"NodeLatitude":33.8536721,"NodeLongitude":35.56468,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:01","EndTime":"2024-01-13 15:58:01","Latitude":null,"Longitude":null,"OSM_ID":6518612186,"NodeLatitude":33.8537107,"NodeLongitude":35.5646053,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:02","EndTime":"2024-01-13 15:58:02","Latitude":null,"Longitude":null,"OSM_ID":6518612188,"NodeLatitude":33.8537417,"NodeLongitude":35.5645492,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:04","EndTime":"2024-01-13 15:58:04","Latitude":null,"Longitude":null,"OSM_ID":292879419,"NodeLatitude":33.8537667,"NodeLongitude":35.5644798,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:05","EndTime":"2024-01-13 15:58:05","Latitude":null,"Longitude":null,"OSM_ID":3096870561,"NodeLatitude":33.8538622,"NodeLongitude":35.5643726,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:07","EndTime":"2024-01-13 15:58:07","Latitude":null,"Longitude":null,"OSM_ID":6518605183,"NodeLatitude":33.8540146,"NodeLongitude":35.5642558,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:08","EndTime":"2024-01-13 15:58:08","Latitude":null,"Longitude":null,"OSM_ID":6518605184,"NodeLatitude":33.8541618,"NodeLongitude":35.5641641,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:10","EndTime":"2024-01-13 15:58:10","Latitude":33.8544317821,"Longitude":35.5641032933,"OSM_ID":292879421,"NodeLatitude":33.854354,"NodeLongitude":35.5640911,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:12","EndTime":"2024-01-13 15:58:12","Latitude":null,"Longitude":null,"OSM_ID":3147888391,"NodeLatitude":33.8545099,"NodeLongitude":35.5640557,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:15","EndTime":"2024-01-13 15:58:15","Latitude":null,"Longitude":null,"OSM_ID":3133673154,"NodeLatitude":33.8549133,"NodeLongitude":35.5639785,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:17","EndTime":"2024-01-13 15:58:17","Latitude":null,"Longitude":null,"OSM_ID":6715620819,"NodeLatitude":33.8551099,"NodeLongitude":35.5639472,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:20","EndTime":"2024-01-13 15:58:20","Latitude":null,"Longitude":null,"OSM_ID":292879423,"NodeLatitude":33.8552787,"NodeLongitude":35.5639118,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:22","EndTime":"2024-01-13 15:58:22","Latitude":null,"Longitude":null,"OSM_ID":4508895335,"NodeLatitude":33.8554432,"NodeLongitude":35.5638388,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:25","EndTime":"2024-01-13 15:58:25","Latitude":null,"Longitude":null,"OSM_ID":6511715721,"NodeLatitude":33.855554,"NodeLongitude":35.5637554,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:27","EndTime":"2024-01-13 15:58:27","Latitude":null,"Longitude":null,"OSM_ID":6511715723,"NodeLatitude":33.8556702,"NodeLongitude":35.5636507,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:30","EndTime":"2024-01-13 15:58:30","Latitude":33.8559897982,"Longitude":35.5633688971,"OSM_ID":292879424,"NodeLatitude":33.855874,"NodeLongitude":35.5634228,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:50","EndTime":"2024-01-13 15:58:50","Latitude":33.8572803202,"Longitude":35.5617419534,"OSM_ID":292879688,"NodeLatitude":33.8573531,"NodeLongitude":35.5615451,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:53","EndTime":"2024-01-13 15:58:53","Latitude":null,"Longitude":null,"OSM_ID":2709382688,"NodeLatitude":33.8576267,"NodeLongitude":35.561174,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:58:56","EndTime":"2024-01-13 15:58:56","Latitude":null,"Longitude":null,"OSM_ID":6715620820,"NodeLatitude":33.8577514,"NodeLongitude":35.5609801,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:00","EndTime":"2024-01-13 15:59:00","Latitude":null,"Longitude":null,"OSM_ID":292879743,"NodeLatitude":33.8581894,"NodeLongitude":35.5601733,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:03","EndTime":"2024-01-13 15:59:03","Latitude":null,"Longitude":null,"OSM_ID":6661437930,"NodeLatitude":33.8583842,"NodeLongitude":35.5598219,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:06","EndTime":"2024-01-13 15:59:06","Latitude":null,"Longitude":null,"OSM_ID":6661437929,"NodeLatitude":33.858509,"NodeLongitude":35.55961,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:10","EndTime":"2024-01-13 15:59:10","Latitude":33.858629406,"Longitude":35.5595319756,"OSM_ID":292879691,"NodeLatitude":33.858617,"NodeLongitude":35.5594155,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:11","EndTime":"2024-01-13 15:59:11","Latitude":null,"Longitude":null,"OSM_ID":6715620821,"NodeLatitude":33.8588492,"NodeLongitude":35.5590909,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:13","EndTime":"2024-01-13 15:59:13","Latitude":null,"Longitude":null,"OSM_ID":6661437928,"NodeLatitude":33.8589355,"NodeLongitude":35.558977,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:15","EndTime":"2024-01-13 15:59:15","Latitude":null,"Longitude":null,"OSM_ID":292879483,"NodeLatitude":33.8591009,"NodeLongitude":35.5587959,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 4"},{"StartTime":"2024-01-13 15:59:16","EndTime":"2024-01-13 15:59:16","Latitude":null,"Longitude":null,"OSM_ID":292879679,"NodeLatitude":33.859408,"NodeLongitude":35.5584855,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:18","EndTime":"2024-01-13 15:59:18","Latitude":null,"Longitude":null,"OSM_ID":6738908541,"NodeLatitude":33.8594811,"NodeLongitude":35.5584545,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:20","EndTime":"2024-01-13 15:59:20","Latitude":null,"Longitude":null,"OSM_ID":4454605832,"NodeLatitude":33.8595763,"NodeLongitude":35.558389,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:21","EndTime":"2024-01-13 15:59:21","Latitude":null,"Longitude":null,"OSM_ID":4454605812,"NodeLatitude":33.8596079,"NodeLongitude":35.5583699,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:23","EndTime":"2024-01-13 15:59:23","Latitude":null,"Longitude":null,"OSM_ID":4454605833,"NodeLatitude":33.85967,"NodeLongitude":35.5583256,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:25","EndTime":"2024-01-13 15:59:25","Latitude":null,"Longitude":null,"OSM_ID":292879433,"NodeLatitude":33.8597206,"NodeLongitude":35.5582859,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:26","EndTime":"2024-01-13 15:59:26","Latitude":null,"Longitude":null,"OSM_ID":292879741,"NodeLatitude":33.8597748,"NodeLongitude":35.5582104,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:28","EndTime":"2024-01-13 15:59:28","Latitude":null,"Longitude":null,"OSM_ID":4454605869,"NodeLatitude":33.8598072,"NodeLongitude":35.5581367,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:30","EndTime":"2024-01-13 15:59:30","Latitude":33.8598932193,"Longitude":35.5580597351,"OSM_ID":4454605870,"NodeLatitude":33.8598342,"NodeLongitude":35.5580534,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:59:31","EndTime":"2024-01-13 15:59:31","Latitude":null,"Longitude":null,"OSM_ID":4454605871,"NodeLatitude":33.8598561,"NodeLongitude":35.5579761,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:33","EndTime":"2024-01-13 15:59:33","Latitude":null,"Longitude":null,"OSM_ID":4454605872,"NodeLatitude":33.8598713,"NodeLongitude":35.5578623,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:35","EndTime":"2024-01-13 15:59:35","Latitude":null,"Longitude":null,"OSM_ID":4454605873,"NodeLatitude":33.8598814,"NodeLongitude":35.557783,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:37","EndTime":"2024-01-13 15:59:37","Latitude":null,"Longitude":null,"OSM_ID":4454605861,"NodeLatitude":33.8598872,"NodeLongitude":35.5577114,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:39","EndTime":"2024-01-13 15:59:39","Latitude":null,"Longitude":null,"OSM_ID":4454605858,"NodeLatitude":33.8598932,"NodeLongitude":35.5575429,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:40","EndTime":"2024-01-13 15:59:40","Latitude":null,"Longitude":null,"OSM_ID":6416654156,"NodeLatitude":33.8599055,"NodeLongitude":35.5572349,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:42","EndTime":"2024-01-13 15:59:42","Latitude":null,"Longitude":null,"OSM_ID":4454605857,"NodeLatitude":33.8599149,"NodeLongitude":35.5568991,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:44","EndTime":"2024-01-13 15:59:44","Latitude":null,"Longitude":null,"OSM_ID":4454605856,"NodeLatitude":33.8599115,"NodeLongitude":35.5568173,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:46","EndTime":"2024-01-13 15:59:46","Latitude":null,"Longitude":null,"OSM_ID":4454605838,"NodeLatitude":33.8599046,"NodeLongitude":35.5565997,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:48","EndTime":"2024-01-13 15:59:48","Latitude":null,"Longitude":null,"OSM_ID":6666578971,"NodeLatitude":33.8599167,"NodeLongitude":35.5563935,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:52","EndTime":"2024-01-13 15:59:52","Latitude":null,"Longitude":null,"OSM_ID":6666578971,"NodeLatitude":33.8599167,"NodeLongitude":35.5563935,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 15:59:50","EndTime":"2024-01-13 15:59:50","Latitude":33.8600023638,"Longitude":35.5562761384,"OSM_ID":3249764714,"NodeLatitude":33.8600353,"NodeLongitude":35.5562906,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 15:59:55","EndTime":"2024-01-13 15:59:55","Latitude":null,"Longitude":null,"OSM_ID":6661620128,"NodeLatitude":33.8599267,"NodeLongitude":35.5562223,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 15:59:57","EndTime":"2024-01-13 15:59:57","Latitude":null,"Longitude":null,"OSM_ID":6661620129,"NodeLatitude":33.8599339,"NodeLongitude":35.5558629,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:00","EndTime":"2024-01-13 16:00:00","Latitude":null,"Longitude":null,"OSM_ID":288791575,"NodeLatitude":33.8599278,"NodeLongitude":35.5554137,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:02","EndTime":"2024-01-13 16:00:02","Latitude":null,"Longitude":null,"OSM_ID":6661293902,"NodeLatitude":33.8599111,"NodeLongitude":35.5551548,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:05","EndTime":"2024-01-13 16:00:05","Latitude":null,"Longitude":null,"OSM_ID":6661293903,"NodeLatitude":33.859881,"NodeLongitude":35.5548987,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:07","EndTime":"2024-01-13 16:00:07","Latitude":null,"Longitude":null,"OSM_ID":3047538492,"NodeLatitude":33.8598042,"NodeLongitude":35.5543971,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:10","EndTime":"2024-01-13 16:00:10","Latitude":33.8598694603,"Longitude":35.554132141,"OSM_ID":6661293904,"NodeLatitude":33.8597964,"NodeLongitude":35.554204,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:12","EndTime":"2024-01-13 16:00:12","Latitude":null,"Longitude":null,"OSM_ID":288791829,"NodeLatitude":33.8597886,"NodeLongitude":35.5539975,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:15","EndTime":"2024-01-13 16:00:15","Latitude":null,"Longitude":null,"OSM_ID":6661293905,"NodeLatitude":33.8598186,"NodeLongitude":35.5536669,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:17","EndTime":"2024-01-13 16:00:17","Latitude":null,"Longitude":null,"OSM_ID":10131809264,"NodeLatitude":33.8598231,"NodeLongitude":35.5536451,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:20","EndTime":"2024-01-13 16:00:20","Latitude":null,"Longitude":null,"OSM_ID":288791577,"NodeLatitude":33.8599017,"NodeLongitude":35.55326,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:22","EndTime":"2024-01-13 16:00:22","Latitude":null,"Longitude":null,"OSM_ID":6661293906,"NodeLatitude":33.8599932,"NodeLongitude":35.5529162,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:25","EndTime":"2024-01-13 16:00:25","Latitude":null,"Longitude":null,"OSM_ID":288791830,"NodeLatitude":33.860115,"NodeLongitude":35.55254,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:27","EndTime":"2024-01-13 16:00:27","Latitude":null,"Longitude":null,"OSM_ID":5244584484,"NodeLatitude":33.8602842,"NodeLongitude":35.5522084,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:30","EndTime":"2024-01-13 16:00:30","Latitude":33.8607379478,"Longitude":35.5516606215,"OSM_ID":288791579,"NodeLatitude":33.8604504,"NodeLongitude":35.5519597,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:32","EndTime":"2024-01-13 16:00:32","Latitude":null,"Longitude":null,"OSM_ID":288791831,"NodeLatitude":33.8612627,"NodeLongitude":35.5507909,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:00:35","EndTime":"2024-01-13 16:00:35","Latitude":null,"Longitude":null,"OSM_ID":2696639920,"NodeLatitude":33.8614253,"NodeLongitude":35.5505495,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:05","EndTime":"2024-01-13 16:01:05","Latitude":null,"Longitude":null,"OSM_ID":2696639920,"NodeLatitude":33.8614253,"NodeLongitude":35.5505495,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:37","EndTime":"2024-01-13 16:00:37","Latitude":null,"Longitude":null,"OSM_ID":6661696520,"NodeLatitude":33.8614273,"NodeLongitude":35.5504509,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:02","EndTime":"2024-01-13 16:01:02","Latitude":null,"Longitude":null,"OSM_ID":6661696520,"NodeLatitude":33.8614273,"NodeLongitude":35.5504509,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:40","EndTime":"2024-01-13 16:00:40","Latitude":null,"Longitude":null,"OSM_ID":6697269016,"NodeLatitude":33.8614368,"NodeLongitude":35.5503503,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:00","EndTime":"2024-01-13 16:01:00","Latitude":null,"Longitude":null,"OSM_ID":6697269016,"NodeLatitude":33.8614368,"NodeLongitude":35.5503503,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:42","EndTime":"2024-01-13 16:00:42","Latitude":null,"Longitude":null,"OSM_ID":6661696521,"NodeLatitude":33.8614513,"NodeLongitude":35.5502652,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:57","EndTime":"2024-01-13 16:00:57","Latitude":null,"Longitude":null,"OSM_ID":6661696521,"NodeLatitude":33.8614513,"NodeLongitude":35.5502652,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:45","EndTime":"2024-01-13 16:00:45","Latitude":null,"Longitude":null,"OSM_ID":6697269017,"NodeLatitude":33.8614763,"NodeLongitude":35.550174,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:55","EndTime":"2024-01-13 16:00:55","Latitude":null,"Longitude":null,"OSM_ID":6697269017,"NodeLatitude":33.8614763,"NodeLongitude":35.550174,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:47","EndTime":"2024-01-13 16:00:47","Latitude":null,"Longitude":null,"OSM_ID":6661696522,"NodeLatitude":33.8614997,"NodeLongitude":35.5501036,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:00:52","EndTime":"2024-01-13 16:00:52","Latitude":null,"Longitude":null,"OSM_ID":6661696522,"NodeLatitude":33.8614997,"NodeLongitude":35.5501036,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ 407"},{"StartTime":"2024-01-13 16:00:50","EndTime":"2024-01-13 16:00:50","Latitude":33.861814115,"Longitude":35.550111291,"OSM_ID":2696639921,"NodeLatitude":33.8615871,"NodeLongitude":35.5499071,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:01:07","EndTime":"2024-01-13 16:01:07","Latitude":null,"Longitude":null,"OSM_ID":3047538512,"NodeLatitude":33.862262,"NodeLongitude":35.5493063,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:10","EndTime":"2024-01-13 16:01:10","Latitude":33.8629260384,"Longitude":35.5484770997,"OSM_ID":11638173692,"NodeLatitude":33.8626611,"NodeLongitude":35.5487344,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:15","EndTime":"2024-01-13 16:01:15","Latitude":null,"Longitude":null,"OSM_ID":288791581,"NodeLatitude":33.863655,"NodeLongitude":35.54731,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:20","EndTime":"2024-01-13 16:01:20","Latitude":null,"Longitude":null,"OSM_ID":3047538464,"NodeLatitude":33.8638961,"NodeLongitude":35.5470525,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:25","EndTime":"2024-01-13 16:01:25","Latitude":null,"Longitude":null,"OSM_ID":288791832,"NodeLatitude":33.8641011,"NodeLongitude":35.5468954,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:30","EndTime":"2024-01-13 16:01:30","Latitude":33.8644894337,"Longitude":35.5467136242,"OSM_ID":3096735759,"NodeLatitude":33.8641709,"NodeLongitude":35.5468407,"NodeType":"Road Node","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:34","EndTime":"2024-01-13 16:01:34","Latitude":null,"Longitude":null,"OSM_ID":2730939308,"NodeLatitude":33.8651158,"NodeLongitude":35.5461433,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ø¨Ø±Ù…Ø§Ù†Ø§ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©"},{"StartTime":"2024-01-13 16:01:38","EndTime":"2024-01-13 16:01:38","Latitude":null,"Longitude":null,"OSM_ID":2671704019,"NodeLatitude":33.8652138,"NodeLongitude":35.5460788,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:42","EndTime":"2024-01-13 16:01:42","Latitude":null,"Longitude":null,"OSM_ID":9377183478,"NodeLatitude":33.8654168,"NodeLongitude":35.5459669,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:46","EndTime":"2024-01-13 16:01:46","Latitude":null,"Longitude":null,"OSM_ID":3298998008,"NodeLatitude":33.8656781,"NodeLongitude":35.545808,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:01:50","EndTime":"2024-01-13 16:01:50","Latitude":33.8657784285,"Longitude":35.5457498692,"OSM_ID":4947302469,"NodeLatitude":33.8657094,"NodeLongitude":35.5457839,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:02:00","EndTime":"2024-01-13 16:02:00","Latitude":null,"Longitude":null,"OSM_ID":3298998007,"NodeLatitude":33.8658419,"NodeLongitude":35.5456819,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:02:10","EndTime":"2024-01-13 16:02:10","Latitude":33.8671285702,"Longitude":35.5447731108,"OSM_ID":3298998004,"NodeLatitude":33.8667172,"NodeLongitude":35.5450474,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:02:12","EndTime":"2024-01-13 16:02:12","Latitude":null,"Longitude":null,"OSM_ID":3298998002,"NodeLatitude":33.8675323,"NodeLongitude":35.5444385,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:02:15","EndTime":"2024-01-13 16:02:15","Latitude":null,"Longitude":null,"OSM_ID":3133684470,"NodeLatitude":33.8678006,"NodeLongitude":35.5442131,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:17","EndTime":"2024-01-13 16:02:17","Latitude":null,"Longitude":null,"OSM_ID":4403883408,"NodeLatitude":33.867962,"NodeLongitude":35.5441337,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:20","EndTime":"2024-01-13 16:02:20","Latitude":null,"Longitude":null,"OSM_ID":4403883407,"NodeLatitude":33.8681233,"NodeLongitude":35.5440219,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:22","EndTime":"2024-01-13 16:02:22","Latitude":null,"Longitude":null,"OSM_ID":4403883421,"NodeLatitude":33.8682539,"NodeLongitude":35.543919,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:25","EndTime":"2024-01-13 16:02:25","Latitude":null,"Longitude":null,"OSM_ID":2985957771,"NodeLatitude":33.8683852,"NodeLongitude":35.5437656,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:27","EndTime":"2024-01-13 16:02:27","Latitude":null,"Longitude":null,"OSM_ID":4403883409,"NodeLatitude":33.8685168,"NodeLongitude":35.5436267,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:30","EndTime":"2024-01-13 16:02:30","Latitude":33.8685876708,"Longitude":35.5435155048,"OSM_ID":4403883405,"NodeLatitude":33.8686483,"NodeLongitude":35.5434473,"NodeType":"Road Node","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:30","EndTime":"2024-01-13 16:02:30","Latitude":null,"Longitude":null,"OSM_ID":4403883406,"NodeLatitude":33.8687563,"NodeLongitude":35.5432678,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:31","EndTime":"2024-01-13 16:02:31","Latitude":null,"Longitude":null,"OSM_ID":2985957772,"NodeLatitude":33.8688753,"NodeLongitude":35.5431026,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:32","EndTime":"2024-01-13 16:02:32","Latitude":null,"Longitude":null,"OSM_ID":11637585833,"NodeLatitude":33.8688834,"NodeLongitude":35.5430913,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:33","EndTime":"2024-01-13 16:02:33","Latitude":null,"Longitude":null,"OSM_ID":11637585834,"NodeLatitude":33.8689067,"NodeLongitude":35.5430589,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:34","EndTime":"2024-01-13 16:02:34","Latitude":null,"Longitude":null,"OSM_ID":11640646372,"NodeLatitude":33.8689503,"NodeLongitude":35.5429983,"NodeType":"Intermediate","StreetName":"Street 900"},{"StartTime":"2024-01-13 16:02:35","EndTime":"2024-01-13 16:02:35","Latitude":null,"Longitude":null,"OSM_ID":4403936131,"NodeLatitude":33.8690239,"NodeLongitude":35.5429657,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:36","EndTime":"2024-01-13 16:02:36","Latitude":null,"Longitude":null,"OSM_ID":4403936144,"NodeLatitude":33.869053,"NodeLongitude":35.542967,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:36","EndTime":"2024-01-13 16:02:36","Latitude":null,"Longitude":null,"OSM_ID":4403936145,"NodeLatitude":33.8691582,"NodeLongitude":35.5429675,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:37","EndTime":"2024-01-13 16:02:37","Latitude":null,"Longitude":null,"OSM_ID":4403936117,"NodeLatitude":33.869258,"NodeLongitude":35.5429271,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:38","EndTime":"2024-01-13 16:02:38","Latitude":null,"Longitude":null,"OSM_ID":11637585838,"NodeLatitude":33.8692803,"NodeLongitude":35.5429092,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:39","EndTime":"2024-01-13 16:02:39","Latitude":null,"Longitude":null,"OSM_ID":4403936146,"NodeLatitude":33.869311,"NodeLongitude":35.5428845,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:40","EndTime":"2024-01-13 16:02:40","Latitude":null,"Longitude":null,"OSM_ID":4403936120,"NodeLatitude":33.8693561,"NodeLongitude":35.5428302,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:41","EndTime":"2024-01-13 16:02:41","Latitude":null,"Longitude":null,"OSM_ID":4403936126,"NodeLatitude":33.8693877,"NodeLongitude":35.5427742,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:42","EndTime":"2024-01-13 16:02:42","Latitude":null,"Longitude":null,"OSM_ID":4403936147,"NodeLatitude":33.8694224,"NodeLongitude":35.5426608,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:43","EndTime":"2024-01-13 16:02:43","Latitude":null,"Longitude":null,"OSM_ID":4403936123,"NodeLatitude":33.8694264,"NodeLongitude":35.5425401,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:43","EndTime":"2024-01-13 16:02:43","Latitude":null,"Longitude":null,"OSM_ID":4403936136,"NodeLatitude":33.8693935,"NodeLongitude":35.5424092,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:44","EndTime":"2024-01-13 16:02:44","Latitude":null,"Longitude":null,"OSM_ID":4403936137,"NodeLatitude":33.869325,"NodeLongitude":35.5423003,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:45","EndTime":"2024-01-13 16:02:45","Latitude":null,"Longitude":null,"OSM_ID":11637585825,"NodeLatitude":33.8692992,"NodeLongitude":35.5422805,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:46","EndTime":"2024-01-13 16:02:46","Latitude":null,"Longitude":null,"OSM_ID":4403936129,"NodeLatitude":33.8692292,"NodeLongitude":35.5422268,"NodeType":"Intermediate","StreetName":"Ø¯ÙˆØ§Ø± Ø§Ù„Ù…ÙƒÙ„Ø³"},{"StartTime":"2024-01-13 16:02:47","EndTime":"2024-01-13 16:02:47","Latitude":null,"Longitude":null,"OSM_ID":4403936130,"NodeLatitude":33.8692018,"NodeLongitude":35.5422149,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:48","EndTime":"2024-01-13 16:02:48","Latitude":null,"Longitude":null,"OSM_ID":2985957780,"NodeLatitude":33.8692574,"NodeLongitude":35.5419729,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:49","EndTime":"2024-01-13 16:02:49","Latitude":null,"Longitude":null,"OSM_ID":2985957735,"NodeLatitude":33.86932,"NodeLongitude":35.5416371,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:50","EndTime":"2024-01-13 16:02:50","Latitude":33.8694312068,"Longitude":35.5411322791,"OSM_ID":4403883415,"NodeLatitude":33.8694232,"NodeLongitude":35.5412027,"NodeType":"Road Node","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:52","EndTime":"2024-01-13 16:02:52","Latitude":null,"Longitude":null,"OSM_ID":2985957781,"NodeLatitude":33.8694926,"NodeLongitude":35.5407845,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:55","EndTime":"2024-01-13 16:02:55","Latitude":null,"Longitude":null,"OSM_ID":4403883417,"NodeLatitude":33.8695702,"NodeLongitude":35.5402202,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:02:58","EndTime":"2024-01-13 16:02:58","Latitude":null,"Longitude":null,"OSM_ID":4403883418,"NodeLatitude":33.8695827,"NodeLongitude":35.5400591,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:01","EndTime":"2024-01-13 16:03:01","Latitude":null,"Longitude":null,"OSM_ID":2985957782,"NodeLatitude":33.8695816,"NodeLongitude":35.5398008,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:04","EndTime":"2024-01-13 16:03:04","Latitude":null,"Longitude":null,"OSM_ID":2671707927,"NodeLatitude":33.8696464,"NodeLongitude":35.5393397,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:07","EndTime":"2024-01-13 16:03:07","Latitude":null,"Longitude":null,"OSM_ID":6735461233,"NodeLatitude":33.8696925,"NodeLongitude":35.5390977,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:10","EndTime":"2024-01-13 16:03:10","Latitude":33.8698653613,"Longitude":35.538535216,"OSM_ID":4368147992,"NodeLatitude":33.8697936,"NodeLongitude":35.5385601,"NodeType":"Road Node","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:13","EndTime":"2024-01-13 16:03:13","Latitude":null,"Longitude":null,"OSM_ID":292660720,"NodeLatitude":33.8699719,"NodeLongitude":35.5376265,"NodeType":"Intermediate","StreetName":"Street 11"},{"StartTime":"2024-01-13 16:03:16","EndTime":"2024-01-13 16:03:16","Latitude":null,"Longitude":null,"OSM_ID":4515999427,"NodeLatitude":33.8701357,"NodeLongitude":35.5367333,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:20","EndTime":"2024-01-13 16:03:20","Latitude":null,"Longitude":null,"OSM_ID":292366548,"NodeLatitude":33.8701597,"NodeLongitude":35.5367367,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:23","EndTime":"2024-01-13 16:03:23","Latitude":null,"Longitude":null,"OSM_ID":292366496,"NodeLatitude":33.8701837,"NodeLongitude":35.5367359,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:26","EndTime":"2024-01-13 16:03:26","Latitude":null,"Longitude":null,"OSM_ID":292366549,"NodeLatitude":33.8702075,"NodeLongitude":35.5367309,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:30","EndTime":"2024-01-13 16:03:30","Latitude":33.8702605658,"Longitude":35.5367730319,"OSM_ID":292366345,"NodeLatitude":33.8702303,"NodeLongitude":35.5367219,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:03:34","EndTime":"2024-01-13 16:03:34","Latitude":null,"Longitude":null,"OSM_ID":292366550,"NodeLatitude":33.8702519,"NodeLongitude":35.536709,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:38","EndTime":"2024-01-13 16:03:38","Latitude":null,"Longitude":null,"OSM_ID":292366499,"NodeLatitude":33.8702717,"NodeLongitude":35.5366924,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:03:43","EndTime":"2024-01-13 16:03:43","Latitude":null,"Longitude":null,"OSM_ID":292366500,"NodeLatitude":33.8702893,"NodeLongitude":35.5366726,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:47","EndTime":"2024-01-13 16:03:47","Latitude":null,"Longitude":null,"OSM_ID":4515999426,"NodeLatitude":33.8704451,"NodeLongitude":35.536627,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:52","EndTime":"2024-01-13 16:03:52","Latitude":null,"Longitude":null,"OSM_ID":4515975989,"NodeLatitude":33.8711466,"NodeLongitude":35.5367159,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:03:56","EndTime":"2024-01-13 16:03:56","Latitude":null,"Longitude":null,"OSM_ID":2677441047,"NodeLatitude":33.8719895,"NodeLongitude":35.5368453,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:01","EndTime":"2024-01-13 16:04:01","Latitude":null,"Longitude":null,"OSM_ID":2677441050,"NodeLatitude":33.8724494,"NodeLongitude":35.5370062,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:05","EndTime":"2024-01-13 16:04:05","Latitude":null,"Longitude":null,"OSM_ID":4086672898,"NodeLatitude":33.8727834,"NodeLongitude":35.5371712,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:10","EndTime":"2024-01-13 16:04:10","Latitude":33.8741818656,"Longitude":35.5379831173,"OSM_ID":4515999424,"NodeLatitude":33.8739882,"NodeLongitude":35.5379537,"NodeType":"Road Node","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:15","EndTime":"2024-01-13 16:04:15","Latitude":null,"Longitude":null,"OSM_ID":2677441049,"NodeLatitude":33.8755971,"NodeLongitude":35.538978,"NodeType":"Intermediate","StreetName":"Street 8"},{"StartTime":"2024-01-13 16:04:20","EndTime":"2024-01-13 16:04:20","Latitude":null,"Longitude":null,"OSM_ID":2677441048,"NodeLatitude":33.8761505,"NodeLongitude":35.5393115,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:25","EndTime":"2024-01-13 16:04:25","Latitude":null,"Longitude":null,"OSM_ID":6727429663,"NodeLatitude":33.8763468,"NodeLongitude":35.5393777,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:30","EndTime":"2024-01-13 16:04:30","Latitude":33.8768019483,"Longitude":35.5396286008,"OSM_ID":4488515681,"NodeLatitude":33.8767217,"NodeLongitude":35.5396124,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:04:31","EndTime":"2024-01-13 16:04:31","Latitude":null,"Longitude":null,"OSM_ID":6727429662,"NodeLatitude":33.8770648,"NodeLongitude":35.5398261,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:32","EndTime":"2024-01-13 16:04:32","Latitude":null,"Longitude":null,"OSM_ID":2580634724,"NodeLatitude":33.8771998,"NodeLongitude":35.5399096,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:34","EndTime":"2024-01-13 16:04:34","Latitude":null,"Longitude":null,"OSM_ID":4488515678,"NodeLatitude":33.8773253,"NodeLongitude":35.5400001,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:35","EndTime":"2024-01-13 16:04:35","Latitude":null,"Longitude":null,"OSM_ID":4488515679,"NodeLatitude":33.877396,"NodeLongitude":35.5400672,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:37","EndTime":"2024-01-13 16:04:37","Latitude":null,"Longitude":null,"OSM_ID":4488515680,"NodeLatitude":33.8774316,"NodeLongitude":35.5400986,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:38","EndTime":"2024-01-13 16:04:38","Latitude":null,"Longitude":null,"OSM_ID":2580634738,"NodeLatitude":33.8774583,"NodeLongitude":35.5401265,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:40","EndTime":"2024-01-13 16:04:40","Latitude":null,"Longitude":null,"OSM_ID":4488515677,"NodeLatitude":33.8775153,"NodeLongitude":35.5401889,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:41","EndTime":"2024-01-13 16:04:41","Latitude":null,"Longitude":null,"OSM_ID":4488515676,"NodeLatitude":33.877562,"NodeLongitude":35.5402531,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:42","EndTime":"2024-01-13 16:04:42","Latitude":null,"Longitude":null,"OSM_ID":2580634734,"NodeLatitude":33.8776305,"NodeLongitude":35.5403533,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:44","EndTime":"2024-01-13 16:04:44","Latitude":null,"Longitude":null,"OSM_ID":4488515672,"NodeLatitude":33.8776754,"NodeLongitude":35.5404204,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:45","EndTime":"2024-01-13 16:04:45","Latitude":null,"Longitude":null,"OSM_ID":2580634748,"NodeLatitude":33.8777189,"NodeLongitude":35.5405016,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:47","EndTime":"2024-01-13 16:04:47","Latitude":null,"Longitude":null,"OSM_ID":4488515675,"NodeLatitude":33.8777481,"NodeLongitude":35.5405585,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:48","EndTime":"2024-01-13 16:04:48","Latitude":null,"Longitude":null,"OSM_ID":4488515674,"NodeLatitude":33.8777714,"NodeLongitude":35.5406153,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:50","EndTime":"2024-01-13 16:04:50","Latitude":null,"Longitude":null,"OSM_ID":4488515673,"NodeLatitude":33.8778121,"NodeLongitude":35.5407325,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:51","EndTime":"2024-01-13 16:04:51","Latitude":null,"Longitude":null,"OSM_ID":2107230289,"NodeLatitude":33.8778808,"NodeLongitude":35.5409855,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:52","EndTime":"2024-01-13 16:04:52","Latitude":null,"Longitude":null,"OSM_ID":4550691373,"NodeLatitude":33.8779322,"NodeLongitude":35.541199,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:54","EndTime":"2024-01-13 16:04:54","Latitude":null,"Longitude":null,"OSM_ID":5617698312,"NodeLatitude":33.8780433,"NodeLongitude":35.5415241,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:55","EndTime":"2024-01-13 16:04:55","Latitude":null,"Longitude":null,"OSM_ID":5617698313,"NodeLatitude":33.8781643,"NodeLongitude":35.5418164,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:57","EndTime":"2024-01-13 16:04:57","Latitude":null,"Longitude":null,"OSM_ID":4502638765,"NodeLatitude":33.8783153,"NodeLongitude":35.5421185,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:04:58","EndTime":"2024-01-13 16:04:58","Latitude":null,"Longitude":null,"OSM_ID":4515711396,"NodeLatitude":33.8784947,"NodeLongitude":35.5424178,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:00","EndTime":"2024-01-13 16:05:00","Latitude":null,"Longitude":null,"OSM_ID":2669684798,"NodeLatitude":33.8786254,"NodeLongitude":35.542576,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:01","EndTime":"2024-01-13 16:05:01","Latitude":null,"Longitude":null,"OSM_ID":292382779,"NodeLatitude":33.878838,"NodeLongitude":35.542775,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:02","EndTime":"2024-01-13 16:05:02","Latitude":null,"Longitude":null,"OSM_ID":292382780,"NodeLatitude":33.8792102,"NodeLongitude":35.5431046,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:04","EndTime":"2024-01-13 16:05:04","Latitude":null,"Longitude":null,"OSM_ID":11637585839,"NodeLatitude":33.8793577,"NodeLongitude":35.5432003,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:05","EndTime":"2024-01-13 16:05:05","Latitude":null,"Longitude":null,"OSM_ID":11637585844,"NodeLatitude":33.8794059,"NodeLongitude":35.5432315,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:07","EndTime":"2024-01-13 16:05:07","Latitude":null,"Longitude":null,"OSM_ID":4132959100,"NodeLatitude":33.8794678,"NodeLongitude":35.5432717,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:08","EndTime":"2024-01-13 16:05:08","Latitude":null,"Longitude":null,"OSM_ID":292653078,"NodeLatitude":33.8795412,"NodeLongitude":35.5433129,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:10","EndTime":"2024-01-13 16:05:10","Latitude":33.8797067291,"Longitude":35.5433749948,"OSM_ID":4488441564,"NodeLatitude":33.8797026,"NodeLongitude":35.5433831,"NodeType":"Road Node","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:12","EndTime":"2024-01-13 16:05:12","Latitude":null,"Longitude":null,"OSM_ID":4488437980,"NodeLatitude":33.8798107,"NodeLongitude":35.5434311,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:14","EndTime":"2024-01-13 16:05:14","Latitude":null,"Longitude":null,"OSM_ID":292653106,"NodeLatitude":33.8803478,"NodeLongitude":35.5436105,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:16","EndTime":"2024-01-13 16:05:16","Latitude":null,"Longitude":null,"OSM_ID":5478819510,"NodeLatitude":33.8804905,"NodeLongitude":35.5436341,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:18","EndTime":"2024-01-13 16:05:18","Latitude":null,"Longitude":null,"OSM_ID":3126296929,"NodeLatitude":33.8806496,"NodeLongitude":35.5436524,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:21","EndTime":"2024-01-13 16:05:21","Latitude":null,"Longitude":null,"OSM_ID":4488441563,"NodeLatitude":33.8807038,"NodeLongitude":35.5436559,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:23","EndTime":"2024-01-13 16:05:23","Latitude":null,"Longitude":null,"OSM_ID":292653107,"NodeLatitude":33.880888,"NodeLongitude":35.5436485,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:25","EndTime":"2024-01-13 16:05:25","Latitude":null,"Longitude":null,"OSM_ID":4515735249,"NodeLatitude":33.8811942,"NodeLongitude":35.5436123,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:27","EndTime":"2024-01-13 16:05:27","Latitude":null,"Longitude":null,"OSM_ID":4515763607,"NodeLatitude":33.8812923,"NodeLongitude":35.543587,"NodeType":"Intermediate","StreetName":"Boulevard Antoine Nicolas Chakhtoura"},{"StartTime":"2024-01-13 16:05:30","EndTime":"2024-01-13 16:05:30","Latitude":33.8814537782,"Longitude":35.5436380246,"OSM_ID":292653109,"NodeLatitude":33.8814271,"NodeLongitude":35.5435551,"NodeType":"Road Node","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:34","EndTime":"2024-01-13 16:05:34","Latitude":null,"Longitude":null,"OSM_ID":3610267598,"NodeLatitude":33.8817866,"NodeLongitude":35.5433965,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:38","EndTime":"2024-01-13 16:05:38","Latitude":null,"Longitude":null,"OSM_ID":3610267611,"NodeLatitude":33.8819016,"NodeLongitude":35.5433315,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:43","EndTime":"2024-01-13 16:05:43","Latitude":null,"Longitude":null,"OSM_ID":4515735245,"NodeLatitude":33.882017,"NodeLongitude":35.5432669,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:47","EndTime":"2024-01-13 16:05:47","Latitude":null,"Longitude":null,"OSM_ID":4451391462,"NodeLatitude":33.8821602,"NodeLongitude":35.5431787,"NodeType":"Intermediate","StreetName":"Avenue Antoine Chakhtoura"},{"StartTime":"2024-01-13 16:05:51","EndTime":"2024-01-13 16:05:51","Latitude":null,"Longitude":null,"OSM_ID":3610267618,"NodeLatitude":33.8824585,"NodeLongitude":35.5430321,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:05:56","EndTime":"2024-01-13 16:05:56","Latitude":null,"Longitude":null,"OSM_ID":3610267594,"NodeLatitude":33.8825859,"NodeLongitude":35.5429507,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:00","EndTime":"2024-01-13 16:06:00","Latitude":null,"Longitude":null,"OSM_ID":4451391486,"NodeLatitude":33.8826211,"NodeLongitude":35.5429367,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:04","EndTime":"2024-01-13 16:06:04","Latitude":null,"Longitude":null,"OSM_ID":3610267595,"NodeLatitude":33.8826615,"NodeLongitude":35.542932,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:09","EndTime":"2024-01-13 16:06:09","Latitude":null,"Longitude":null,"OSM_ID":4451391487,"NodeLatitude":33.8826957,"NodeLongitude":35.5429332,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:13","EndTime":"2024-01-13 16:06:13","Latitude":null,"Longitude":null,"OSM_ID":292653092,"NodeLatitude":33.8827248,"NodeLongitude":35.5429483,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:17","EndTime":"2024-01-13 16:06:17","Latitude":null,"Longitude":null,"OSM_ID":5503509757,"NodeLatitude":33.8837061,"NodeLongitude":35.544581,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:22","EndTime":"2024-01-13 16:06:22","Latitude":null,"Longitude":null,"OSM_ID":7432104515,"NodeLatitude":33.8838802,"NodeLongitude":35.5448662,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:26","EndTime":"2024-01-13 16:06:26","Latitude":null,"Longitude":null,"OSM_ID":5503509756,"NodeLatitude":33.8841536,"NodeLongitude":35.5453323,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:30","EndTime":"2024-01-13 16:06:30","Latitude":null,"Longitude":null,"OSM_ID":3143704905,"NodeLatitude":33.8847071,"NodeLongitude":35.5462612,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:35","EndTime":"2024-01-13 16:06:35","Latitude":null,"Longitude":null,"OSM_ID":289195954,"NodeLatitude":33.885725,"NodeLongitude":35.5479437,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:39","EndTime":"2024-01-13 16:06:39","Latitude":null,"Longitude":null,"OSM_ID":2107230255,"NodeLatitude":33.8866243,"NodeLongitude":35.549457,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:43","EndTime":"2024-01-13 16:06:43","Latitude":null,"Longitude":null,"OSM_ID":290326714,"NodeLatitude":33.8875412,"NodeLongitude":35.5510465,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:48","EndTime":"2024-01-13 16:06:48","Latitude":null,"Longitude":null,"OSM_ID":11041713447,"NodeLatitude":33.8877383,"NodeLongitude":35.5513726,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:52","EndTime":"2024-01-13 16:06:52","Latitude":null,"Longitude":null,"OSM_ID":7428152981,"NodeLatitude":33.8888669,"NodeLongitude":35.5532401,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:06:56","EndTime":"2024-01-13 16:06:56","Latitude":null,"Longitude":null,"OSM_ID":4451591494,"NodeLatitude":33.8892946,"NodeLongitude":35.5539531,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:01","EndTime":"2024-01-13 16:07:01","Latitude":null,"Longitude":null,"OSM_ID":6499227932,"NodeLatitude":33.8894445,"NodeLongitude":35.5541894,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:14","EndTime":"2024-01-13 16:07:14","Latitude":null,"Longitude":null,"OSM_ID":6499227932,"NodeLatitude":33.8894445,"NodeLongitude":35.5541894,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:05","EndTime":"2024-01-13 16:07:05","Latitude":null,"Longitude":null,"OSM_ID":4516216029,"NodeLatitude":33.889485,"NodeLongitude":35.5542546,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:16","EndTime":"2024-01-13 16:07:16","Latitude":null,"Longitude":null,"OSM_ID":4516216029,"NodeLatitude":33.889485,"NodeLongitude":35.5542546,"NodeType":"Intermediate","StreetName":"Rue Ste. Mere Teresa"},{"StartTime":"2024-01-13 16:07:10","EndTime":"2024-01-13 16:07:10","Latitude":33.8895821817,"Longitude":35.554237217,"OSM_ID":6514118079,"NodeLatitude":33.8896203,"NodeLongitude":35.554181,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:12","EndTime":"2024-01-13 16:07:12","Latitude":null,"Longitude":null,"OSM_ID":2105757650,"NodeLatitude":33.8895813,"NodeLongitude":35.5541174,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:18","EndTime":"2024-01-13 16:07:18","Latitude":null,"Longitude":null,"OSM_ID":4451591487,"NodeLatitude":33.8895706,"NodeLongitude":35.5543924,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:01","EndTime":"2024-01-13 16:38:01","Latitude":null,"Longitude":null,"OSM_ID":4451591487,"NodeLatitude":33.8895706,"NodeLongitude":35.5543924,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:21","EndTime":"2024-01-13 16:07:21","Latitude":null,"Longitude":null,"OSM_ID":4451591480,"NodeLatitude":33.8896413,"NodeLongitude":35.5545087,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:05","EndTime":"2024-01-13 16:38:05","Latitude":null,"Longitude":null,"OSM_ID":4451591480,"NodeLatitude":33.8896413,"NodeLongitude":35.5545087,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:23","EndTime":"2024-01-13 16:07:23","Latitude":null,"Longitude":null,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:07:23","EndTime":"2024-01-13 16:07:23","Latitude":null,"Longitude":null,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:38:10","EndTime":"2024-01-13 16:38:10","Latitude":33.8899211314,"Longitude":35.5547243352,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:10","EndTime":"2024-01-13 16:38:10","Latitude":33.8899211314,"Longitude":35.5547243352,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:31","EndTime":"2024-01-13 16:38:31","Latitude":33.8898701818,"Longitude":35.5546511023,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:38:31","EndTime":"2024-01-13 16:38:31","Latitude":33.8898701818,"Longitude":35.5546511023,"OSM_ID":6736336512,"NodeLatitude":33.8897486,"NodeLongitude":35.5546904,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:25","EndTime":"2024-01-13 16:07:25","Latitude":null,"Longitude":null,"OSM_ID":3052025669,"NodeLatitude":33.8908958,"NodeLongitude":35.5566333,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:27","EndTime":"2024-01-13 16:07:27","Latitude":null,"Longitude":null,"OSM_ID":6582793619,"NodeLatitude":33.8913517,"NodeLongitude":35.557379,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:30","EndTime":"2024-01-13 16:07:30","Latitude":null,"Longitude":null,"OSM_ID":11221840110,"NodeLatitude":33.8914239,"NodeLongitude":35.5574972,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:32","EndTime":"2024-01-13 16:07:32","Latitude":null,"Longitude":null,"OSM_ID":11221840112,"NodeLatitude":33.8917164,"NodeLongitude":35.5579762,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:34","EndTime":"2024-01-13 16:07:34","Latitude":null,"Longitude":null,"OSM_ID":4451613982,"NodeLatitude":33.8920094,"NodeLongitude":35.5584549,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:07:36","EndTime":"2024-01-13 16:07:36","Latitude":null,"Longitude":null,"OSM_ID":4451614394,"NodeLatitude":33.8921568,"NodeLongitude":35.5586999,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:38","EndTime":"2024-01-13 16:07:38","Latitude":null,"Longitude":null,"OSM_ID":4451614395,"NodeLatitude":33.8921617,"NodeLongitude":35.5586636,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:41","EndTime":"2024-01-13 16:07:41","Latitude":null,"Longitude":null,"OSM_ID":4451614396,"NodeLatitude":33.8921676,"NodeLongitude":35.5586141,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:43","EndTime":"2024-01-13 16:07:43","Latitude":null,"Longitude":null,"OSM_ID":4451614397,"NodeLatitude":33.892169,"NodeLongitude":35.5585734,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:45","EndTime":"2024-01-13 16:07:45","Latitude":null,"Longitude":null,"OSM_ID":4451614398,"NodeLatitude":33.8921646,"NodeLongitude":35.558538,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:47","EndTime":"2024-01-13 16:07:47","Latitude":null,"Longitude":null,"OSM_ID":4451614399,"NodeLatitude":33.8921543,"NodeLongitude":35.558499,"NodeType":"Intermediate","StreetName":"Ø·Ø±ÙŠÙ‚ Ù…ÙŠØ±Ù†Ø§ Ø§Ù„Ø´Ø§Ù„ÙˆØ­ÙŠ"},{"StartTime":"2024-01-13 16:07:50","EndTime":"2024-01-13 16:07:50","Latitude":33.8920739937,"Longitude":35.5583495827,"OSM_ID":4451613960,"NodeLatitude":33.892133,"NodeLongitude":35.5584373,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:00","EndTime":"2024-01-13 16:08:00","Latitude":null,"Longitude":null,"OSM_ID":11221840097,"NodeLatitude":33.8920073,"NodeLongitude":35.5582245,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:10","EndTime":"2024-01-13 16:08:10","Latitude":33.8916522756,"Longitude":35.5574814991,"OSM_ID":11221840099,"NodeLatitude":33.8916198,"NodeLongitude":35.5575687,"NodeType":"Road Node","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:17","EndTime":"2024-01-13 16:08:17","Latitude":null,"Longitude":null,"OSM_ID":11221840101,"NodeLatitude":33.8915412,"NodeLongitude":35.5574357,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:24","EndTime":"2024-01-13 16:08:24","Latitude":null,"Longitude":null,"OSM_ID":11221840103,"NodeLatitude":33.8914506,"NodeLongitude":35.5572823,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:08:32","EndTime":"2024-01-13 16:08:32","Latitude":33.8914587669,"Longitude":35.557069729,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:09:43","EndTime":"2024-01-13 16:09:43","Latitude":33.891546869,"Longitude":35.5571216503,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:12:18","EndTime":"2024-01-13 16:12:18","Latitude":33.8914875788,"Longitude":35.5571409105,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:12:27","EndTime":"2024-01-13 16:12:29","Latitude":33.8914541303,"Longitude":35.5571730354,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:12:30","EndTime":"2024-01-13 16:12:36","Latitude":33.8914002232,"Longitude":35.5571961779,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:08:58","EndTime":"2024-01-13 16:12:51","Latitude":33.8914858392,"Longitude":35.5570646272,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:13:13","EndTime":"2024-01-13 16:13:13","Latitude":33.8915188924,"Longitude":35.5569755808,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:13:01","EndTime":"2024-01-13 16:13:39","Latitude":33.8915253324,"Longitude":35.5570085651,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:09:14","EndTime":"2024-01-13 16:13:48","Latitude":33.891523558,"Longitude":35.557032492,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:13:54","EndTime":"2024-01-13 16:13:54","Latitude":33.891537492,"Longitude":35.5570388715,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:19:16","EndTime":"2024-01-13 16:19:16","Latitude":33.8915105667,"Longitude":35.5569682531,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:34:11","EndTime":"2024-01-13 16:34:11","Latitude":33.8915153199,"Longitude":35.5571256162,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:36:02","EndTime":"2024-01-13 16:36:02","Latitude":33.891494159,"Longitude":35.5570689391,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:36:04","EndTime":"2024-01-13 16:36:07","Latitude":33.8915116138,"Longitude":35.5570757835,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:36:19","EndTime":"2024-01-13 16:36:26","Latitude":33.8915343307,"Longitude":35.5571583695,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:36:37","EndTime":"2024-01-13 16:36:37","Latitude":33.8915069465,"Longitude":35.5571775116,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:37:15","EndTime":"2024-01-13 16:37:15","Latitude":33.8914748089,"Longitude":35.5570419488,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:37:38","EndTime":"2024-01-13 16:37:40","Latitude":33.8914290016,"Longitude":35.557092902,"OSM_ID":6582793620,"NodeLatitude":33.8914239,"NodeLongitude":35.5572371,"NodeType":"Stay Point","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:44","EndTime":"2024-01-13 16:37:44","Latitude":null,"Longitude":null,"OSM_ID":6601898956,"NodeLatitude":33.8910164,"NodeLongitude":35.5565463,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:48","EndTime":"2024-01-13 16:37:48","Latitude":null,"Longitude":null,"OSM_ID":11221840109,"NodeLatitude":33.8906856,"NodeLongitude":35.5559871,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:52","EndTime":"2024-01-13 16:37:52","Latitude":null,"Longitude":null,"OSM_ID":4220971866,"NodeLatitude":33.8905318,"NodeLongitude":35.5557272,"NodeType":"Intermediate","StreetName":"Avenue President Amine Gemayel"},{"StartTime":"2024-01-13 16:37:57","EndTime":"2024-01-13 16:37:57","Latitude":null,"Longitude":null,"OSM_ID":4516213592,"NodeLatitude":33.8896577,"NodeLongitude":35.5542466,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:39:00","EndTime":"2024-01-13 16:39:00","Latitude":null,"Longitude":null,"OSM_ID":6736336516,"NodeLatitude":33.889516,"NodeLongitude":35.554898,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:39:30","EndTime":"2024-01-13 16:39:30","Latitude":33.8899947614,"Longitude":35.5551917469,"OSM_ID":6736336511,"NodeLatitude":33.8895782,"NodeLongitude":35.5551202,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:39:38","EndTime":"2024-01-13 16:39:38","Latitude":null,"Longitude":null,"OSM_ID":6736336522,"NodeLatitude":33.8892271,"NodeLongitude":35.5553409,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ Ø¨Ø±Ø¨Ø± Ø£Ø¨Ùˆ Ø¬ÙˆØ¯Ø©"},{"StartTime":"2024-01-13 16:39:46","EndTime":"2024-01-13 16:39:46","Latitude":null,"Longitude":null,"OSM_ID":6697197342,"NodeLatitude":33.889748,"NodeLongitude":35.5562112,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ Ø¨Ø±Ø¨Ø± Ø£Ø¨Ùˆ Ø¬ÙˆØ¯Ø©"},{"StartTime":"2024-01-13 16:39:54","EndTime":"2024-01-13 16:39:54","Latitude":null,"Longitude":null,"OSM_ID":3052025667,"NodeLatitude":33.889882,"NodeLongitude":35.5564351,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ Ø¨Ø±Ø¨Ø± Ø£Ø¨Ùˆ Ø¬ÙˆØ¯Ø©"},{"StartTime":"2024-01-13 16:40:02","EndTime":"2024-01-13 16:40:02","Latitude":null,"Longitude":null,"OSM_ID":290325906,"NodeLatitude":33.889991,"NodeLongitude":35.5566306,"NodeType":"Intermediate","StreetName":"Ø´Ø§Ø±Ø¹ Ø¨Ø±Ø¨Ø± Ø£Ø¨Ùˆ Ø¬ÙˆØ¯Ø©"},{"StartTime":"2024-01-13 16:40:10","EndTime":"2024-01-13 16:40:10","Latitude":33.890203638,"Longitude":35.5571126191,"OSM_ID":11356639101,"NodeLatitude":33.8903598,"NodeLongitude":35.5572447,"NodeType":"Road Node","StreetName":"Ø´Ø§Ø±Ø¹ Ø¨Ø±Ø¨Ø± Ø£Ø¨Ùˆ Ø¬ÙˆØ¯Ø©"},{"StartTime":"2024-01-13 16:40:30","EndTime":"2024-01-13 16:40:30","Latitude":null,"Longitude":null,"OSM_ID":6601898954,"NodeLatitude":33.8907716,"NodeLongitude":35.5579305,"NodeType":"Intermediate","StreetName":null},{"StartTime":"2024-01-13 16:40:50","EndTime":"2024-01-13 16:40:50","Latitude":33.8901674571,"Longitude":35.5584061206,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:41:10","EndTime":"2024-01-13 16:41:10","Latitude":33.8903928095,"Longitude":35.5583563324,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:41:31","EndTime":"2024-01-13 16:41:31","Latitude":33.8904500146,"Longitude":35.5583727214,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:42:30","EndTime":"2024-01-13 16:42:30","Latitude":33.8902613072,"Longitude":35.5585384024,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:40:34","EndTime":"2024-01-13 16:42:36","Latitude":33.8902402999,"Longitude":35.5584394595,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:40:33","EndTime":"2024-01-13 16:42:53","Latitude":33.8902787508,"Longitude":35.558412612,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 16:43:15","EndTime":"2024-01-13 16:43:15","Latitude":33.8902935483,"Longitude":35.558390164,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 16:45:20","EndTime":"2024-01-13 16:45:20","Latitude":33.8903269505,"Longitude":35.558124824,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:04:53","EndTime":"2024-01-13 17:04:53","Latitude":33.89030069,"Longitude":35.5583799134,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:07:22","EndTime":"2024-01-13 17:07:22","Latitude":33.8902502896,"Longitude":35.5583796602,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:06:28","EndTime":"2024-01-13 17:08:06","Latitude":33.8902360819,"Longitude":35.5584080239,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 17:06:08","EndTime":"2024-01-13 17:08:39","Latitude":33.8902549801,"Longitude":35.5584208122,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Stay Point","StreetName":null},{"StartTime":"2024-01-13 17:10:35","EndTime":"2024-01-13 17:10:35","Latitude":33.8901297633,"Longitude":35.5585364843,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null},{"StartTime":"2024-01-13 17:30:37","EndTime":"2024-01-13 17:30:37","Latitude":33.8900718059,"Longitude":35.5583689847,"OSM_ID":6601898953,"NodeLatitude":33.8901091,"NodeLongitude":35.5585243,"NodeType":"Road Node","StreetName":null}]
       let routearray:any[]=[];
     
       this.tablerow++;
@@ -15924,7 +16278,7 @@ async displayClusters(AlocSimulId:any){
 }
   displayTimelineCoTraveler(){
     this.DisplayCoTravelerflag = 2;
-    this.displayCoTravelers();
+    // this.displayCoTravelers();
   }
 
   
@@ -15945,45 +16299,46 @@ async displayClusters(AlocSimulId:any){
     this.opentableData(tableroutearray, this.typeofdata);
   }
 
-  opentableData(array:any,typeofdata:any){
+  opentableData(elt:any,typeofdata:any){
     this.openTable=true;
 
     if(typeofdata=='devicehistory'){
     
         // array2.push(array[i]); 
   
-      array.forEach((elt:any)=>{
+      // array.forEach((elt:any)=>{
         let x:any = {
           deviceid: elt[0],
           Time:  this.dateTtoDate(elt[1]),
-          Lng: elt[4],
-          lat: elt[3],
+          // Time: elt[1],
+          Lng: elt[3],
+          lat: elt[4],
         }
         this.Datatable1.unshift(x);
         this.Datatable=this.Datatable1;
         this.tablerow++;
-      })
+      // })
     
      
 
     }
    else if(typeofdata=='trace')
    { 
-    for (let i = this.count; i < array.length; i++) {
+    // for (let i = this.count; i < array.length; i++) {
   
-      // array2.push(array[i]);
+    //   // array2.push(array[i]);
 
-      let x:any = {
+    //   let x:any = {
        
-        Time: array[i].StartTime,
-        StreetName: array[i].StreetName,
-        Lng: array[i].NodeLongitude,
-        lat: array[i].NodeLatitude,
-      }
-      this.Datatable1.unshift(x);
-      this.Datatable=this.Datatable1;
-      this.tablerow++;
-    }
+    //     Time: array[i].StartTime,
+    //     StreetName: array[i].StreetName,
+    //     Lng: array[i].NodeLongitude,
+    //     lat: array[i].NodeLatitude,
+    //   }
+    //   this.Datatable1.unshift(x);
+    //   this.Datatable=this.Datatable1;
+    //   this.tablerow++;
+    // }
   }
     console.log("this.Datatable-----------",this.Datatable);
   }
@@ -16078,17 +16433,31 @@ this.navbarSimulId=obj22;
   }
 
   changebarRoute1(){
+ 
+  this.clearRoutes();
+
     this.stopRoute();
     this.startRoute1();
-    console.log("speedTimeRoute----------",this.speedTimeRoute)
+    // alert(this.speedTimeRoute1);
   }
 
   startRoute(){
+     this.showroutedicv=false;
+    this.isRunningRoute = true;
+    this.getrouteLine();
+  }
+
+  startRoute22(){
+  this.clearRoutes();
+    this.stopRoute();
+    this.speedTimeRoute=0;
+     this.showroutedicv=false;
     this.isRunningRoute = true;
     this.getrouteLine();
   }
 
   startRoute1(){
+    this.ShowHeader=false;
     this.isRunningRoute = true;
     this.displaybyroute();
   }
@@ -16099,11 +16468,17 @@ this.navbarSimulId=obj22;
   }
 
     toggleDropdown() {
+      this.showroutedicv=true;
     var dropdownContent = document.getElementById("dropdownContent1");
     if (dropdownContent.style.display === "block") {
       dropdownContent.style.display = "none";
+      
+
     } else {
+
       dropdownContent.style.display = "block";
+   
+
     }
   }
 
@@ -16124,6 +16499,8 @@ clearRoutes(){
   $('#controlbutton').css('display', 'none');
   $('#routebar').css('display', 'none');
   $('#routebar1').css('display', 'none');
+  $('#leafletroute').css('display', 'none');
+
   
   this.routeDeviceArray=[];
   this.routeDeviceArrayLoop=[];
@@ -16140,9 +16517,13 @@ clearRoutes(){
   this.indexRoute=0;
   this.count=0;
 
-
+  if (this.map && this.routingControlArray.length > 0) {
+    this.routingControlArray.forEach((control: any) => {
+        control.remove(); // Remove from the map
+    });
+    this.routingControlArray = []; // Empty the array
 }
-
+}
 
 
 
@@ -16163,19 +16544,16 @@ async getrouteLine(){
   let routeDevices1:any[]=[];
   let routeDevices:any[]=[];
 
-  // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
-  
-  // routeDevices = this.dataService.getroutedevices().split(',');
   routeDevices = this.Devices.split(',');
   this.routeDevicestable=routeDevices;
   console.log("this.routeDevices-----------", routeDevices)
-  let colorarray:any[]=['green','red',this.SectorColor,'yellow','purpule'];
+  let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
    routeDevices.forEach((deviceId:any,index:any)=>{
      
     routeDevices1.push({'deviceid':deviceId,'color':colorarray[index]})
   });
+  console.log("routeDevices1-----------", routeDevices1)
 
-// let routeDevices1= [{'deviceid':'4e79560f-e59a-4d7b-8b91-6dddbd571c57','color':'green'},{'deviceid':'436cab63-5002-475d-8d11-c321e5850659','color':"red"}]
 this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
 
  
@@ -16191,7 +16569,7 @@ this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
 
     //  let markerPositions = datajson['markerPositions'];
      let markerPositions = datajson;
-     console.log("markerPositions-----------",markerPositions)
+     console.log("markerPositions-----------",markerPositions);
      this.routedatajson=this.routedatajson;
      this.displayRoute=true;
      this.displayclusters=true;
@@ -16202,6 +16580,8 @@ this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
 
   let color;
   let x1:any=[{'deviceid':'','color':''}];
+  console.log("x1-----------",x1);
+
   // let data11:any=this.routedatajson.markerPositions;
   let data11:any=this.routedatajson;
   // console.log("data11----",data11);
@@ -16262,11 +16642,12 @@ this.routeDeviceArrayLoop.push( animatedmarker1);
 
 }
 console.log("this.routeDeviceArray-------",this.routeDeviceArray);
+console.log("arrayfortable-------",arrayfortable);
 
 arrayfortable.push(elt);
 
 this.typeofdata='devicehistory'
-this.opentableData(arrayfortable,this.typeofdata);
+this.opentableData(elt,this.typeofdata);
 this.indexRoute++;
 
 if (this.isRunningRoute==false) {
@@ -16580,58 +16961,93 @@ private handleRouteData(data: any, deviceArray?: any[]) {
   }
 
   async displaybyroute(){
+    
+
+    this.showroutedicv=false;
     let routeDevices1:any[]=[];
     let routeDevices:any[]=[];
     let objcolor:any[]=[];
     this.openTable=true;
     this.isRunningRoute=true;
+    this.showroutebar1=true;
     $('#routebar1').css('display', '');
     $('#routebar').css('display', 'none');
-  //   if (this.isRunningRoute==false) {
-  //     return;
-  // }
-    // this.routeDevices='4e79560f-e59a-4d7b-8b91-6dddbd571c57,436cab63-5002-475d-8d11-c321e5850659';
-    
-    // routeDevices = this.dataService.getroutedevices().split(',');
     routeDevices = this.Devices.split(',');
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
-    let colorarray:any[]=['green','red',this.SectorColor,'yellow','purpule'];
-    //random color
-    // let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
-  
+    let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
+
      routeDevices.forEach((deviceId:any,index:any)=>{
-       
       routeDevices1.push({'deviceid':deviceId,'color':colorarray[index]});
-      // routeDevices1.push({'deviceid':deviceId,'color':color});
     });
-  
-  // let routeDevices1= [{'deviceid':'4e79560f-e59a-4d7b-8b91-6dddbd571c57','color':'green'},{'deviceid':'436cab63-5002-475d-8d11-c321e5850659','color':"red"}]
   this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
-  
-   
     let datajson:any;
-    // await this.http.get<any[]>('/assets/angularjson.json').subscribe((data:any[]) => {
-      // console.log("data-----------",data)
-      // datajson=data;
       datajson=this.datajson;
       this.routedatajson=datajson;
-  
-      // let markerPositions = datajson['markerPositions'];
       let markerPositions = datajson
       routeDevices1.forEach((a:any)=> { 
       let deviceArray=  markerPositions.filter((elt:any)=>{
           return  a.deviceid===elt[0]
-            
           });
           objcolor.push({color:a.color,data:deviceArray,deviceId:a.deviceid,index:0});
         });
-  
-        this.displayPolylines(markerPositions,objcolor);
-        // });
+        this.displayPolylines(markerPositions,objcolor,routeDevices);
       }
+
+    //   displayPolylines(markerPositions: any[],objcolor:any[],routeDevices:any[]): void {
+    //     if (this.isRunningRoute==false) {
+    //     return;
+    // }
+ 
+    //   const interval = setTimeout(async() => {
+    //   //  let x:any;
+    //     // let currentDevice:any= markerPositions[x.index][0];
+    //     // console.log("currentDevice-----------",currentDevice);
+    //      let x:any=  objcolor.find((elt:any)=>{
+    //       // console.log("elt-----------",elt);
+    //       let currentDevice:any;
+    //       routeDevices.forEach((dev:any)=>{
+    //         // return elt.deviceId==dev
+    //         if(dev==elt.deviceId){
+    //           currentDevice=dev;
+    //         }
+    //         // return currentDevice;
+    //       });
+          
+    //       console.log("currentDevice---------",currentDevice);
+    //       return elt.deviceId==currentDevice
+    //     });
+    //     console.log("devvvvvvvvvvvvvvvvv---------",x);
+    //     console.log("x.index---------",x.index,"  datalength---",x.data.length,"  from markerpos--",markerPositions.length);
+
+    //     if (x.index >= x.data.length) {
+    //       clearInterval(interval); // Stop when all polylines are displayed
+    //       return;
+    //     }
+    //     console.log("x-----------",x);
+    //     if(x.index+1>=x.data.length){}
+    //     else if(x.index<=x.data.length) {    
+    //       let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.map);
+    //       let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
   
-  displayPolylines(markerPositions: any[],objcolor:any[]): void {
+    //       console.log("polyline--------",polyline);        
+    //       this.polylineRouteArray.push(polyline);
+    //       this.polylineRouteArrayLoop.push(polyline1);
+    //       this.xroutearray.push(markerPositions[x.index]);
+    //       this.typeofdata='devicehistory'
+    //       this.opentableData(markerPositions[x.index],this.typeofdata);
+    // }
+                 
+    //   // }
+      
+    
+    //     this.currentIndex++;
+    //     x.index++;
+    //     await this.displayPolylines(markerPositions,objcolor,routeDevices);
+    //   },  0.1/this.speedTimeRoute); // Adjust the interval duration as needed
+    // } 
+
+  displayPolylines(markerPositions: any[],objcolor:any[],routeDevices:any[]): void {
     
       if (this.isRunningRoute==false) {
       return;
@@ -16644,61 +17060,35 @@ private handleRouteData(data: any, deviceArray?: any[]) {
   
       let currentDevice= markerPositions[this.currentIndex][0];
       console.log("currentDevice-----------",currentDevice);
-  
     let x=  objcolor.find((elt:any)=>{
       console.log("elt-----------",elt);
-
       return elt.deviceId==currentDevice});
       console.log("x-----------",x);
-        // x.index=this.routecountobj;
       if(x.index+1>=x.data.length)
         {
       
           }
       else if(x.index<=x.data.length) {
-        // this.polylines.push(polyline);
-  
-        // if(this.currentIndex>0){
-
      
         let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.map);
         let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
 
-        console.log("polyline--------",polyline);
-        // Decorate the polyline
-        // L.polylineDecorator(polyline, {
-        //   patterns: [{
-        //     offset: 25,
-        //     repeat: 300,
-        //     symbol: L.Symbol.arrowHead({
-        //       pixelSize: 15,
-        //       pathOptions: {
-        //         fillOpacity: 1,
-        //         weight: 0
-        //       }
-        //     })
-        //   }]
-        // }).addTo(this.map);
-       
-        this.polylineRouteArray.push(polyline);
+         this.polylineRouteArray.push(polyline);
         this.polylineRouteArrayLoop.push(polyline1);
         this.xroutearray.push(markerPositions[this.currentIndex]);
         this.typeofdata='devicehistory'
-        this.opentableData(this.xroutearray,this.typeofdata);
+        this.opentableData(markerPositions[x.index],this.typeofdata);
   }
-               
-    // }
-    
-  
       this.currentIndex++;
       x.index++;
-      await this.displayPolylines(markerPositions,objcolor);
+      console.log("this.speedTimeRoute1  ",this.speedTimeRoute1);
+      await this.displayPolylines(markerPositions,objcolor,routeDevices);
     },  3000/this.speedTimeRoute); // Adjust the interval duration as needed
   } 
 
   changebarRoute(){
     this.stopRoute();
-    this.startRoute();
+     this.startRoute();
     console.log("speedTimeRoute----------",this.speedTimeRoute)
   }
 
@@ -16941,7 +17331,7 @@ private handleRouteData(data: any, deviceArray?: any[]) {
 
 
 
-  async test33(){
+    async test33(){
 
     if (this.marker) {
       this.map.removeLayer(this.marker);
@@ -17038,7 +17428,8 @@ if(this.reportType=="1" ){
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":""
   };
 }else if(this.reportType=="2"){
 
@@ -17051,11 +17442,23 @@ if(this.reportType=="1" ){
     this.markerLoop.clearLayers();
 
   }
-  // let device = localStorage.getItem('deviceselected');
+  let deviceselected = localStorage.getItem('deviceselected');
 
 
   if (!JSON.parse(localStorage.getItem("multiselection"))) {
     this.multiselection = [];
+    if (this.Devices == "" || typeof this.Devices == "undefined") {
+
+      this.Devices = deviceselected;
+
+    }else{
+      if(!this.Devices.includes(deviceselected)){
+
+        this.Devices = this.Devices + ',' +deviceselected;
+          }
+    }
+
+  
 
   } else {
     //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")));
@@ -17070,6 +17473,11 @@ if(this.reportType=="1" ){
       this.Devices = this.Devices + ',' + this.multiselection;
 
     }
+    if(!this.Devices.includes(deviceselected)){
+
+  this.Devices = this.Devices + ',' +deviceselected;
+    }
+
   }
   
    queryjson={
@@ -17093,7 +17501,8 @@ if(this.reportType=="1" ){
     "imsiId": this.IMSI_IDValue,
     "countryCode": this.countrycode,
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":""
   };
 
 }
@@ -17121,8 +17530,10 @@ if(this.reportType=="6"){
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":""
   };
+
 }
 
 
@@ -17166,7 +17577,8 @@ else if(this.reportType=="3"){
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":""
   };
 
   
@@ -17194,7 +17606,8 @@ else if(this.reportType=="3"){
     "imsiId": this.IMSI_IDValue,
     "countryCode": "",
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":""
   };
   for (const elt of queryjson.Coordinates) {
     if(elt.Type==='Circle'){
@@ -17261,6 +17674,13 @@ else if(this.reportType=="3"){
 
 }else if(this.reportType=="11"){
   //let device = localStorage.getItem('deviceselected');
+
+  if(this.Phone_nbr == null){
+    this.Phone_nbr ="";
+  }
+  if(this.ImsiID == null){
+    this.ImsiID ="";
+  }
   queryjson={
     "reportName": "No Name",
     "reportType": this.selectedType.toString(),
@@ -17282,9 +17702,10 @@ else if(this.reportType=="3"){
     "imsiId": this.ImsiID,
     "countryCode": "",
     "senario": SenariObj,
-    "BtsTypeSlected": ""
+    "BtsTypeSlected": "",
+    "Phone_nbr":this.Phone_nbr
   };
-  await this.datacrowdService.getTCDSimulationObject(this.ImsiID).then((res:any)=>{
+  await this.datacrowdService.getTCDSimulationObject(queryjson).then((res:any)=>{
     console.log("getTCDSimulationObject res",res);
     this.datajson=res;
     this.tcd();
@@ -17728,7 +18149,14 @@ if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && thi
   lastMarkerLng = this.datajson[i][3];
         }
       }
- 
+      this.heatarr=this.datajson.map((res:any)=>{
+        return [res[4],res[3]]
+      })
+      console.log("heatarr>>>>",this.heatarr);
+     this.heat = L.heatLayer(this.heatarr, {
+      radius: 20
+    });
+   // this.heat.addTo(this.map);
 
       //       markersBatch.push(marker);
       //     }
@@ -17924,7 +18352,8 @@ if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && thi
       this.magnifiedMap.addLayer(this.markerLoop);
       this.layerGroup.addLayer(this.marker);
    
-}}
+}
+}
 
 if(this.senarioFlag==true){
   this.senariocount++;
@@ -17943,11 +18372,28 @@ let obj22:any={
     this.navbarSimulId=obj22;
 
 
+    }else{
+
+      //this.isFormVisible = false;
+      let obj22:any={
+        senarioParentName:this.senarioParentName,
+        simulationid:this.simulationid,
+        Action:"addnewMenu",
+        senariocount:0,
+        senarioFlag:this.senarioFlag,
+        reportType:this.reportType
+      }
+        
+      // this.senarioIdOutput.emit(obj22);
+          this.navbarSimulId=obj22;
     }
     let obj:any={"table_id": this.simulationid }
 
      this.datacrowdService.SaveSimul(obj);
- } 
+ $('#controlbutton').css('display', '');
+ this.displayclusters = true;
+
+    } 
  async bars(){
   await this.datacrowdService.getNextActionMenuList().then((response:any)=>{
   console.log("response===========",response);
@@ -17965,29 +18411,405 @@ let obj22:any={
     }
 
 
-    async DisplayFromSenario(){
-      let ISExport:boolean=this.informationservice.getISExport();
+//     async DisplayFromSenario(){
+//       let ISExport:boolean=this.informationservice.getISExport();
       
-      //console.log('ISExport:',ISExport); // Debugging log
+//       //console.log('ISExport:',ISExport); // Debugging log
       
-      if(ISExport==false){
+//       if(ISExport==false){
 
-           console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
+//            console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
       
-      let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
-       console.log("data>>>111111>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+//       let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+//        console.log("data>>>111111>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
 
-       if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[0].TYPE=="GRID"){
-        console.log('VcisrowData>>>>',this.informationservice.getVcisrowData());
+//        if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[0].TYPE=="GRID"){
+//         console.log('VcisrowData>>>>',this.informationservice.getVcisrowData());
+// let vcisrowData:any=this.informationservice.getVcisrowData();
+
+// if(vcisrowData.issenario=="1"){
+// // if(A_isSenarioFromcase==true){
+//   if(this.senarioFlag==true){
+
+//   }else{
+//     $("#toggleColor").click();
+
+//   }
+// //   this.senarioParentName=this.simulationid;
+// //   let obj:any={
+// //     senarioParentName:this.senarioParentName,
+// //     simulationid:this.simulationid,
+// //     Action:"DisplayFromSenario",
+// //     senariocount:this.senariocount,
+// //     senarioFlag:this.senarioFlag,
+// //     reportType:this.reportType
+
+
+// //   }
+// //   // this.senarioIdOutput.emit(this.senarioParentName);
+// //   this.navbarSimulId=obj;
+
+// }
+
+// if(vcisrowData.reporttype=="TCD History"){
+
+
+  
+// }else{
+//   await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+//     console.log("res in getSimulationobject ",res);
+//     this.datajson=res;
+//     if (this.datajson !== null) {
+//       ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+//       this.marker = L.markerClusterGroup({
+//         spiderfyOnMaxZoom: false,
+//         animate: true,
+//         singleMarkerMode: true,
+//       });
+//       this.markerLoop = L.markerClusterGroup({
+//         spiderfyOnMaxZoom: false,
+//         animate: true,
+//         singleMarkerMode: true,
+//       });
+//       let lastMarkerLat:any;
+//       let lastMarkerLng:any;
+  
+//       for (var j = 0; j < 1; j++) {
+//         for (var i = 0; i < this.datajson; i++) {
+//           this.markers = L.marker([
+//             Number(this.datajson[i].location_latitude),
+//             Number(this.datajson[i].location_longitude)
+         
+//           ]);
+//           this.markers.off("click");
+//           this.markers.on("mousedown", (e: any) => {
+//             if (e.originalEvent.buttons == 2) {
+//               e.target.openPopup();
+  
+//             }
+//             if (e.originalEvent.buttons == 1) {
+//               //  alert(1);
+//             }
+//           });
+//           this.markersArray.push(this.markers)
+//           console.log("lastMarkerLat datajson",this.datajson[i])
+//   lastMarkerLat = this.datajson[i][4];
+//   lastMarkerLng = this.datajson[i][3];
+//         }
+//       }
+  
+  
+//       //       markersBatch.push(marker);
+//       //     }
+  
+//       //     // Apply event listeners to the batch of markers
+//       //     markersBatch.forEach(marker => {
+//       //       marker.off("click");
+//       //       marker.on("mousedown", (e: any) => {
+//       //         if (e.originalEvent.buttons == 2) {
+//       //           e.target.openPopup();
+//       //         }
+//       //         if (e.originalEvent.buttons == 1) {
+//       //           // alert(1);
+//       //         }
+//       //       });
+  
+//       //       this.markersArray.push(marker);
+//       //     });
+  
+//       //     // Clear markersBatch to free up memory
+//       //     markersBatch.length = 0;
+//       //   }
+//       // }
+//       // // End the timer and log the elapsed time
+//       // //console.timeEnd('loopTime');
+  
+//       //     //  this.marker.openPopup(
+//       //     //  html11
+//       //     //  );
+  
+  
+  
+//       this.rowData = [];
+//       this.datajson.forEach((element: any, key: any) => {
+//         this.myMarker = this.binddata(
+//           element[4],
+//           element[3],
+//           element[1],
+//           element[0],
+//           element[2],
+//           element[5],
+//           ""
+//         );
+  
+//         this.myMarker.lat = element[4];
+//         this.myMarker.lng = element[3]
+//         this.myMarker.timestamp = element[1]
+//         this.myMarker.tel = element[0];
+//         this.myMarker.name = element[2];
+//         this.marker.addLayer(this.myMarker);
+//         this.markerLoop.addLayer(this.myMarker);
+//         this.myMarker.off("click");
+//         this.myMarker.on("mousedown", async (e: any) => {
+//           if (e.originalEvent.buttons == 2) {
+//             ////console.log("markerChildrensssssss", e.target)
+//             this.rowData = [];
+//             var jsonaggrid = {
+//               Device_id: e.target.tel,
+//               Tel: e.target.name,
+//               Date: e.target.timestamp,
+//               Hits: "1",
+//               Coord: e.target.lat + ',' + e.target.lng,
+//               //Lat:e.target.lat
+//             };
+//             this.rowData.push(jsonaggrid);
+  
+  
+//             const componentfactory =
+//               this.componentFactoryResolver.resolveComponentFactory(
+//                 VAgGridComponent
+//               );
+//             const componentref =
+//               this.viewContainerRef.createComponent(componentfactory);
+//             componentref.instance.rowData = this.rowData;
+//             componentref.instance.columnDefs = this.columnDefs;
+//             componentref.instance.headerHeight = 0;
+//             // componentref.instance.selectdevices = true;
+//             componentref.instance.Title = "Here On";
+//             componentref.instance.distinct = true;
+//             componentref.changeDetectorRef.detectChanges();
+//             componentref.instance.Grid2Type = 'btn-54';
+//             componentref.instance.GridID = 'GeoGrid1';
+  
+//             const html2 = componentref.location.nativeElement;
+//             await html2;
+  
+//             // $('#agGrid').css('height','10px');
+//             $('.ag-theme-balham').css('height', '130px');
+  
+  
+//             // /  e.target.openPopup(html2, e.target._latlng);
+//             this.map.openPopup(html2, e.target._latlng);
+  
+  
+//           } else if (e.originalEvent.buttons == 1) {
+  
+//           }
+  
+//         });
+//       });
+  
+//       const componentfactory =
+//         this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+//       const componentref =
+//         this.viewContainerRef.createComponent(componentfactory);
+//       const html1 = (componentref.location.nativeElement.style.display = "none");
+//       componentref.instance.columnDefs = this.columnDefs;
+//       componentref.changeDetectorRef.detectChanges();
+//       this.marker.off("click");
+//       this.marker.on("clustermousedown", async (e: any) => {
+//         if (e.originalEvent.buttons == 2) {
+//           var markerChildrens = e.layer.getAllChildMarkers();
+  
+  
+  
+  
+  
+//           this.rowData = [];
+  
+//           for (var j = 0; j < markerChildrens.length; j++) {
+//             var jsonaggrid = {
+//               Device_id: markerChildrens[j].tel,
+//               Tel: markerChildrens[j].name,
+//               Date: markerChildrens[j].timestamp,
+//               Hits: "1",
+//               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+//               // Lat:markerChildrens[j].lat
+//             };
+//             this.rowData.push(jsonaggrid);
+//           }
+  
+//           ////console.log("markerChildrens>>>>>", markerChildrens);
+  
+//           const componentfactory =
+//             this.componentFactoryResolver.resolveComponentFactory(
+//               VAgGridComponent
+//             );
+//           const componentref =
+//             this.viewContainerRef.createComponent(componentfactory);
+//           componentref.instance.rowData = this.rowData;
+//           componentref.instance.columnDefs = this.columnDefs;
+//           componentref.instance.headerHeight = 0;
+//           // componentref.instance.selectdevices = true;
+//           componentref.instance.Title = "Here On";
+//           componentref.instance.distinct = true;
+//           componentref.changeDetectorRef.detectChanges();
+//           componentref.instance.pagination = false;
+//           componentref.instance.rowGrouping = true;
+//           componentref.instance.contextmenu = false;
+//           componentref.instance.Grid2Type = 'btn-54';
+//           componentref.instance.GridID = 'GeoGrid1';
+//           const html1 = componentref.location.nativeElement;
+//           await html1;
+//           ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+//           if (markerChildrens.length < 3) {
+//             // $('#agGrid').css('height','10px');
+//             $('.ag-theme-balham').css('height', '130px');
+  
+//           } else {
+//             $('.ag-theme-balham').css('height', ' 250px ');
+  
+//           }
+  
+  
+//           this.map.openPopup(html1, e.layer.getLatLng());
+  
+//           // $(".modal-content").css("width","650px");
+//           // $(".modal-content").css("right","200px");
+//           // $(".modal-content").css("padding","10px");
+//           // $(".modal-content").css("top","85px");
+//           // $(".modal-content").draggable({
+//           //   axis: "both",
+//           //   cursor: "move"
+//           // });
+//           //  this.modalRef =this.modalService.open(this.popupContent1);
+  
+//         }
+//         if (e.originalEvent.buttons == 1) {
+//           // alert(4);
+  
+//         }
+  
+//         //open popup;
+//       });
+//       lastMarkerLat = this.datajson[0][4];
+//       lastMarkerLng = this.datajson[0][3];
+//       this.map.addLayer(this.marker);
+//       this.map.setView([lastMarkerLat, lastMarkerLng],12);
+      
+//       this.magnifiedMap.addLayer(this.markerLoop);
+//       this.layerGroup.addLayer(this.marker);
+   
+//   }
+  
+//    });
+//   this.displayShapes(data[0].COLVALUE);
+
+// }
+
+//         this.senarioParentName=data[0].COLVALUE;
+//         this.simulationid=data[0].COLVALUE;
+      
+//         let obj:any={
+//           senarioParentName:this.senarioParentName,
+//           simulationid:this.simulationid,
+//           Action:"DisplayFromSenario",
+//           senariocount:this.senariocount,
+//           senarioFlag:this.senarioFlag,
+//           reportType:this.reportType
+      
+      
+//         }
+//         // this.senarioIdOutput.emit(this.senarioParentName);
+//         this.navbarSimulId=obj;
+
+
+
+//       }else{
+
+//         for(let i=0;i<data.length;i++)
+//           {
+
+//             if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
+//               // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
+//               //   )]);
+            
+            
+//               await this.datacrowdService
+//               .getfixedelementsObject([ parseInt(data[i].colValue)])
+//               .then(async (res: any) => {
+//                 //console.log('res>>', res);
+//                 this.displayFixedElements(res);
+            
+//               });
+            
+            
+//             }  else if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
+//               await this.datacrowdService.getSelectedShapes(data[i].COLVALUE).then((res:any)=>{
+//                 console.log("res in getSimulationobject ",res);
+//                 let data=JSON.parse(res); 
+//                 console.log("data  <<<<  ",data);
+    
+//                 for( let i =0 ; i< data.length ; i++){
+//                   console.log("IIIIIIIIIIIIIIIIII  ",data[i]);
+//                   this.displayShapes2([data[i]]);
+           
+//                 }
+//               });
+    
+    
+          
+            
+            
+//             }
+            
+//           }
+
+
+//        }
+
+
+
+//       }}
+
+async DisplayFromSenario(){
+  let ISExport:boolean=this.informationservice.getISExport();
+  
+  //console.log('ISExport:',ISExport); // Debugging log
+  
+
+  let data2:any=JSON.parse("["+this.informationservice.getAgGidSelectedNode()+"]");
+
+  let colValues: any[]=[];
+  data2.forEach((innerArray: any[]) => {
+    innerArray.forEach(item => {
+      if(item.TYPE=="GRID"){
+        colValues.push(item.COLVALUE);
+
+      }
+    });
+  });
+  
+
+  if(ISExport==false){
+
+
+        
+  
+
+   const jsonString = this.informationservice.getAgGidSelectedNode();
+
+   console.log("cedrikkkkk11111",jsonString);
+   console.log("cedrikkkkk2222222",JSON.parse(jsonString));
+
+   setTimeout(async () => {
+    
+  //  let  data:any[]=[];
+
+   let data=JSON.parse(jsonString);
+   console.log("DATAAAAAAAAAAAAA>>>>>>>>>>>>>>>>>>>",data)
+   
+
+   if(JSON.parse(jsonString)[0].COLNAME=="LOC_REPORT_CONFIG_ID"  && JSON.parse(jsonString)[0].TYPE=="GRID"){
+    console.log('VcisrowData>>>>',this.informationservice.getVcisrowData());
 let vcisrowData:any=this.informationservice.getVcisrowData();
 
 if(vcisrowData.issenario=="1"){
-alert(111);
 // if(A_isSenarioFromcase==true){
-  if(this.senarioFlag==true){
+if(this.senarioFlag==true){
 
-  }else{
-    $("#toggleColor").click();
+}else{
+$("#toggleColor").click();
 
   }
 //   this.senarioParentName=this.simulationid;
@@ -18005,245 +18827,288 @@ alert(111);
 //   this.navbarSimulId=obj;
 
 }
-        await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
-          console.log("res in getSimulationobject ",res);
-          this.datajson=res;
-          if (this.datajson !== null) {
-            ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-            this.marker = L.markerClusterGroup({
-              spiderfyOnMaxZoom: false,
-              animate: true,
-              singleMarkerMode: true,
+
+if(vcisrowData.reporttype=="Tcd History"){
+  await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+    console.log("res in getSimulationobject ",res);
+    this.datajson=res;
+});
+        this.tcd();
+
+  
+
+  
+}else if(vcisrowData.reporttype=="Fixed Element Scan"){
+
+  await this.datacrowdService
+            .getFixedElementsSenario(parseInt(data[0].COLVALUE))
+            .then(async (res: any) => {
+              console.log('getFixedElementsSenario>>', res);
+              this.displayFixedElements(res);
+          
             });
-            this.markerLoop = L.markerClusterGroup({
-              spiderfyOnMaxZoom: false,
-              animate: true,
-              singleMarkerMode: true,
-            });
-            let lastMarkerLat:any;
-            let lastMarkerLng:any;
-        
-            for (var j = 0; j < 1; j++) {
-              for (var i = 0; i < this.datajson; i++) {
-                this.markers = L.marker([
-                  Number(this.datajson[i].location_latitude),
-                  Number(this.datajson[i].location_longitude)
-               
-                ]);
-                this.markers.off("click");
-                this.markers.on("mousedown", (e: any) => {
-                  if (e.originalEvent.buttons == 2) {
-                    e.target.openPopup();
-        
-                  }
-                  if (e.originalEvent.buttons == 1) {
-                    //  alert(1);
-                  }
-                });
-                this.markersArray.push(this.markers)
-                console.log("lastMarkerLat datajson",this.datajson[i])
-        lastMarkerLat = this.datajson[i][4];
-        lastMarkerLng = this.datajson[i][3];
-              }
+            this.displayShapes(data[0].COLVALUE);
+
+}
+
+else{
+
+  if(vcisrowData.reporttype=="Device History"){
+    this.reportType=2;
+  }else if(vcisrowData.reporttype=="Device History Pattern"){
+    this.reportType=6;
+  }
+  await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+    console.log("res in getSimulationobject ",res);
+    this.datajson=res;
+    if (this.datajson !== null) {
+      ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
+      this.marker = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      this.markerLoop = L.markerClusterGroup({
+        spiderfyOnMaxZoom: false,
+        animate: true,
+        singleMarkerMode: true,
+      });
+      let lastMarkerLat:any;
+      let lastMarkerLng:any;
+  
+      for (var j = 0; j < 1; j++) {
+        for (var i = 0; i < this.datajson; i++) {
+          this.markers = L.marker([
+            Number(this.datajson[i].location_latitude),
+            Number(this.datajson[i].location_longitude)
+         
+          ]);
+          this.markers.off("click");
+          this.markers.on("mousedown", (e: any) => {
+            if (e.originalEvent.buttons == 2) {
+              e.target.openPopup();
+  
             }
-        
-        
-            //       markersBatch.push(marker);
-            //     }
-        
-            //     // Apply event listeners to the batch of markers
-            //     markersBatch.forEach(marker => {
-            //       marker.off("click");
-            //       marker.on("mousedown", (e: any) => {
-            //         if (e.originalEvent.buttons == 2) {
-            //           e.target.openPopup();
-            //         }
-            //         if (e.originalEvent.buttons == 1) {
-            //           // alert(1);
-            //         }
-            //       });
-        
-            //       this.markersArray.push(marker);
-            //     });
-        
-            //     // Clear markersBatch to free up memory
-            //     markersBatch.length = 0;
-            //   }
-            // }
-            // // End the timer and log the elapsed time
-            // //console.timeEnd('loopTime');
-        
-            //     //  this.marker.openPopup(
-            //     //  html11
-            //     //  );
-        
-        
-        
+            if (e.originalEvent.buttons == 1) {
+              //  alert(1);
+            }
+          });
+          this.markersArray.push(this.markers)
+          console.log("lastMarkerLat datajson",this.datajson[i])
+  lastMarkerLat = this.datajson[i][4];
+  lastMarkerLng = this.datajson[i][3];
+        }
+      }
+  
+  
+      //       markersBatch.push(marker);
+      //     }
+  
+      //     // Apply event listeners to the batch of markers
+      //     markersBatch.forEach(marker => {
+      //       marker.off("click");
+      //       marker.on("mousedown", (e: any) => {
+      //         if (e.originalEvent.buttons == 2) {
+      //           e.target.openPopup();
+      //         }
+      //         if (e.originalEvent.buttons == 1) {
+      //           // alert(1);
+      //         }
+      //       });
+  
+      //       this.markersArray.push(marker);
+      //     });
+  
+      //     // Clear markersBatch to free up memory
+      //     markersBatch.length = 0;
+      //   }
+      // }
+      // // End the timer and log the elapsed time
+      // //console.timeEnd('loopTime');
+  
+      //     //  this.marker.openPopup(
+      //     //  html11
+      //     //  );
+  
+  
+  
+      this.rowData = [];
+      this.datajson.forEach((element: any, key: any) => {
+        this.myMarker = this.binddata(
+          element[4],
+          element[3],
+          element[1],
+          element[0],
+          element[2],
+          element[5],
+          ""
+        );
+  
+        this.myMarker.lat = element[4];
+        this.myMarker.lng = element[3]
+        this.myMarker.timestamp = element[1]
+        this.myMarker.tel = element[0];
+        this.myMarker.name = element[2];
+        this.marker.addLayer(this.myMarker);
+        this.markerLoop.addLayer(this.myMarker);
+        this.myMarker.off("click");
+        this.myMarker.on("mousedown", async (e: any) => {
+          if (e.originalEvent.buttons == 2) {
+            ////console.log("markerChildrensssssss", e.target)
             this.rowData = [];
-            this.datajson.forEach((element: any, key: any) => {
-              this.myMarker = this.binddata(
-                element[4],
-                element[3],
-                element[1],
-                element[0],
-                element[2],
-                element[5],
-                ""
-              );
-        
-              this.myMarker.lat = element[4];
-              this.myMarker.lng = element[3]
-              this.myMarker.timestamp = element[1]
-              this.myMarker.tel = element[0];
-              this.myMarker.name = element[2];
-              this.marker.addLayer(this.myMarker);
-              this.markerLoop.addLayer(this.myMarker);
-              this.myMarker.off("click");
-              this.myMarker.on("mousedown", async (e: any) => {
-                if (e.originalEvent.buttons == 2) {
-                  ////console.log("markerChildrensssssss", e.target)
-                  this.rowData = [];
-                  var jsonaggrid = {
-                    Device_id: e.target.tel,
-                    Tel: e.target.name,
-                    Date: e.target.timestamp,
-                    Hits: "1",
-                    Coord: e.target.lat + ',' + e.target.lng,
-                    //Lat:e.target.lat
-                  };
-                  this.rowData.push(jsonaggrid);
-        
-        
-                  const componentfactory =
-                    this.componentFactoryResolver.resolveComponentFactory(
-                      VAgGridComponent
-                    );
-                  const componentref =
-                    this.viewContainerRef.createComponent(componentfactory);
-                  componentref.instance.rowData = this.rowData;
-                  componentref.instance.columnDefs = this.columnDefs;
-                  componentref.instance.headerHeight = 0;
-                  // componentref.instance.selectdevices = true;
-                  componentref.instance.Title = "Here On";
-                  componentref.instance.distinct = true;
-                  componentref.changeDetectorRef.detectChanges();
-                  componentref.instance.Grid2Type = 'btn-54';
-                  componentref.instance.GridID = 'GeoGrid1';
-        
-                  const html2 = componentref.location.nativeElement;
-                  await html2;
-        
-                  // $('#agGrid').css('height','10px');
-                  $('.ag-theme-balham').css('height', '130px');
-        
-        
-                  // /  e.target.openPopup(html2, e.target._latlng);
-                  this.map.openPopup(html2, e.target._latlng);
-        
-        
-                } else if (e.originalEvent.buttons == 1) {
-        
-                }
-        
-              });
-            });
-        
+            var jsonaggrid = {
+              Device_id: e.target.tel,
+              Tel: e.target.name,
+              Date: e.target.timestamp,
+              Hits: "1",
+              Coord: e.target.lat + ',' + e.target.lng,
+              //Lat:e.target.lat
+            };
+            this.rowData.push(jsonaggrid);
+  
+  
             const componentfactory =
-              this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+              this.componentFactoryResolver.resolveComponentFactory(
+                VAgGridComponent
+              );
             const componentref =
               this.viewContainerRef.createComponent(componentfactory);
-            const html1 = (componentref.location.nativeElement.style.display = "none");
+            componentref.instance.rowData = this.rowData;
             componentref.instance.columnDefs = this.columnDefs;
+            componentref.instance.headerHeight = 0;
+            // componentref.instance.selectdevices = true;
+            componentref.instance.Title = "Here On";
+            componentref.instance.distinct = true;
             componentref.changeDetectorRef.detectChanges();
-            this.marker.off("click");
-            this.marker.on("clustermousedown", async (e: any) => {
-              if (e.originalEvent.buttons == 2) {
-                var markerChildrens = e.layer.getAllChildMarkers();
-        
-        
-        
-        
-        
-                this.rowData = [];
-        
-                for (var j = 0; j < markerChildrens.length; j++) {
-                  var jsonaggrid = {
-                    Device_id: markerChildrens[j].tel,
-                    Tel: markerChildrens[j].name,
-                    Date: markerChildrens[j].timestamp,
-                    Hits: "1",
-                    Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-                    // Lat:markerChildrens[j].lat
-                  };
-                  this.rowData.push(jsonaggrid);
-                }
-        
-                ////console.log("markerChildrens>>>>>", markerChildrens);
-        
-                const componentfactory =
-                  this.componentFactoryResolver.resolveComponentFactory(
-                    VAgGridComponent
-                  );
-                const componentref =
-                  this.viewContainerRef.createComponent(componentfactory);
-                componentref.instance.rowData = this.rowData;
-                componentref.instance.columnDefs = this.columnDefs;
-                componentref.instance.headerHeight = 0;
-                // componentref.instance.selectdevices = true;
-                componentref.instance.Title = "Here On";
-                componentref.instance.distinct = true;
-                componentref.changeDetectorRef.detectChanges();
-                componentref.instance.pagination = false;
-                componentref.instance.rowGrouping = true;
-                componentref.instance.contextmenu = false;
-                componentref.instance.Grid2Type = 'btn-54';
-                componentref.instance.GridID = 'GeoGrid1';
-                const html1 = componentref.location.nativeElement;
-                await html1;
-                ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-                if (markerChildrens.length < 3) {
-                  // $('#agGrid').css('height','10px');
-                  $('.ag-theme-balham').css('height', '130px');
-        
-                } else {
-                  $('.ag-theme-balham').css('height', ' 250px ');
-        
-                }
-        
-        
-                this.map.openPopup(html1, e.layer.getLatLng());
-        
-                // $(".modal-content").css("width","650px");
-                // $(".modal-content").css("right","200px");
-                // $(".modal-content").css("padding","10px");
-                // $(".modal-content").css("top","85px");
-                // $(".modal-content").draggable({
-                //   axis: "both",
-                //   cursor: "move"
-                // });
-                //  this.modalRef =this.modalService.open(this.popupContent1);
-        
-              }
-              if (e.originalEvent.buttons == 1) {
-                // alert(4);
-        
-              }
-        
-              //open popup;
-            });
-            lastMarkerLat = this.datajson[0][4];
-            lastMarkerLng = this.datajson[0][3];
-            this.map.addLayer(this.marker);
-            this.map.setView([lastMarkerLat, lastMarkerLng],12);
-            
-            this.magnifiedMap.addLayer(this.markerLoop);
-            this.layerGroup.addLayer(this.marker);
-         
+            componentref.instance.Grid2Type = 'btn-54';
+            componentref.instance.GridID = 'GeoGrid1';
+  
+            const html2 = componentref.location.nativeElement;
+            await html2;
+  
+            // $('#agGrid').css('height','10px');
+            $('.ag-theme-balham').css('height', '130px');
+  
+  
+            // /  e.target.openPopup(html2, e.target._latlng);
+            this.map.openPopup(html2, e.target._latlng);
+  
+  
+          } else if (e.originalEvent.buttons == 1) {
+  
+          }
+  
+        });
+      });
+  
+      const componentfactory =
+        this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
+      const componentref =
+        this.viewContainerRef.createComponent(componentfactory);
+      const html1 = (componentref.location.nativeElement.style.display = "none");
+      componentref.instance.columnDefs = this.columnDefs;
+      componentref.changeDetectorRef.detectChanges();
+      this.marker.off("click");
+      this.marker.on("clustermousedown", async (e: any) => {
+        if (e.originalEvent.buttons == 2) {
+          var markerChildrens = e.layer.getAllChildMarkers();
+  
+  
+  
+  
+  
+          this.rowData = [];
+  
+          for (var j = 0; j < markerChildrens.length; j++) {
+            var jsonaggrid = {
+              Device_id: markerChildrens[j].tel,
+              Tel: markerChildrens[j].name,
+              Date: markerChildrens[j].timestamp,
+              Hits: "1",
+              Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
+              // Lat:markerChildrens[j].lat
+            };
+            this.rowData.push(jsonaggrid);
+          }
+  
+          ////console.log("markerChildrens>>>>>", markerChildrens);
+  
+          const componentfactory =
+            this.componentFactoryResolver.resolveComponentFactory(
+              VAgGridComponent
+            );
+          const componentref =
+            this.viewContainerRef.createComponent(componentfactory);
+          componentref.instance.rowData = this.rowData;
+          componentref.instance.columnDefs = this.columnDefs;
+          componentref.instance.headerHeight = 0;
+          // componentref.instance.selectdevices = true;
+          componentref.instance.Title = "Here On";
+          componentref.instance.distinct = true;
+          componentref.changeDetectorRef.detectChanges();
+          componentref.instance.pagination = false;
+          componentref.instance.rowGrouping = true;
+          componentref.instance.contextmenu = false;
+          componentref.instance.Grid2Type = 'btn-54';
+          componentref.instance.GridID = 'GeoGrid1';
+          const html1 = componentref.location.nativeElement;
+          await html1;
+          ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
+          if (markerChildrens.length < 3) {
+            // $('#agGrid').css('height','10px');
+            $('.ag-theme-balham').css('height', '130px');
+  
+          } else {
+            $('.ag-theme-balham').css('height', ' 250px ');
+  
+          }
+  
+  
+          this.map.openPopup(html1, e.layer.getLatLng());
+  
+          // $(".modal-content").css("width","650px");
+          // $(".modal-content").css("right","200px");
+          // $(".modal-content").css("padding","10px");
+          // $(".modal-content").css("top","85px");
+          // $(".modal-content").draggable({
+          //   axis: "both",
+          //   cursor: "move"
+          // });
+          //  this.modalRef =this.modalService.open(this.popupContent1);
+  
         }
-        
-         });
-        this.displayShapes(data[0].COLVALUE);
+        if (e.originalEvent.buttons == 1) {
+          // alert(4);
+  
+        }
+  
+        //open popup;
+      });
+      lastMarkerLat = this.datajson[0][4];
+      lastMarkerLng = this.datajson[0][3];
+      this.map.addLayer(this.marker);
+      this.map.setView([lastMarkerLat, lastMarkerLng],12);
       
+      this.magnifiedMap.addLayer(this.markerLoop);
+      this.layerGroup.addLayer(this.marker);
+   
+  }
+  
+   });
+  this.displayShapes(data[0].COLVALUE);
+
+  if(vcisrowData.reporttype=="Fixed Element Activity Scan"){
+    await this.datacrowdService
+              .getFixedElementsSenario(parseInt(data[0].COLVALUE))
+              .then(async (res: any) => {
+                console.log('getFixedElementsSenario>>', res);
+                this.displayFixedElements(res);
+            
+              });
+  
+  }
+}
+
         this.senarioParentName=data[0].COLVALUE;
         this.simulationid=data[0].COLVALUE;
       
@@ -18259,347 +19124,64 @@ alert(111);
         }
         // this.senarioIdOutput.emit(this.senarioParentName);
         this.navbarSimulId=obj;
-console.log("zaherr",obj)
 
 
 
-      }else{
+  }else{
 
+let allData:any = data;
+console.log("hello--",this.informationservice.getAgGidSelectedNode());
 
-        for(let i=0;i<data.length;i++)
-          {
-            if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
-              // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
-              //   )]);
-            
-            
-              await this.datacrowdService
-              .getfixedelementsObject([ parseInt(data[i].colValue)])
-              .then(async (res: any) => {
-                //console.log('res>>', res);
-                this.displayFixedElements(res);
-            
-              });
-            
-            
+    for(let i=0;i<data.length;i++)
+      {
+        if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
+          // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
+          //   )]);
+        
+        
+          await this.datacrowdService
+          .getfixedelementsObject([ parseInt(data[i].colValue)])
+          .then(async (res: any) => {
+            //console.log('res>>', res);
+            this.displayFixedElements(res);
+        
+          });
+        
+        
+        }
+
+        else if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
+          await this.datacrowdService.getSelectedShapes(data[i].COLVALUE).then((res:any)=>{
+            console.log("res in getSimulationobject ",res);
+            let data=JSON.parse(res); 
+            console.log("data  <<<<  ",data);
+
+            for( let i =0 ; i< data.length ; i++){
+              console.log("IIIIIIIIIIIIIIIIII  ",data[i]);
+              this.displayShapes2([data[i]]);
+       
             }
-            // else if(data[i].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[i].TYPE=="GRID"){
-            //   await this.datacrowdService.getSimulationobject([data[i].COLVALUE]).then((res:any)=>{
-            //     console.log("res in getSimulationobject ",res);
-            //     this.datajson=res;
-            //     if (this.datajson !== null) {
-            //       ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
-            //       this.marker = L.markerClusterGroup({
-            //         spiderfyOnMaxZoom: false,
-            //         animate: true,
-            //         singleMarkerMode: true,
-            //       });
-            //       this.markerLoop = L.markerClusterGroup({
-            //         spiderfyOnMaxZoom: false,
-            //         animate: true,
-            //         singleMarkerMode: true,
-            //       });
-            //       let lastMarkerLat:any;
-            //       let lastMarkerLng:any;
-              
-            //       for (var j = 0; j < 1; j++) {
-            //         for (var i = 0; i < this.datajson; i++) {
-            //           this.markers = L.marker([
-            //             Number(this.datajson[i].location_latitude),
-            //             Number(this.datajson[i].location_longitude)
-                     
-            //           ]);
-            //           this.markers.off("click");
-            //           this.markers.on("mousedown", (e: any) => {
-            //             if (e.originalEvent.buttons == 2) {
-            //               e.target.openPopup();
-              
-            //             }
-            //             if (e.originalEvent.buttons == 1) {
-            //               //  alert(1);
-            //             }
-            //           });
-            //           this.markersArray.push(this.markers)
-            //           console.log("lastMarkerLat datajson",this.datajson[i])
-            //   lastMarkerLat = this.datajson[i][4];
-            //   lastMarkerLng = this.datajson[i][3];
-            //         }
-            //       }
-              
-              
-            //       //       markersBatch.push(marker);
-            //       //     }
-              
-            //       //     // Apply event listeners to the batch of markers
-            //       //     markersBatch.forEach(marker => {
-            //       //       marker.off("click");
-            //       //       marker.on("mousedown", (e: any) => {
-            //       //         if (e.originalEvent.buttons == 2) {
-            //       //           e.target.openPopup();
-            //       //         }
-            //       //         if (e.originalEvent.buttons == 1) {
-            //       //           // alert(1);
-            //       //         }
-            //       //       });
-              
-            //       //       this.markersArray.push(marker);
-            //       //     });
-              
-            //       //     // Clear markersBatch to free up memory
-            //       //     markersBatch.length = 0;
-            //       //   }
-            //       // }
-            //       // // End the timer and log the elapsed time
-            //       // //console.timeEnd('loopTime');
-              
-            //       //     //  this.marker.openPopup(
-            //       //     //  html11
-            //       //     //  );
-              
-              
-              
-            //       this.rowData = [];
-            //       this.datajson.forEach((element: any, key: any) => {
-            //         this.myMarker = this.binddata(
-            //           element[4],
-            //           element[3],
-            //           element[1],
-            //           element[0],
-            //           element[2],
-            //           element[5],
-            //           ""
-            //         );
-              
-            //         this.myMarker.lat = element[4];
-            //         this.myMarker.lng = element[3]
-            //         this.myMarker.timestamp = element[1]
-            //         this.myMarker.tel = element[0];
-            //         this.myMarker.name = element[2];
-            //         this.marker.addLayer(this.myMarker);
-            //         this.markerLoop.addLayer(this.myMarker);
-            //         this.myMarker.off("click");
-            //         this.myMarker.on("mousedown", async (e: any) => {
-            //           if (e.originalEvent.buttons == 2) {
-            //             ////console.log("markerChildrensssssss", e.target)
-            //             this.rowData = [];
-            //             var jsonaggrid = {
-            //               Device_id: e.target.tel,
-            //               Tel: e.target.name,
-            //               Date: e.target.timestamp,
-            //               Hits: "1",
-            //               Coord: e.target.lat + ',' + e.target.lng,
-            //               //Lat:e.target.lat
-            //             };
-            //             this.rowData.push(jsonaggrid);
-              
-              
-            //             const componentfactory =
-            //               this.componentFactoryResolver.resolveComponentFactory(
-            //                 VAgGridComponent
-            //               );
-            //             const componentref =
-            //               this.viewContainerRef.createComponent(componentfactory);
-            //             componentref.instance.rowData = this.rowData;
-            //             componentref.instance.columnDefs = this.columnDefs;
-            //             componentref.instance.headerHeight = 0;
-            //             // componentref.instance.selectdevices = true;
-            //             componentref.instance.Title = "Here On";
-            //             componentref.instance.distinct = true;
-            //             componentref.changeDetectorRef.detectChanges();
-            //             componentref.instance.Grid2Type = 'btn-54';
-            //             componentref.instance.GridID = 'GeoGrid1';
-              
-            //             const html2 = componentref.location.nativeElement;
-            //             await html2;
-              
-            //             // $('#agGrid').css('height','10px');
-            //             $('.ag-theme-balham').css('height', '130px');
-              
-              
-            //             // /  e.target.openPopup(html2, e.target._latlng);
-            //             this.map.openPopup(html2, e.target._latlng);
-              
-              
-            //           } else if (e.originalEvent.buttons == 1) {
-              
-            //           }
-              
-            //         });
-            //       });
-              
-            //       const componentfactory =
-            //         this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-            //       const componentref =
-            //         this.viewContainerRef.createComponent(componentfactory);
-            //       const html1 = (componentref.location.nativeElement.style.display = "none");
-            //       componentref.instance.columnDefs = this.columnDefs;
-            //       componentref.changeDetectorRef.detectChanges();
-            //       this.marker.off("click");
-            //       this.marker.on("clustermousedown", async (e: any) => {
-            //         if (e.originalEvent.buttons == 2) {
-            //           var markerChildrens = e.layer.getAllChildMarkers();
-              
-              
-              
-              
-              
-            //           this.rowData = [];
-              
-            //           for (var j = 0; j < markerChildrens.length; j++) {
-            //             var jsonaggrid = {
-            //               Device_id: markerChildrens[j].tel,
-            //               Tel: markerChildrens[j].name,
-            //               Date: markerChildrens[j].timestamp,
-            //               Hits: "1",
-            //               Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-            //               // Lat:markerChildrens[j].lat
-            //             };
-            //             this.rowData.push(jsonaggrid);
-            //           }
-              
-            //           ////console.log("markerChildrens>>>>>", markerChildrens);
-              
-            //           const componentfactory =
-            //             this.componentFactoryResolver.resolveComponentFactory(
-            //               VAgGridComponent
-            //             );
-            //           const componentref =
-            //             this.viewContainerRef.createComponent(componentfactory);
-            //           componentref.instance.rowData = this.rowData;
-            //           componentref.instance.columnDefs = this.columnDefs;
-            //           componentref.instance.headerHeight = 0;
-            //           // componentref.instance.selectdevices = true;
-            //           componentref.instance.Title = "Here On";
-            //           componentref.instance.distinct = true;
-            //           componentref.changeDetectorRef.detectChanges();
-            //           componentref.instance.pagination = false;
-            //           componentref.instance.rowGrouping = true;
-            //           componentref.instance.contextmenu = false;
-            //           componentref.instance.Grid2Type = 'btn-54';
-            //           componentref.instance.GridID = 'GeoGrid1';
-            //           const html1 = componentref.location.nativeElement;
-            //           await html1;
-            //           ////console.log("markerChildrens.length>>>>>>", markerChildrens.length)
-            //           if (markerChildrens.length < 3) {
-            //             // $('#agGrid').css('height','10px');
-            //             $('.ag-theme-balham').css('height', '130px');
-              
-            //           } else {
-            //             $('.ag-theme-balham').css('height', ' 250px ');
-              
-            //           }
-              
-              
-            //           this.map.openPopup(html1, e.layer.getLatLng());
-              
-            //           // $(".modal-content").css("width","650px");
-            //           // $(".modal-content").css("right","200px");
-            //           // $(".modal-content").css("padding","10px");
-            //           // $(".modal-content").css("top","85px");
-            //           // $(".modal-content").draggable({
-            //           //   axis: "both",
-            //           //   cursor: "move"
-            //           // });
-            //           //  this.modalRef =this.modalService.open(this.popupContent1);
-              
-            //         }
-            //         if (e.originalEvent.buttons == 1) {
-            //           // alert(4);
-              
-            //         }
-              
-            //         //open popup;
-            //       });
-            //       lastMarkerLat = this.datajson[0][4];
-            //       lastMarkerLng = this.datajson[0][3];
-            //       this.map.addLayer(this.marker);
-            //       this.map.setView([lastMarkerLat, lastMarkerLng],12);
-                  
-            //       this.magnifiedMap.addLayer(this.markerLoop);
-            //       this.layerGroup.addLayer(this.marker);
-               
-            //   }
-              
-            //    });
-            //   this.displayShapes(data[i].COLVALUE);
-            
-            //   this.senarioParentName=data[i].COLVALUE;
-            //   this.simulationid=data[i].COLVALUE;
-            
-            //   let obj:any={
-            //     senarioParentName:this.senarioParentName,
-            //     simulationid:this.simulationid,
-            //     Action:"DisplayFromSenario",
-            //     senariocount:this.senariocount,
-            //     senarioFlag:this.senarioFlag,
-            //     reportType:this.reportType
-            
-            
-            //   }
-            //   // this.senarioIdOutput.emit(this.senarioParentName);
-            //   this.navbarSimulId=obj;
-            // }
-            else if(data[0].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID" && data[i].TYPE=="GRID"){
-              console.log(" inn AOI Library Display ");
-              console.log("entered ++++++++++++++++++++++++++"+data[0].COLNAME);
-              console.log("the valueeeeeeeeeeeeeeeee"+data[0].COLVALUE);
-              await this.datacrowdService.getSelectedShape(data[0].COLVALUE).then((res:any)=>{
-                console.log("res in getSimulationobject ",res);
-                this.datajson=res;
-              });
-            
-              if (this.datajson !== null) {
-            
-            if (this.map) {
-              const centerLatLng = [this.datajson.center.lat, this.datajson.center.lng];
-              const radius = this.datajson.radius;
-              const circle = L.circle([this.datajson.center.lat, this.datajson.center.lng], {
-                  color: "#6e83f0",
-                  fillOpacity: 0.7,
-                  radius: radius
-              }).addTo(this.map);
-            this.circleDisplay=circle;
-              const paddingRatio = 6; 
-              const bounds = L.latLngBounds(
-                  L.latLng(centerLatLng[0] - (radius / 111320) * paddingRatio, centerLatLng[1] - (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio),
-                  L.latLng(centerLatLng[0] + (radius / 111320) * paddingRatio, centerLatLng[1] + (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio)
-              );
-            
-  
-                 
-  circle.bindTooltip(`${this.datajson.Name}`, {
-    permanent: true,
-    interactive: true,
-  
-    opacity: 0.9,
-    direction: "center"
-  }).openTooltip();
-  
-  
-  this.map.fitBounds(bounds);
-  
-  
-              //     circle.bindTooltip(`
-              //       <div class="custom-popup">
-              //           ${this.datajson.Name}
-              //       </div>`, {
-              //       offset: L.point(0, 0) 
-              //   });
-                
-              // this.map.fitBounds(bounds);
-            }
-            
-            }
-            }
-            
-          }
+          });
 
 
-       }
+      
+        
+        
+        }
+        else if(data[0].COLNAME=="COTRAVELER_DATA" && data[i].TYPE=="GRID"){
+        console.log("dddddd--->",allData);
+        this.displayCoTravelers(JSON.parse(jsonString));
+        }
+        
+      }
 
 
+   }
 
-      }}
+  }, 1000);
+
+
+  }}
 
     getsenarioId(obj:any){
       console.log("obj><><><<>",obj);
@@ -18640,7 +19222,7 @@ console.log("zaherr",obj)
   });
   
       }else  if(obj.action=="reset"){
-        this.clearShapes();
+        // this.clearShapes();
   
       }else if(obj.action=="nextAction"){
   
@@ -18655,6 +19237,7 @@ console.log("zaherr",obj)
         this.showTextMenu=false;
     
       }
+ $('#controlbutton').css('display', '');
       
         }
 
@@ -18666,6 +19249,8 @@ console.log("zaherr",obj)
           this.ImsiID=param.IMSI_ID;
           this.DateTimeFrom=this.convertDate(param.dateTimeFrom);
           this.DateTimeTo=this.convertDate(param.dateTimeTo);
+          this.Phone_nbr=param.PHONE_NB;
+
           console.log("this.dateTimeFrom-----",this.dateTimeFrom);
           console.log("this.DateTimeTo-----",this.dateTimeTo);
 
@@ -18772,11 +19357,243 @@ convertArray(input: any[]): { id: number, name: string }[] {
      localStorage.removeItem("deviceselected");
      localStorage.removeItem("locSimulId");
      localStorage.removeItem("userCode");
-     localStorage.removeItem("locSimulId");
-
+     localStorage.removeItem("formData");
+     localStorage.removeItem("selectedType");
     }
+
+    async displayShapes2(circlecoord :any){
+  
+      console.log("circlecoord",circlecoord)
+    
+      
+        for (
+          var j = 0;
+          j < circlecoord.length;
+          j++
+        ) {
+          if (circlecoord[j].Type == "Circle") {
+            this.Coord.push({
+              ID: circlecoord[0].ID,
+              Name: "",
+              Value: "",
+              Type: circlecoord[0].Type,
+              Bounds: "",
+              radius: circlecoord[0].radius,
+              center: circlecoord[0].center,
+              leafletid: circlecoord[0].leafletid,
+              PolyBoundsCoords: "",
+              selectedStartDate: "",
+              selectedEndDate: "",
+              countrycodes:"",
+      
+            });
+      
+            this.circle = L.circle(circlecoord[j].center, {
+              color: "#6e83f0",
+              fillOpacity: 0.2,
+              radius: circlecoord[j].radius,
+            });
+            this.circle.bindTooltip(circlecoord[j].Name, {
+              permanent: true,
+              interactive: true,
+              opacity: 0.9,
+              direction: "center"
+            }).openTooltip();
+            
+            this.layerGroup.addLayer(this.circle);
+            this.drawnLayers.push(this.circle);
+            this.drawnItems.addLayer(this.circle);
+      
+          } else if (circlecoord[j].Type == "Rectangle") {
+      
+            let bnds = L.latLngBounds(
+              L.latLng(
+                circlecoord[j].Bounds.topLeft.lat,
+                circlecoord[j].Bounds.topLeft.lng
+              ),
+              L.latLng(
+                circlecoord[j].Bounds.bottomRight.lat,
+                circlecoord[j].Bounds.bottomRight.lng
+              )
+            );
+      
+            this.rectangle = L.rectangle(bnds, {
+              color: "#6e83f0",
+              fillOpacity: 0.2,
+            });
+            this.rectangle.bindTooltip(circlecoord[j].Name, {
+              permanent: true,
+              interactive: true,
+              opacity: 0.9,
+              direction: "center"
+            }).openTooltip();
+            this.layerGroup.addLayer(this.rectangle);
+            this.drawnLayers.push(this.rectangle);
+            this.drawnItems.addLayer(this.rectangle);
+      
+          } else if (circlecoord[j].Type == "Polygon") {
+            this.polygon = L.polygon(circlecoord[j].Bounds, {
+              color: "#6e83f0",
+              fillOpacity: 0.2,
+            });
+            this.polygon.bindTooltip(circlecoord[j].Name, {
+              permanent: true,
+              interactive: true,
+              opacity: 0.9,
+              direction: "center"
+            }).openTooltip();
+            this.layerGroup.addLayer(this.polygon);
+            this.drawnLayers.push(this.polygon);
+            this.drawnItems.addLayer(this.polygon);
+      
+          } else if (circlecoord[j].Type == "Polyline") {
+            this.polyline = L.polyline(circlecoord[j].Bounds, {
+              color: "#6e83f0",
+              fillOpacity: 0.2,
+            });
+            this.polyline.bindTooltip(circlecoord[j].Name, {
+              permanent: true,
+              interactive: true,
+              opacity: 0.9,
+              direction: "center"
+            }).openTooltip();
+            this.layerGroup.addLayer(this.polyline);
+            this.drawnLayers.push(this.polyline);
+            this.drawnItems.addLayer(this.polyline);
+          }
+          
+          this.layerGroup.addTo(this.map);
+        this.map.setView(circlecoord[j].center, 18)
+    
+        }
+    
+      
+      // });
+    }
+    remover(){
+      $('#refresh').css('display','none');
+    }
+
+handleSpeedChange(speed:number){
+  this.speedTime=speed;
+}
+
+
+handleSpeedChange1(speed:number){
+  this.speedTimeRoute=speed;
+}
+handleSpeedChange2(speed:number){
+  this.speedmarker=speed;
 }
 
 
 
+OpenCorrelation(){
 
+  this.closemodalservice();
+
+  this.modalRef =  this.modalService.open(this.Correlation);
+
+    $(".modal-content").css("width", "650px");
+
+    $(".modal-content").css("right", "200px");
+
+    $(".modal-content").css("padding", "10px");
+
+    $(".modal-content").css("top", "200px");
+
+    $(".modal-content").draggable({
+
+      axis: "both",
+
+      cursor: "move"
+
+    });
+
+
+
+  }
+
+  closeCorrelationModal(){
+
+    this.closemodalservice();
+  }
+  
+sendCorrelationObject(){
+
+  let imsi = localStorage.getItem('imsiSelected');
+
+  console.log("selected imsi  "+imsi);
+
+  let from=$("#from").val();
+
+  let to=$("#to").val();
+
+  let time=$("#time").val();
+
+  let distance= $("#distance").val();
+
+// alert(" siiii "+ this.simulationid  )
+
+let obj="{ \"id\": \""+imsi+"\", \"start_date\": \""+from+"\", \"end_date\": \""+to+"\", \"time\": "+time+", \"distance\": "+distance+", \"simulationId\": "+this.simulationid+"}";
+
+console.log(obj);
+
+this.datacrowdService.executeCoRelation(obj);
+
+this.closemodalservice();
+
+this.displayCoRelation();
+
+
+
+}
+
+
+ addFlowLines(): void {
+  // Example flow data - Replace this with your flow data
+  const flowData = [
+    { from: [51.505, -0.09], to: [48.8566, 2.3522] }, // London to Paris
+    { from: [51.505, -0.09], to: [40.7128, -74.0060] }  // London to New York
+  ];
+
+  flowData.forEach((flow:any) => {
+    const fromLatLng = L.latLng(flow.from[0], flow.from[1]);
+    const toLatLng = L.latLng(flow.to[0], flow.to[1]);
+
+    const flowLine = L.polyline([fromLatLng, toLatLng], {
+      color: 'blue',
+      weight: 2,
+      opacity: 0.7,
+      smoothFactor: 1
+    }).addTo(this.map);
+
+    // Optionally, add markers at the start and end points
+    L.marker(flow.from).addTo(this.map);
+    L.marker(flow.to).addTo(this.map);
+  });
+
+
+  
+}
+
+ addCurve() {
+  alert(11)
+  const path = [
+    'M', [51.505, -0.09],   // Start point
+    'Q', [51.515, -0.1],    // Control point
+         [51.52, -0.12]     // End point
+  ];
+
+  const curve = (L as any).curve(path, {
+    color: 'red',
+    weight: 5,
+    opacity: 0.5
+  }).addTo(this.map);
+}
+
+
+}
+
+
+ 

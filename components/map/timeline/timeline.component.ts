@@ -423,32 +423,56 @@ this.generateTimeline();
         this.fromButton = 2;
         this.generateTimeline();
       } else {
-        $('#Map').css('display', '');
+        
         $('#Graph').css('display', 'none');
+        console.log("this.clickedButtonId1111111--",this.clickedButtonId);
         this.dataservice.setTimelineSimulID(this.clickedButtonId);
+        let mapType=this.dataservice.getmapType();
+        
+    if (mapType === 'online') {
+      $('#Map').css('display', '');
         $('#displayTimelineSimul').click();
+    } else if (mapType === 'offline'){
+      $('#MapOffline').css('display', '');
+      $('#displayTimelineSimulOffline').click();
+      }
+      $('#Timeline').css('display', 'none');
+      
+
+
+
+      
       }
 
     }
   }
 
-  addDynamicHtml() {
+  addDynamicHtml(htmlContent:any) {
     if(this.countertimelineReportContainer !=0){
       this.removeReportContainer();
       this.countertimelineReportContainer =0;
     }
     const testDiv = this.elementRef.nativeElement.querySelector('#report-container');
     if (testDiv) {
-      alert(this.markerids.data.text.id)
-      const iframe = document.createElement('iframe');
-      iframe.src = '../../../../../assets/report_' + this.markerids.data.text.id + '.html';
-      iframe.width = '100%';
-      iframe.height = '1800';
-      testDiv.appendChild(iframe);
-      this.countertimelineReportContainer++;
+        const iframe = document.createElement('iframe');
+        iframe.width = '100%';
+        iframe.height = '1800';
+  
+        // Append the iframe to the div
+        testDiv.appendChild(iframe);
+  
+        // Write the HTML content into the iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (iframeDoc) {
+          iframeDoc.open();
+          iframeDoc.write(htmlContent);
+          iframeDoc.close();
+        }
+  
+        this.countertimelineReportContainer++;
 
     } else {
-      console.error('Div with id Timeline not found.');
+      console.error('Div with id Timeline not found.'); 
     }
 
 
@@ -562,16 +586,18 @@ this.generateTimeline();
         this.fromButton = 2;
         this.fromBack=0;
         this.generateTimeline();
-      }else if(this.test == 2){
-        this.previousMarkerids=this.markerids;
-        this.markerids=markerId;
-        this.dataservice.setDatePickerFromTimeline(1);
-        const dialogRef = this.dialog.open(DatePickerComponent);
-        dialogRef.afterClosed().subscribe(result => {
-           this.fromButton = 4;
-           this.generateTimeline();
-        })
-      }else{
+      }
+      // else if(this.test == 2){
+      //   this.previousMarkerids=this.markerids;
+      //   this.markerids=markerId;
+      //   this.dataservice.setDatePickerFromTimeline(1);
+      //   const dialogRef = this.dialog.open(DatePickerComponent);
+      //   dialogRef.afterClosed().subscribe(result => {
+      //      this.fromButton = 4;
+      //      this.generateTimeline();
+      //   })
+      // }
+      else{
         }
       markerId = null;
 
@@ -715,7 +741,7 @@ this.generateTimeline();
           contextMenu.querySelector('li:nth-child(2)').addEventListener('click', async () => {
             await this.datacrowdService.getDrillDownTimeline(this.markerids.data.text.id).then((response: any) => {
               let id = this.markerids.data.text.id;
-              this.addDynamicHtml();
+              this.addDynamicHtml(response);
             });
           });
           contextMenu.querySelector('li:nth-child(3)').addEventListener('click', () => {
@@ -744,57 +770,76 @@ this.generateTimeline();
     }
   }
   displaySimul() {
-    $('#Map').css('display', '');
+    $('#Timeline').css('display', 'none');
+  
     $('#Graph').css('display', 'none');
     if (this.flagDisplay == 1) {
       this.datacrowdService.getDailySimulationId(this.markerids.data.text.id).then(Response => {
         const stringSeparated = Response.join(',');
+        console.log("stringSeparatedd1111111--",stringSeparated);
+
         this.dataservice.setTimelineSimulID(stringSeparated);
         this.markerids = null;
-        if ($('#MapOffline').css('display') === 'none') {
-          $('#displayTimelineSimul').click();
-       
-        } else {
-        $('#displayTimelineSimulOffline').click();
+        // $('#displayTimelineSimul').click();
+        let mapType=this.dataservice.getmapType();
           
-        }
-
+    if (mapType === 'online') {
+      $('#Map').css('display', '');
+        $('#displayTimelineSimul').click();
+    } else if (mapType === 'offline'){
+      $('#MapOffline').css('display', '');
+      $('#displayTimelineSimulOffline').click();
+      }
       });
 
     } else if (this.flagDisplay == 2) {
+      console.log("this.markerids.data.text.id)1111",this.markerids.data.text.id);
       this.dataservice.setTimelineSimulID(this.markerids.data.text.id);
       this.markerids = null;
-      if ($('#MapOffline').css('display') === 'none') {
-        $('#displayTimelineSimul').click();
-     
-      } else {
-      $('#displayTimelineSimulOffline').click();
+      // $('#displayTimelineSimul').click();
+      let mapType=this.dataservice.getmapType();
         
+           
+    if (mapType === 'online') {
+      $('#Map').css('display', '');
+        $('#displayTimelineSimul').click();
+    } else if (mapType === 'offline'){
+      $('#MapOffline').css('display', '');
+      $('#displayTimelineSimulOffline').click();
       }
     } else if (this.flagDisplay == 3) {
       this.datacrowdService.getMonthlySimulationId(this.markerids.data.text.id).then(Response => {
         const stringSeparated = Response.join(',');
+        console.log("stringSeparated1111--",stringSeparated);
+
         this.dataservice.setTimelineSimulID(stringSeparated);
         this.markerids = null;
-        if ($('#MapOffline').css('display') === 'none') {
-          $('#displayTimelineSimul').click();
-       
-        } else {
-        $('#displayTimelineSimulOffline').click();
-          
-        }
+        // $('#displayTimelineSimul').click();
+        let mapType=this.dataservice.getmapType();
+        
+        
+        if (mapType === 'online') {
+          $('#Map').css('display', '');
+            $('#displayTimelineSimul').click();
+        } else if (mapType === 'offline'){
+          $('#MapOffline').css('display', '');
+          $('#displayTimelineSimulOffline').click();
+          }
       });
     } else if (this.flagDisplay == 4) {
       this.markerids.data.text.simulationId=179752;
       this.dataservice.setTimelineSimulID(this.markerids.data.text.simulationId);
       this.markerids = null;
-      if ($('#MapOffline').css('display') === 'none') {
-        $('#displayTimelineSimul').click();
-     
-      } else {
-      $('#displayTimelineSimulOffline').click();
+      // $('#displayTimelineSimul').click();
+      let mapType=this.dataservice.getmapType();
         
-      }
+      if (mapType === 'online') {
+        $('#Map').css('display', '');
+          $('#displayTimelineSimul').click();
+      } else if (mapType === 'offline'){
+        $('#MapOffline').css('display', '');
+        $('#displayTimelineSimulOffline').click();
+        }
     } else { 
 
     }

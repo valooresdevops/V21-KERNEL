@@ -33,12 +33,19 @@ export class NavbarComponent  implements OnInit{
   showPropertiesForm:boolean=false;
   ngAfterViewInit() {
     const parentElement = this.elementRef.nativeElement.querySelector('.navigation-bar');
-    this.renderer.listen(parentElement, 'click', (event: Event) => {
-      const clickedElement = event.target as HTMLElement;
-      console.log('clickedElement',clickedElement)
-      if (clickedElement && (clickedElement.classList.contains('menu') || clickedElement.closest('.menu'))) {
-        this.menuClickHandler(event);
+    this.renderer.listen(parentElement, 'click', (event: any) => {
+      console.log("eventtt",event);
+      if (event.detail > 0) {
+    
+        const clickedElement = event.target as HTMLElement;
+        console.log('clickedElement', clickedElement);
+    
+        if (clickedElement && (clickedElement.classList.contains('menu') || clickedElement.closest('.menu'))) {
+          this.menuClickHandler(event);
+        }
       }
+
+ 
     });
   }
   onOpenProperties() {
@@ -318,17 +325,21 @@ reportType:any;
     console.log(JSON.stringify(complexJSON, null, 2));
   }
 
-  showSubMenu(item: Node) {
-    console.log('item >>> ',item)
-    this.currentTab = item;
-    this.lastClickedTab = item; // Update last clicked tab
-    this.displaySenario(item);
-  let obj:any={
-      action:"displaysenario",
-      simulID:item.id,
-      reportType:this.reportType
-    }
-    this.displayclusters2.emit(obj);
+  showSubMenu(item: Node,event:any) {
+    console.log('event >>> ',event)
+if(event.detail>0){
+  console.log('item >>> ',item)
+  this.currentTab = item;
+  this.lastClickedTab = item; // Update last clicked tab
+  this.displaySenario(item);
+let obj:any={
+    action:"displaysenario",
+    simulID:item.id,
+    reportType:this.reportType
+  }
+  this.displayclusters2.emit(obj);
+}
+ 
 
   }
 
@@ -618,7 +629,6 @@ if(typeof this.SimulName=="undefined"){
   // let obj:any={"table_id": this.SimulationID }
 
   //  await this.datacrowdservice.SaveSimul(obj);
-
    var button :any= $('.menu-item').filter(function() {
     return $(this).find('span:contains('+firstValue+')').length > 0;
 });
@@ -628,7 +638,6 @@ console.log('SimulationID',this.SimulationID)
 console.log("buttonzzz",button);
 if(button.prevObject.length > 0) {
   button.find('span:contains('+firstValue+')').text(finalvalue); // Change 'new text value' to your desired text
-  console.log('updateSimulNameById>>>>>',this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue));
   this.hierarchyData=this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue);
 } else {
   console.log('Button not found.');

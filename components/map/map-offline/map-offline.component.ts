@@ -78,7 +78,7 @@ import {getWidth} from 'ol/extent.js';
   import DragAndDrop from 'ol/interaction/DragAndDrop.js';
 // import { AnimationStyleMetadata } from '@angular/animations';
 import { LayerControlComponent } from '../component/layer-control/layer-control.component';
-import { DataService } from 'src/app/Kernel/services/data.service';
+import { DataService } from '../Services/data.service';
 // import { DataService } from '../Services/data.service';
 import { LoaderService } from 'src/app/Kernel/services/loader.service';
 import { OfflinedataService } from '../Services/offlinedata.service';
@@ -86,6 +86,7 @@ import { VAgGridComponent } from '../component/v-ag-grid/v-ag-grid.component';
 import { InformationService } from "src/app/Kernel/services/information.service";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import L from 'leaflet';
 
 
 useGeographic();
@@ -474,10 +475,15 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
   PropertiesSimulID: any;
   olpopup1111:any;
   modalRef:any;
-  showCancelButton: boolean;
+  showcancelDrawingCircle: boolean;
+  showcancelDrawingpolygon: boolean;
+  showcancelDrawingpolyine: boolean;
   topcancel: any;
   leftcancel: any;
   headerchangeCounter:number=0;
+  showcancelDrawingpoint:boolean;
+  pointerDiv:any;
+  sketchFeature:any;
    constructor(
     private datacrowdService: DatacrowdService,
     private httpClient: HttpClient,
@@ -1389,7 +1395,24 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
 
   status: boolean = false;
   clickEvent() {
-    this.status = !this.status;
+    if(this.status==false){
+      $('.button-container').css('display', 'inline');
+      $('.button-container2').css('display', 'inline');
+      $('.button-container3').css('display', 'inline');
+      $('.button-container4').css('display', 'inline');
+      $('.button-container5').css('display', 'inline');
+      $('.mouseover1').css('box-shadow', '0 2px 8px rgba(0, 0, 0, 0.4)');
+      this.status=true;
+    }
+    else{
+      $('.button-container').css('display', 'none');
+    $('.button-container2').css('display', 'none');
+    $('.button-container3').css('display', 'none');
+    $('.button-container4').css('display', 'none');
+    $('.button-container5').css('display', 'none');
+    $('.mouseover1').css('box-shadow', 'none');
+    this.status=false;  
+  }
   }
   toggleButtonContainer() {
     const buttonContainer = document.querySelector('.button-container');
@@ -1418,6 +1441,15 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     $('#datepicker').css('display', 'none');  
     $('#cotravelerpopup').css('display', 'none');  
     $('#fixedelementpopup').css('display', 'none');  
+
+    $('.button-container').css('display', 'none');
+    $('.button-container2').css('display', 'none');
+    $('.button-container3').css('display', 'none');
+    $('.button-container4').css('display', 'none');
+    $('.button-container5').css('display', 'none');
+    $('.mouseover1').css('box-shadow', 'none');
+
+
 
     this.datacrowdService.getmaptypesOffline().then((res) => {
       this.maptypes=res;
@@ -1497,7 +1529,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
      // url: "https://10.1.8.23:443/openstreetmaplebanon/{z}/{x}/{y}.png",
       //url: "https://10.1.7.24:443/map/{z}/{x}/{y}.png",
       // url: 'https://10.1.8.23:443/openstreetmaplebanon/{z}/{x}/{y}.png',
-      url:"http://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
+      url:"http://10.1.2.106/tileserver-php-master/satellite/{z}/{x}/{y}.png",
 
       minZoom: 0,
       maxZoom: 15,
@@ -1560,7 +1592,7 @@ export class MapOfflineComponent implements OnInit, AfterViewInit {
     const roadLayer = new TileLayer({
       source: new XYZ({
     
-        url:"https://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
+        url:"http://10.1.2.205/tileserver-php-master/satellite/{z}/{x}/{y}.png",
         minZoom: 0,
         maxZoom: 15,
       }),
@@ -2890,7 +2922,10 @@ this.regiondata=res;
  
   drawCircle() {
     this.countries=[];
-    this.showCancelButton = true;
+    this.showcancelDrawingpoint = false;
+    this.showcancelDrawingpolyine = false;
+    this.showcancelDrawingpolygon = false;
+    this.showcancelDrawingCircle = true;
     this.deactivateDrawInteraction();
     this.drawInteraction = new Draw({
       source: this.vectorSource,
@@ -2929,6 +2964,7 @@ this.regiondata=res;
         this.drawInteraction.setActive(false);
         this.drawInteraction = null;
       } else {
+
         var polygon_extent = event.feature.getGeometry()!.getExtent();
         // console.log("polygon_extent-----------",polygon_extent);
         console.log("polygon_extent.-------------",polygon_extent);
@@ -2998,6 +3034,14 @@ this.regiondata=res;
  
    
   }
+  addPointerMoveListener(){
+    this.map.getViewport().addEventListener('pointermove',(event:PointerEvent)=>{
+      const mapCoords=this.map.getCoordinateFromPixel([event.clientX,event.clientY]);
+      const pixelCoords=this.map.getPixelFromCoordinate(mapCoords);
+      this.pointerDiv.style.left=`${event.clientX+10}px`;
+      this.pointerDiv.style.top=`${event.clientY+10}px`;
+    });
+  }
 
   selectedFeature() {
     if (select !== null) {
@@ -3006,6 +3050,10 @@ this.regiondata=res;
   }
 
   drawPoint() {
+    this.showcancelDrawingpoint = true;
+    this.showcancelDrawingpolyine = false;
+    this.showcancelDrawingpolygon = false;
+    this.showcancelDrawingCircle = false;
     this.countries=[];
     this.deactivateDrawInteraction();
     this.drawInteraction = new Draw({
@@ -3020,6 +3068,7 @@ this.regiondata=res;
       // console.log("polygon_extent-----------",polygon_extent);
 
       this.vectorSourceCountry.forEachFeatureIntersectingExtent(polygon_extent,  (feature:any) => {
+        this.showcancelDrawingpoint=false;
         console.info(feature);
         console.info('isoo---------',feature.values_.iso_a2);
         let iso=feature.values_.iso_a2;
@@ -3055,11 +3104,16 @@ this.regiondata=res;
       });
       this.deactivateDrawInteraction();
     });
-
+    
     this.map.addInteraction(this.drawInteraction);
+    
   }
 
   drawLineString() {
+    this.showcancelDrawingpoint = false;
+    this.showcancelDrawingpolyine = true;
+    this.showcancelDrawingpolygon = false;
+    this.showcancelDrawingCircle = false;
     this.countries=[];
     this.deactivateDrawInteraction();
     this.drawInteraction = new Draw({
@@ -3135,7 +3189,10 @@ this.regiondata=res;
     this.map.addInteraction(this.drawInteraction);
   }
   drawPolygon() {
-
+    this.showcancelDrawingpoint = false;
+    this.showcancelDrawingpolyine = false;
+    this.showcancelDrawingpolygon = true;
+    this.showcancelDrawingCircle = false;
     this.countries=[];
 
     this.deactivateDrawInteraction();
@@ -4696,6 +4753,8 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
     this.displayarc();
 
     this.isTcd = false;
+    this.displayedColumns = ['Time', 'event', 'Lng', 'lat'];
+
   }
 
   displaySectorGrid(properties: any) {
@@ -5334,13 +5393,14 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
                 shapecoord[j].radius,
                 shapecoord[j].leafletid
               );
-            } else if (shapecoord[j].Type == 'Polygon') {
+            }else if (shapecoord[j].Type == 'Polygon') {
               this.displayPolygon(shapecoord[j]);
             } else if (shapecoord[j].Type == 'Polygon') {
               this.displayPolyline(shapecoord[j], 'simulation');
-            }
+            }else if (shapecoord[j].Type == 'point') {
+              this.displayPoint();
           }
-        });
+     } });
     } else if (this.isFixedElements == true) {
       console.log('isFixedElements>>>>>>>>>>>>>>>>>>');
 
@@ -5400,7 +5460,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
       this.AoiIds = (window.parent.parent.parent[7] as any).A_AoiIds;
       console.log('AoiIds>>>>>', this.AoiIds);
       for (let i = 0; i < this.AoiIds.length; i++) {
-        this.datacrowdService.getSelectedShape(this.AoiIds[i]).then((res) => {
+        this.datacrowdService.getSelectedShapes(this.AoiIds[i]).then((res) => {
           console.log('getSelectedShape>>>>', res);
           this.Aoiresp = res;
           console.log('myres=', this.Aoiresp);
@@ -5926,32 +5986,21 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
   }
 
   startTimeline() {
-    this.openTable=true;
     this.showbarstart=true;
     this.showbarreverse=false;
-    this.ImgFirstCoord=[this.CdrData.CDR[0].IMSILocation[0][1],this.CdrData.CDR[0].IMSILocation[0][2]];
-    this.ShowTimeline = true;
     this.Datatable=[];
     this.Datatablereverse=[];
-
     this.Datatable1=[...this.Datatable1.slice(0, this.Datatable1.length-this.index)];
-    console.log("11111111111111111--------",this.Datatable1);
-    console.log("2222222222222222--------",this.Datatable1.length);
     this.index=0;
-    console.log('this.CdrData.CDR[0]>>>>>>>>>>>>>',this.CdrData.CDR[0]);
-    console.log('starttimeline>>>>>>>>>>>>>');
-
     this.isRunning = true;
- 
-    // this.featurestcd=this.sectorarray['or'][0]['values_'].source.featureChangeKeys_;
-
+    $('#tabletest').css('display', 'none');
     $('#tabledatabtn').css('display', '');
     $('#hidesimul').click();
     console.log('this.vectorLayerSector--------', this.vectorLayerSector);
     this.startLoop();
-    let length=this.vectorLayerSector.getSource().getFeatures().length;
-    console.log('length--------', length);
-    
+    $('#tabledatabtn').css('display', '');
+    this.ShowHeader=false;
+    this.showTextMenu=false;
   }
   ReverseTimeline() {
     this.ShowTimeline = true;
@@ -6005,8 +6054,8 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
       sector = sector.values_;
       return (
         sector.Azimuth.toString() === xElement[0][2]
-       && sector.lng.toString()  === xElement[0][1] 
-       && sector.lat.toString()  === xElement[0][0]
+       && sector.lng.toString()  === Number(xElement[0][1]).toString()
+       && sector.lat.toString()  === Number(xElement[0][0]).toString()
       );
     });
 
@@ -6083,21 +6132,24 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
 
       let linestring:number=0;
       // linestring=this.ImgFirstCoord.distanceTo(L.latLng(xElement[0][0],xElement[0][1]));
- 
-      let line = new LineString([this.ImgFirstCoord,[xElement[0][0],xElement[0][1]]]);
+ console.log("this.ImgFirstCoord------",this.ImgFirstCoord);
+      let line = new LineString([Number(xElement[0][0]),Number(xElement[0][1])]);
       let distance = line.getLength()*100000;
       let output = Math.round(distance * 100) / 100;
-      console.log("start:::::",this.ImgFirstCoord);
-      console.log("endddd:::::",[xElement[0][0],xElement[0][1]]);
-      console.log("line:::::::::::::::::",line);
-      console.log("distance:::::::::::::::::",distance);
-      console.log("output:::::::::::::::::",output);
+      // console.log("start:::::",this.ImgFirstCoord);
+      // console.log("endddd:::::",[xElement[0][0],xElement[0][1]]);
+      // console.log("line:::::::::::::::::",line);
+      // console.log("distance:::::::::::::::::",distance);
+      // console.log("output:::::::::::::::::",output);
+
+      // console.log("output:::::::::::::::::",output);
 
       if(this.indexTimeline==1){
         this.view = new ol.View({
           center: [findedSector2[0].values_.lng, findedSector2[0].values_.lat],
           zoom: 15,
         });
+        console.log("this.view:::::::::::::::::",this.view);
   
         this.map.setView(this.view);
       
@@ -6105,7 +6157,10 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
         if(output<2472){
       
         }else{
+          console.log("xElement[0] else---",xElement[0]);
+
           this.ImgFirstCoord=[xElement[0][0],xElement[0][1]];
+          console.log("this.ImgFirstCoord else---",this.ImgFirstCoord);
 
           this.view = new ol.View({
             center: [findedSector2[0].values_.lng, findedSector2[0].values_.lat],
@@ -6206,8 +6261,8 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
       sector = sector.values_;
       return (
         sector.Azimuth.toString() === xElement[0][2]
-       && sector.lng.toString()  === xElement[0][1] 
-       && sector.lat.toString()  === xElement[0][0]
+        && sector.lng.toString()  === Number(xElement[0][1]).toString()
+        && sector.lat.toString()  === Number(xElement[0][0]).toString()
       );
     });
 
@@ -6717,9 +6772,9 @@ if(this.indexTimeline==1){
   }
 
   displayCircleForLoop(long: any, lat: any, radius: any, BulkshapeId: any) {
- 
+ this.showcancelDrawingCircle=false
     const view = this.map.getView();
-    this.showCancelButton = false;
+
     console.log('centerrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', [long, lat]);
 
     const resolution = view.getResolution();
@@ -6989,7 +7044,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
           if (size === 1) {
             
             src =
-            '../../../../../assets/assetsOffline/icons/assets/img/icons' +
+            '../../../../../assets/assetsOffline/icons/' +
              cluster.get('features')[0].A_Type +
             '.png'; // Access A_Type directly from the feature
     
@@ -7054,7 +7109,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
   }
 
   openPopup2() {
-    alert(111);
+   
     // this.grid=true;
     this.value=false;
   
@@ -7129,6 +7184,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
   }
 
   displayPolygon(obj: any) {
+    this.showcancelDrawingpolygon = false;
     const polygonCoords = obj.PolyBoundsCoords.map((coord: any) => {
       const element3 = parseFloat(coord.lat);
       const element4 = parseFloat(coord.lng);
@@ -7232,8 +7288,11 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
     this.magnifiedMap.addLayer(this.layerPolygonLoop);
   }
 
-  
+  displayPoint(){
+    this.showcancelDrawingpoint=false;
+  }
   displayPolygonForLoop(obj: any) {
+    this.showcancelDrawingpolygon = false;
     const polygonCoords = obj.map((coord: any) => {
       const element3 = parseFloat(coord.lat);
       const element4 = parseFloat(coord.lng);
@@ -7306,6 +7365,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
   }
 
   displayPolyline(obj: any, type: string) {
+   
     let color: any;
     const polylineCoords = obj.Bounds.map((coord: any) => {
       const element3 = parseFloat(coord.lat);
@@ -7378,6 +7438,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
   }
 
   displayPolylineForLoop(obj: any) {
+    this.showcancelDrawingpolyine = false;
     let color: any;
     const polylineCoords = obj.map((coord: any) => {
       const element3 = parseFloat(coord.lat);
@@ -8075,7 +8136,7 @@ console.log('Cluster Features:---------------',  this.source.getFeatures());
   showMeasurepopup() {
     console.log("22222222222222222222")
     this.measurepopup = !this.measurepopup;
-  }
+    this.ShowHeader=false;}
 
   // cancelModify() {
   //   alert("cancel")
@@ -9000,13 +9061,9 @@ this.displayarcLoop();
   }
 
   opentimelineScreen() {
-   
-    (window.parent as any).hideSimulation();
-    
-
-       
-    this.displayedColumns = ['Time', 'event', 'Lng', 'lat'];
-    // this.openTable = true;
+ this.ShowHeader=false;
+ 
+    this.openTable = true;
 if($('#tabletest').css('display') === 'block'){
 
   $('#tabletest').css('display','none');
@@ -9015,6 +9072,16 @@ if($('#tabletest').css('display') === 'block'){
   $('#tabletest').css('display','block');
 
 }
+this.ShowHeader=false;
+this.showTextMenu=false;
+   
+
+    
+
+       
+ 
+    // this.openTable = true;
+
     // if ((this.openTable = true)) {
     //   this.openTable = true;
     // } else {
@@ -9033,725 +9100,6 @@ if($('#tabletest').css('display') === 'block'){
     this.map.setView(this.view);
   }
 
-  displayPolylinetest() {
-    let x:any=[
-      [
-          34.4085117,
-          35.8184616
-      ],
-      [
-          34.4204491,
-          35.8308841
-      ],
-      [
-          34.4204491,
-          35.8308841
-      ],
-      [
-          34.420858,
-          35.8280376
-      ],
-      [
-          34.420858,
-          35.8280376
-      ],
-      [
-          34.4245409,
-          35.8270469
-      ],
-      [
-          34.4245409,
-          35.8270469
-      ],
-      [
-          34.4357441,
-          35.831
-      ],
-      [
-          34.4357441,
-          35.831
-      ],
-      [
-          34.4346381,
-          35.8323361
-      ],
-      [
-          34.4346381,
-          35.8323361
-      ],
-      [
-          34.443753,
-          35.8225922
-      ],
-      [
-          34.443753,
-          35.8225922
-      ],
-      [
-          34.4414816,
-          35.8196738
-      ],
-      [
-          34.4414816,
-          35.8196738
-      ],
-      [
-          34.4323681,
-          35.8207715
-      ],
-      [
-          34.4323681,
-          35.8207715
-      ],
-      [
-          34.4231876,
-          35.8233785
-      ],
-      [
-          34.4231876,
-          35.8233785
-      ],
-      [
-          34.4153362,
-          35.8221897
-      ],
-      [
-          34.4153362,
-          35.8221897
-      ],
-      [
-          34.4090163,
-          35.8191227
-      ],
-      [
-          34.4090163,
-          35.8191227
-      ],
-      [
-          34.4084307,
-          35.8185404
-      ],
-      [
-          34.4084307,
-          35.8185404
-      ],
-      [
-          34.4091594,
-          35.8179927
-      ],
-      [
-          34.4091594,
-          35.8179927
-      ],
-      [
-          34.4093697,
-          35.8186213
-      ],
-      [
-          34.4093697,
-          35.8186213
-      ],
-      [
-          34.4095632,
-          35.8178577
-      ],
-      [
-          34.4095632,
-          35.8178577
-      ],
-      [
-          34.4086495,
-          35.8183912
-      ],
-      [
-          34.4086495,
-          35.8183912
-      ],
-      [
-          34.420939,
-          35.8310906
-      ],
-      [
-          34.420939,
-          35.8310906
-      ],
-      [
-          34.4208417,
-          35.8257852
-      ],
-      [
-          34.4208417,
-          35.8257852
-      ],
-      [
-          34.4230102,
-          35.8238277
-      ],
-      [
-          34.4230102,
-          35.8238277
-      ],
-      [
-          34.4352673,
-          35.8202117
-      ],
-      [
-          34.4352673,
-          35.8202117
-      ],
-      [
-          34.4439361,
-          35.8225362
-      ],
-      [
-          34.4439361,
-          35.8225362
-      ],
-      [
-          34.4501156,
-          35.8342366
-      ],
-      [
-          34.4501156,
-          35.8342366
-      ],
-      [
-          34.4547608,
-          35.8585475
-      ],
-      [
-          34.4547608,
-          35.8585475
-      ],
-      [
-          34.4516249,
-          35.8614708
-      ],
-      [
-          34.4516249,
-          35.8614708
-      ],
-      [
-          34.4504192,
-          35.8603381
-      ],
-      [
-          34.4504192,
-          35.8603381
-      ],
-      [
-          34.4545835,
-          35.8691024
-      ],
-      [
-          34.4545835,
-          35.8691024
-      ],
-      [
-          34.458914,
-          35.883867
-      ],
-      [
-          34.458914,
-          35.883867
-      ],
-      [
-          34.4629376,
-          35.8913061
-      ],
-      [
-          34.4629376,
-          35.8913061
-      ],
-      [
-          34.4637315,
-          35.9063679
-      ],
-      [
-          34.4637315,
-          35.9063679
-      ],
-      [
-          34.4913887,
-          35.9551604
-      ],
-      [
-          34.4913887,
-          35.9551604
-      ],
-      [
-          34.5065183,
-          35.9656054
-      ],
-      [
-          34.5409034,
-          36.1890166
-      ],
-      [
-          34.5403982,
-          36.1894456
-      ],
-      [
-          34.5403982,
-          36.1894456
-      ],
-      [
-          34.541024,
-          36.1891756
-      ],
-      [
-          34.541024,
-          36.1891756
-      ],
-      [
-          34.5410533,
-          36.1899677
-      ],
-      [
-          34.5410533,
-          36.1899677
-      ],
-      [
-          34.5410352,
-          36.1892673
-      ],
-      [
-          34.4085129,
-          35.8184025
-      ],
-      [
-          34.40914,
-          35.8175404
-      ],
-      [
-          34.40914,
-          35.8175404
-      ],
-      [
-          34.4091619,
-          35.8185794
-      ],
-      [
-          34.4091619,
-          35.8185794
-      ],
-      [
-          34.4091781,
-          35.8174972
-      ],
-      [
-          34.4091781,
-          35.8174972
-      ],
-      [
-          34.4085996,
-          35.8183996
-      ],
-      [
-          34.4085154,
-          35.8184069
-      ],
-      [
-          34.4085154,
-          35.8184069
-      ],
-      [
-          34.4086458,
-          35.8183915
-      ],
-      [
-          34.4072264,
-          35.8194916
-      ],
-      [
-          34.4072264,
-          35.8194916
-      ],
-      [
-          34.442156,
-          35.8272058
-      ],
-      [
-          34.442156,
-          35.8272058
-      ],
-      [
-          34.4397479,
-          35.830455
-      ],
-      [
-          34.4397479,
-          35.830455
-      ],
-      [
-          34.4365072,
-          35.8314599
-      ],
-      [
-          34.4365072,
-          35.8314599
-      ],
-      [
-          34.435692,
-          35.8309189
-      ],
-      [
-          34.435692,
-          35.8309189
-      ],
-      [
-          34.4020062,
-          35.8387689
-      ],
-      [
-          34.4020062,
-          35.8387689
-      ],
-      [
-          34.4184884,
-          35.8313725
-      ],
-      [
-          34.4184884,
-          35.8313725
-      ],
-      [
-          34.414061,
-          35.8239946
-      ],
-      [
-          34.414061,
-          35.8239946
-      ],
-      [
-          34.4086008,
-          35.8184664
-      ],
-      [
-          34.4086008,
-          35.8184664
-      ],
-      [
-          34.4092958,
-          35.8173968
-      ],
-      [
-          34.4092958,
-          35.8173968
-      ],
-      [
-          34.408665,
-          35.8184581
-      ],
-      [
-          34.4402948,
-          35.8297066
-      ],
-      [
-          34.4356552,
-          35.8312445
-      ],
-      [
-          34.4356552,
-          35.8312445
-      ],
-      [
-          34.438195,
-          35.818994
-      ],
-      [
-          34.438195,
-          35.818994
-      ],
-      [
-          34.4164267,
-          35.8230606
-      ],
-      [
-          34.4164267,
-          35.8230606
-      ],
-      [
-          34.3988144,
-          35.8095078
-      ],
-      [
-          34.3988144,
-          35.8095078
-      ],
-      [
-          34.3673726,
-          35.7537024
-      ],
-      [
-          34.3673726,
-          35.7537024
-      ],
-      [
-          34.2782216,
-          35.6929582
-      ],
-      [
-          34.2782216,
-          35.6929582
-      ],
-      [
-          34.2103666,
-          35.6517605
-      ],
-      [
-          34.2103666,
-          35.6517605
-      ],
-      [
-          34.1405867,
-          35.6388547
-      ],
-      [
-          34.1405867,
-          35.6388547
-      ],
-      [
-          34.0070014,
-          35.6491578
-      ],
-      [
-          34.0070014,
-          35.6491578
-      ],
-      [
-          33.9918597,
-          35.6433006
-      ],
-      [
-          33.9918597,
-          35.6433006
-      ],
-      [
-          33.9859066,
-          35.6400205
-      ],
-      [
-          33.9859066,
-          35.6400205
-      ],
-      [
-          33.9840561,
-          35.6383811
-      ],
-      [
-          33.9840561,
-          35.6383811
-      ],
-      [
-          33.9781829,
-          35.626657
-      ],
-      [
-          33.9781829,
-          35.626657
-      ],
-      [
-          33.9786708,
-          35.6192495
-      ],
-      [
-          33.9786708,
-          35.6192495
-      ],
-      [
-          33.9173545,
-          35.5839095
-      ],
-      [
-          33.9173545,
-          35.5839095
-      ],
-      [
-          33.8988215,
-          35.5682256
-      ],
-      [
-          33.8988215,
-          35.5682256
-      ],
-      [
-          33.8956169,
-          35.5429811
-      ],
-      [
-          33.8956169,
-          35.5429811
-      ],
-      [
-          33.8976484,
-          35.4958922
-      ],
-      [
-          33.8976484,
-          35.4958922
-      ],
-      [
-          33.8870611,
-          35.4938952
-      ],
-      [
-          33.8870611,
-          35.4938952
-      ],
-      [
-          33.8806666,
-          35.489621
-      ],
-      [
-          33.8806666,
-          35.489621
-      ],
-      [
-          33.893088,
-          35.4975644
-      ],
-      [
-          33.893088,
-          35.4975644
-      ],
-      [
-          33.8945555,
-          35.4949575
-      ],
-      [
-          33.8945555,
-          35.4949575
-      ],
-      [
-          33.9144756,
-          35.5825864
-      ],
-      [
-          33.9144756,
-          35.5825864
-      ],
-      [
-          33.9326969,
-          35.5891901
-      ],
-      [
-          33.9326969,
-          35.5891901
-      ],
-      [
-          33.9472145,
-          35.5927684
-      ],
-      [
-          33.9472145,
-          35.5927684
-      ],
-      [
-          33.9655616,
-          35.6066886
-      ],
-      [
-          33.9655616,
-          35.6066886
-      ],
-      [
-          33.9719869,
-          35.6102066
-      ],
-      [
-          33.9719869,
-          35.6102066
-      ],
-      [
-          33.9778204,
-          35.6270862
-      ],
-      [
-          33.9778204,
-          35.6270862
-      ],
-      [
-          33.9848294,
-          35.6394782
-      ],
-      [
-          34.4086666,
-          35.8183292
-      ],
-      [
-          34.4092845,
-          35.8175848
-      ]
-    ];
-    let type: any = 'simulation';
-
-    let color: any;
-    this.polylineCoordsRoute = x.map((coord: any) => {
-      const element3 = parseFloat(coord[0]);
-      const element4 = parseFloat(coord[1]);
-      // return transform([element3, element4], 'EPSG:4326', 'EPSG:3857');
-      return [element4, element3];
-    });
-    if (type === 'simulation') {
-      color = '#FF0000';
-    } else if (type === 'direction') {
-      color = '#0c1a10';
-    } else if (type === 'directionByTime') {
-      color = '#3388ff';
-    }
-    const styles = [
-      new Style({
-        fill: new Fill({
-          color: color,
-        }),
-        stroke: new Stroke({
-          color: color,
-          width: 3,
-        }),
-        image: new CircleStyle({
-          radius: 7,
-          fill: new Fill({
-            color: color,
-          }),
-        }),
-      }),
-    ];
-    if (this.coordinatesArray.find((a) => a.ID === this.polylineCoordsRoute)) {
-    } else if (type === 'direction' || type === 'directionByTime') {
-    } else {
-     
-    }
-    this.sourcePolyline = new VectorSource({
-      features: [new Feature(new LineString(this.polylineCoordsRoute))],
-    });
-    this.layerPolyline = new VectorLayer({
-      source: this.sourcePolyline,
-      style: styles,
-    });
-    this.polylines.push(this.layerPolyline);
-    this.map.addLayer(this.layerPolyline);
-
-    this.markerFeature = new Feature({
-      type: 'icon',
-      geometry: new Point(this.polylineCoordsRoute[0]), // Starting point for the marker
-      // ... other properties for your marker style
-    });
-
-    // Create a vector source and layer for the marker
-    const markerSource = new VectorSource({
-      features: [this.markerFeature],
-    });
-
-    const markerLayer = new VectorLayer({
-      source: markerSource,
-      // Add your marker style here
-    });
-
-    // Add the marker layer to the map
-    this.map.addLayer(markerLayer);
-    $('#animatonbar').css('display', '');
-  }
 
   animateMarker() {
     this.animationInterval = setInterval(() => {
@@ -11966,7 +11314,7 @@ this.displayPolyline(x,"bts")
           if(this.DisplayCoRelationflag == 1){
             this.deviceCoordinatesArr = await this.datacrowdService.getAllCoRelationCommonLocationHits(this.coRelationId);
           }else{
-          this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId,this.deviceIdArr);
+          this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId);
           }
       
         
@@ -12714,7 +12062,7 @@ this.displayPolyline(x,"bts")
       this.shapeIdArr = "";
     }
     for (let i = 0; i < this.shapeIdArr.length; i++) {
-      this.datacrowdService.getSelectedShape(this.shapeIdArr[i]).then((res) => {
+      this.datacrowdService.getSelectedShapes(this.shapeIdArr[i]).then((res) => {
         this.Aoiresp = res;
         this.coordinatesArray.push(this.Aoiresp);
         console.log("resssssssssssss----------",res);
@@ -12790,12 +12138,11 @@ this.displayPolyline(x,"bts")
    
   async displayTimelineSimul(){
     let x:any=this.dataservice1.getTimelineSimulID();  
-    this.usercode = (window.parent as any).AV2_userCode;
     if(x.toString().indexOf(',') != -1){
       const idsArray = x.split(',');
       for (const id of idsArray) {
         await this.datacrowdService
-        .getsimualtion(id, this.usercode)
+        .getSimulationobject(id)
         .then((res) => {
           this.datajson = res;
         });
@@ -12807,7 +12154,7 @@ this.displayPolyline(x,"bts")
   
     
       await this.datacrowdService
-      .getsimualtion(x, this.usercode)
+      .getSimulationobject(x)
       .then((res) => {
         this.datajson = res;
       });
@@ -13020,7 +12367,7 @@ arrayfortable.push(elt);
  
 
 this.typeofdata='devicehistory'
-this.opentableData(arrayfortable,this.typeofdata);
+this.opentableData(elt,this.typeofdata);
 this.indexRoute++;
 
 if (this.isRunningRoute==false) {
@@ -13108,18 +12455,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         console.log("x-----------",x);
           // x.index=this.routecountobj;
         if(x.index+1>=x.data.length)
-          {
-        
-            }
+          { }
         else if(x.index<=x.data.length) {
-          // this.polylines.push(polyline);
-    
-          // if(this.currentIndex>0){
-       
-          // let polyline = L.polyline([[x.data[x.index][0],x.data[x.index][1]],[x.data[x.index+1][0],x.data[x.index+1][1]]],{color:x.color}).addTo(this.map);
-          // let color = `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
-          
-          // let color = 'red';
           const styles = [
             new Style({
               fill: new Fill({
@@ -13165,8 +12502,8 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           // this.polylineRouteArray.push(polyline);
           this.xroutearray.push(markerPositions[this.currentIndex]);
           this.typeofdata='devicehistory'
-          this.opentableData(this.xroutearray,this.typeofdata);
-    }
+          this.opentableData(this.xroutearray[x.index],this.typeofdata);
+        }
         
       // }
       
@@ -13179,6 +12516,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
 
    
       clearRoutes(){
+        this.showroutedicv=false;
         this.routeDeviceArray.forEach((elt:any)=>{
           this.map.removeLayer(elt);
           });
@@ -13234,45 +12572,89 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     
       }
 
-      opentableData(array:any,typeofdata:any){
-        this.openTable=true;
+      // opentableData(array:any,typeofdata:any){
+      //   this.openTable=true;
    
+      //   if(typeofdata=='devicehistory'){
+        
+      //       // array2.push(array[i]); 
+      
+      //     array.forEach((elt:any)=>{
+      //       let x:any = {
+      //         deviceid: elt[0],
+      //         Time: this.dateTtoDate(elt[1]),
+      //         Lng: elt[3],
+      //         lat: elt[4],
+      //       }
+      //       this.Datatable1.unshift(x);
+      //       this.Datatable=this.Datatable1;
+      //       this.tablerow++;
+      //     })
+        
+         
+   
+      //   }
+      //  else if(typeofdata=='trace')
+      //  { 
+      //   for (let i = this.count; i < array.length; i++) {
+      
+      //     // array2.push(array[i]);
+  
+      //     let x:any = {
+           
+      //       Time:  this.dateTtoDate(array[i].StartTime),
+      //       StreetName: array[i].StreetName,
+      //       Lng: array[i].NodeLongitude,
+      //       lat: array[i].NodeLatitude,
+      //     }
+      //     this.Datatable1.unshift(x);
+      //     this.Datatable=this.Datatable1;
+      //     this.tablerow++;
+      //   }
+      // }
+      //   console.log("this.Datatable-----------",this.Datatable);
+      // }
+
+      opentableData(elt:any,typeofdata:any){
+        this.openTable=true;
+    
         if(typeofdata=='devicehistory'){
         
             // array2.push(array[i]); 
       
-          array.forEach((elt:any)=>{
+          // array.forEach((elt:any)=>{
             let x:any = {
               deviceid: elt[0],
-              Time: this.dateTtoDate(elt[1]),
+              Time:  this.dateTtoDate(elt[1]),
+              // Time: elt[1],
               Lng: elt[3],
               lat: elt[4],
             }
             this.Datatable1.unshift(x);
             this.Datatable=this.Datatable1;
             this.tablerow++;
-          })
+          // })
         
          
-   
+    
         }
        else if(typeofdata=='trace')
        { 
-        for (let i = this.count; i < array.length; i++) {
+        // for (let i = this.count; i < array.length; i++) {
       
-          // array2.push(array[i]);
-  
-          let x:any = {
+        //   // array2.push(array[i]);
+    
+        //   let x:any = {
            
-            Time:  this.dateTtoDate(array[i].StartTime),
-            StreetName: array[i].StreetName,
-            Lng: array[i].NodeLongitude,
-            lat: array[i].NodeLatitude,
-          }
-          this.Datatable1.unshift(x);
-          this.Datatable=this.Datatable1;
-          this.tablerow++;
-        }
+        //     Time: array[i].StartTime,
+        //     StreetName: array[i].StreetName,
+        //     Lng: array[i].NodeLongitude,
+        //     lat: array[i].NodeLatitude,
+        //   }
+        //   this.Datatable1.unshift(x);
+        //   this.Datatable=this.Datatable1;
+        //   this.tablerow++;
+        // }
       }
         console.log("this.Datatable-----------",this.Datatable);
       }
@@ -13672,6 +13054,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
               this.displayClusters2("184545");
             }
             async getallroute1(){
+              this.showroutedicv=false;
               this.routeDevices = this.dataservice1.getroutedevices().split(',');
                 console.log("this.routeDevices----",this.routeDevices);
             
@@ -13956,12 +13339,13 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     }
   }
   bydevice(){
- 
+ this.showroutedicv=false;
     this.speedTimeRoute=0;
     this.increaseSpeed();
   }
 
   byroute(){
+    this.showroutedicv=false;
     this.speedTimeRoute=0;
     this.increaseSpeed1();
   }
@@ -13985,6 +13369,14 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
    
     console.log("deviceValue",this.deviceValue) 
     console.log("selectedType",this.selectedType) 
+    this.map.removeLayer(this.clusters2);
+    this.map.removeLayer(this.clusters);
+    this.manysimularray=[];
+    this.clusterFeatures=[];
+    this.clusterFeaturesLoop=[];
+    this.manysimularrayLoop=[];
+    this.clusters = [];
+    this.clusters2 = [];
     
     
     
@@ -14010,7 +13402,12 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
           //console.log('getALLcountryIDS>>>>',res);
     
           this.countrycode=res;
-    
+     if (this.datajson.length === 0) {
+          Swal.fire({
+            text: 'No Data Available',
+            backdrop: false,
+            // showCancelButton: true,
+          })}
            await this.datacrowdService.getcountry2(this.countrycode).then((res:any)=>{
               //console.log('getcountry2>>>>',res);
               this.countrycode=res;
@@ -14068,23 +13465,36 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
     else if(this.reportType=="2"){
       // this.clearShapes();
     
-   
+     let deviceselected:any = localStorage.getItem('deviceselected');
+
     
       if (!JSON.parse(localStorage.getItem("multiselection"))) {
         this.multiselection = [];
     
+        if (this.Devices == "" || typeof this.Devices == "undefined") {
+
+          this.Devices = deviceselected;
+          
+        }else{
+          if(!this.Devices.includes(deviceselected)){
+    
+            this.Devices = this.Devices + ',' +deviceselected;
+              }
+        }
       } else {
         //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")));
-        //console.log('multiselection>>>>', JSON.parse(localStorage.getItem("multiselection")).join());
+        console.log('Devices>>>>', this.Devices);
     
         this.multiselection = JSON.parse(localStorage.getItem("multiselection")).join();
         if (this.Devices == "" || typeof this.Devices == "undefined") {
-    
           this.Devices = this.multiselection;
         } else {
     
           this.Devices = this.Devices + ',' + this.multiselection;
-    
+          if(!this.Devices.includes(deviceselected)){
+
+            this.Devices = this.Devices + ',' +deviceselected;
+              }
         }
       }
       
@@ -14249,7 +13659,7 @@ console.log("this.speedTimeRoute222222----",this.speedTimeRoute);
         "senario": "-1",
         "BtsTypeSlected": ""
       };
-      await this.datacrowdService.getTCDSimulationObject(this.ImsiID).then((res:any)=>{
+      await this.datacrowdService.getTCDSimulationObject(queryjson).then((res:any)=>{
         console.log("getTCDSimulationObject res",res);
         this.datajson=res;
         this.tcd();
@@ -14656,97 +14066,266 @@ if(this.reportType== "8"){
                 return stringtojson;
     }
 
-    async DisplayFromSenarioOffline(){
-      let ISExport:boolean=this.informationservice.getISExport();
+    // async DisplayFromSenarioOffline(){
+    //   let ISExport:boolean=this.informationservice.getISExport();
       
-      console.log('ISExport:',ISExport); // Debugging log
+    //   console.log('ISExport:',ISExport); // Debugging log
       
-      if(ISExport==false){
-      
-      
-            console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
-      let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
-      
-      if(data[0].colName=="bts_cell_id" ){
-        console.log("data >>>>>>>>>>",data);
-        console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
-          )]);
+    //   if(ISExport==false){
       
       
-        await this.datacrowdService
-        .getfixedelementsObject([ parseInt(data[0].colValue)])
-        .then(async (res: any) => {
-          console.log('res>>', res);
-          this.displayFixedElements(res);
+    //         console.log("data>>>>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+    //   let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
       
-        });
+    //   if(data[0].colName=="bts_cell_id" ){
+    //     console.log("data >>>>>>>>>>",data);
+    //     console.log("data z>>>>>>>>>>",[ parseInt(data[0].colValue
+    //       )]);
       
       
-      }else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
-        await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
-          console.log("res in getSimulationobject ",res);
-          this.datajson=res;
-          if (this.datajson !== null) {
+    //     await this.datacrowdService
+    //     .getfixedelementsObject([ parseInt(data[0].colValue)])
+    //     .then(async (res: any) => {
+    //       console.log('res>>', res);
+    //       this.displayFixedElements(res);
+      
+    //     });
+      
+      
+    //   }else if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"){
+    //     await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+    //       console.log("res in getSimulationobject ",res);
+    //       this.datajson=res;
+    //       if (this.datajson !== null) {
            
-            this.displayClusters(this.datajson);
-        }
+    //         this.displayClusters(this.datajson);
+    //     }
         
-         });
-         console.log("data in display from senario============",data);
-        // this.displayShapes(data[0].colValue);
+    //      });
+    //      console.log("data in display from senario============",data);
+    //     // this.displayShapes(data[0].colValue);
 
-        await this.datacrowdService
-        .getExecutionParam(data[0].colValue)
-        .then((res) => {
-          this.ExecutionParam = res;
-          console.log(
-            'getExecutionParam response >>>>',
-            this.ExecutionParam.Coordinates
-          );
-          let shapecoord = this.ExecutionParam.Coordinates;
+    //     await this.datacrowdService
+    //     .getExecutionParam(data[0].colValue)
+    //     .then((res) => {
+    //       this.ExecutionParam = res;
+    //       console.log(
+    //         'getExecutionParam response >>>>',
+    //         this.ExecutionParam.Coordinates
+    //       );
+    //       let shapecoord = this.ExecutionParam.Coordinates;
 
-          localStorage.setItem('coordsimul', JSON.stringify(shapecoord));
-          var shapeId = 0;
+    //       localStorage.setItem('coordsimul', JSON.stringify(shapecoord));
+    //       var shapeId = 0;
 
-          for (var j = 0; j < shapecoord.length; j++) {
-            if (shapecoord[j].Type == 'Circle') {
-              this.displayCircle(
-                shapecoord[j].center.lng,
-                shapecoord[j].center.lat,
-                shapecoord[j].radius,
-                shapecoord[j].leafletid
-              );
-            } else if (shapecoord[j].Type == 'Polygon') {
-              this.displayPolygon(shapecoord[j]);
-            } else if (shapecoord[j].Type == 'Polygon') {
-              this.displayPolyline(shapecoord[j], 'simulation');
-            }
-          }
-        });
+    //       for (var j = 0; j < shapecoord.length; j++) {
+    //         if (shapecoord[j].Type == 'Circle') {
+    //           this.displayCircle(
+    //             shapecoord[j].center.lng,
+    //             shapecoord[j].center.lat,
+    //             shapecoord[j].radius,
+    //             shapecoord[j].leafletid
+    //           );
+    //         } else if (shapecoord[j].Type == 'Polygon') {
+    //           this.displayPolygon(shapecoord[j]);
+    //         } else if (shapecoord[j].Type == 'Polygon') {
+    //           this.displayPolyline(shapecoord[j], 'simulation');
+    //         }
+    //       }
+    //     });
       
-        this.senarioParentName=data[0].colValue;
-        this.simulationid=data[0].colValue;
+    //     this.senarioParentName=data[0].colValue;
+    //     this.simulationid=data[0].colValue;
       
-        let obj:any={
-          senarioParentName:this.senarioParentName,
-          simulationid:this.simulationid,
-          Action:"DisplayFromSenario",
-          senariocount:this.senariocount,
-          senarioFlag:this.senarioFlag,
-          reportType:this.reportType
+    //     let obj:any={
+    //       senarioParentName:this.senarioParentName,
+    //       simulationid:this.simulationid,
+    //       Action:"DisplayFromSenario",
+    //       senariocount:this.senariocount,
+    //       senarioFlag:this.senarioFlag,
+    //       reportType:this.reportType
       
+      
+    //     }
+    //     // this.senarioIdOutput.emit(this.senarioParentName);
+    //     this.navbarSimulId=obj;
+    //   }
+    //   // data.forEach(async (element: any, key: any) => {
+      
+      
+    //   // }); 
+    //   }
+    //       }
+
+
+          async DisplayFromSenarioOffline(){
+            let ISExport:boolean=this.informationservice.getISExport();
+            
+            //console.log('ISExport:',ISExport); // Debugging log
+            
+            if(ISExport==false){
+      
+                 console.log("data>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
+            
+            let data:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+             console.log("data>>>111111>>>>>>>",JSON.parse(this.informationservice.getAgGidSelectedNode()));
+      
+             if(data[0].COLNAME=="LOC_REPORT_CONFIG_ID"  && data[0].TYPE=="GRID"){
+              console.log('VcisrowData>>>>',this.informationservice.getVcisrowData());
+      let vcisrowData:any=this.informationservice.getVcisrowData();
+      
+      if(vcisrowData.issenario=="1"){
+    
+      // if(A_isSenarioFromcase==true){
+        if(this.senarioFlag==true){
+      
+        }else{
+          $("#toggleColor").click();
       
         }
-        // this.senarioIdOutput.emit(this.senarioParentName);
-        this.navbarSimulId=obj;
-      }
-      // data.forEach(async (element: any, key: any) => {
+      //   this.senarioParentName=this.simulationid;
+      //   let obj:any={
+      //     senarioParentName:this.senarioParentName,
+      //     simulationid:this.simulationid,
+      //     Action:"DisplayFromSenario",
+      //     senariocount:this.senariocount,
+      //     senarioFlag:this.senarioFlag,
+      //     reportType:this.reportType
       
       
-      // }); 
+      //   }
+      //   // this.senarioIdOutput.emit(this.senarioParentName);
+      //   this.navbarSimulId=obj;
+      
       }
-          }
+      await this.datacrowdService.getExecutionParam(data[0].COLVALUE).then((res) => {
+        this.ExecutionParam = res;
+        console.log('resssssssssssssss----------------',res);
+        console.log("getExecutionParam response >>>>", this.ExecutionParam.Coordinates);
+        let circlecoord = this.ExecutionParam.Coordinates;
+        console.log('circlecoord----------------',circlecoord);
 
+        localStorage.setItem("coordsimul", JSON.stringify(circlecoord));
+
+        for (var j = 0;j < circlecoord.length;j++) {
+          if (circlecoord[j].Type == "Circle") {
+
+            this.displayCircle(circlecoord[j].center.lng, circlecoord[j].center.lat, circlecoord[j].radius, circlecoord[j].leafletid);
+          }
+          else if (circlecoord[j].Type == "Polygon") {
+            this.displayPolygon(circlecoord);
+          }
+          else if (circlecoord[j].Type == "Polyline") {
+            this.displayPolyline(circlecoord,'simulation');
+          }
+        }
+      });
+              await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
+                console.log("res in getSimulationobject ",res);
+                this.datajson=res;
+                if (this.datajson !== null) {
+                  this.displayClusters(this.datajson);
+                }
+              
+               });
+              // this.displayShapes(data[0].COLVALUE);
+             
+            
+              this.senarioParentName=data[0].COLVALUE;
+              this.simulationid=data[0].COLVALUE;
+            
+              let obj:any={
+                senarioParentName:this.senarioParentName,
+                simulationid:this.simulationid,
+                Action:"DisplayFromSenario",
+                senariocount:this.senariocount,
+                senarioFlag:this.senarioFlag,
+                reportType:this.reportType
+            
+            
+              }
+              // this.senarioIdOutput.emit(this.senarioParentName);
+              this.navbarSimulId=obj;
+      console.log("zaherr",obj)
+      
+      
+      
+            }else{
+      
+      
+              for(let i=0;i<data.length;i++)
+                {
+                  if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
+                    // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
+                    //   )]);
+                  
+                  
+                    await this.datacrowdService
+                    .getfixedelementsObject([ parseInt(data[i].colValue)])
+                    .then(async (res: any) => {
+                      //console.log('res>>', res);
+                      this.displayFixedElements(res);
+                  
+                    });
+                  
+                  
+                  }
+                  else if(data[0].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID" && data[i].TYPE=="GRID"){
+                    console.log(" inn AOI Library Display ");
+                    console.log("entered ++++++++++++++++++++++++++"+data[0].COLNAME);
+                    console.log("the valueeeeeeeeeeeeeeeee"+data[0].COLVALUE);
+                    await this.datacrowdService.getSelectedShapes(data[0].COLVALUE).then((res:any)=>{
+                      console.log("res in getSimulationobject ",res);
+                      this.datajson=res;
+                    });
+
+                    
+                    if (this.datajson !== null) {
+                  
+                  if (this.map) {
+                    const centerLatLng = [this.datajson.center.lat, this.datajson.center.lng];
+                    const radius = this.datajson.radius;
+                  //   const circle = L.circle([this.datajson.center.lat, this.datajson.center.lng], {
+                  //       color: "#6e83f0",
+                  //       fillOpacity: 0.7,
+                  //       radius: radius
+                  //   }).addTo(this.map);
+                  // this.circleDisplay=circle;
+                  //   const paddingRatio = 6; 
+                  //   const bounds = L.latLngBounds(
+                  //       L.latLng(centerLatLng[0] - (radius / 111320) * paddingRatio, centerLatLng[1] - (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio),
+                  //       L.latLng(centerLatLng[0] + (radius / 111320) * paddingRatio, centerLatLng[1] + (radius / (111320 * Math.cos(centerLatLng[0] * Math.PI / 180))) * paddingRatio)
+                  //   );
+                  
+        
+                       
+        // circle.bindTooltip(`${this.datajson.Name}`, {
+        //   permanent: true,
+        //   interactive: true,
+        
+        //   opacity: 0.9,
+        //   direction: "center"
+        // }).openTooltip();
+        
+        
+        // this.map.fitBounds(bounds);
+        
+        
+                
+                  }
+                  
+                  }
+                  }
+                  
+                }
+      
+      
+             }
+      
+      
+      
+            }}
+      
           openPropertiesForm(SimulID:any) {
             this.PropertiesSimulID=SimulID;
             // this.showPropertiesForm=true;
@@ -14774,8 +14353,11 @@ if(this.reportType== "8"){
           cancelDrawing(): void {
     
             this.drawInteraction.setActive(false);
-        
-            this.showCancelButton = false;
+        this.showcancelDrawingpoint=false;
+            this.showcancelDrawingCircle = false;
+            this.showcancelDrawingpolygon = false;
+            this.showcancelDrawingpolyine = false;
+            
           }
 
           clearlocalStorage(){
@@ -14783,11 +14365,11 @@ if(this.reportType== "8"){
             localStorage.removeItem("deviceselected");
             localStorage.removeItem("locSimulId");
             localStorage.removeItem("userCode");
-            localStorage.removeItem("locSimulId");
-            localStorage.removeItem("locSimulId");
+            localStorage.removeItem("formData");
+            localStorage.removeItem("selectedType");
 
        
-           }
+           } 
         
 }
 

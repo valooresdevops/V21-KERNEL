@@ -23,6 +23,7 @@ export class TextmenuComponent implements OnInit {
    console.log("nextActionMenuList in child comp:",this.nextActionMenuList);
    }
   async CallFunctions(menucode:any){
+    this.dialog.closeAll();
     console.log("menucode====",menucode);
 //    await this.datacrowdservice.getObjectIdNextMenu(menucode).then((objid:number)=>{
 //       console.log("objid====",objid);

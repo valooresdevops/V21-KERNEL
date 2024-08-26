@@ -93,7 +93,8 @@ html{
   width: 2rem;
   border: 1px solid #999;
 }
-.button-container4 button{
+.button-container4 button,
+.button-container5 button{
   cursor: pointer;
   background-color: #fff;
   height: 2rem;
@@ -117,7 +118,7 @@ html{
   display: flex;
   position: absolute;
   left: 8px;
-  /* z-index: 999999; */
+  z-index: 999999;
   top: 14px;
   flex-direction: column;
   justify-content: center;
@@ -574,7 +575,7 @@ img{
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.4);
   z-index: 1;
-  margin-top: 53px;
+  margin-top: 129px;
   margin-right: 131px;
   border-radius: 4px;
 }
@@ -705,7 +706,7 @@ position: absolute;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
   z-index: 9999;
   top: 100%; /* Position the dropdown below the button */
-  left: 0; /* Align the left of the dropdown with the button */
+  left: 34px; /* Align the left of the dropdown with the button */
 }
 
 .dropdown-content1 button {
@@ -761,7 +762,7 @@ z-index: 9999999999999999;
   display: flex;
   position: absolute;
   left: 8px;
-  z-index: 999;
+  z-index: 99;
   top: 6px;
   flex-direction: column;
   justify-content: center;
@@ -830,7 +831,7 @@ z-index: 9999999999999999;
 
 fieldset {
   border: 1px solid black;
-  width: 330px;
+  width: 375px;
   margin: 0 auto;
   padding: 20px;
 }
@@ -883,3 +884,42 @@ legend {
   padding-right: 5px;
 
 }
+#cancelDrawingpolygon {
+  position: absolute;
+  top: 109px;
+  left: 30px;
+  height: 32px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+
+#cancelDrawingpolyine {
+  position: absolute;
+  top: 77px;
+  left: 30px;
+  height: 32px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+#cancelDrawingpoint {
+  position: absolute;
+  top: 171px;
+  left: 30px;
+  height: 30px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#GeoGrid1  .ag-row-selected::before{
+  display:contents !important;
+      }
+      
+
+      fieldset {
+        border: 1px solid black;
+        width: 375px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      

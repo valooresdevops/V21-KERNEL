@@ -1,41 +1,53 @@
-import { Component, EventEmitter, Input, OnInit, OnDestroy, Output } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, OnDestroy, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { FormControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { DatacrowdService } from '../../Services/datacrowd.service';
-
+import { DataService } from '../../Services/data.service';
+import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
+import { InformationService } from 'src/app/Kernel/services/information.service';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-  form: FormGroup;
+export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
+  form: UntypedFormGroup;
   selectedType: number;
   IMSI_IDValue: string = '';
   getAllProcAndPack: any;
+  openFromKwg:boolean;
   @Input() simulationtype: any[] = [];
-  @Input() IsClear:number=0; 
+  @Input() IsClear: number = 0; 
+  @Input() ChangeType: any ; 
+  @Input() IsTypechanged: number = 0; 
+  public reloadType: boolean =true;
+
+
+  formKwg=new FormGroup({
+    reports: new UntypedFormControl('')
+  });
+
 
   @Output() onChangeEvent: EventEmitter<any> = new EventEmitter();
-
-  constructor(private datacrowdService: DatacrowdService) {
-    this.form = new FormGroup({
-      dateTimeFrom: new FormControl(''),
-      dateTimeTo: new FormControl(''),
-      Device: new FormControl(''),
-      countryValue: new FormControl(''),
-      MeterFrom: new FormControl(''),
-      MeterTo: new FormControl(''),
-      TimeLimit: new FormControl(''),
-      IMSI_ID: new FormControl(''),
-      GROUPS: new FormControl(''),
-      TYPE: new FormControl('')
+  public getExecutedReport = GlobalConstants.getExecutedReports1 ;
+  constructor(private datacrowdService: DatacrowdService,private dataservice:DataService,private informationservice:InformationService) {
+    this.form = new UntypedFormGroup({
+      dateTimeFrom: new UntypedFormControl(''),
+      dateTimeTo: new UntypedFormControl(''),
+      Device: new UntypedFormControl(''),
+      countryValue: new UntypedFormControl(''),
+      MeterFrom: new UntypedFormControl(''),
+      MeterTo: new UntypedFormControl(''),
+      TimeLimit: new UntypedFormControl(''),
+      IMSI_ID: new UntypedFormControl(''),
+      GROUPS: new UntypedFormControl(''),
+      TYPE: new UntypedFormControl(''),
+      PHONE_NB: new UntypedFormControl('')
     });
     this.selectedType = 0;
   }
 
   async ngOnInit(): Promise<void> {
     this.loadFormData();
-   
     const now = new Date();
     now.setHours(now.getHours() + 3); // Adjusting current time +3 hours
     const oneYearAgo = new Date(now);
@@ -53,35 +65,61 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.getAllProcAndPack = this.convertArray(res);
     });
     console.log("getAllProcAndPack", this.getAllProcAndPack);
-  
-  }
+
+    // await this.datacrowdService.getExecutedReports().then((res: any) => {
+    //   console.log("getExecutedReports res", res);
+    //   this.getExecutedReports=  res.map((item:any) => ({
+    //     ID: item.executedReportId,
+    //     NAME: item.executedReportName
+    //   }));
+    // });
+    // console.log("getExecutedReports>>>", this.getExecutedReports);
 
 
    
-ngOnChanges(changes: any): void {
-  console.log("changes",changes);
-  if (changes['IsClear'] ) {
-    this.reset();
-    this.form.reset();
-    this.form.controls['TYPE'].setValue(1);
-    this.selectedType = 1;
+      this.openFromKwg=this.dataservice.getHeaderFromKwg();
+    console.log("this.openFromKwg----",this.openFromKwg);
 
-    this.simulationtype = [
-      { id: 1, name: "Activity Scan By Hits" },
-      { id: 2, name: "Device History" },
-      { id: 3, name: "Device Travel Pattern" },
-      { id: 6, name: "Device History Pattern" },
-      { id: 7, name: "POI" },
-      { id: 8, name: "Fixed Element Scan" },
-      { id: 9, name: "Fixed Element Activity Scan" },
-      { id: 10, name: "Activity Scan By Device" },
-      { id: 11, name: "TCD History" },
-      { id: 13, name: "Grouping History" },
-      { id: 14, name: "TCD History Pattern" }
-    ];
+    
   }
-}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log("changes", changes);
+    if (changes['IsClear']) {
+      this.reset();
+      this.form.controls['TYPE'].setValue(1);
+      this.selectedType = 1;
+
+      this.simulationtype = [
+        { id: 1, name: "Activity Scan By Hits" },
+        { id: 2, name: "Device History" },
+        { id: 3, name: "Device Travel Pattern" },
+        { id: 6, name: "Device History Pattern" },
+        { id: 7, name: "POI" },
+        { id: 8, name: "Fixed Element Scan" },
+        { id: 9, name: "Fixed Element Activity Scan" },
+        { id: 10, name: "Activity Scan By Device" },
+        { id: 11, name: "TCD History" },
+        { id: 13, name: "Grouping History" },
+      ];
+    }
+
+    if (changes['IsTypechanged']) {
+      let headerType=this.dataservice.getheaderType();
+      console.log("headerType ",headerType);
+      this.form.controls["TYPE"].setValue(headerType);
+      this.selectedType = headerType;
+setTimeout(() => {
+  this.reloadType = false;
+}, 100);
+
+setTimeout(() => {
+  this.reloadType = true;
+}, 100);
   
+
+    }
+  }
 
   ngOnDestroy(): void {
     this.saveFormData();
@@ -120,32 +158,43 @@ ngOnChanges(changes: any): void {
   }
 
   loadFormData(): void {
-    const savedFormData = localStorage.getItem('formData');
-    const savedSelectedType = localStorage.getItem('selectedType');
+    let  savedFormData :any= localStorage.getItem('formData');
+    let savedSelectedType:any = localStorage.getItem('selectedType');
+    console.log("savedFormData", savedFormData);
+    console.log("savedSelectedType>>", savedSelectedType);
 
-    if (savedFormData) {
+    if (savedFormData!==null && typeof savedFormData!="undefined") {
+      console.log("savedFormData>", JSON.parse(savedFormData));
+      let dataa=JSON.parse(savedFormData);
+   
+console.log("savedFormData final",JSON.parse(savedFormData))
       this.form.setValue(JSON.parse(savedFormData));
     }
 
-    if (savedSelectedType) {
+    
+    if (savedSelectedType!==null && typeof savedSelectedType!="undefined") {
+
       this.selectedType = JSON.parse(savedSelectedType);
     }
+
+
   }
 
-  reset(){
+  reset() {
     this.form.reset();
     const now = new Date();
     now.setHours(now.getHours() + 3); // Adjusting current time +3 hours
     const oneYearAgo = new Date(now);
     oneYearAgo.setFullYear(now.getFullYear() - 1);
 
-    if (!this.form.get('dateTimeFrom')?.value) {
-      this.form.get('dateTimeFrom')?.setValue(oneYearAgo.toISOString().slice(0, 16));
-    }
-    if (!this.form.get('dateTimeTo')?.value) {
-      this.form.get('dateTimeTo')?.setValue(now.toISOString().slice(0, 16));
-    }
-    // this.form.get('MeterFrom')?.setValue(200);
+    this.form.get('dateTimeFrom')?.setValue(oneYearAgo.toISOString().slice(0, 16));
+    this.form.get('dateTimeTo')?.setValue(now.toISOString().slice(0, 16));
   }
-}
 
+  displaykwg(){
+    const reportsValue = this.formKwg.get('reports')?.value;
+    this.informationservice.setAgGidSelectedNode(reportsValue);
+    $('#refreshJspGraph').click();
+  }
+
+}

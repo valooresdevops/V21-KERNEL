@@ -99,7 +99,8 @@ import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab
         NextLayerFormComponent,
         ButtonJsonRelationComponent,
         AdvancedSearchConfigurationComponent,
-        AdvancedSearchConfigurationFormComponent
+        AdvancedSearchConfigurationFormComponent,
+        KwgCytoscapeComponent
     ],
     imports: [
         InDisplayRoutingModule,
@@ -114,7 +115,7 @@ import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab
         BrowserModule,
         AgGridModule ,
     ] ,
-    exports: [MasterLinkFormComponent,
+    exports: [MasterLinkFormComponent,KwgCytoscapeComponent
     ],
 })
 
