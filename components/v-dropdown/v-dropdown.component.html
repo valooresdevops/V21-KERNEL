@@ -9,7 +9,7 @@
 
           <ng-container *ngIf="isComponentPhoneNumbers; else defaultDropdownTemplate">
             <!-- Custom dropdown template for phone numbers -->
-            <ng-multiselect-dropdown 
+            <ng-multiselect-dropdown (wheel)="onDropdownScroll($event)"
               [placeholder]="placeholder" 
               [settings]="dropdownSettings" 
               [data]="dropdownList"
@@ -36,7 +36,7 @@
 
           <ng-template #defaultDropdownTemplate>
             <ng-container *ngIf="!singleSelection; else elseTemplate">
-              <ng-multiselect-dropdown 
+              <ng-multiselect-dropdown (wheel)="onDropdownScroll($event)"
                   [placeholder]="placeholder" 
                   [settings]="dropdownSettings" 
                   [data]="dropdownList"
@@ -61,7 +61,7 @@
             <ng-template #elseTemplate>
               <ng-container *ngIf="!isDropdownEmpty; else elseTemplate2">
                 <!-- Render this block if dropdownList is not empty -->
-                <ng-multiselect-dropdown 
+                <ng-multiselect-dropdown (wheel)="onDropdownScroll($event)"
                   [placeholder]="placeholder" 
                   [settings]="dropdownSettings" 
                   [data]="dropdownList"
@@ -87,7 +87,7 @@
               </ng-container>
               
               <ng-template #elseTemplate2>
-                <ng-multiselect-dropdown 
+                <ng-multiselect-dropdown (wheel)="onDropdownScroll($event)"
                   [placeholder]="placeholder" 
                   [settings]="dropdownSettings" 
                   [data]="dropdownList"

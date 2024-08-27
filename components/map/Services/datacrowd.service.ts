@@ -916,5 +916,9 @@ async GetHtmlContent(senarioID: any): Promise<any> {
   return response;
 }
 
- 
+async MaptoMap(SimulID :any){
+
+  let response= await this.httpClient.post<any>(this.ipAddress +"/api/MapToMap/"+SimulID, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
 }

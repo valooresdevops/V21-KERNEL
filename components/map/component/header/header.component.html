@@ -1,8 +1,18 @@
+
+
+
 <form [formGroup]="form">
   <div class="row">
+  <div *ngIf="openFromKwg==true">
+    <form [formGroup]="formKwg">
+      <v-input formControlName="reports" 
+      [parentForm]="formKwg" type="lookup" [lookupDataApi]="getExecutedReport" id="reports"
+      lookupWidth="700px" lookupHeight="700px" label="reports" fieldName="reports" (lookupOnChange)="displaykwg()">
+      </v-input>
+      </form>
+  </div>
   
-  
-      <div >
+      <div *ngIf="openFromKwg==false">
       <v-input formControlName="dateTimeFrom" [required]="true" [parentForm]="form" label="dateTimeFrom"
               type="datetime-local" id="dateTimeFrom" fieldName="dateTimeFrom"></v-input>
               
@@ -11,7 +21,7 @@
             
             
             
-              <v-dropdown formControlName="TYPE" [required]="true" 
+              <v-dropdown *ngIf="reloadType" formControlName="TYPE" [required]="true" 
               [dataJSON]="simulationtype" id="TYPE" label="TYPE" [parentForm]="form"
               fieldName="TYPE"  (onChangeEvent)="changeType($event)"></v-dropdown>
      
@@ -24,9 +34,8 @@
                   
                   </div> 
                 
-                    <!-- <label for="country" style="font-weight: bold; font-size: 14px;">Country</label><br>
-                    <input type="text" id="country" formControlName="countryValue">
-                  -->
+
+                  
                   <v-input formControlName="countryValue" 
                   [parentForm]="form" type="lookup" [lookupStaticData]="getAllProcAndPack" id="countryValue"
                   lookupWidth="700px" lookupHeight="700px" label="Country" fieldName="countryValue" lookupSelection="multiple">
@@ -52,9 +61,10 @@
       
                           </div> 
                              <div *ngIf="selectedType == 11" >
-                              <v-input formControlName="IMSI_ID" [required]="true" [parentForm]="form" label="IMSI_ID"
+                              <v-input formControlName="IMSI_ID"  [parentForm]="form" label="Imsi Id"
                             type="text" id="IMSI_ID" fieldName="IMSI_ID"></v-input>
-                           
+                            <v-input formControlName="PHONE_NB"  [parentForm]="form" label="Phone Number"
+                            type="text" id="PHONE_NB" fieldName="PHONE_NB"></v-input>
       
                                  
                                   </div>  <div *ngIf="selectedType == 13" >
@@ -69,3 +79,5 @@
   
   </form>
   <button id="SendData" style="display:none;" (click)="sendparam()"></button>
+ 
+

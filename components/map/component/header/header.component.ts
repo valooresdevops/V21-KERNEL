@@ -66,26 +66,39 @@ export class HeaderComponent implements OnInit, OnDestroy, OnChanges {
     });
     console.log("getAllProcAndPack", this.getAllProcAndPack);
 
-    // await this.datacrowdService.getExecutedReports().then((res: any) => {
-    //   console.log("getExecutedReports res", res);
-    //   this.getExecutedReports=  res.map((item:any) => ({
-    //     ID: item.executedReportId,
-    //     NAME: item.executedReportName
-    //   }));
-    // });
-    // console.log("getExecutedReports>>>", this.getExecutedReports);
-
 
    
       this.openFromKwg=this.dataservice.getHeaderFromKwg();
     console.log("this.openFromKwg----",this.openFromKwg);
 
-    
+    console.log("selectedTypeepepe",this.selectedType)
+if(this.selectedType != null ){
+  this.form.controls["TYPE"].setValue(this.selectedType);
+setTimeout(() => {
+this.reloadType = false;
+}, 100);
+
+setTimeout(() => {
+this.reloadType = true;
+}, 100);
+}else{
+  this.selectedType = 1;
+  this.form.controls["TYPE"].setValue(1);
+setTimeout(() => {
+this.reloadType = false;
+}, 100);
+
+setTimeout(() => {
+this.reloadType = true;
+}, 100);
+}
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log("changes", changes);
     if (changes['IsClear']) {
+     
       this.reset();
       this.form.controls['TYPE'].setValue(1);
       this.selectedType = 1;
@@ -119,6 +132,7 @@ setTimeout(() => {
   
 
     }
+    console.log(" typeeeeeeeeeeeeeeeeeeeeee===",this.form.controls["TYPE"]);
   }
 
   ngOnDestroy(): void {
@@ -163,20 +177,9 @@ setTimeout(() => {
     console.log("savedFormData", savedFormData);
     console.log("savedSelectedType>>", savedSelectedType);
 
-    if (savedFormData!==null && typeof savedFormData!="undefined") {
-      console.log("savedFormData>", JSON.parse(savedFormData));
-      let dataa=JSON.parse(savedFormData);
-   
-console.log("savedFormData final",JSON.parse(savedFormData))
-      this.form.setValue(JSON.parse(savedFormData));
-    }
-
-    
-    if (savedSelectedType!==null && typeof savedSelectedType!="undefined") {
-
       this.selectedType = JSON.parse(savedSelectedType);
-    }
-
+      console.log("this.selectedType",this.selectedType)
+    // }
 
   }
 

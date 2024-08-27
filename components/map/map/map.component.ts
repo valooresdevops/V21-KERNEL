@@ -80,8 +80,12 @@ import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
 import { InformationService } from "src/app/Kernel/services/information.service";
 import { FileDownloadService } from "../Services/FileDownloadService.service";
+import 'src/assets/Leaflet.Canvas-Flowmap-Layer-master/src/CanvasFlowmapLayer.js';
+import * as esri from 'esri-leaflet';
+import 'leaflet-curve'; // Import the curve plugin
 
 declare let alertify: any;
+declare var flowmapL: any;
 
 class BTSObject {
   ids: any;
@@ -463,6 +467,8 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   showroutedicv: boolean=false;
   IsTypechanged: number;
   heatarr: any;
+  geojsonData1: any;
+  geoJsonLayerArray: any[]=[];
 
   countryCellRenderer(params: ICellRendererParams) {
     const flag =
@@ -531,7 +537,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
       width: 400,
       wrapText: true,
       autoHeight: true,
-      cellStyle: { "flex": '1', color: "#03f8fc" },
+      cellStyle: { "flex": '1', color: "#007bff" },
       onCellClicked: this.onTelColumnClicked.bind(this),
 
     },
@@ -1299,28 +1305,10 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   dateTimeFrom:any;
   dateTimeTo:any;
   headerchangeCounter:number=0;
-  items=[
-    {label:'Start',action:this.startTimeline.bind(this)},
-    {label:'Reverse',action:this.ReverseTimeline.bind(this)},
-    {label:'Reset',action:this.resetTimeline.bind(this)},
-    {label:'Stop',action:this.stopTimeline.bind(this)},
-    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
-  ];
-  items2=[
-    {label:'Start',action:this.startRoute.bind(this)},
-    {label:'Stop',action:this.stopRoute.bind(this)},
-    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
-  ];
-  items3=[
-    {label:'Start',action:this.startRoute1.bind(this)},
-    {label:'Stop',action:this.stopRoute.bind(this)},
-    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
-  ];
-  items4=[
-    {label:'Start',action:this.animateMarker.bind(this)},
-    {label:'Stop',action:this.stopAnimationButton.bind(this)},
-    {label:'Next',action:this.processNextBatchRoute.bind(this)},
-  ];
+  items:any[]=[];
+  opentimer:boolean=false;
+  animatedPolylines: any[]=[];
+  AnimatedMarkers: any[]=[];
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -1661,9 +1649,8 @@ console.log("currentWidth----",currentWidth,"---currentHeight---",currentHeight)
 console.log("generateColumns ><<><><>",this.generateColumns('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities'))
 console.log("generateRowData ><<><><>",this.generateRowData('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities',[["\"3CD0A7B8-B53A-4DF3-A10A-9EB9DF6D7F0C\"",2,1,1696712400000,1696712400000,1,1,"LB","Baabda"],["\"a5f497f7-5479-44c7-ade1-77a939555b1b\"",2,1,1696885200000,1696885200000,1,1,"LB","Baabda"]]))
 
-
-    this.addFlowLines();
-}
+  //  this.testflwomap();
+  }
 
 async loadSimulationTypes() {
   try {
@@ -1694,9 +1681,17 @@ this.addnewSenario();
   
 }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     // Now it's safe to access childComponent
     //console.log("0000000000000000000",this.childComponent);
+    await  this.httpClient.get('../assets/countries.geojson').subscribe((geojsonData: any) => {
+      const geoJsonOptions: L.GeoJSONOptions = {
+        style: this.customStyleFunction,  
+      };
+    
+        this.geojsonData1=geojsonData;
+   
+    });
   }
   
 
@@ -3075,6 +3070,7 @@ if(this.indexTimeline==1){
 
 
   clearShapes() {
+    this.opentimer=false;
     this.showroutebar1=false;
     if(this.flagInQueue == 0){
       this.inQueueArray =[];
@@ -3411,10 +3407,25 @@ this.routedatajson=[];
 this.reportType=1;
 this.headerchangeCounter++;
 this.clearRoutes();
-$("#timeline").css("display","none");
-$("#routebar1").css("display","none");
-$("#routebar").css("display","none");
+ 
+if(this.animatedPolylines){
+  this.animatedPolylines.forEach((polyline:any) => {
+    this.map.removeLayer(polyline); // Remove polyline from the map
+  });
+  this.animatedPolylines = [];
+}
 
+if(this.AnimatedMarkers){
+  this.AnimatedMarkers.forEach((marker:any) => {
+    this.map.removeLayer(marker); // Remove polyline from the map
+  });
+  this.AnimatedMarkers = [];
+}
+if(this.geoJsonLayerArray.length!=0){
+  this.geoJsonLayerArray.forEach((elt:any)=>
+    this.map.removeLayer(elt));
+}
+this.geoJsonLayerArray=[];
   }
 
 
@@ -3428,7 +3439,7 @@ $("#routebar").css("display","none");
     //  this.map.getContainer().style.cursor = 'url(src/assets/images\searchIcon.png), auto';
    
 
-    this.map = map;
+    this.map =map;
     map.zoomControl.remove();
 
     // document.getElementById('map').addEventListener('mousemove', (e:any)=> {
@@ -9168,6 +9179,17 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
   }
 
   tcd() {
+
+     
+this.opentimer=true;
+
+this. items=[
+  {label:'Start',action:this.startTimeline.bind(this)},
+  {label:'Reverse',action:this.ReverseTimeline.bind(this)},
+  {label:'Reset',action:this.resetTimeline.bind(this)},
+  {label:'Stop',action:this.stopTimeline.bind(this)},
+  {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+];
     this.displaysectors=true;
 
     $('.timeline').css('display', 'flex');
@@ -10642,6 +10664,13 @@ setbtsType(type: any) {
     await this.datacrowdService.getSimulationobject(AlocSimulId).then((res: any) => {
       this.datajson = res;
       //console.log("getsimultion response >>>>", this.datajson);
+      this.heatarr=this.datajson.map((res:any)=>{
+        return [res[4],res[3]]
+      })
+      console.log("heatarr>>>>",this.heatarr);
+     this.heat = L.heatLayer(this.heatarr, {
+      radius: 20
+    });
     });
     //console.log("this.datajson.markerPositions>>>>", this.datajson.markerPositions);
 
@@ -11585,11 +11614,11 @@ return transformedData;
 customStyleFunction(feature:any) {
   // Implement your custom styling logic here
   return {
-    fillColor: 'transparent',
+    fillColor: 'blue',
     weight: 2,
     opacity: 1,
-    color: 'white',
-    fillOpacity: 0.7
+    color: 'blue',
+    fillOpacity: 0.3
   };
 }
 
@@ -14171,7 +14200,8 @@ DisplayInQueue(){
     //  this.display=true;
 
     }
- 
+    $('#controlbutton').css('display', '');
+
   }
   onClick() {
     this.isClicked = !this.isClicked;
@@ -15187,7 +15217,7 @@ animateMarker() {
          animatedmarker.setLatLng(currentLatLng);
        
          this.currentIndex++; 
-       setTimeout(() =>  this.movePersonMarker(animatedmarker,pathCoordinates,routedata), 3000/this.speedmarker ); 
+       setTimeout(() =>  this.movePersonMarker(animatedmarker,pathCoordinates,routedata), 3000/this.speedTimeRoute ); 
  
      } else {
        //console.log('Animation Completed');
@@ -15196,6 +15226,12 @@ animateMarker() {
 
 
   routeDev(){
+    this.opentimer=true;
+    this.items=[
+       {label:'Start',action:this.animateMarker.bind(this)},
+       {label:'Stop',action:this.stopAnimationButton.bind(this)},
+       {label:'Next',action:this.processNextBatchRoute.bind(this)},
+     ];
     this.showroutedicv=false;
     this.count=0;
     this.templates=[];
@@ -16442,6 +16478,13 @@ this.navbarSimulId=obj22;
   }
 
   startRoute(){
+    this.showroutedicv=false;
+    this.isRunningRoute = true;
+    this.items=[
+      {label:'Start',action:this.startRoute.bind(this)},
+      {label:'Stop',action:this.stopRoute.bind(this)},
+      {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+    ];
      this.showroutedicv=false;
     this.isRunningRoute = true;
     this.getrouteLine();
@@ -16457,8 +16500,15 @@ this.navbarSimulId=obj22;
   }
 
   startRoute1(){
+    this.opentimer=true;
     this.ShowHeader=false;
     this.isRunningRoute = true;
+   this.items=[
+      {label:'Start',action:this.startRoute1.bind(this)},
+      {label:'Stop',action:this.stopRoute.bind(this)},
+      {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+    ];
+   
     this.displaybyroute();
   }
 
@@ -16484,46 +16534,50 @@ this.navbarSimulId=obj22;
 
 
 
-clearRoutes(){
-  this.routeDeviceArray.forEach((elt:any)=>{
+  clearRoutes(){
+    this.showroutedicv=false;
+  
+    this.stopRoute();
+    this.opentimer=false;
+    this.routeDeviceArray.forEach((elt:any)=>{
+      this.map.removeLayer(elt);
+      });
+      this.routeDeviceArrayLoop.forEach((elt:any)=>{
+        this.magnifiedMap.removeLayer(elt);
+        });
+    this.polylineRouteArray.forEach((elt:any)=>{
     this.map.removeLayer(elt);
     });
-    this.routeDeviceArrayLoop.forEach((elt:any)=>{
-      this.magnifiedMap.removeLayer(elt);
-      });
-  this.polylineRouteArray.forEach((elt:any)=>{
-  this.map.removeLayer(elt);
-  });
-  this.isRunningRoute = false;
-  this.openTable=false;
-  $('#controlbutton').css('display', 'none');
-  $('#routebar').css('display', 'none');
-  $('#routebar1').css('display', 'none');
-  $('#leafletroute').css('display', 'none');
-
+    this.isRunningRoute = false;
+    this.openTable=false;
+    $('#controlbutton').css('display', 'none');
+    $('#leafletroute').css('display', 'none');
   
-  this.routeDeviceArray=[];
-  this.routeDeviceArrayLoop=[];
-  this.typeofdata='';
-  this.speedTimeRoute=0;
-  this.routingpolyline=[];
-  this.routingicons=[];
-  this.currentIndex=0;
-  this.displayedColumns =[];
-  this.Datatable1=[];
-  this.Datatable=[];
-  this.polylineRouteArray=[];
-  this.tablerow=0;
-  this.indexRoute=0;
-  this.count=0;
-
-  if (this.map && this.routingControlArray.length > 0) {
-    this.routingControlArray.forEach((control: any) => {
-        control.remove(); // Remove from the map
-    });
-    this.routingControlArray = []; // Empty the array
-}
-}
+    
+    this.routeDeviceArray=[];
+    this.routeDeviceArrayLoop=[];
+    this.typeofdata='';
+    this.speedTimeRoute=1;
+    this.routingpolyline=[];
+    this.routingicons=[];
+    this.currentIndex=0;
+    this.displayedColumns =[];
+    this.Datatable1=[];
+    this.Datatable=[];
+    this.polylineRouteArray=[];
+    this.tablerow=0;
+    this.indexRoute=0;
+    this.count=0;
+  
+    if (this.map && this.routingControlArray.length > 0) {
+      this.routingControlArray.forEach((control: any) => {
+          control.remove(); // Remove from the map
+      });
+      this.routingControlArray = []; // Empty the array
+  }
+  }
+  
+  
 
 
 
@@ -16560,7 +16614,7 @@ this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
   let datajson:any;
   // await this.http.get<any[]>('/assets/angularjson.json').subscribe((data:any[]) => {
     $('#controlbutton').css('display', '');
-    $('#routebar').css('display', '');
+ 
     // console.log("data-----------",data)
     // datajson=data;
     datajson=this.datajson;
@@ -16970,8 +17024,8 @@ private handleRouteData(data: any, deviceArray?: any[]) {
     this.openTable=true;
     this.isRunningRoute=true;
     this.showroutebar1=true;
-    $('#routebar1').css('display', '');
-    $('#routebar').css('display', 'none');
+ 
+   
     routeDevices = this.Devices.split(',');
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
@@ -17567,7 +17621,7 @@ else if(this.reportType=="3"){
     "DateTimeTo": this.DateTimeTo,
     "Coordinates":this.Coord,
     "meter": "",
-    "Devices": this.Devices,
+    "Devices":"",
     "isCSVAttached": "",
     "dataType": "",
     "telephoneNumber": "",
@@ -18324,6 +18378,12 @@ if(this.reportType !="11" && this.reportType!="8" && this.reportType!="9" && thi
 
           }
 
+// Extract coordinates (latitude and longitude) from datajson
+let allCoordinates: L.LatLngExpression[] = this.datajson.map((item:any) => [item[3], item[4]]);
+
+// Create bounds and fit the map to these bounds
+        const bounds = L.latLngBounds(allCoordinates);
+          this.map.fitBounds(bounds);
 
           this.map.openPopup(html1, e.layer.getLatLng());
 
@@ -19152,7 +19212,7 @@ console.log("hello--",this.informationservice.getAgGidSelectedNode());
 
         else if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
           await this.datacrowdService.getSelectedShapes(data[i].COLVALUE).then((res:any)=>{
-            console.log("res in getSimulationobject ",res);
+            console.log("res in getSelectedShapes ",res);
             let data=JSON.parse(res); 
             console.log("data  <<<<  ",data);
 
@@ -19237,7 +19297,6 @@ console.log("hello--",this.informationservice.getAgGidSelectedNode());
         this.showTextMenu=false;
     
       }
- $('#controlbutton').css('display', '');
       
         }
 
@@ -19592,7 +19651,418 @@ this.displayCoRelation();
   }).addTo(this.map);
 }
 
+byRouteFirst(){
+  this.ShowHeader=false;
 
+  this.handleSpeedChange1(1);
+  this.startRoute1();
+}
+byDeviceFirst(){
+  this.ShowHeader=false;
+  this.opentimer=true;
+  this.handleSpeedChange1(1);
+  this.changebarRoute();
+}
+
+
+
+testflwomap(){
+
+
+
+
+  const odData = [{
+    id: '1',
+    originLat: 51.505,
+    originLng: -0.09,
+    destinationLat: 40.7128,
+    destinationLng: -74.0060,
+    count: 10
+  }];
+
+  const flowmapLayer:any = L.canvasFlowmapLayer(odData, {
+    originAndDestinationFieldIds: {
+      originUniqueIdField: 'id',
+      originGeometry: { x: 'originLng', y: 'originLat' },
+      destinationGeometry: { x: 'destinationLng', y: 'destinationLat' },
+    },
+    canvasBezierStyle: {
+      type: 'simple',
+      strokeStyle: '#FF0000',
+      lineWidth: 4,
+    }
+  });
+
+  // if (flowmapLayer) {
+  //   console.log('Flowmap Layer Initialized:', flowmapLayer);
+  //   console.log('Flowmap Layer Properties:', flowmapLayer.options);
+  //   flowmapLayer.addTo(this.map);
+
+  //   // Check canvas creation after a short delay
+  //   setTimeout(() => {
+  //     const canvasElement = flowmapLayer._canvas;
+  //     if (canvasElement) {
+  //       console.log('Canvas Element:', canvasElement);
+  //     } else {
+  //       console.error('Canvas element was not created.');
+  //     }
+  //   }, 1000);
+  // } else {
+  //   console.error('Flowmap Layer failed to initialize.');
+  // }
+  if (flowmapLayer) {
+    console.log('Flowmap Layer Initialized:', flowmapLayer);
+    console.log('Flowmap Layer Options:', flowmapLayer.options);
+  
+    // Check if map exists and is initialized
+    if (this.map) {
+      console.log('Map is initialized:', this.map);
+      flowmapLayer.addTo(this.map);
+  
+      // Check canvas creation after a short delay
+      setTimeout(() => {
+        const canvasElement = flowmapLayer._canvas;
+        if (canvasElement) {
+          console.log('Canvas Element:', canvasElement);
+          console.log('Canvas Element Dimensions:', canvasElement.width, canvasElement.height);
+        } else {
+          console.error('Canvas element was not created.');
+  
+          // Additional checks if canvas is not created
+          console.log('Checking internal state of flowmap layer...');
+  
+          // Iterate over layers in the map
+          this.map.eachLayer((layer:any) => {
+            console.log('Map Layer:', layer);
+          });
+  
+          // Check if the flowmap layer is on the map
+          const isLayerOnMap = this.map.hasLayer(flowmapLayer);
+          console.log('Is Flowmap Layer on Map?', isLayerOnMap);
+  
+          // Check if the canvas context is accessible
+          const canvasContext = canvasElement ? canvasElement.getContext('2d') : null;
+          if (canvasContext) {
+            console.log('Canvas Context:', canvasContext);
+          } else {
+            console.error('Canvas context is not available.');
+          }
+        }
+      }, 1000);
+
+      
+    } else {
+      console.error('Map is not initialized. Cannot add flowmap layer.');
+    }
+  } else {
+    console.error('Flowmap Layer failed to initialize.');
+  }
+  
+  
+  }
+
+
+
+async addCurvedFlowLines(): Promise<void> {
+  let flowData:any;
+    await  this.datacrowdService.MaptoMap(171503).then((res:any)=>{
+  console.log("resss MaptoMap",res);
+  
+  this.drawBoundaries(res);
+  
+
+  const transformedData = res.reduce((acc:any, curr:any) => {
+    const deviceID = curr.device_id;
+  
+    // Find the existing device entry
+    let existingDevice = acc.find((item:any) => item.deviceID === deviceID);
+  
+    if (existingDevice) {
+      // If device exists, update the last segment's 'to' coordinates
+      const lastSegment = existingDevice.Data[existingDevice.Data.length - 1];
+      lastSegment.to = [curr.first_latitude, curr.first_longitude];
+      
+      // Create a new segment for the current country
+      existingDevice.Data.push({
+        from: [curr.first_latitude, curr.first_longitude],
+        to: [curr.first_latitude, curr.first_longitude]
+      });
+    } else {
+      // If device does not exist, create a new entry
+      acc.push({
+        deviceID: deviceID,
+        Data: [{
+          from: [curr.first_latitude, curr.first_longitude],
+          to: [curr.first_latitude, curr.first_longitude]
+        }]
+      });
+    }
+  
+    return acc;
+  }, []);
+  
+  // Remove segments where 'from' and 'to' are the same
+  transformedData.forEach((device:any) => {
+    device.Data = device.Data.filter((segment:any) => 
+      !(
+        segment.from[0] === segment.to[0] &&
+        segment.from[1] === segment.to[1]
+      )
+    );
+  });
+  
+  console.log('transformedData>>>',transformedData);
+  
+  // Optional: Remove empty segments
+  transformedData.forEach((device:any) => {
+    device.Data = device.Data.filter((segment:any) => segment.from && segment.to);
+  });
+  
+  console.log(transformedData);
+
+  flowData=transformedData;
+});
+  
+  
+    // Extract all coordinates from flowData
+  let allCoordinates: L.LatLngExpression[] = [];
+  flowData.forEach((flow:any) => {
+    flow.Data.forEach((route:any) => {
+      allCoordinates.push(route.from);
+      allCoordinates.push(route.to);
+    });
+  });
+  
+  
+  // Create bounds and fit the map to these bounds
+  const bounds = L.latLngBounds(allCoordinates);
+  this.map.fitBounds(bounds);
+  
+    let colorarray=['red','magenta','cyan','yellow','orange','purple','pink','maroon','blue'];
+  
+  
+    flowData.forEach((flows: any,index:any) => {
+  
+      flows.Data.forEach((flow: any) => {
+        console.log("flow",flow)
+        if (!flow.from || !flow.to) {
+          console.error('Flow data is missing coordinates:', flow);
+          return;
+        }
+    
+        const fromLatLng = L.latLng(flow.from[0], flow.from[1]);
+        const toLatLng = L.latLng(flow.to[0], flow.to[1]);
+    
+        // Calculate control point for Bezier curve
+        const controlPointLat = (fromLatLng.lat + toLatLng.lat) / 2 + 5; // Adjust '5' to control the curve
+        const controlPointLng = (fromLatLng.lng + toLatLng.lng) / 2;
+    
+        const controlPoint = [controlPointLat, controlPointLng];
+    
+        // Create a custom curved line using a series of small segments
+        const numberOfSegments = 100; // Increase for smoother curves
+        const latlngs:any = [];
+    
+        for (let i = 0; i <= numberOfSegments; i++) {
+          const t = i / numberOfSegments;
+          const x = (1 - t) * (1 - t) * fromLatLng.lat + 2 * (1 - t) * t * controlPoint[0] + t * t * toLatLng.lat;
+          const y = (1 - t) * (1 - t) * fromLatLng.lng + 2 * (1 - t) * t * controlPoint[1] + t * t * toLatLng.lng;
+          latlngs.push([x, y]);
+        }
+    
+        // Create an empty polyline that will be animated
+        const animatedPolyline = L.polyline([], {
+          color: colorarray[index],
+          weight: 2,
+          opacity: 0.7,
+        }).addTo(this.map);
+        this.animatedPolylines.push(animatedPolyline); // Store reference to polyline
+    
+        let currentSegment = 0;
+    
+        // Function to animate the polyline by adding segments progressively
+        function animatePolyline() {
+          if (currentSegment < latlngs.length) {
+            // Add the next segment to the polyline
+            animatedPolyline.addLatLng(latlngs[currentSegment]);
+    
+            currentSegment += 1;
+            requestAnimationFrame(animatePolyline); // Continue animation
+          }
+        }
+    
+        // Start the animation
+        animatePolyline();
+        // Create a red icon
+        const redIcon = L.divIcon({
+          className: 'custom-icon',
+          html: '<div style="background-color:'+ colorarray[index]+' ; width: 10px; height: 10px; border-radius: 50%;"></div>',
+          iconSize: [10, 10] // Size of the icon
+        });
+        // Optionally, add markers at the start and end points
+       let animatedMarkersFrom:any= L.marker(flow.from,{icon:redIcon}).addTo(this.map);
+       let animatedMarkersTo:any=L.marker(flow.to,{icon:redIcon}).addTo(this.map);
+       const popupInfo = `<b style="color: red; background-color: white">${flows.deviceID}</b>`;
+       console.log("flow.deviceID",flows.deviceID)
+       animatedMarkersFrom.bindPopup(popupInfo);
+       animatedMarkersTo.bindPopup(popupInfo);
+        this.AnimatedMarkers.push(animatedMarkersFrom);
+        this.AnimatedMarkers.push(animatedMarkersTo);
+    
+      });
+    });
+   
+    
+  }
+// async addCurvedFlowLines(): Promise<void> {
+//   let flowData:any;
+//     await  this.datacrowdService.MaptoMap(171503).then((res:any)=>{
+//   console.log("resss MaptoMap",res);
+//   this.drawBoundaries(res);
+
+//   const transformedData = res.reduce((acc:any, curr:any) => {
+//     const deviceID = curr.device_id;
+  
+//     // Find the existing device entry
+//     let existingDevice = acc.find((item:any) => item.deviceID === deviceID);
+  
+//     if (existingDevice) {
+//       // If device exists, update the last segment's 'to' coordinates
+//       const lastSegment = existingDevice.Data[existingDevice.Data.length - 1];
+//       lastSegment.to = [curr.first_latitude, curr.first_longitude];
+      
+//       // Create a new segment for the current country
+//       existingDevice.Data.push({
+//         from: [curr.first_latitude, curr.first_longitude],
+//         to: [curr.first_latitude, curr.first_longitude]
+//       });
+//     } else {
+//       // If device does not exist, create a new entry
+//       acc.push({
+//         deviceID: deviceID,
+//         Data: [{
+//           from: [curr.first_latitude, curr.first_longitude],
+//           to: [curr.first_latitude, curr.first_longitude]
+//         }]
+//       });
+//     }
+  
+//     return acc;
+//   }, []);
+  
+//   // Optional: Remove empty segments
+//   transformedData.forEach((device:any) => {
+//     device.Data = device.Data.filter((segment:any) => segment.from && segment.to);
+//   });
+  
+//   console.log(transformedData);
+
+//   flowData=transformedData;
+// });
+  
+  
+//     // Extract all coordinates from flowData
+//   let allCoordinates: L.LatLngExpression[] = [];
+//   flowData.forEach((flow:any) => {
+//     flow.Data.forEach((route:any) => {
+//       allCoordinates.push(route.from);
+//       allCoordinates.push(route.to);
+//     });
+//   });
+  
+  
+//   // Create bounds and fit the map to these bounds
+//   const bounds = L.latLngBounds(allCoordinates);
+//   this.map.fitBounds(bounds);
+  
+//     let colorarray=['red','magenta','cyan','yellow','orange','purple','pink','maroon','blue'];
+  
+  
+//     flowData.forEach((flows: any,index:any) => {
+  
+//       flows.Data.forEach((flow: any) => {
+//         console.log("flow",flow)
+//         if (!flow.from || !flow.to) {
+//           console.error('Flow data is missing coordinates:', flow);
+//           return;
+//         }
+    
+//         const fromLatLng = L.latLng(flow.from[0], flow.from[1]);
+//         const toLatLng = L.latLng(flow.to[0], flow.to[1]);
+    
+//         // Calculate control point for Bezier curve
+//         const controlPointLat = (fromLatLng.lat + toLatLng.lat) / 2 + 5; // Adjust '5' to control the curve
+//         const controlPointLng = (fromLatLng.lng + toLatLng.lng) / 2;
+    
+//         const controlPoint = [controlPointLat, controlPointLng];
+    
+//         // Create a custom curved line using a series of small segments
+//         const numberOfSegments = 100; // Increase for smoother curves
+//         const latlngs:any = [];
+    
+//         for (let i = 0; i <= numberOfSegments; i++) {
+//           const t = i / numberOfSegments;
+//           const x = (1 - t) * (1 - t) * fromLatLng.lat + 2 * (1 - t) * t * controlPoint[0] + t * t * toLatLng.lat;
+//           const y = (1 - t) * (1 - t) * fromLatLng.lng + 2 * (1 - t) * t * controlPoint[1] + t * t * toLatLng.lng;
+//           latlngs.push([x, y]);
+//         }
+    
+//         // Create an empty polyline that will be animated
+//         const animatedPolyline = L.polyline([], {
+//           color: colorarray[index],
+//           weight: 2,
+//           opacity: 0.7,
+//         }).addTo(this.map);
+//         this.animatedPolylines.push(animatedPolyline); // Store reference to polyline
+    
+//         let currentSegment = 0;
+    
+//         // Function to animate the polyline by adding segments progressively
+//         function animatePolyline() {
+//           if (currentSegment < latlngs.length) {
+//             // Add the next segment to the polyline
+//             animatedPolyline.addLatLng(latlngs[currentSegment]);
+    
+//             currentSegment += 1;
+//             requestAnimationFrame(animatePolyline); // Continue animation
+//           }
+//         }
+    
+//         // Start the animation
+//         animatePolyline();
+//         // Create a red icon
+//         const redIcon = L.divIcon({
+//           className: 'custom-icon',
+//           html: '<div style="background-color:'+ colorarray[index]+' ; width: 10px; height: 10px; border-radius: 50%;"></div>',
+//           iconSize: [10, 10] // Size of the icon
+//         });
+//         // Optionally, add markers at the start and end points
+//        let animatedMarkersFrom:any= L.marker(flow.from,{icon:redIcon}).addTo(this.map);
+//        let animatedMarkersTo:any=L.marker(flow.to,{icon:redIcon}).addTo(this.map);
+//         this.AnimatedMarkers.push(animatedMarkersFrom);
+//         this.AnimatedMarkers.push(animatedMarkersTo);
+    
+//       });
+//     });
+   
+    
+//   }
+  drawBoundaries(res:any[]){
+    const uniqueCountries = Array.from(new Set(res.map((item:any) => item.country_alpha2)));
+    console.log("uniqueCountries111111111",uniqueCountries);
+
+    const geoJsonOptions: L.GeoJSONOptions = {
+      style: this.customStyleFunction,  
+    };
+    uniqueCountries.forEach((country)=>{
+      let lebanonFeature=this.geojsonData1.features.find((a: any) => a.properties.ISO_A2 == country);
+      console.log("geojsonData1111111111",lebanonFeature);
+  
+      this.geoJsonLayer = L.geoJSON(lebanonFeature, geoJsonOptions).addTo(this.map);
+      this.geoJsonLayerArray.push(this.geoJsonLayer);
+    })
+  
+  }
 }
 
 
