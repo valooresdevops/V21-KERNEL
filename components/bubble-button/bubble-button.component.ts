@@ -84,7 +84,6 @@ this.allMenus = this.bubbleMenus;
       this.isSideNavActive = !this.isSideNavActive;
     }
   toggleActiveMenu(menuCode: String, appAbrv: String, childMenusCount: String,menuName:String) {
-    console.log('menuCode>>>>>>>>>>',menuCode);
     console.log('appAbrv>>>>>>>>>',appAbrv);
     console.log('childMenusCount>>>>>>',childMenusCount);
     this.menuName = menuName;

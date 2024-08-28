@@ -46,13 +46,14 @@ export class VDynamicSearchComponent implements OnInit {
   rowData: any;
   gridOptions: any;
   searchService: any;
-
+  public searchButtonId:any;
    
   constructor(private formBuilder: UntypedFormBuilder,
      private http: HttpClient,private commonFunctions: CommonFunctions,
      public informationservice: InformationService,) {}
 
   async ngOnInit(): Promise<void> {
+    this.searchButtonId=this.objectId+"_"+this.isForForm;
     //this.getDynamicSearchMainDropDown=GlobalConstants.getDynamicSearchMainDropDown+this.objectId;
 if(this.sourceQuery == null){
 
@@ -365,7 +366,15 @@ fields.thirdDropdownOptions=this.thirdCombo ;
         reloadGrid : false
       }
     }
-  
+    const checkIfAdvancedSearchHasFunctionApi = from(axios.get(GlobalConstants.checkIfAdvancedSearchHasFunction+this.objectId));
+    const checkIfAdvancedSearchHasFunction = await lastValueFrom(checkIfAdvancedSearchHasFunctionApi);
+    console.log("checkIfAdvancedSearchHasFunction>>>>>>>>",checkIfAdvancedSearchHasFunction.data);
+    
+    if(checkIfAdvancedSearchHasFunction.data!=0){
+      $("#searchFunctionButton_"+this.objectId)[0].click();
+      console.log("YAHOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+    }
+    
     this.onSearchSubmit.emit(obj);
   }
 
@@ -467,4 +476,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     this.onSearchSubmit.emit(obj);
   }
 
+
+
+  
 }

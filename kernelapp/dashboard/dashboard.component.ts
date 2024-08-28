@@ -43,6 +43,10 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
 
    }
+
+   
+  public description: String='';
+
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any[] = [];
   public agColumnsJson1: any[] = [];
@@ -103,6 +107,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         this.showDashboard = true;
       }, 1000);
     });
+
+    
   }
 
   
@@ -134,6 +140,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers });
     console.log("data>>>>>",this.data);
     this.tabName = this.informationservice.getSelectedTabName();
+    console.log(111111111)
     this.data.subscribe(
       (res: any) => {
         this.allData = res;
@@ -145,6 +152,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
           if (this.allData[i].type == 'Chart')
           {
             this.chartValue.push(this.allData[i]);
+            this.description=this.allData[i].description;
           }
           
           if(this.allData[i].type == 'Grid')
@@ -163,6 +171,19 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         for (let i = 0; i < this.gridValue.length; i++)
         {
           this.gridRecords.push(this.gridValue[i].Records);
+
+          // for(let x = 0; x < this.gridValue[i].Header.length; x ++)
+          // {
+          //   if(this.gridValue[i].Header[x].headerName != "TITLE")
+          //   {
+          //     alert(1)
+          //   }
+          //   else
+          //   {
+          //     alert(2)
+          //   }
+          // }
+          
           this.gridHeader.push(this.gridValue[i].Header);
 
           this.agColumnsJson[i] = this.gridValue[i].Header;

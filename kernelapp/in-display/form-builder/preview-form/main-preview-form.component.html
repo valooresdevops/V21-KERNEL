@@ -9,7 +9,7 @@
 <div *ngFor="let tableOption of tableOptions1">
 
     <div *ngIf="tableOption.isAdvancedSearch == 1">
-<v-dynamic-search [objectId]="tableOption.objectId"   [sourceQuery]="tableOption.sourceQuery" (onSearchSubmit)="onSearchSubmit($event)" isForForm="false"></v-dynamic-search>
+<v-dynamic-search [objectId]="tableOption.objectId"   [sourceQuery]="tableOption.sourceQuery" (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="false"></v-dynamic-search>
 
 </div>
   <div *ngIf="test_1 == '1'">
@@ -38,7 +38,7 @@
     </v-grid>
     <div style="display: inline-block;" *ngFor="let fields of test">
       <div *ngIf="fields.columnTypeCode == 14 && fields.mainAndPreview == true" style="display: inline-block; margin-right: 10px;">
-        <v-button style="margin-right: 10px;" value="{{ fields.name }}" btnActionType="button" id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id)"></v-button>
+        <v-button style="margin-right: 10px;" value="{{ fields.name }}" btnActionType="button" id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id,'dynamicButton')"></v-button>
       </div>
     </div>
   </div>

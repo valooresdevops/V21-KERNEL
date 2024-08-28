@@ -76,7 +76,7 @@ export class AmPreviewFormComponent implements OnInit {
   public canDelete: string = "";
   public sourceQuery: string = "";
   public toolBar: string = "";
-  public dialogArray: any[] = [];
+  // public dialogArray: any[] = [];
   public update: boolean = false;
   public required_flag: boolean;
   public isMainTab: number;
@@ -107,6 +107,9 @@ export class AmPreviewFormComponent implements OnInit {
   public LastObject: any = [];
   public gridColumns: AgColumns[] = [];
   public allColumnsAr: any[] = [{ id: '', name: '' }];
+  
+  public gridStaticValue: any;
+
   public operators = [
     { id: '', name: '' },
     { id: 1, name: 'And' },
@@ -1153,10 +1156,7 @@ export class AmPreviewFormComponent implements OnInit {
 
   // After Save Functions
   async dynamicDRBOnAfterSave(objectId: number) {
-    alert(11111111);
-    console.log("entered dynamicDRBOnAfterSave>>>");
     try {
-      let mainTab = this.informationservice.getMainTab();
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/4/0";
       const dynamicDRBOnAfterSaveUrl = from(axios.post(url));
       const dynamicDRBOnAfterSave = await lastValueFrom(dynamicDRBOnAfterSaveUrl);
@@ -1479,6 +1479,7 @@ export class AmPreviewFormComponent implements OnInit {
                   }
                 }
               }
+              ///////Sigma
               else if(type == 8){
                 let formData = this.dynamicForm.value;
                 let selectedTabName = this.informationservice.getSelectedTabName();
@@ -5203,7 +5204,6 @@ export class AmPreviewFormComponent implements OnInit {
       this.AllTabs = [];
       this.tableOptions1 = [];
       this.test_1 = "0";
-      // let objectId=this.amInfo.objectId;
 
       // $(".nav-tabs").show();
 
@@ -5215,18 +5215,20 @@ export class AmPreviewFormComponent implements OnInit {
         this.actionType == 'update';
       }
 
-      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
-        let part:String [] =this.amInfo.objectId.split('|');
-      this.amInfo.objectId =part[1].trim();
-      }
 
       // if(this.amInfo.objectId.includes("~N~")){
       //   let part:String [] =this.amInfo.objectId.split('|');
       // this.amInfo.objectId =part[1].trim();
       // }
+
+      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
+        let part:String [] =this.amInfo.objectId.split('|');
+      this.amInfo.objectId =part[1].trim();
+      }
       const getAllTabsUrl = from(axios.get(GlobalConstants.getAllTabs + this.amInfo.objectId));
       const getAllTabs = await lastValueFrom(getAllTabsUrl);
       this.allTabsTemp=getAllTabs.data;
+      console.log("ALL TABS DATA>>>>>>>>",getAllTabs.data);
       this.loaderService.isLoading.next(true);
       for (let i = 0; i < getAllTabs.data.length; i++) {
 
@@ -5260,11 +5262,13 @@ export class AmPreviewFormComponent implements OnInit {
         // )
 
         let isGrid = 1;
+//console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == 1) {
           isGrid = 0;
         } else {
           isGrid = getAllTabs.data[i].isGrid;
         }
+//console.log("isGrid ========",isGrid);
         // If condition lookup to disable a tab on onload
         let conditionTest: any;
         let condition = getAllTabs.data[i].condition == null ? -1 : getAllTabs.data[i].condition;
@@ -5609,6 +5613,7 @@ export class AmPreviewFormComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
     }
@@ -5627,7 +5632,6 @@ export class AmPreviewFormComponent implements OnInit {
     this.roleId = this.informationservice.getUserRoleId();
     if (this.amInfo == undefined) {
       this.amInfo = this.lookupData[0];
-      console.log('data>>>>>>>>>>>>>>',this.lookupData[0])
     }
 
     this.loadAM(false);
@@ -5652,7 +5656,7 @@ export class AmPreviewFormComponent implements OnInit {
   async getAllColums() {
     //SERVICE1998
 
-    //console.log("number into this function >>>>>>>>>>>>>>>>>")
+    console.log("number into this function >>>>>>>>>>>>>>>>>")
     this.informationservice.setDynamicService("~" + this.informationservice.getSelectedTabName() + "~", JSON.stringify(this.amInfo));
 
     this.loaderService.isLoading.next(true);
@@ -5969,6 +5973,7 @@ export class AmPreviewFormComponent implements OnInit {
 const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
     isGrid = getTabConfigurationApi.data[0].isGrid;
+    console.log("getTabConfigurationApi.data>>>>>>>>>>",getTabConfigurationApi.data)
     console.log("ELIE IS FROM BUTTON CLICK 111>>>>>>>>>>>>>>>>",this.amInfo);
     console.log("ELIE IS FROM BUTTON CLICK 2222>>>>>>>>>>>>>>>>",this.amInfo.isFromButtonClick);
     console.log("ELIE IS FROM BUTTON CLICK 3333>>>>>>>>>>>>>>>>",this.amInfo.buttonClick);
@@ -6048,9 +6053,9 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     if (isGrid == 1 && hasSourceQuery == 0) {
       this.agColumns = [];
       this.agColumnsJson = "";
-
+console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
       let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi.data, 'select', this.amInfo));
-      //console.log("TESTTABLE>>>>>>>>>>>",jsonData);
+      console.log("TESTTABLE>>>>>>>>>>>",jsonData);
       let tableNames: string = '';
       for (let u = 0; u < jsonData.length; u++) {
         tableNames = tableNames + "," + jsonData[u].tableName;
@@ -6357,6 +6362,9 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
           this.columnId = "ROW_ID";
           this.agColumnsJson = gridHeaders;
           this.agColumns.push(this.agColumnsJson);
+          console.log("gridHeaders>>>>>>>>>>>",gridHeaders);
+
+          console.log("gridResults>>>>>>>>>>>",gridResults);
           this.gridStaticData = gridResults;
           this.test_1 = '1';
 
@@ -6765,7 +6773,8 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
               this.test_1 = '1';
             }
           } else {
-            this.listOfHeaders.push(data_0[i])
+            this.listOfHeaders.push(data_0[i]);
+            console.log('listOfHeaders>>>>>>>>',this.listOfHeaders);
           }
           this.loaderService.isLoading.next(false);
         }
@@ -6775,6 +6784,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
       if (this.actionType == "update") {
 
         let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi3.data, 'select', '-1'));
+        console.log("jsonData>>>>1>>>>>>>",jsonData)
 
         let jsonVal = [{
           objectId: this.objectId,
@@ -6796,13 +6806,24 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
           dataa = getDynamicFormData.data;
         }
 
-
-
+       
+let jsonData1='[';
+let count = 0;
         for (let i = 0; i < dataa.length; i++) {
           this.loaderService.isLoading.next(true);
           let colName = dataa[i].colName.toUpperCase();
           let colValue = dataa[i].colValue;
           let colType = dataa[i].colType;
+
+          if(this.listOfHeaders.some(header => header.name === colName)){
+            if(count == 0){
+              jsonData1 +="{\""+colName+"\":"+colValue; 
+              count = 1;
+            }else{
+              jsonData1 +=",\""+colName+"\":"+colValue; 
+            }
+
+          }
           // Remove time from date value
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
@@ -6907,7 +6928,11 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
 
 
           if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
-            this.handleFormFieldValues(colName, colValue);
+           let a = this.handleFormFieldValues(colName, colValue);
+           console.log("jp colName>>>>>>>>>>>>>>>>", colName);
+           
+           console.log("jp> colValue>>>>>>>>>>>>>>>", colValue);
+           console.log("jp>>>>>>>>>>>>>>>>", a);
           }
 
           if (colType == "hidden") {
@@ -6934,9 +6959,19 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
                   }
           this.loaderService.isLoading.next(false);
         }
+        jsonData1 +="}]"
+        console.log("jp jsonData1>>>>>>>>>>>>>>>>", JSON.parse(jsonData1));
 
+         this.gridStaticValue=JSON.parse(jsonData1);
+        setTimeout(()=>{
+        this.showGrid=false;
+        },100);
+        setTimeout(()=>{
+          this.showGrid = true;
+        },100);
         // Load field dependencies
         // setTimeout(async () => {
+        console.log("11111111111111111111111111");
           this.loadFieldDependencyForForm();
         // }, 100);
 
@@ -6947,6 +6982,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
       // Hide all fieldsets that contain all it's fields hidden
       // setTimeout(() => {
         this.handleFormFieldsetsAfterLoad();
+        console.log('jp>>>>><<<<<<>>>>>>>',this.listOfHeaders);
         this.showTheGridIntoForm();
       // }, 150);
 
@@ -7300,20 +7336,40 @@ console.log('COLUMN_ID--------------------->',data[i])
       }
     }
   }
-//jp
-  async onShowButtonForm(buttonId: number) {
+
+  /////////IMPORTANT AN DYNAMIC BUTTON AND DYNAMIC SEARCH\\\\\\\\\\\\\\\\\\
+
+  async onShowButtonForm(buttonId: number,fromButtonOrSearch:string) {
+    console.log("BUTTON TRIGGERED!!!!!!!!!!!!!");
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
     let mainTab = this.informationservice.getMainTab();
-    const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
-    const getButtonData = await lastValueFrom(getButtonDataUrl);
-    let data1 = getButtonData.data;
-    this.columnTypeCode = data1.columnType;
+    let data1:any;
+    let decodedString='';
+    console.log("fromButtonOrSearch>>>>>>>>>>>>>>>",fromButtonOrSearch);
+    if(fromButtonOrSearch=="dynamicButton"){
 
-    if (data1.blobFile != null && data1.blobFile != undefined) {
-      const base64EncodedString = data1.blobFile;
-      const decodedString = atob(base64EncodedString);
+        const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
+        const getButtonData = await lastValueFrom(getButtonDataUrl);
+        data1 = getButtonData.data;
+        this.columnTypeCode = data1.columnType;
+        const base64EncodedString = data1.blobFile;
+        decodedString = atob(base64EncodedString);
+
+    }else{
+
+        const getSearchButtonFunctionDataApi = from(axios.get(GlobalConstants.getSearchButtonFunctionData + this.objectId));
+        const getSearchButtonFunctionData = await lastValueFrom(getSearchButtonFunctionDataApi);
+        data1 = getSearchButtonFunctionData.data[0];
+        this.columnTypeCode = 14;
+        decodedString=getSearchButtonFunctionData.data[0].blobFile;
+    }
+    console.log("DATA111111>>>>>>>>>>>>>",data1);
+    if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
+      
       let splitedString = decodedString.split("|");
+      console.log("SPLITED STRING>>>>>>>>>>>>>>",splitedString);
       splitedString.forEach(async (part, index) => {
+        console.log("alla ouwwet>>>>>>>>",part);
 
       let procedureName = part.split("~A~")[0];
       let buttonAction: any = part.split("~A~")[1];
@@ -7329,6 +7385,17 @@ console.log('COLUMN_ID--------------------->',data[i])
       let jsonResponse = part.split("~A~")[11];
 
       this.buttonObjectId = procedureName;
+        console.log("procedureName>>>>>>>>>",procedureName);
+        console.log("buttonAction>>>>>>>>>",buttonAction);
+        console.log("isMainPreview>>>>>>>>>",isMainPreview);
+        console.log("params>>>>>>>>>",params);
+        console.log("url>>>>>>>>>",url);
+        console.log("otherCondition>>>>>>>>>",otherCondition);
+        console.log("alertValue>>>>>>>>>",alertValue);
+        console.log("thirdCondition>>>>>>>>>",thirdCondition);
+        console.log("alertMessage>>>>>>>>>",alertMessage);
+        console.log("jsonRequest>>>>>>>>>",jsonRequest);
+        console.log("jsonResponse>>>>>>>>>",jsonResponse);
 
       // Call Procedure
       if (buttonAction == 2) {
@@ -7619,6 +7686,7 @@ console.log('COLUMN_ID--------------------->',data[i])
       }
       // Call Api
       else if (buttonAction == "3") {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 let dataa:any=[];
         let formData = this.dynamicForm.value;
         if (formData) {
@@ -8141,7 +8209,9 @@ let dataa:any=[];
           });
         }
       }
+      console.log("this.test>>>>>>>>>",this.test);
       this.gridColumns.push(this.agColumnsJson);
+      console.log("gridColumns>>>>>>>",this.gridColumns)
       this.showGrid = true;
     }
 

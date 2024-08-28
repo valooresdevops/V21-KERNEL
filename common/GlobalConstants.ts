@@ -340,6 +340,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getDynamicSearchMainDropDown = GlobalConstants.inDispGatewat +'api/getDynamicSearchMainDropDown/';
   public static getComboQueryData = GlobalConstants.inDispGatewat +'api/getComboQueryData/';
   public static getQueryHeadersForAdvancedSearch = GlobalConstants.inDispGatewat +'api/getQueryHeadersForAdvancedSearch/';
+  public static checkIfAdvancedSearchHasFunction = GlobalConstants.inDispGatewat +'api/checkIfAdvancedSearchHasFunction/';
+  public static getSearchButtonFunctionData = GlobalConstants.inDispGatewat +'api/getSearchButtonFunctionData/';
 
   
   
@@ -434,7 +436,6 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getMasterLinks = GlobalConstants.inDispGatewat + 'api/getMasterLinks/';
   public static insertMasterLinkData = GlobalConstants.inDispGatewat + 'api/insertMasterLinkData/';
   public static executeMasterLink = GlobalConstants.inDispGatewat + 'api/executeMasterLink/';
-  public static getExecutedReports1 = GlobalConstants.inDispGatewat + 'api/getExecutedReports1';
   public static getExecutedReports = GlobalConstants.inDispGatewat + 'api/getExecutedReports/';
   public static getExecutedReportData = GlobalConstants.inDispGatewat + 'api/getExecutedReportData/';
   public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';

@@ -101,6 +101,9 @@ export class DashboardPopupComponent implements OnInit {
     this.commonFunctions.navigateToPage('/dashboard');
   }
   onUpdateClick() {
+    this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode()
+    
+    localStorage.setItem('agGidSelectedNode', this.agGridSelectedNodes);
     this.action = 'update';
     this.dataservice.setactionType(this.action);
     const dialogConfig = new MatDialogConfig();

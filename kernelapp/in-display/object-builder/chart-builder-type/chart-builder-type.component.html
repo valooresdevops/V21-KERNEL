@@ -72,7 +72,12 @@
                  fieldName="Column">
         </v-input>
       </div >
-    </div>  
+    </div>
+    <div class="row">
+      <div class="col-lg-5">
+          <v-input  formControlName="describtion" [parentForm]="chartForm" type="text" label="Describtion" fieldName="describtion"></v-input>
+      </div>
+  </div>
       <v-button value="Save" (click)="Next()"></v-button>
     </form>
   </v-tab>

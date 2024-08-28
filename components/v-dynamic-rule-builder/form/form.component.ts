@@ -1820,6 +1820,7 @@ export class DynamicBuilderFormComponent implements OnInit {
       // On Load - Where Condition
       stepValue = this.form_whereCondition.controls[value]?.value;
       if (stepValue != "") {
+        ///////Sigma
         if (value == 'step_8') {
           this.getAllColumnsByTable = GlobalConstants.GetColVal + this.form_whereCondition.controls['step_0']?.value;
           $(".onWhereCondition .step_1").show();

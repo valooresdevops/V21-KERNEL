@@ -4,7 +4,7 @@
       <div class="tabName">{{tabName}}</div>
     </div>
   </v-tab>
-  
+<!--   
   <div class="container-wrapper" *ngIf="checkVisibiltyDashboard">
     <div class="custom-container">
       <div class="button-section">
@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
   
   
 
@@ -52,6 +52,9 @@
               <ng-container>
                 <div class="chart-container" *ngIf="data.stockAd == 0">
                   <v-highcharts [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts>
+                  <div *ngIf="description != 'null'" style="align-items: center; display: flex; align-content: center;">
+                    {{allData[i].description}}
+                  </div>
                 </div>
                 <div class="chart-container" *ngIf="data.stockAd == 1">
                   <v-highcharts-stocks [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts-stocks>

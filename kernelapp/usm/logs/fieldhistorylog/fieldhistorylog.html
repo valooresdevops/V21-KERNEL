@@ -2,19 +2,19 @@
     <div class="row">
         <div class="col-lg-2">
             <v-dropdown formControlName="application" [dataApi]="getUSMApplicationComboApi" label="Application"
-                [parentForm]="fieldHistoryLogForm" (onChangeEvent)="onChangeApplicationName($event)"  fieldName="application" style="z-index: 99999;"></v-dropdown>
+                [parentForm]="fieldHistoryLogForm" (onChangeEvent)="onChangeApplicationName($event)"  fieldName="application"></v-dropdown>
         </div>
         <div class="col-lg-2">
             <v-dropdown formControlName="user" [dataApi]="getUserApi" label="User" [parentForm]="fieldHistoryLogForm"
-                fieldName="user" style="z-index: 99999;"></v-dropdown>
+                fieldName="user"></v-dropdown>
         </div>
         <div class="col-lg-2">
             <v-dropdown formControlName="menu" [dataApi]="getMenuApi" label="Menu"  [parentForm]="fieldHistoryLogForm"
-                fieldName="menu" style="z-index: 99999;" (onChangeEvent)="onChangeApplicationMenu($event)"></v-dropdown>
+                fieldName="menu"></v-dropdown>
         </div>
         <div class="col-lg-2">
             <v-dropdown formControlName="field" [dataApi]="getFieldApi" label="Field" [parentForm]="fieldHistoryLogForm"
-                fieldName="field" style="z-index: 99999;"></v-dropdown>
+                fieldName="field"></v-dropdown>
         </div>
 
         </div>

@@ -191,9 +191,10 @@ body {
 .side-nav-body-content .top-section {
   width: 100%;
   /* margin-top: 5px; */
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   background: var(--app-navigation-background-color);
   border-radius: var(--app-layout-borders);
+  color: var(--side-nav-color);
   position: relative;
   display: flex;
   align-items: center;
@@ -218,8 +219,7 @@ body {
 }
 
 .side-nav-body-content .top-section .top-section-1 img.active {
-  /* width: 100%; */
-  width: 60%;
+  width: 100%;
   display: block;
   transition: 0.5s all;
 }
@@ -236,8 +236,9 @@ body {
   padding-right: 1%;
   overflow:scroll; */
 
-
+  background-color: var(--app-background-color);
   width: 100%;
+  height: 100%;
   /* min-height: 95vh; */
   padding-left: 1%;
   padding-right: 1%;

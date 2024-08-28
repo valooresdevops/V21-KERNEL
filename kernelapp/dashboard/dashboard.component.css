@@ -245,7 +245,8 @@ button:hover {
   max-width: 100%;
   min-height: 60px;
   display: block;
-  background: white;
+  background-color: var(--app-background-color);
+
   border-radius: 4px;
   overflow: hidden;
 }
@@ -260,7 +261,8 @@ button:hover {
   justify-content: space-between;
   box-sizing: border-box;
   cursor: move;
-  background: white;
+  background-color: var(--app-background-color);
+
   font-size: 14px;
 }
 
@@ -292,7 +294,7 @@ button:hover {
 .listContainer {
   position: relative;
   width: 100%;
-  background-color: white;
+  background-color: var(--app-background-color);
   display: flex;
   flex-wrap: wrap;
 
@@ -301,7 +303,7 @@ button:hover {
 .listContainer1 {
   position: relative;
   width: 100%;
-  background-color: white;
+  background-color: var(--app-background-color);
   /* display: flex;
   flex-wrap: wrap; */
   max-width: 100%;
@@ -313,7 +315,7 @@ button:hover {
   position: relative;
   width: 100%; /* One-third of the row, equivalent to 4 out of 12 columns */
   max-width: 100%;
-  background-color: white;
+  background-color: var(--app-background-color);
 }
 /* 
   .box {
@@ -438,7 +440,8 @@ button:hover {
   font-weight: bold;  /* Make text bold */
   color: #333;  /* Change text color */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);  /* Add shadow to the text */
-  background-color: #ffff;  /* Optional: Add background color */
+   background-color: var(--app-background-color);
+  /* Optional: Add background color */
   /* padding: 10px 20px; */
   /* border-radius: 5px; */
   /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  Add shadow to the container */

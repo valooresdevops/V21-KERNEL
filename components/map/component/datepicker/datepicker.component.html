@@ -6,22 +6,22 @@
       <input  type="date" [formControl]="startDateControl">
     </div>
     <div class="input-wrapper">
-      <input  id="beginTimeInput appt" type="time"  [(ngModel)]="beginTimeInput" >
+      <input  id="appt" type="time"  #beginTimeInput>
     </div>
   </div>
 
 <hr>
-<div *ngIf="fromTimeline">
+
   <mat-label>End Operation</mat-label>
   <div class="input-container">
     <div class="input-wrapper">
       <input  type="date" [formControl]="endDateControl">
     </div>
     <div class="input-wrapper">
-      <input  id="endTimeInput appt" type="time"    [(ngModel)]="endTimeInput"  >
+      <input  id="appt" type="time"   #endTimeInput>
     </div>
   </div>
-</div>
+
 </div>
 
 <nav class="alertify-buttons">

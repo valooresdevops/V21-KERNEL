@@ -200,18 +200,10 @@ class="customButtons customButtons_Layout" style="display: none;">
   <!-- <button (click)="addMarker()" title='Draw a Point'><img src="./assets/img/Point.PNG" alt="Point"></button> -->
   
 </div>
-<button *ngIf="showcancelDrawingCircle" id="cancelDrawingCircle" (click)="cancelDrawing()"  title='Cancel'>
+<button *ngIf="showCancelButton" id="cancelDrawingCircle" (click)="cancelDrawing()"  title='Cancel'>
   Cancel
 </button>
-<button *ngIf="showcancelDrawingpolygon" id="cancelDrawingpolygon" (click)="cancelDrawing()"  title='Cancel'>
-  Cancel
-</button>
-<button *ngIf="showcancelDrawingpolyine" id="cancelDrawingpolyine" (click)="cancelDrawing()"  title='Cancel'>
-  Cancel
-</button>
-<button *ngIf="showcancelDrawingpoint" id="cancelDrawingpoint" (click)="cancelDrawing()"  title='Cancel'>
-  Cancel
-</button>
+
 <div class="button-container2" [class.hidetools]="status" [class.showtools]="!status" [class.dimmed]="isDimmed"> 
   <!-- <button (click)="EditShapes()" title='Edit layers' ><img src="./assets/img/Edit.PNG" alt="edit"></button> -->
   <!-- <div *ngIf="editMode===true" class="editMode">

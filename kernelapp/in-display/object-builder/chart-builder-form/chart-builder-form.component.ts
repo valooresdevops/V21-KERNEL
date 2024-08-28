@@ -56,6 +56,8 @@ export class ChartBuilderFormComponent implements OnInit {
 
   chartType: number;
   is3d: number;
+  public description: String='';
+  public isDescription: boolean = false;
 
   ngOnInit(): void {
     console.log('data-->: ',this.data)
@@ -63,6 +65,10 @@ export class ChartBuilderFormComponent implements OnInit {
     this.chartType = this.data.chartType;
     let ids = this.ids
     let stockChartType;
+    this.description=this.data.description;
+    if(this.description != 'null'){
+      this.isDescription=true;
+    }
 
     const trackColors = Highcharts.getOptions().colors.map(color =>
       new Highcharts.Color(color).setOpacity(0.3).get());

@@ -5,7 +5,7 @@
     </div>
 </div>
 
-<div class="header-dialog" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
+<div class="header-dialog">
     <div></div>
     <div class="dialogTitle"></div>
     <button type="button" id="closeId" class="btn-close" aria-label="Close" (click)="closeDialog(true)"></button>
@@ -26,9 +26,9 @@
                       
                             <div *ngIf="tableOption.isAdvancedSearch == 1 ">
                                             <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
-                                                (onSearchSubmit)="onSearchSubmit($event)" isForForm="true"></v-dynamic-search> 
+                                                (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="true"></v-dynamic-search> 
                             </div>
-
+                        
             <!-------------------------------------------------------------------------------------------------->
 
 
@@ -491,7 +491,7 @@
                                     <div *ngIf="fields.columnTypeCode == 14 && fields.mainAndPreview == false && fields.columnType != 'hidden'"
                                         class="button-container-2 fieldSet_{{ fields.fieldSetId }}">
                                         <v-button value="{{ fields.name }}" btnActionType="button"
-                                            id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id)"
+                                            id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id,'dynamicButton')"
                                             style="max-width: 125px" [disabled]="fields.conditionResult"></v-button>
                                     </div>
                                 </div>
@@ -507,9 +507,9 @@
                             [agOnGridEvents]="true"
                             (onGridEventSave)="gridEventSave($event)"
                             [showOrHideButton]="true"
-                            [dataApi]="test"
+                          [dataApi]="test"
                             [showOrHideButton]="false"
-                            [dataApiParam]="dataApiParam">
+                            [dataApiParam]="dataApiParam"[staticData]="gridStaticValue" >
                     </v-grid>
                     <div class="row" *ngIf="tableOption.isSave == 1 && tableOption.isQueryForm!='1' && tableOption.isDynamicReport!='1'">
                         <div class="row justify-content-center">
@@ -529,7 +529,7 @@
 
                     <div *ngIf="tableOption.isAdvancedSearch == 1 && isPageGrid && test_1 == '1' ">
                         <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
-                            (onSearchSubmit)="onSearchSubmit($event)" isForForm="false"></v-dynamic-search>
+                            (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="false"></v-dynamic-search>
                     </div>
                     <v-grid *ngIf="isPageGrid && test_1 == '1'" allowSideBar="true" [agPrimaryKey]="columnId"
                         [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [paginationPageSize]="10"
@@ -561,7 +561,7 @@
                     <div *ngIf="isPageGrid && test_1 == '1' && previewButton">
                         <div *ngFor="let x of testButtons" class="mb-3">
                             <div class="button-container-2">
-                                <v-button value="{{ x.name }}" btnActionType="button" (click)="onShowButtonForm(x.id)"
+                                <v-button value="{{ x.name }}" btnActionType="button" (click)="onShowButtonForm(x.id,'dynamicButton')"
                                     [disabled]="x.readOnly" style="max-width: 125px">1</v-button>
                             </div>
                         </div>
@@ -569,6 +569,10 @@
                 </div>
             </div>
         </v-tab>
-        
+              <!---------------------------------HIDDEN USED BUTTON FOR DYNAMIC SEARCH-------------------------------->
+
+              <button style="display:none" id="searchFunctionButton_{{tableOption.objectId}}" (click)="onShowButtonForm(null,'dynamicSearch')"></button>
+
+              <!-------------------------------------------------------------------------------------------------------->  
     </ng-container>
 </v-tabs-container>

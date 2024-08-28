@@ -21,6 +21,7 @@
   .boxForCharts {
     position: absolute;
     display: flex;
+    flex-direction: column;
     width: 30%;
     height: 30%; /* Ensure the box has a defined height */
     margin-left: 5%;
