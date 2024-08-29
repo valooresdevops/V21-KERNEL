@@ -55,6 +55,7 @@ export class ChartBuilderTypeComponent implements OnInit {
     query: new UntypedFormControl(''),
     Row: new UntypedFormControl(''),
     Column: new UntypedFormControl(''),
+    describtion: new UntypedFormControl(''),
     is3d: new UntypedFormControl(''),
     isHorizental: new UntypedFormControl(''),
     isShowLegend: new UntypedFormControl(''),
@@ -114,6 +115,9 @@ export class ChartBuilderTypeComponent implements OnInit {
             this.chartForm.get("isHorizental").setValue(toggleIsHorizontalValue);
             this.chartForm.get("isShowLegend").setValue(toggleshowlegendValue);
             this.chartForm.get("isDrilldown").setValue(toggleisDrilldownValue);
+            //describtion
+            this.chartForm.get("describtion").setValue(res[0].chartDescription);
+
             this.chartData = JSON.parse(res[1].data);
             for (let i = 0; i < this.chartData.length; i++) {
 
@@ -1214,7 +1218,6 @@ export class ChartBuilderTypeComponent implements OnInit {
   }
 
   nextTab(type:any, identifier: string, e: any,) {
-    alert("identifier = " + identifier);
     if(e == 'c'){
     this.chartType = identifier;
     var sum = 0
@@ -1391,6 +1394,15 @@ export class ChartBuilderTypeComponent implements OnInit {
 
 
     if (this.actionType == 'update') {
+      let describtionValue: String;
+      if(this.chartForm.get("describtion").value == null)
+        {
+          describtionValue = "";
+        }
+        else
+        {
+          describtionValue = this.chartForm.get("describtion").value;
+        }
       let selectedNodes = this.informationservice.getAgGidSelectedNode();
       let allData = {
         chartId: this.informationservice.getAgGidSelectedNode(),
@@ -1400,6 +1412,7 @@ export class ChartBuilderTypeComponent implements OnInit {
         // chartSize:"",
         chartHTitle: this.chartForm.get("Row").value,
         chartVTitle: this.chartForm.get("Column").value,
+        chartDescription: describtionValue,
         showLegend: toggleshowlegendValue,
         is3d: toggleIs3dValue,
         isHorizontal: toggleIsHorizontalValue,
@@ -1416,6 +1429,15 @@ export class ChartBuilderTypeComponent implements OnInit {
           this.commonFunctions.reloadPage("/dsp/chartBuilder");
         })
     } else {
+      let describtionValue: String;
+      if(this.chartForm.get("describtion").value == null)
+      {
+        describtionValue = "";
+      }
+      else
+      {
+        describtionValue = this.chartForm.get("describtion").value;
+      }
       
       this.agGridSelectedNodes = localStorage.getItem('agGidSelectedLookup_(Row)_id');
       let allData = {
@@ -1425,6 +1447,7 @@ export class ChartBuilderTypeComponent implements OnInit {
         // chartSize:"",
         chartHTitle: this.chartForm.get("Column").value,
         chartVTitle: this.chartForm.get("Row").value,
+        chartDescription: describtionValue,
         showLegend: toggleshowlegendValue,
         is3d: toggleIs3dValue,
         isHorizontal: toggleIsHorizontalValue,

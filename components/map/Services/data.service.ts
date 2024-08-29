@@ -24,10 +24,6 @@ export class DataService {
   private shapeIdDate:any;
   private valuedate:any;
   private mapType:any;
-  private datacrowd:boolean=false;
-  private headerFromKwg:boolean=false;
-  private headerType:any;
-  
   constructor() { }
 
   getFromTimeline() {
@@ -149,23 +145,5 @@ export class DataService {
   }
   getmapType(){
     return this.mapType;
-  }
-  setdatacrowd(datacrowd:boolean){
-    this.datacrowd=datacrowd;
-  }
-  getdatacrowd(){
-    return this.datacrowd;
-  }
-  setHeaderFromKwg(headerFromKwg:boolean){
-    this.headerFromKwg=headerFromKwg;
-  }
-  getHeaderFromKwg(){
-    return this.headerFromKwg;
-  }
-  setheaderType(headerType:any){
-    this.headerType=headerType;
-  }
-  getheaderType(){
-    return this.headerType;
   }
 }

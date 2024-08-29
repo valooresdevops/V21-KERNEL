@@ -27,6 +27,20 @@ export class SideNavComponent implements OnInit {
 
   toggleAppTheme: boolean; // used to toggle app theme
 
+  public themeColorsChanged: boolean = false;
+  public isBob: boolean = false;
+  
+  backGroundColor: string;
+  layoutForegroundColor: string;
+  appBtnHoverColor: string;
+  appBtnBgColor: string;
+  sideNavColor: string;
+  appNavigationBackgroundColor: string;
+  appBtnMainColor: string;
+  whiteColor: string;
+  blackColor: string;
+  blueColor: string;
+
   // Logged In User Information
   public loggedInUsername: string = '';
   public loggedInUserFullName: string = '';
@@ -600,6 +614,21 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
     public informationservice: InformationService) { }
 
   ngOnInit(): void {
+
+    const root = document.documentElement;
+
+    root.style.setProperty('--layout-foreground-color', localStorage.getItem('layoutForegroundColor'));
+    root.style.setProperty('--side-nav-color', localStorage.getItem('sideNavColor'));
+    root.style.setProperty('--app-navigation-background-color', localStorage.getItem('appNavigationBackgroundColor'));
+    root.style.setProperty('--app-btn-main-color', localStorage.getItem('appBtnMainColor'));
+    root.style.setProperty('--app-btn-bg-color', localStorage.getItem('appBtnBgColor'));
+    root.style.setProperty('--app-btn-hover-color', localStorage.getItem('appBtnHoverColor'));
+    root.style.setProperty('--white-color', localStorage.getItem('whiteColor'));
+    root.style.setProperty('--app-background-color', localStorage.getItem('backGroundColor'));
+    root.style.setProperty('--blue-color', localStorage.getItem('blueColor'));
+
+
+
     //this.informationservice.setNavBreadCrumb('');
     
     // In case of application related reset choosenTab control that's found in v-tabs
@@ -719,5 +748,108 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
       width: '70%',
       height: '70%',
     });
+  }
+
+  changeThemeToDefault()
+  {
+    this.themeColorsChanged = true;
+
+    const root = document.documentElement;
+        
+    this.layoutForegroundColor = 'rgb(0, 0, 0)';
+    root.style.setProperty('--layout-foreground-color', this.layoutForegroundColor);
+
+    this.sideNavColor = 'rgb(52, 58, 64)';
+    root.style.setProperty('--side-nav-color', this.sideNavColor);
+
+    this.appNavigationBackgroundColor = 'rgb(243, 242, 239)';
+    root.style.setProperty('--lightgrey-color', this.appNavigationBackgroundColor);
+    
+    this.appBtnMainColor = 'rgb(46, 140, 200)';
+    root.style.setProperty('--app-btn-main-color', this.appBtnMainColor);
+
+    this.appBtnBgColor = 'rgb(255, 255, 255)';
+    root.style.setProperty('--app-btn-bg-color', this.appBtnBgColor);
+
+    this.appBtnHoverColor = 'rgb(225, 225, 225)';
+    root.style.setProperty('--app-btn-hover-color', this.appBtnHoverColor);
+
+    this.whiteColor = 'rgb(255, 255, 255)';
+    root.style.setProperty('--white-color', this.whiteColor);
+
+    this.blackColor = 'rgb(52, 58, 64)';
+    root.style.setProperty('--black-color', this.blackColor);
+
+    this.backGroundColor = 'rgb(255 255, 255)';
+    root.style.setProperty('--app-background-color', this.backGroundColor);
+
+    this.blueColor = 'rgb(46, 140, 200)';
+    root.style.setProperty('--blue-color', this.blueColor);
+
+
+    // Save the theme colors to local storage
+    localStorage.setItem('themeColorsChanged', JSON.stringify(this.themeColorsChanged));
+    localStorage.setItem('layoutForegroundColor', this.layoutForegroundColor);
+    localStorage.setItem('sideNavColor', this.sideNavColor);
+    localStorage.setItem('appNavigationBackgroundColor', this.appNavigationBackgroundColor);
+    localStorage.setItem('appBtnMainColor', this.appBtnMainColor);
+    localStorage.setItem('appBtnBgColor', this.appBtnBgColor);
+    localStorage.setItem('appBtnHoverColor', this.appBtnHoverColor);
+    localStorage.setItem('whiteColor', this.whiteColor);
+    localStorage.setItem('blackColor', this.blackColor);
+    localStorage.setItem('backGroundColor', this.backGroundColor);
+    localStorage.setItem('blueColor', this.blueColor);
+  }
+
+  changeThemeToWyb()
+  {
+    const root = document.documentElement;
+
+    this.themeColorsChanged = true;
+
+    this.layoutForegroundColor = 'rgb(255, 255, 255)';
+    root.style.setProperty('--layout-foreground-color', this.layoutForegroundColor);
+
+    this.sideNavColor = 'rgb(255, 255, 255)';
+    root.style.setProperty('--side-nav-color', this.sideNavColor);
+
+    this.appNavigationBackgroundColor = 'rgb(0, 0, 0)';
+    root.style.setProperty('--app-navigation-background-color', this.appNavigationBackgroundColor);
+    
+    this.appBtnMainColor = 'rgb(225, 224, 26)';
+    root.style.setProperty('--app-btn-main-color', this.appBtnMainColor);
+
+    this.appBtnBgColor = 'rgb(0, 0, 0)';
+    root.style.setProperty('--app-btn-bg-color', this.appBtnBgColor);
+
+    this.appBtnHoverColor = 'rgb(0, 0, 0)';
+    root.style.setProperty('--app-btn-hover-color', this.appBtnHoverColor);
+
+    this.whiteColor = 'rgb(225, 224, 26)';
+    root.style.setProperty('--white-color', this.whiteColor);
+
+    this.blackColor = 'rgb(255 255, 255)';
+    root.style.setProperty('--black-color', this.blackColor);
+
+    this.backGroundColor = 'rgb(255 254, 26)';
+    root.style.setProperty('--app-background-color', this.backGroundColor);
+
+    this.blueColor = 'rgb(0, 0, 0)';
+    root.style.setProperty('--blue-color', this.blueColor);
+    
+
+
+    // Save the theme colors to local storage
+    localStorage.setItem('themeColorsChanged', JSON.stringify(this.themeColorsChanged));
+    localStorage.setItem('layoutForegroundColor', this.layoutForegroundColor);
+    localStorage.setItem('sideNavColor', this.sideNavColor);
+    localStorage.setItem('appNavigationBackgroundColor', this.appNavigationBackgroundColor);
+    localStorage.setItem('appBtnMainColor', this.appBtnMainColor);
+    localStorage.setItem('appBtnBgColor', this.appBtnBgColor);
+    localStorage.setItem('appBtnHoverColor', this.appBtnHoverColor);
+    localStorage.setItem('whiteColor', this.whiteColor);
+    localStorage.setItem('blackColor', this.blackColor);
+    localStorage.setItem('backGroundColor', this.backGroundColor);
+    localStorage.setItem('blueColor', this.blueColor);
   }
 }

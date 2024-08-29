@@ -67,6 +67,10 @@ export class AdvancedSearchConfigurationComponent {
         field: 'colType',
       },
       {
+        headerName: 'Display Name',
+        field: 'searchDescription',
+      },
+      {
         headerName: 'Query',
         field: 'comboSql',
       },

@@ -37,7 +37,7 @@ public customPath: any;
 // public userId = 1;
 public prevParentCode: String = ''; // Used to store the previous parent menu before selecting the child menu
 public appSname: String = '';
-public a: boolean = false;
+public showBubbleChild: boolean = false;
 public counter: Number=0;
 public previousMenuCode:String='';
 public isSideNavActive = false; // Manage the state of the side nav
@@ -61,14 +61,10 @@ public isSideNavActive = false; // Manage the state of the side nav
   ngOnInit(): void
   {
 this.bubbleMenus = this.informationservice.getBubbleButton();
-console.log('bubbleMenus>>> :',this.bubbleMenus);
 this.allMenus = this.bubbleMenus;
-// console.log(this.imgSrc);
   }
   onBubbleClicked(){
-    // console.log("selected>>>>>>>>",this.informationservice.getAgGidSelectedNode());
     // this.commonFunctions.navigateToPage(this.menuVariable);
-    console.log("Bubble Clicked !!!!!!!!!");
     this.isClicked == true;
   }
    // Function used to navigate to a page by routing
@@ -84,9 +80,6 @@ this.allMenus = this.bubbleMenus;
       this.isSideNavActive = !this.isSideNavActive;
     }
   toggleActiveMenu(menuCode: String, appAbrv: String, childMenusCount: String,menuName:String) {
-    console.log('menuCode>>>>>>>>>>',menuCode);
-    console.log('appAbrv>>>>>>>>>',appAbrv);
-    console.log('childMenusCount>>>>>>',childMenusCount);
     this.menuName = menuName;
 
     if(menuName != 'Back'){      
@@ -121,7 +114,6 @@ this.allMenus = this.bubbleMenus;
       if (appAbrv == null) {
         appAbrv = '';
       }
-      console.log('childMenusCount>>>>>>>',childMenusCount);
       if (childMenusCount != '0') {
         this.fetchChildMenus(menuCode);
       }
@@ -135,9 +127,9 @@ this.allMenus = this.bubbleMenus;
 
   fetchChildMenus(menuCode: any) {
     // If 'a' is true and menuCode is the same as previousMenuCode
-    if (this.a && menuCode === this.previousMenuCode) {
+    if (this.showBubbleChild && menuCode === this.previousMenuCode) {
         // Only set 'a' to false if menuCode is the same
-        this.a = false;
+        this.showBubbleChild = false;
         return; // Exit the function
     }
 
@@ -171,7 +163,7 @@ this.allMenus = this.bubbleMenus;
 
                     // Update bubbleChildMenus with new data
                     this.bubbleChildMenus = bubbleMenus;
-                    this.a = true; // Ensure 'a' remains true after fetching new data
+                    this.showBubbleChild = true; // Ensure 'a' remains true after fetching new data
                 }
             );
     } else {
@@ -204,12 +196,12 @@ this.allMenus = this.bubbleMenus;
 
                         // Update bubbleChildMenus with new data
                         this.bubbleChildMenus = bubbleMenus;
-                        this.a = true; // Ensure 'a' remains true after fetching new data
+                        this.showBubbleChild = true; // Ensure 'a' remains true after fetching new data
                     }
                 );
         } else {
             // If 'a' is false, set it to true to allow future fetches
-            this.a = true;
+            this.showBubbleChild = true;
         }
     }
 }

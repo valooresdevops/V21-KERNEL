@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { ButtonRendererComponent } from './buttonRenderer.component';
 import { KpiBuilderPreviewComponent } from 'src/app/Kernel/kernelapp/in-display/object-builder/kpi-builder-preview/kpi-builder-preview.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { ObjectSizeManagerPopupComponent } from '../object-size-manager-popup/object-size-manager-popup.component';
 @Component({
   selector: 'app-kpi-ratio-popup',
   templateUrl: './kpi-ratio-popup.component.html',
@@ -106,24 +107,69 @@ export class KpiRatioPopupComponent implements OnInit {
 
   }
   Insert() {
-    this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
-    let selectedNodes = this.agGridSelectedNodes;
+    
+    // if(this.informationService.getAgGidSelectedNode() == '' || this.informationService.getAgGidSelectedNode() == null)
+    //   {
+    //     alert("Plese select a kpi first")
+    //   }
+    //   else
+    //   {
+    //     const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
+    //     data: "kpi",
+    //     width: '50%',
+    //     height: '40%',
+    //   });
+  
+    //   dialogRef.afterClosed().subscribe(result => {
+  
+    //     let allData = {
+    //       kpiId: this.informationService.getAgGidSelectedNode(),
+    //       templateId: this.informationService.getSelectedTabId(),
+    //     }
+      
+    //     this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
+    //   { headers: GlobalConstants.headers }).subscribe({
+    //     next: (res) => {
+    //       console.log(res);
+  
+    //     },
+    //     error: (error) => {
+    //       console.log(error);
+    //     }
+    //   });
+    // this.commonFunctions.reloadPage('/dashboard');
+    // this.commonFunctions.navigateToPage('/dashboard');
+  
+    //   });
+    //   }
 
-    let allData = {
-      kpiId: selectedNodes,
-      templateId: this.informationService.getSelectedTabId(),
-    }
 
-    this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
-      { headers: GlobalConstants.headers }).subscribe({
-        next: (res) => {
-        },
-        error: (error) => {
-        }
-      });
 
-    this.commonFunctions.reloadPage('/dashboard');
-    this.commonFunctions.navigateToPage('/dashboard');
+
+
+
+
+
+
+    // this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
+    // let selectedNodes = this.agGridSelectedNodes;
+
+    
+    // let allData = {
+    //   kpiId: selectedNodes,
+    //   templateId: this.informationService.getSelectedTabId(),
+    // }
+
+    // this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
+    //   { headers: GlobalConstants.headers }).subscribe({
+    //     next: (res) => {
+    //     },
+    //     error: (error) => {
+    //     }
+    //   });
+
+    // this.commonFunctions.reloadPage('/dashboard');
+    // this.commonFunctions.navigateToPage('/dashboard');
 
   }
 }

@@ -839,7 +839,7 @@ export class PreviewFormComponent implements OnInit {
     });
   }
 
-  async onShowButtonForm(buttonId: number) {
+  async onShowButtonForm(buttonId: number,fromButtonOrSearch:string) {
     let mainTab = this.informationservice.getMainTab();
     const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
     const getButtonData = await lastValueFrom(getButtonDataUrl);

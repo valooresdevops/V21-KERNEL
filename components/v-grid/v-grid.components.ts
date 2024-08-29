@@ -1328,7 +1328,8 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
             localStorage.setItem("agGidSelectedLookup_(" + this.lookupFieldName + ")_name", this.lookupNames);
           } else {
             console.log("FETET LA HON");
-            console.log("event-->",event)
+            console.log("event-->",event);
+            this.informationservice.setSelectedNodeVGrid(event.data);
             if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
             {
               // this.selectedNodes = '';

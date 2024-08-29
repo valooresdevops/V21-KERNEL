@@ -1,0 +1,47 @@
+/* Center the form elements and adjust layout within dialog constraints */
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Align items to the top */
+  align-items: center;
+  height: 100%; /* Full height of the dialog */
+  width: 100%; /* Full width of the dialog */
+  padding: 20px; /* Add padding for spacing */
+  box-sizing: border-box; /* Include padding in width/height calculation */
+}
+
+/* Separate field group */
+.form-group {
+  width: 100%; /* Full width of the dialog */
+  margin-bottom: 15px; /* Space below image name field */
+}
+
+/* Flex container for image upload and preview */
+.upload-preview-container {
+  display: flex; /* Align upload button and preview side by side */
+  align-items: center; /* Center align vertically */
+  width: 100%; /* Full width of the dialog */
+  margin-bottom: 20px; /* Increase space below this row */
+  gap: 10px; /* Space between upload button and image preview */
+}
+
+/* Ensure the image preview remains small and circular */
+.image-preview-container img.small-preview {
+  width: 50px; /* Small width for preview */
+  height: 50px; /* Small height for preview */
+  border-radius: 50%; /* Circular shape */
+  object-fit: cover; /* Maintain aspect ratio and cover */
+  display: block; /* Block display for better centering */
+}
+
+/* Flexbox to align the buttons horizontally */
+.button-wrapper {
+  display: flex; /* Align buttons horizontally */
+  justify-content: center; /* Center buttons */
+  gap: 10px; /* Space between the buttons */
+  margin-top: 30px; /* Space above buttons */
+}
+
+.upload-preview-container v-file {
+  margin-top: 10px; /* Add margin to push the upload field slightly lower */
+}

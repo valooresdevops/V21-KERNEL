@@ -51,6 +51,12 @@ import { APIBuilderComponent } from './api-builder/api-builder.component';
 import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
 import { AdvancedSearchConfigurationComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration.component';
 import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration-form/advanced-search-configuration-form.component';
+import { IconsFormComponent } from './object-builder/knowledge-graph/icons/icons-form/icons-form.component';
+import { AlertBuilderComponent } from './object-builder/alert-builder/alert-builder.component';
+import { IconsComponent } from './object-builder/knowledge-graph/icons/icons.component';
+import { AlertBuilderFormComponent } from './object-builder/alert-builder/alert-builder-form/alert-builder-form.component';
+import { AlertPreviewComponent } from './object-builder/alert-builder/alert-preview/alert-preview.component';
+
 
 @NgModule({
     declarations: [
@@ -100,7 +106,11 @@ import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab
         ButtonJsonRelationComponent,
         AdvancedSearchConfigurationComponent,
         AdvancedSearchConfigurationFormComponent,
-        KwgCytoscapeComponent
+        IconsFormComponent,
+        AlertBuilderComponent,
+        AlertBuilderFormComponent,
+        IconsComponent,
+        AlertPreviewComponent
     ],
     imports: [
         InDisplayRoutingModule,
@@ -115,7 +125,7 @@ import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab
         BrowserModule,
         AgGridModule ,
     ] ,
-    exports: [MasterLinkFormComponent,KwgCytoscapeComponent
+    exports: [MasterLinkFormComponent,
     ],
 })
 

@@ -14,20 +14,3 @@
     overflow: none;
 }
 
-.navigation ul {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-  }
-  
-  .navigation ul li a {
-    text-decoration: none;
-    color: #007bff;
-    cursor: pointer;
-  }
-  
-  html {
-    scroll-behavior: smooth;
-  }

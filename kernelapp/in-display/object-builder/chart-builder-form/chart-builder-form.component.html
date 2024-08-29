@@ -1,10 +1,16 @@
 <form [formGroup]="chartForm">
-  <div class="boxForCharts" style="position:absolute;"  *ngFor="let options of newChartObject; let i = index" >
+  <div  style="position:absolute;"  *ngFor="let options of newChartObject; let i = index" >
   <div class="chart-row">
      <div class="chart-container" id="chartContainer" style="width: 500px; display: flex; justify-content: center; align-items: center; padding-top: 5%;">
        <v-highcharts [sizeCheck]="true" [Highcharts]="Highcharts" [options]="options" ></v-highcharts>
      </div>
- </div>   
+ </div>  
+ <div *ngIf="isDescription">
+{{description}}
+ </div>
+ <div>
+
+ </div> 
  </div>
  <div class="boxForStocks" style="position:absolute"  *ngFor="let options of stockObject; let i = index" >
   <div class="chart-row">

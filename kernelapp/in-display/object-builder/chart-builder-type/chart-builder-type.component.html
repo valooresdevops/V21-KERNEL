@@ -72,7 +72,17 @@
                  fieldName="Column">
         </v-input>
       </div >
-    </div>  
+    </div>
+
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea formControlName="description" id="description" class="form-control" fieldName="description"></textarea>
+      </div>
+    </div>
+  </div>
+
       <v-button value="Save" (click)="Next()"></v-button>
     </form>
   </v-tab>

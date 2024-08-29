@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, forwardRef, Input, OnChanges, OnInit,ViewChild, Output, SimpleChanges, ViewEncapsulation, Renderer2, ElementRef } from '@angular/core';
 import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR, FormGroupDirective, NgForm, } from '@angular/forms';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
-import { IDropdownSettings, MultiSelectComponent } from 'ng-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { from, lastValueFrom } from 'rxjs';
 import axios from 'axios';
 
@@ -37,7 +37,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   public singleSelection: any;
 
   @ViewChild('itemElement', { static: false }) itemElement: ElementRef;
-  @ViewChild(MultiSelectComponent) multiselect : MultiSelectComponent;
+
   @Input() public isComponentPhoneNumbers: boolean = false;
 
   @Input() public multipleSelectionDroppDown: boolean = false;
@@ -110,7 +110,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   }
 
   public loadData(): Promise<void> {
-    console.log("11111111")
+    // console.log("11111111")
     return new Promise<void>((resolve) => {
       if (this.dataApi != '' || this.dataJSON != null) {
         this.dropdownList = [];
@@ -126,7 +126,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
             let dropdownDataPromise: Promise<any>;
   
             if (this.dataBody != '') {
-              dropdownDataPromise = axios.post(this.dataApi, this.dataBody);
+              dropdownDataPromise = axios.get(this.dataApi, this.dataBody);
             } else {
               dropdownDataPromise = axios.get(this.dataApi);
             }
@@ -340,7 +340,7 @@ private extractDropdownValues(jsonData: any): void {
   ngOnChanges(changes: SimpleChanges): void
   {
     this.loadData();
-    console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    // console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   }
 
   onItemSelect(item: any)
@@ -358,11 +358,6 @@ private extractDropdownValues(jsonData: any): void {
 
     this.formField.setValue(this.selectedValues);
     this.onSelectionChange();
-    
-    if(this.multiselect){
-      this.multiselect.closeDropdown();
-    }
-
   }
 
   onSelectAll(items: any[])
@@ -448,9 +443,4 @@ private extractDropdownValues(jsonData: any): void {
   {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  onDropdownScroll(event: WheelEvent): void{
-    event.stopPropagation();
-  }
-
-
 }

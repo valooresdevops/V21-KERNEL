@@ -91,7 +91,8 @@ export class VFileComponent implements ControlValueAccessor
     }
     else
     {
-      this.changed(formData);
+      this.changed(base64Data);
+      // this.changed(formData);
     }
   }
 

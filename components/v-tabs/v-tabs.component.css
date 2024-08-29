@@ -4,7 +4,7 @@
     /* overflow-y: hidden;
     overflow-x: scroll; */
     display: none;
-     height: 80px !important;
+    height: 85px !important;
     flex-direction: column;
     gap: 5px;
 }
@@ -36,7 +36,7 @@
 }
 
 .tab-content {
-    padding: 10px 5px 10px 5px;
+    padding: 0px 5px 10px 5px;
     /* height: 78vh; */
     /*so that the dropdown doesn't create another scroller*/
     overflow-y: hidden;

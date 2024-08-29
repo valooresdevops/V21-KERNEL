@@ -1,0 +1,15 @@
+<div *ngIf="reloadGrid">
+<v-grid
+allowSideBar="true"
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="amd"
+[dataApi]="getAlertData"
+[frameworkComponents]="frameworkComponents"
+(onGridAdd)="onAddClick()"
+(onGridDelete)="onDeleteClick()"
+(onGridUpdate)="onUpdateClick()"
+agPrimaryKey="chartId"
+></v-grid>
+</div>

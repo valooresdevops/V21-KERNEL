@@ -25,6 +25,10 @@ import { ExecutedReportsComponent } from './object-builder/knowledge-graph/execu
 import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
 import { APIBuilderComponent } from './api-builder/api-builder.component';
 import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
+import { IconsFormComponent } from './object-builder/knowledge-graph/icons/icons-form/icons-form.component';
+import { AlertBuilderComponent } from './object-builder/alert-builder/alert-builder.component';
+import { IconsComponent } from './object-builder/knowledge-graph/icons/icons.component';
+
 const routes: Routes = [
    {
       path: 'augmentedConfig',
@@ -234,6 +238,31 @@ const routes: Routes = [
          },
       ]
    },
+   {
+      path: 'kwgIcons',
+      data:{breadcrumb:'icons'},
+      children: [
+         {
+            path:'',
+            component:IconsComponent
+         },
+         {
+            path:'add',
+            component:IconsFormComponent
+         }
+      ]
+   },
+   {
+      path: 'alertBuilder',
+      data: { breadcrumb: 'Alert Builder '},
+      children: [
+         {
+            path: '',
+            component: AlertBuilderComponent
+         },
+      ]
+   },
+
    // {
    //    path: 'knowledgeGraph',
    //    data: { breadcrumb: 'Knowledge Graph' },

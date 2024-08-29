@@ -84,11 +84,11 @@ export class ChartBuilderComponent implements OnInit {
       },
       {
         headerName: 'Created by',
-        field: 'createdBy',
+        field: 'username',
       },
       {
         headerName: 'Created date',
-        field: 'creationDate',
+        field: 'creation_date',
 
       }
 

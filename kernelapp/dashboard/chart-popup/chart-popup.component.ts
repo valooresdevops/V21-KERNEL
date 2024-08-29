@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { ChartBuilderFormComponent } from 'src/app/Kernel/kernelapp/in-display/object-builder/chart-builder-form/chart-builder-form.component';
 import { ButtonRendererComponent } from './buttonRenderer.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { ObjectSizeManagerPopupComponent } from '../object-size-manager-popup/object-size-manager-popup.component';
 
 @Component({
   selector: 'app-chart-popup',
@@ -96,19 +97,37 @@ export class ChartPopupComponent implements OnInit {
     }
   }
 
-  Insert() {
-    //test
-    this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
-    let selectedNodes = this.agGridSelectedNodes;
-    let allData = {
-      chartId: selectedNodes,
-      templateId: this.informationservice.getSelectedTabId()
+  Insert()
+  {
+    if(this.informationservice.getAgGidSelectedNode() == '' || this.informationservice.getAgGidSelectedNode() == null)
+    {
+      alert("Plese select a chart first")
     }
+    else
+    {
+      this.agGridSelectedNodes = this.informationservice.getAgGidSelectedNode();
+      let selectedNodes = this.agGridSelectedNodes;
 
-    this.http.post<any>(GlobalConstants.addDashboardChart, allData,
+      let  chartId = selectedNodes;
+      let  templateId = this.informationservice.getSelectedTabId();
+
+      const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
+        data: "chart",
+        width: '40%',
+        height: '33%',
+      });
+
+      
+      dialogRef.afterClosed().subscribe(result => {
+        let allData={
+          chartId:chartId,
+          templateId:templateId
+        };
+      
+        this.http.post<any>(GlobalConstants.addDashboardChart, allData,
       { headers: GlobalConstants.headers }).subscribe({
         next: (res) => {
-          console.log(res);
+          console.log("RES<><><><><><>",res);
 
         },
         error: (error) => {
@@ -117,5 +136,8 @@ export class ChartPopupComponent implements OnInit {
       });
     this.commonFunctions.reloadPage('/dashboard');
     this.commonFunctions.navigateToPage('/dashboard');
+
+      });
+    }
   }
 }

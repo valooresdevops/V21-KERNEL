@@ -16,7 +16,7 @@
 
   <div class="menu"
    *ngFor="let item of currentHierarchy.length > 0 ? currentHierarchy : hierarchyData">
-    <button class="menu-item" (contextmenu)="handleRightClick($event,item)" *ngIf="item.children && item.children.length > 0" (click)="showSubMenu(item,$event)" id={{item.id}}>
+    <button class="menu-item" (contextmenu)="handleRightClick($event,item)" *ngIf="item.children && item.children.length > 0" (click)="showSubMenu(item)" id={{item.id}}>
       <!-- {{ item.SimulName }} -->
       
       <span  *ngIf="item.SimulName=='No Name'" ><input readonly class="smartinput" type="text" value="{{ item.Name }}" /></span>
@@ -30,7 +30,7 @@
       <!-- <div *ngIf="isHovered" class="tooltipsssss">{{ item.SimulName }}</div> -->
 
     </button>
-    <button class="menu-item" (contextmenu)="handleRightClick($event, item)"  *ngIf="!item.children || item.children.length === 0" (click)="showSubMenu(item,$event)" id={{item.id}}>
+    <button class="menu-item" (contextmenu)="handleRightClick($event, item)"  *ngIf="!item.children || item.children.length === 0" (click)="showSubMenu(item)" id={{item.id}}>
       <!-- {{ item.SimulName }} -->
       <span  *ngIf="item.SimulName=='No Name'" ><input readonly class="smartinput" type="text" value="{{ item.Name }}" /></span>
         <span  *ngIf="item.SimulName != 'No Name'" ><input readonly class="smartinput" type="text" value="{{ item.SimulName }}" />
@@ -51,7 +51,7 @@
         </div>  -->
     </button>
     <!--  -->
-    <div class="submenu" *ngIf="item.children && item.children.length > 0" style="z-index: 9991;">
+    <div class="submenu" *ngIf="item.children && item.children.length > 0">
       
       <button class="submenu-item" *ngFor="let submenu of item.children" (click)="addMenu(submenu)">
         <span  *ngIf="submenu.SimulName=='No Name'" >{{ submenu.Name }}</span>

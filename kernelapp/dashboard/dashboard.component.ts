@@ -18,6 +18,7 @@ Highcharts3D(Highcharts);
 
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import { string } from 'sql-formatter/lib/src/lexer/regexFactory';
 
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
@@ -43,6 +44,11 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
 
    }
+
+   
+  public description: String='';
+  public objectWidth: String='';
+
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any[] = [];
   public agColumnsJson1: any[] = [];
@@ -103,6 +109,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         this.showDashboard = true;
       }, 1000);
     });
+
+    
   }
 
   
@@ -145,6 +153,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
           if (this.allData[i].type == 'Chart')
           {
             this.chartValue.push(this.allData[i]);
+            this.description=this.allData[i].description;
           }
           
           if(this.allData[i].type == 'Grid')
@@ -152,6 +161,10 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
             this.gridValue.push(this.allData[i]);
             this.gridIndexes.push(i);
           }
+
+          this.objectWidth = this.allData[i].objectWidth;
+          // alert(this.objectWidth)
+       //   this.calculateFlexBasis(this.objectWidth);
         }
 
         this.setupGridIndexes();
@@ -163,6 +176,19 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         for (let i = 0; i < this.gridValue.length; i++)
         {
           this.gridRecords.push(this.gridValue[i].Records);
+
+          // for(let x = 0; x < this.gridValue[i].Header.length; x ++)
+          // {
+          //   if(this.gridValue[i].Header[x].headerName != "TITLE")
+          //   {
+          //     alert(1)
+          //   }
+          //   else
+          //   {
+          //     alert(2)
+          //   }
+          // }
+          
           this.gridHeader.push(this.gridValue[i].Header);
 
           this.agColumnsJson[i] = this.gridValue[i].Header;
@@ -297,7 +323,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                               viewDistance: 25,
                             }
                           },
-                          title: {text:this.allData[i].data.records[0].TITLE},
+                          title: {text:this.allData[i].Title, align: 'center'},
                           xAxis: {
                             categories: this.ids
                           },
@@ -318,7 +344,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                             pointFormat: '{point.y}'
                           },
                           series: [{
-                            name: this.allData[i].data.records[0].TITLE,
+                            name: this.allData[i].Title,
                             data: this.names,
                           }],
                           credits: {
@@ -330,13 +356,13 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       this.newChartObject = [
                         {
                           chart: {type: this.chartType},
-                          title: {text: this.allData[i].data.records[0].TITLE},
+                          title: {text: this.allData[i].Title, align: 'center'},
                           xAxis: {
                             categories: this.ids
                           },
                           yAxis: {
                             title: {
-                              text: 'Value'
+                              text: 'Value', align: 'center'
                             }
                           },
                           plotOptions: {
@@ -351,7 +377,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                             pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
                           },
                           series: [{
-                            name: this.allData[i].data.records[0].TITLE,
+                            name: this.allData[i].Title,
                             data: this.names,
                           }]
                         }
@@ -369,7 +395,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
               
               
                   title: {
-                      text: 'Sales per employee per weekday',
+                      text: 'Sales per employee per weekday', align: 'center',
                       style: {
                           fontSize: '1em',
                       }
@@ -479,7 +505,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           }
                         },
                         title: {
-                          text: this.allData[i].data.records[0].TITLE
+                          text: this.allData[i].Title, align: 'center'
                         },
                         xAxis: {
                           categories: this.ids
@@ -512,7 +538,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 this.newChartObject = [
                   {
                     chart: { type: 'line' },
-                    title: { text: this.allData[i].data.records[0].TITLE},
+                    title: { text: this.allData[i].Title, align: 'center'},
                     xAxis: {
                       categories: this.ids
                     },
@@ -548,7 +574,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         }
                       },
                       title: {
-                        text: this.allData[i].data.records[0].TITLE
+                        text: this.allData[i].Title, align: 'center'
                       },
                       credits: {
                           enabled: false
@@ -581,7 +607,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         type: 'area'
                       },
                       title: {
-                        text: this.allData[i].data.records[0].TITLE
+                        text: this.allData[i].Title, align: 'center'
                       },
                       xAxis: {
                         categories: this.ids
@@ -622,7 +648,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         }
                       },
                       title: {
-                        text: this.allData[i].data.records[0].TITLE,
+                        text: this.allData[i].Title,
                         align: 'center',
                         verticalAlign: 'top',
                         y: 60,
@@ -673,7 +699,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     type:'semiPie'
                 },
                 title: {
-                    text: this.allData[i].data.records[0].TITLE,
+                    text: this.allData[i].Title,
                     align: 'center',
                     verticalAlign: 'top',
                     y: 60,
@@ -725,7 +751,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     this.newChartObject = [
                       {
                         chart: { type: 'scatter'},
-                        title: { text: this.allData[i].data.records[0].TITLE },
+                        title: { text: this.allData[i].Title, align: 'center' },
                         credits: {
                             enabled: false
                         },
@@ -764,7 +790,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   this.newChartObject = [
                     {
                       chart: { type: 'scatter' },
-                      title: { text: this.allData[i].data.records[0].TITLE },
+                      title: { text: this.allData[i].Title, align: 'center' },
                       xAxis: {
                         title: {
                           text: 'X Axis'
@@ -806,7 +832,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       //       depth: 50,
                       //       viewDistance: 25
                       //   }},
-                      //   title: { text: this.allData[i].data.records[0].TITLE},
+                      //   title: { text: this.allData[i].Title},
                       //   xAxis: [{ categories: this.ids}],
                       //   yAxis: [{
                       //     title: { text: 'Primary Axis' }
@@ -854,14 +880,13 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           pointFormat: 'Cars sold: {point.y}'
                       },
                       title: {
-                          text: this.allData[i].data.records[0].TITLE,
-                          align: 'left'
+                          text: this.allData[i].Title, align: 'center'
                       },
                       credits: {
                           enabled: false
                       },
                       // subtitle: {
-                      //     text: this.allData[i].data.records[0].TITLE,
+                      //     text: this.allData[i].Title,
                       //     align: 'left'
                       // },
                       legend: {
@@ -882,7 +907,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     
                   this.newChartObject  = [{
                     chart: { type: 'column' },
-                    title: { text: this.allData[i].data.records[0].TITLE },
+                    title: { text: this.allData[i].Title },
                     xAxis: [{ categories: this.ids}],
                     yAxis: [{
                       title: { text: 'Primary Axis' }
@@ -930,8 +955,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       }
                     },
                     title: {
-                      text: this.allData[i].data.records[0].TITLE,
-                      align: 'left'
+                      text: this.allData[i].Title,
+                      align: 'center' // Ensure the title is centered
                     },
                     plotOptions: {
                       pie: {
@@ -947,14 +972,15 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       pointFormat: '<b>{point.name}</b>: {point.y}'
                     },
                     series: [{
-                      name: this.allData[i].data.records[0].TITLE,
+                      name: this.allData[i].Title,
                       data: transformedData
                     }]
                   }];
                 } else {
                   this.newChartObject = [{
                     chart: { type: 'pie' },
-                    title: { text: this.allData[i].data.records[0].TITLE },
+                    title: { text: this.allData[i].Title,
+                      align: 'center' },
                     plotOptions: {
                       pie: {}
                     },
@@ -966,7 +992,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         enabled: false
                     },
                     series: [{
-                      name: this.allData[i].data.records[0].TITLE,
+                      name: this.allData[i].Title,
                       data: data1,
                     }]
                   }];
@@ -985,7 +1011,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].data.records[0].title
+                    text: this.allData[i].Title, align: 'center'
                   },
                   credits: {
                       enabled: false
@@ -1021,7 +1047,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].data.records[0].title
+                    text: this.allData[i].Title, align: 'center'
                   },
                   credits: {
                     enabled: false // Disable the credits link
@@ -1057,14 +1083,14 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].data.records[0].title
+                    text: this.allData[i].Title, align: 'center'
                   },
                   credits: {
                     enabled: false // Disable the credits link
                   },
           
                   series: [{
-                    name: this.allData[i].data.records[0].title,
+                    name: this.allData[i].Title,
                     type: 'column',
                     data: transformedData1,
                     dataGrouping: {
@@ -1088,14 +1114,14 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 },
         
                 title: {
-                    text: this.allData[i].data.records[0].title
+                    text: this.allData[i].Title, align: 'center'
                 },
                 credits: {
                     enabled: false
                 },
         
                 series: [{
-                    name: this.allData[i].data.records[0].title,
+                    name: this.allData[i].Title,
                     type: 'line', 
                     data: transformedData1,
                     step: true,
@@ -1115,7 +1141,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 },
         
                 title: {
-                    text: this.allData[i].data.records[0].title
+                    text: this.allData[i].Title, align: 'center'
                 },
                 credits: {
                     enabled: false
@@ -1171,7 +1197,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   title: {
-                      text: this.allData[i].data.records[0].title,
+                      text: this.allData[i].Title, align: 'center',
                       style: {
                           fontSize: '28px' // Adjusted font size to match the increased size
                       }
@@ -1284,7 +1310,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         enabled: false
                     },
                     title: {
-                        text: this.allData[i].data.records[0].title,
+                        text: this.allData[i].Title, align: 'center',
                         style: {
                             fontSize: '14px' // Font size adjusted to match the gauge
                         }
@@ -1372,7 +1398,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       identifier: 'Speedometer'
                     },
                     title: {
-                      text: this.allData[i].data.records[0].title
+                      text: this.allData[i].Title, align: 'center'
                     },
                     credits: {
                         enabled: false
@@ -1449,7 +1475,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
             
                   title: {
-                      text: this.allData[i].data.records[0].title
+                      text: this.allData[i].Title, align: 'center'
                   },
                   credits: {
                       enabled: false
@@ -1545,7 +1571,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   title: {
-                      text: this.allData[i].data.records[0].title
+                      text: this.allData[i].Title, align: 'center'
                   },
                   credits: {
                       enabled: false
@@ -1643,7 +1669,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 
               //     const gaugeValueData = this.allData[i].data.records[0].gaugevalue;
               //     const gaugelabelData = this.allData[i].data.records[0].gaugelabel;
-              //     const gaugeTitlelData = this.allData[i].data.records[0].title;
+              //     const gaugeTitlelData = this.allData[i].Title;
               
                 
               //     this.newChartObject = [{
@@ -1898,6 +1924,11 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.toggleAlertsVisibility();
   }
 
+  // calculateFlexBasis(objectWidth: string): string {
+  //   const baseWidth = 33.33; // Base percentage for flex-basis
+  //   return `calc(${baseWidth * objectWidth}% - 20px)`;
+  // }
+
   ngAfterViewInit(): void {
     this.toggleAlertsVisibility();
   }
@@ -1949,10 +1980,12 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
 
 
   onExitButtonClick(data: any) {
-    const selectedObject = data.type + '_' + data.ID
+    const selectedObject = data.type + '_' + data.ID 
+    
     this.http.post<any>(GlobalConstants.deleteSelectedObject + this.informationservice.getSelectedTabId() + '/' + selectedObject, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.commonFunctions.reloadPage('/dashboard');
+        // alert(111)
       })
   }
 
@@ -1969,7 +2002,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
 
       this.http.post<any>(GlobalConstants.getQueryData + data.ID, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
-          info = res
+          info = res;
         const dialogConfig = new MatDialogConfig();
         dialogConfig.width = '700px';
         dialogConfig.height = '700px';
@@ -1977,7 +2010,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
           data: info,
           width: '50%',
-          height: '35%',
+          height: '45%',
         });
       });
     } else if (data.type == 'Grid') {
@@ -2160,7 +2193,15 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
       );
     }
     
+
+
+    isDescriptionLong(description: string): boolean {
+      return description.length > 100; // You can adjust this number based on your line length
+    }
+    
+    toggleFullDescription(index: number): void {
+      // Implement the logic to expand the description and hide the "Read More" button
+      console.log("show more pressed");
+    }
+   
   }
-
-
-  

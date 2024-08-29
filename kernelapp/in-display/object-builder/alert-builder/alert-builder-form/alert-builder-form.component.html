@@ -1,0 +1,57 @@
+<!-- alert-builder-form.component.html -->
+<form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+  <!-- Alert Name Field -->
+  <div class="form-group">
+    <v-input
+      type="text"
+      formControlName="title"
+      [parentForm]="uploadForm"
+      label="Alert Name"
+      fieldName="title"
+      required="true"
+    ></v-input>
+  </div>
+
+  <!-- Alert Color Field -->
+  <div class="form-group">
+    <v-input
+      type="color"
+      formControlName="color"
+      [parentForm]="uploadForm"
+      label="Alert Color"
+      fieldName="color"
+      required="true"
+    ></v-input>
+  </div>
+
+  <!-- Functionality Dropdown -->
+  <div class="form-group">
+    <label for="functionality">Functionality:</label>
+    <select id="functionality" formControlName="functionality">
+      <option *ngFor="let func of functionalities" [value]="func">{{ func }}</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <v-input
+      formControlName="qbe_id"
+      [parentForm]="uploadForm"
+      type="lookup"
+      [lookupDataApi]="getqueryData"
+      lookupWidth="600px"
+      lookupHeight="400px"
+      label="Query"
+      fieldName="query"
+      (ngModelChange)="onQueryChange($event)"
+    ></v-input>
+  </div>
+
+  <!-- Buttons Container -->
+  <div class="button-wrapper">
+    <v-button value="Cancel" (click)="onCancel()"></v-button>
+    <v-button
+      value="Submit"
+      [disabled]="!uploadForm.valid"
+      (click)="onSubmit()"
+    ></v-button>
+  </div>
+</form>

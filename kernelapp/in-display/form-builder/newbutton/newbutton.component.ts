@@ -25,7 +25,7 @@ export class NewbuttonComponent implements OnInit {
   public AllFieldSet: any;
   public actionType: string = '';
   public buttonId: number;
-  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'}];
+  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'},{id: 9,name: 'Save New'}];
   public FormOpeningSelected: boolean = false;
   Condition: boolean= false;
   ApiSelected: boolean = false;
@@ -516,6 +516,13 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
             thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             break;
+            case 9:
+              condition = null;
+              OtherCondition = null;
+              alertValue = null;
+              thirdCondition = null;
+              alertMessage = null;
+              break; 
         }
         console.log("4444444444444444444444");
 
@@ -646,6 +653,13 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
             thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             break;
+            case 9:
+              condition = null;
+              OtherCondition = null;
+              alertValue = null;
+              thirdCondition = null;
+              alertMessage = null;
+              break;
         }
         console.log("99999999999999999999999");
 

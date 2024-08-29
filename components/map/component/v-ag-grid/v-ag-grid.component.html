@@ -1,4 +1,4 @@
-<div id="agGrid" (mouseenter)="canceler($event)">
+<div id="agGrid" >
   <!-- <div style='height:200px' *ngIf="selectdevices" ><label class='switch'><input type='checkbox'  (click)="selectShapes($event)"><span class='slider round'></span></label> -->
 <div *ngIf="distinct" class='hereOn'>  
   <strong *ngIf="Grid2Type=='btn-54'"> <input type="checkbox" (change)="handleCheckboxChange($event)" id="selectall"></strong> <a *ngIf="Grid2Type=='btn-54'" style="color: blue;">   SelectAll</a> <strong style='flex:auto;'>{{Title}}</strong><a style='color: blue;cursor: pointer;'(click)="openpopup()">More..</a></div>
