@@ -10505,6 +10505,7 @@ setbtsType(type: any) {
 
     await this.datacrowdService.getSimulationobject(AlocSimulId).then((res: any) => {
       this.datajson = res;
+      
       //console.log("getsimultion response >>>>", this.datajson);
       this.heatarr=this.datajson.map((res:any)=>{
         return [res[4],res[3]]
@@ -10514,7 +10515,12 @@ setbtsType(type: any) {
       radius: 20
     });
     });
-    //console.log("this.datajson.markerPositions>>>>", this.datajson.markerPositions);
+
+    let existingDeviceArray1 = this.datajson.map((item:any) =>item[0]);
+    let existingDeviceArray = [...new Set(existingDeviceArray1)];
+    this.Devices = existingDeviceArray.join(',');
+
+    console.log("Devices>>>>", this.Devices);
 
     if (this.datajson !== null) {
       //console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
@@ -16862,8 +16868,8 @@ private handleRouteData(data: any, deviceArray?: any[]) {
     this.showroutebar1=true;
  
    
-    // routeDevices = this.Devices.split(',');
-    routeDevices = this.Devices;
+    routeDevices = this.Devices.split(',');
+    // routeDevices = this.Devices;
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
     let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
@@ -18730,6 +18736,11 @@ else{
   await this.datacrowdService.getSimulationobject([data[0].COLVALUE]).then((res:any)=>{
     console.log("res in getSimulationobject ",res);
     this.datajson=res;
+    let existingDeviceArray1 = this.datajson.map((item:any) =>item[0]);
+    let existingDeviceArray = [...new Set(existingDeviceArray1)];
+    this.Devices = existingDeviceArray.join(',');
+
+    console.log("Devices>>>>", this.Devices);
     if (this.datajson !== null) {
       ////console.log("this.datajson.markerPositions<<<>>>>>", this.datajson.markerPositions.length);
       this.marker = L.markerClusterGroup({
@@ -19606,8 +19617,22 @@ async addCurvedFlowLines(): Promise<void> {
           color: colorarray[index],
           weight: 2,
           opacity: 0.7,
+        }).arrowheads({
+          frequency: 3, // Places the arrow in the middle
+          size: '12px'
         }).addTo(this.map);
+
+        const animatedPolylineLoop = L.polyline([], {
+          color: colorarray[index],
+          weight: 2,
+          opacity: 0.7,
+        }).arrowheads({
+          frequency: 3, // Places the arrow in the middle
+          size: '12px'
+        }).addTo(this.magnifiedMap);
+
         this.animatedPolylines.push(animatedPolyline); // Store reference to polyline
+        this.animatedPolylines.push(animatedPolylineLoop); // Store reference to polyline
     
         let currentSegment = 0;
     
@@ -19616,6 +19641,7 @@ async addCurvedFlowLines(): Promise<void> {
           if (currentSegment < latlngs.length) {
             // Add the next segment to the polyline
             animatedPolyline.addLatLng(latlngs[currentSegment]);
+            animatedPolylineLoop.addLatLng(latlngs[currentSegment]);
     
             currentSegment += 2;
             requestAnimationFrame(animatePolyline); // Continue animation
@@ -19790,6 +19816,7 @@ async addCurvedFlowLines(): Promise<void> {
       console.log("geojsonData1111111111",lebanonFeature);
   
       this.geoJsonLayer = L.geoJSON(lebanonFeature, geoJsonOptions).addTo(this.map);
+       let geoJsonLayerLoop = L.geoJSON(lebanonFeature, geoJsonOptions).addTo(this.magnifiedMap);
       this.geoJsonLayerArray.push(this.geoJsonLayer);
     })
   
@@ -19801,8 +19828,7 @@ async addCurvedFlowLines(): Promise<void> {
 
   
 async displayClusters33(AlocSimulId:any){
-  this.Devices=['495ce394-9ea5-49d2-a5b9-09774f83b9ee','9750A873-5F49-4077-AE27-E15D491B2068'];
-  this.displayclusters=true;
+   this.displayclusters=true;
   let deviceInfoArray:any[]=[];
   await this.datacrowdService.getSimulationobject(this.simulationid).then((res: any) => {
     this.datajson = res;
