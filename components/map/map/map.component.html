@@ -313,12 +313,13 @@ oncontextmenu="return false;"
     <span *ngFor="let item of graphtools" title="{{item[0]}}" (click)="CallFunctions(item[3])">
         <i class="{{item[1]}}"></i>
     </span>
-      <span  *ngIf="reportType == 2 || reportType == 6 " title="Routing" (click)="toggleDropdown()">
+      <!-- <span  *ngIf="reportType == 2 || reportType == 6 " title="Routing" (click)="toggleDropdown()"> -->
+        <span   title="Routing" (click)="toggleDropdown()">
           <i class="fa-solid fa-road"></i>
       </span>
 
       <div id="dropdownContent1" class="dropdown-content1" *ngIf="showroutedicv===true">
-        <span (click)="byDeviceFirst()">Point To Point</span>
+        <span (click)="byDeviceFirst()">By devices</span>
         <span (click)="byRouteFirst()">By routes</span>
         <span (click)="routeDev()">Display Routes</span>
         <span (click)="clearRoutes()">Clear</span>
@@ -835,6 +836,9 @@ openLoginUser
       OpenCorrelation
   </button>
 
-  <button id="flow" style="z-index: 9999;left: 245px;position: absolute;" (click)="addCurvedFlowLines()">
-    Map to map
+  <button id="flow" style="z-index: 9999;left: 245px;position: absolute;" (click)="displayClusters33(171503)">
+   Point to Point
+</button>
+<button id="flow" style="z-index: 9999;left: 330px;position: absolute;" (click)="addCurvedFlowLines()">
+  Map to map
 </button>

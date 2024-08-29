@@ -80,9 +80,10 @@ import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
 import { InformationService } from "src/app/Kernel/services/information.service";
 import { FileDownloadService } from "../Services/FileDownloadService.service";
-import 'src/assets/Leaflet.Canvas-Flowmap-Layer-master/src/CanvasFlowmapLayer.js';
 import * as esri from 'esri-leaflet';
 import 'leaflet-curve'; // Import the curve plugin
+// import 'leaflet-ant-path';
+import 'leaflet-arrowheads';
 
 declare let alertify: any;
 declare var flowmapL: any;
@@ -1650,6 +1651,12 @@ console.log("generateColumns ><<><><>",this.generateColumns('device_id,number_of
 console.log("generateRowData ><<><><>",this.generateRowData('device_id,number_of_hits,number_of_days,first_seen,last_seen,number_of_countries,number_of_cities,list_of_countries,list_of_cities',[["\"3CD0A7B8-B53A-4DF3-A10A-9EB9DF6D7F0C\"",2,1,1696712400000,1696712400000,1,1,"LB","Baabda"],["\"a5f497f7-5479-44c7-ade1-77a939555b1b\"",2,1,1696885200000,1696885200000,1,1,"LB","Baabda"]]))
 
   //  this.testflwomap();
+
+   // Add custom marker
+  //  const customMarker = this.createCustomMarker(51.505, -0.09, 'Start', 'red');
+  //  customMarker.addTo(this.map);
+
+  
   }
 
 async loadSimulationTypes() {
@@ -9692,172 +9699,7 @@ this. items=[
 
       },
     });
-    //console.log('11111111111111>>>>>>',  );
-
-    // for (var j = 0; j < 1; j++) {
-    //   for (var i = 0; i < this.datajson.markerPositions.length; i++) {
-    //     this.myMarker = L.marker([
-    //       Number(this.datajson.markerPositions[i][0]),
-    //       Number(this.datajson.markerPositions[i][1]),
-    //     ]);
-    //     // this.marker.addLayer(this.markers);
-    //     this.myMarker.off("click");
-    //     this.myMarker.on("mousedown", (e: any) => {
-    //       if (e.originalEvent.buttons == 2) {
-    //         e.target.openPopup();
-    //         // alert(2);
-    //       }
-    //       if (e.originalEvent.buttons == 1) {
-    //         //  alert(1);
-    //       }
-
-    //     });
-
-    //   }
-
-
-    //   this.rowData = [];
-    //   this.datajson.markerPositions.forEach((element: any, key: any) => {
-    //     this.myMarker = this.binddata(
-    //       element[0],
-    //       element[1],
-    //       element[2],
-    //       element[3],
-    //       element[4],
-    //       element[5],
-    //       ""
-    //     );
-    //     this.myMarker.lat = element[0];
-    //     this.myMarker.lng = element[1];
-    //     this.myMarker.timestamp = element[3];
-    //     this.myMarker.tel = element[2];
-    //     this.myMarker.name = element[4];
-    //     this.myMarker.off("click");
-    //     this.myMarker.on("mousedown", async (e: any) => {
-    //       if (e.originalEvent.buttons == 2) {
-    //         //console.log("markerChildrensssssss", e.target)
-    //         this.rowData = [];
-    //         var jsonaggrid = {
-    //           Device_id: e.target.tel,
-    //           Tel: e.target.name,
-    //           Date: e.target.timestamp,
-    //           Hits: "1",
-    //           Coord: e.target.lat + ',' + e.target.lng,
-
-    //         };
-    //         this.rowData.push(jsonaggrid);
-
-
-    //         const componentfactory =
-    //           this.componentFactoryResolver.resolveComponentFactory(
-    //             VAgGridComponent
-    //           );
-    //         const componentref =
-    //           this.viewContainerRef.createComponent(componentfactory);
-    //         componentref.instance.rowData = this.rowData;
-    //         componentref.instance.columnDefs = this.columnDefs;
-    //         componentref.instance.headerHeight = 0;
-    //         // componentref.instance.selectdevices = true;
-    //         componentref.instance.Title = "Here On";
-    //         componentref.instance.distinct = true;
-    //         componentref.changeDetectorRef.detectChanges();
-    //         const html2 = componentref.location.nativeElement;
-    //         componentref.instance.Grid2Type = 'btn-54';
-    //         componentref.instance.GridID = 'GeoGridbyDevice';
-
-
-    //         await html2;
-
-    //         $('.ag-theme-balham').css('height', '130px');
-
-    //         // /  e.target.openPopup(html2, e.target._latlng);
-    //         this.map.openPopup(html2, e.target._latlng);
-
-
-    //       } else if (e.originalEvent.buttons == 1) {
-
-    //       }
-
-    //     });
-    //     this.marker.addLayer(this.myMarker);
-    //     //  this.filterData2(this.datajson.markerPositions, this.marker, this.controlLayers);
-
-    //     $('#controlbutton').css('display', '');
-
-    //   })
-    //   this.marker.addTo(this.map);
-
-    // };
-
-
-    // const componentfactory =
-    //   this.componentFactoryResolver.resolveComponentFactory(VAgGridComponent);
-    // const componentref =
-    //   this.viewContainerRef.createComponent(componentfactory);
-    // const html1 = (componentref.location.nativeElement.style.display = "none");
-    // componentref.instance.columnDefs = this.columnDefs;
-    // componentref.changeDetectorRef.detectChanges();
-    // this.marker.off("click");
-    // this.marker.on("clustermousedown", async (e: any) => {
-    //   if (e.originalEvent.buttons == 2) {
-    //     var markerChildrens = e.layer.getAllChildMarkers();
-
-    //     //console.log("markerChildrens>>><<<", markerChildrens)
-    //     //console.log('rowdata before1>>>>>>', this.rowData)
-
-    //     this.rowData = [];
-    //     //console.log('rowdata before2>>>>>>', this.rowData)
-
-    //     for (var j = 0; j < markerChildrens.length; j++) {
-    //       var jsonaggrid = {
-    //         Device_id: markerChildrens[j].tel,
-    //         Tel: markerChildrens[j].name,
-    //         Date: markerChildrens[j].timestamp,
-    //         Hits: "1",
-    //         Coord: markerChildrens[j].lat + ',' + markerChildrens[j].lng,
-
-    //       };
-    //       //console.log('rowdata jsonaggrid>>>>', jsonaggrid)
-    //       this.rowData.push(jsonaggrid);
-    //     }
-    //     //console.log('rowdata after>>>>>>', this.rowData)
-    //     const componentfactory =
-    //       this.componentFactoryResolver.resolveComponentFactory(
-    //         VAgGridComponent
-    //       );
-    //     const componentref =
-    //       this.viewContainerRef.createComponent(componentfactory);
-    //     componentref.instance.rowData = this.rowData;
-    //     componentref.instance.columnDefs = this.columnDefs;
-    //     componentref.instance.headerHeight = 0;
-    //     // componentref.instance.selectdevices = true;
-    //     componentref.instance.Title = "Here On";
-    //     componentref.instance.distinct = true;
-    //     componentref.changeDetectorRef.detectChanges();
-    //     componentref.instance.pagination = false;
-    //     componentref.instance.rowGrouping = true;
-    //     componentref.instance.contextmenu = false;
-    //     componentref.instance.Grid2Type = 'btn-54';
-    //     componentref.instance.GridID = 'GeoGridbyDevice';
-
-    //     const html1 = componentref.location.nativeElement;
-    //     await html1;
-
-
-
-
-    //     this.map.openPopup(html1, e.layer.getLatLng());
-    //     if (markerChildrens.length < 3) {
-    //       // $('#agGrid').css('height','10px');
-    //       $('.ag-theme-balham').css('height', '130px');
-
-    //     } else {
-    //       $('.ag-theme-balham').css('height', ' 250px ');
-
-    //     }
-    //   }
-    // });
-
+   
     if (this.datajson !== null) {
 
       this.markerLoop = L.markerClusterGroup({
@@ -16500,15 +16342,9 @@ this.navbarSimulId=obj22;
   }
 
   startRoute1(){
-    this.opentimer=true;
     this.ShowHeader=false;
     this.isRunningRoute = true;
-   this.items=[
-      {label:'Start',action:this.startRoute1.bind(this)},
-      {label:'Stop',action:this.stopRoute.bind(this)},
-      {label:'Display Data',action:this.opentimelineScreen.bind(this)}
-    ];
-   
+ 
     this.displaybyroute();
   }
 
@@ -17026,7 +16862,8 @@ private handleRouteData(data: any, deviceArray?: any[]) {
     this.showroutebar1=true;
  
    
-    routeDevices = this.Devices.split(',');
+    // routeDevices = this.Devices.split(',');
+    routeDevices = this.Devices;
     this.routeDevicestable=routeDevices;
     console.log("this.routeDevices-----------", routeDevices)
     let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
@@ -17048,59 +16885,6 @@ private handleRouteData(data: any, deviceArray?: any[]) {
         this.displayPolylines(markerPositions,objcolor,routeDevices);
       }
 
-    //   displayPolylines(markerPositions: any[],objcolor:any[],routeDevices:any[]): void {
-    //     if (this.isRunningRoute==false) {
-    //     return;
-    // }
- 
-    //   const interval = setTimeout(async() => {
-    //   //  let x:any;
-    //     // let currentDevice:any= markerPositions[x.index][0];
-    //     // console.log("currentDevice-----------",currentDevice);
-    //      let x:any=  objcolor.find((elt:any)=>{
-    //       // console.log("elt-----------",elt);
-    //       let currentDevice:any;
-    //       routeDevices.forEach((dev:any)=>{
-    //         // return elt.deviceId==dev
-    //         if(dev==elt.deviceId){
-    //           currentDevice=dev;
-    //         }
-    //         // return currentDevice;
-    //       });
-          
-    //       console.log("currentDevice---------",currentDevice);
-    //       return elt.deviceId==currentDevice
-    //     });
-    //     console.log("devvvvvvvvvvvvvvvvv---------",x);
-    //     console.log("x.index---------",x.index,"  datalength---",x.data.length,"  from markerpos--",markerPositions.length);
-
-    //     if (x.index >= x.data.length) {
-    //       clearInterval(interval); // Stop when all polylines are displayed
-    //       return;
-    //     }
-    //     console.log("x-----------",x);
-    //     if(x.index+1>=x.data.length){}
-    //     else if(x.index<=x.data.length) {    
-    //       let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.map);
-    //       let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
-  
-    //       console.log("polyline--------",polyline);        
-    //       this.polylineRouteArray.push(polyline);
-    //       this.polylineRouteArrayLoop.push(polyline1);
-    //       this.xroutearray.push(markerPositions[x.index]);
-    //       this.typeofdata='devicehistory'
-    //       this.opentableData(markerPositions[x.index],this.typeofdata);
-    // }
-                 
-    //   // }
-      
-    
-    //     this.currentIndex++;
-    //     x.index++;
-    //     await this.displayPolylines(markerPositions,objcolor,routeDevices);
-    //   },  0.1/this.speedTimeRoute); // Adjust the interval duration as needed
-    // } 
-
   displayPolylines(markerPositions: any[],objcolor:any[],routeDevices:any[]): void {
     
       if (this.isRunningRoute==false) {
@@ -17116,6 +16900,7 @@ private handleRouteData(data: any, deviceArray?: any[]) {
       console.log("currentDevice-----------",currentDevice);
     let x=  objcolor.find((elt:any)=>{
       console.log("elt-----------",elt);
+     
       return elt.deviceId==currentDevice});
       console.log("x-----------",x);
       if(x.index+1>=x.data.length)
@@ -17123,21 +16908,47 @@ private handleRouteData(data: any, deviceArray?: any[]) {
       
           }
       else if(x.index<=x.data.length) {
-     
-        let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.map);
-        let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
 
+        // let polyline = (L as any).polyline.antPath([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]], {
+        //   color: x.color,
+        //   weight: 5,
+        // }).addTo(this.map);
+
+        
+     
+        let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).arrowheads({
+          frequency: 3, // Places the arrow in the middle
+          size: '12px'
+        });
+        polyline.addTo(this.map);
+        let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
          this.polylineRouteArray.push(polyline);
         this.polylineRouteArrayLoop.push(polyline1);
-        this.xroutearray.push(markerPositions[this.currentIndex]);
-        this.typeofdata='devicehistory'
+        
+        // this.xroutearray.push(markerPositions[this.currentIndex]);
+        this.typeofdata='devicehistory';
+        console.log("x.index----------",x.index);
+        console.log("this.currentIndex-----------",this.currentIndex);
+
         this.opentableData(markerPositions[x.index],this.typeofdata);
+
+        // const midpoint = this.getMidpoint(L.latLng([x.data[x.index][4],x.data[x.index][3]]), L.latLng([x.data[x.index+1][4],x.data[x.index+1][3]]));
+
+        // const arrowIcon = L.divIcon({
+        //   html: '→',
+        //   className: 'arrow-icon',
+        //   iconSize: [50, 50],
+        //   iconAnchor: [10, 10]
+        // });
+    
+        // L.marker(midpoint, { icon: arrowIcon }).addTo(this.map);
+
   }
       this.currentIndex++;
       x.index++;
       console.log("this.speedTimeRoute1  ",this.speedTimeRoute1);
       await this.displayPolylines(markerPositions,objcolor,routeDevices);
-    },  3000/this.speedTimeRoute); // Adjust the interval duration as needed
+    },  3000/this.speedTimeRoute); 
   } 
 
   changebarRoute(){
@@ -17147,7 +16958,6 @@ private handleRouteData(data: any, deviceArray?: any[]) {
   }
 
 
-   
    
  
     
@@ -17331,8 +17141,7 @@ private handleRouteData(data: any, deviceArray?: any[]) {
     
     
     async hi(){
-      this.usercode="8158";
-      this.displayClusters2("184545");
+      this.displayClusters2("176381");
     }
 
     showTimeline(){
@@ -19652,10 +19461,17 @@ this.displayCoRelation();
 }
 
 byRouteFirst(){
+  this.items=[
+    {label:'Start',action:this.startRoute1.bind(this)},
+    {label:'Stop',action:this.stopRoute.bind(this)},
+    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+  ];
+  this.opentimer=true;
+ 
   this.ShowHeader=false;
 
   this.handleSpeedChange1(1);
-  this.startRoute1();
+  // this.startRoute1();
 }
 byDeviceFirst(){
   this.ShowHeader=false;
@@ -19666,106 +19482,14 @@ byDeviceFirst(){
 
 
 
-testflwomap(){
-
-
-
-
-  const odData = [{
-    id: '1',
-    originLat: 51.505,
-    originLng: -0.09,
-    destinationLat: 40.7128,
-    destinationLng: -74.0060,
-    count: 10
-  }];
-
-  const flowmapLayer:any = L.canvasFlowmapLayer(odData, {
-    originAndDestinationFieldIds: {
-      originUniqueIdField: 'id',
-      originGeometry: { x: 'originLng', y: 'originLat' },
-      destinationGeometry: { x: 'destinationLng', y: 'destinationLat' },
-    },
-    canvasBezierStyle: {
-      type: 'simple',
-      strokeStyle: '#FF0000',
-      lineWidth: 4,
-    }
-  });
-
-  // if (flowmapLayer) {
-  //   console.log('Flowmap Layer Initialized:', flowmapLayer);
-  //   console.log('Flowmap Layer Properties:', flowmapLayer.options);
-  //   flowmapLayer.addTo(this.map);
-
-  //   // Check canvas creation after a short delay
-  //   setTimeout(() => {
-  //     const canvasElement = flowmapLayer._canvas;
-  //     if (canvasElement) {
-  //       console.log('Canvas Element:', canvasElement);
-  //     } else {
-  //       console.error('Canvas element was not created.');
-  //     }
-  //   }, 1000);
-  // } else {
-  //   console.error('Flowmap Layer failed to initialize.');
-  // }
-  if (flowmapLayer) {
-    console.log('Flowmap Layer Initialized:', flowmapLayer);
-    console.log('Flowmap Layer Options:', flowmapLayer.options);
-  
-    // Check if map exists and is initialized
-    if (this.map) {
-      console.log('Map is initialized:', this.map);
-      flowmapLayer.addTo(this.map);
-  
-      // Check canvas creation after a short delay
-      setTimeout(() => {
-        const canvasElement = flowmapLayer._canvas;
-        if (canvasElement) {
-          console.log('Canvas Element:', canvasElement);
-          console.log('Canvas Element Dimensions:', canvasElement.width, canvasElement.height);
-        } else {
-          console.error('Canvas element was not created.');
-  
-          // Additional checks if canvas is not created
-          console.log('Checking internal state of flowmap layer...');
-  
-          // Iterate over layers in the map
-          this.map.eachLayer((layer:any) => {
-            console.log('Map Layer:', layer);
-          });
-  
-          // Check if the flowmap layer is on the map
-          const isLayerOnMap = this.map.hasLayer(flowmapLayer);
-          console.log('Is Flowmap Layer on Map?', isLayerOnMap);
-  
-          // Check if the canvas context is accessible
-          const canvasContext = canvasElement ? canvasElement.getContext('2d') : null;
-          if (canvasContext) {
-            console.log('Canvas Context:', canvasContext);
-          } else {
-            console.error('Canvas context is not available.');
-          }
-        }
-      }, 1000);
-
-      
-    } else {
-      console.error('Map is not initialized. Cannot add flowmap layer.');
-    }
-  } else {
-    console.error('Flowmap Layer failed to initialize.');
-  }
-  
-  
-  }
 
 
 
 async addCurvedFlowLines(): Promise<void> {
   let flowData:any;
-    await  this.datacrowdService.MaptoMap(171503).then((res:any)=>{
+  // 171503
+  console.log("this.simulationid",this.simulationid)
+    await  this.datacrowdService.MaptoMap(this.simulationid).then((res:any)=>{
   console.log("resss MaptoMap",res);
   
   this.drawBoundaries(res);
@@ -19838,8 +19562,9 @@ async addCurvedFlowLines(): Promise<void> {
   const bounds = L.latLngBounds(allCoordinates);
   this.map.fitBounds(bounds);
   
-    let colorarray=['red','magenta','cyan','yellow','orange','purple','pink','maroon','blue'];
-  
+    // let colorarray=['red','magenta','cyan','yellow','orange','purple','pink','maroon','blue'];
+    let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange','magenta','cyan','maroon'];
+
   
     flowData.forEach((flows: any,index:any) => {
   
@@ -19870,7 +19595,13 @@ async addCurvedFlowLines(): Promise<void> {
           latlngs.push([x, y]);
         }
     
-        // Create an empty polyline that will be animated
+
+        // const animatedPolyline = (L as any).polyline.antPath([ ], {
+        //   color: colorarray[index],
+        //   weight: 5,
+        // }).addTo(this.map);
+
+        // // Create an empty polyline that will be animated
         const animatedPolyline = L.polyline([], {
           color: colorarray[index],
           weight: 2,
@@ -19886,7 +19617,7 @@ async addCurvedFlowLines(): Promise<void> {
             // Add the next segment to the polyline
             animatedPolyline.addLatLng(latlngs[currentSegment]);
     
-            currentSegment += 1;
+            currentSegment += 2;
             requestAnimationFrame(animatePolyline); // Continue animation
           }
         }
@@ -19904,8 +19635,8 @@ async addCurvedFlowLines(): Promise<void> {
        let animatedMarkersTo:any=L.marker(flow.to,{icon:redIcon}).addTo(this.map);
        const popupInfo = `<b style="color: red; background-color: white">${flows.deviceID}</b>`;
        console.log("flow.deviceID",flows.deviceID)
-       animatedMarkersFrom.bindPopup(popupInfo);
-       animatedMarkersTo.bindPopup(popupInfo);
+        animatedMarkersFrom.bindPopup(popupInfo);
+        animatedMarkersTo.bindPopup(popupInfo);
         this.AnimatedMarkers.push(animatedMarkersFrom);
         this.AnimatedMarkers.push(animatedMarkersTo);
     
@@ -20063,6 +19794,143 @@ async addCurvedFlowLines(): Promise<void> {
     })
   
   }
+
+  displayBubles(object:any){
+
+  }
+
+  
+async displayClusters33(AlocSimulId:any){
+  this.Devices=['495ce394-9ea5-49d2-a5b9-09774f83b9ee','9750A873-5F49-4077-AE27-E15D491B2068'];
+  this.displayclusters=true;
+  let deviceInfoArray:any[]=[];
+  await this.datacrowdService.getSimulationobject(this.simulationid).then((res: any) => {
+    this.datajson = res;
+    console.log("this.datajson ------",this.datajson )
+  });
+  let existingDeviceArray1 = this.datajson.map((item:any) =>item[0]);
+  let existingDeviceArray = [...new Set(existingDeviceArray1)];
+  console.log("existingDeviceArray ------",existingDeviceArray );
+
+  let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
+ 
+  existingDeviceArray.forEach((deviceId:any,index:any)=>{
+  //   console.log("deviceId-----",deviceId)
+
+  // let  DeviceDataArray1 = this.datajson.find((item:any) => item[0]===deviceId);
+  // console.log("111111111111 ------",DeviceDataArray1 );
+     
+    deviceInfoArray.push({'deviceid':deviceId,'color':colorarray[index]})
+  });
+
+  console.log("deviceInfoArray ------",deviceInfoArray );
+  
+
+  deviceInfoArray.forEach((dev:any)=>{
+   
+  let  DeviceDataArray1 = this.datajson.filter((item:any) => item[0]==dev.deviceid);
+  console.log("111111111111 ------",DeviceDataArray1 );
+
+  this.fixedMarkersGroup = new L.MarkerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    animate: true,
+    singleMarkerMode: false,
+    zoomToBoundsOnClick: false,
+    iconCreateFunction: function (cluster) {
+      var markers = cluster.getAllChildMarkers();
+      var markersCount = markers.length;
+  
+      let iconSize = 40; // Default icon size
+      if (markersCount < 50) {
+        iconSize = 40; // Small cluster icon
+      } else if (markersCount >= 50 && markersCount < 100) {
+        iconSize = 60; // Medium cluster icon
+      } else {
+        iconSize = 80; // Large cluster icon
+      }
+  
+
+  // // Create a custom div icon with the same marker style
+  // const customIcon = L.divIcon({
+  //   className: 'custom-div-icon', // CSS class for styling
+  //   html: `
+  //     <div class="marker-container" style="background-color: ${color};">
+  //       <div class="marker-text">${text}</div>
+  //     </div>
+  //   `, // Keep the HTML structure the same, change color dynamically
+  //   iconSize: [30, 30], // Adjust based on your marker size
+  //   iconAnchor: [15, 15], // Center the marker
+  // });
+
+  // // Create and return the marker
+  // return L.marker([lat, lng], { icon: customIcon });;
+      
+      var html = `
+        <div class="elementGroup11" style="width:${iconSize}px;height:${iconSize}px;line-height:${iconSize}px;">
+          <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${dev.color}.png" style="width:${iconSize}px;height:${iconSize}px;" />
+          start
+        </div>
+      `;
+  
+      return L.divIcon({
+        html: html,
+        className: 'mycluster',
+        iconSize: L.point(iconSize, iconSize)
+      });
+    },
+  });
+  
+  // Assuming you already have your markers, add them to the group
+  DeviceDataArray1.forEach((object: any) => {
+    let center: any = [Number(object[4]), Number(object[3])];
+  
+    var fixedElementIcon = L.icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-'+dev.color+'.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
+    });
+  
+    this.fixedElementMarker = L.marker(center, {
+      icon: fixedElementIcon,
+    });
+  
+    this.fixedMarkersGroup.addLayer(this.fixedElementMarker);
+  });
+  
+  // Add the cluster group to the map
+  this.fixedMarkersGroup.addTo(this.map);
+
+ 
+})
+
+}
+
+
+  getMidpoint(latlng1: L.LatLng, latlng2: L.LatLng): L.LatLng {
+  return L.latLng(
+    (latlng1.lat + latlng2.lat) / 2,
+    (latlng1.lng + latlng2.lng) / 2
+  );
+}
+
+createCustomMarker(lat: number, lng: number, text: string, color: string): L.Marker {
+  // Create a custom div icon with the same marker style
+  const customIcon = L.divIcon({
+    className: 'custom-div-icon', // CSS class for styling
+    html: `
+      <div class="marker-container" style="background-color: ${color};">
+        <div class="marker-text">${text}</div>
+      </div>
+    `, // Keep the HTML structure the same, change color dynamically
+    iconSize: [30, 30], // Adjust based on your marker size
+    iconAnchor: [15, 15], // Center the marker
+  });
+
+  // Create and return the marker
+  return L.marker([lat, lng], { icon: customIcon });;
+}
+
 }
 
 
