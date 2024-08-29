@@ -107,10 +107,8 @@ export class AdvancedSearchConfigurationFormComponent {
   switchMainDropDownValues(){
     if(this.searchConfigForm.get('isForForm').value==true){
       this.getColumnNames=GlobalConstants.getColumnsForDynamicSearch+this.data.objectId
-
     }else{
       this.getColumnNames=GlobalConstants.getQueryHeadersForAdvancedSearch+this.data.objectId
-
     }
 
   }
