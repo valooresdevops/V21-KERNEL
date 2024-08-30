@@ -20102,6 +20102,350 @@ displaybyTail(){
       },  6000/this.speedTimeRoute); 
     } 
 
+
+    async nearBy(){
+      if (typeof this.DateTimeFrom === 'undefined' || this.DateTimeFrom === null ||this.DateTimeFrom.includes('undefined')) {
+        // Set DateTimeFrom to one year ago from today
+        let oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        this.DateTimeFrom = this.convertDate2(oneYearAgo.toISOString()); // Convert to ISO string format
+    }
+    
+    // Check if DateTimeTo is undefined or null
+    if (typeof this.DateTimeTo === 'undefined' || this.DateTimeTo === null || this.DateTimeTo.includes('undefined')) {
+        // Set DateTimeTo to today's date
+        let today = new Date();
+        this.DateTimeTo = this.convertDate2(today.toISOString()); // Convert to ISO string format
+    }
+await this.datacrowdService.getSimulationId().then(async (res:any)=>{
+  //console.log('getcountry2>>>>',res);
+  this.simulationid=res;
+  //console.log("countrycode finall",this.countrycode)
+
+  if (this.fixedMarkersArray.length == 0 && JSON.parse(localStorage.getItem("fixedelementsObject")!).length == 0) {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.data = {
+      content: 'Select 1 or more Fixed Elements!',
+    };
+
+    this.dialog.open(ContentmodalComponent, dialogConfig);
+
+  }
+  else {
+    const dialogRef = this.dialog.open(this.bulkdraw)
+    //  //console.log("cRdaius111>>",$('.bulkRadius'))
+
+
+    dialogRef.afterClosed().subscribe(async result => {
+
+      this.cRdaius = parseInt(this.cRdaius);
+      if (this.cRdaius >= this.circleLimit) {
+        const dialogConfig = new MatDialogConfig();
+        dialogConfig.data = {
+          content: 'Circle limit exeeded!',
+        };
+
+        let dialogRef = this.dialog.open(ContentmodalComponent, dialogConfig);
+        dialogRef.afterClosed().subscribe(result => {
+
+
+          //  this.map.removeLayer(shape);
+          //  featureGroup.removeLayer(item.layer);
+
+
+        });
+
+      } else {
+        //console.log("fixedelementsObject1111>>>>", this.fixedelementsObject)
+
+        //console.log("fixedelementsObject>>>>", JSON.parse(localStorage.getItem("fixedelementsObject")));
+        var shapeId = 0;
+        if (JSON.parse(localStorage.getItem("fixedelementsObject")) === null) {
+
+          if (this.fixedMarkersArray.length > 0) {
+            //console.log('fixedMarkersArraylength>><<<><><', this.fixedMarkersArray.length);
+
+            //console.log('fixedMarkersArray>><<<><><', this.fixedMarkersArray);
+            //console.log("111111111")
+            for (let element of this.fixedMarkersArray as any) {
+              //console.log("222222222")
+            
+            // this.fixedMarkersArray.forEach(async (element: any, key: any) => {
+              //console.log('center>>>', [element._latlng.lat, element._latlng.lng])
+              this.circle = L.circle([element._latlng.lat, element._latlng.lng], {
+                color: "#6e83f0",
+                fillOpacity: 0.5,
+                radius: this.cRdaius,
+              });
+
+
+              this.center = {
+                lng: element._latlng.lng,
+                lat: element._latlng.lat
+              };
+
+              let  C_countryCodes:any=""
+    
+      
+
+              this.Coord.push({
+                ID: shapeId,
+                Name: "",
+                Value: "",
+                Type: "Circle",
+                Bounds: "",
+                radius: this.cRdaius,
+                center: this.center,
+                leafletid: shapeId,
+                PolyBoundsCoords: "",
+                selectedStartDate: "",
+                selectedEndDate: "",
+                countrycodes:C_countryCodes,
+
+              });
+
+
+              //  localStorage.setItem("coords", JSON.stringify(this.Coord));
+
+              //console.log("this.coord", this.Coord)
+
+              this.layerGroup.addLayer(this.circle);
+
+            };
+
+          }
+        } else {
+          //console.log("else")
+
+          this.fixedelementsObject = JSON.parse(localStorage.getItem("fixedelementsObject"));
+          //console.log("fixedelementsObject>>>>", this.fixedelementsObject);
+          //console.log("fixedelementsObjectlength>>>>", this.fixedelementsObject.length);
+
+          // this.fixedelementsObject.forEach(async (element: any, key: any) => {
+            for (const element of this.fixedelementsObject) {
+              //console.log("555555555")
+
+            //console.log('center>>>', [element[3], element[4]])
+            this.circle = L.circle([element[4], element[3]], {
+              color: "#6e83f0",
+              fillOpacity: 0.5,
+              radius: this.cRdaius,
+            });
+
+            this.center = {
+              lng: element[3],
+              lat: element[4]
+            };
+
+            let  C_countryCodes:any;
+      
+            let zz:any= await this.determineIntersectingRegions(this.circle,this.geojsonData,'circle');
+            //console.log("zz ",zz);
+     
+       await this.datacrowdService.getcountry(zz).then((ress:any)=>{
+         //console.log('getcountry>>>>',ress);
+         // C_subregion=ress[0];
+         // C_region=ress[1];
+         // C_Country=ress[2];
+         C_countryCodes=ress;
+       
+       }) 
+     
+
+            this.Coord.push({
+              ID: shapeId,
+              Name: "",
+              Value: "",
+              Type: "Circle",
+              Bounds: "",
+              radius: this.cRdaius,
+              center: this.center,
+              leafletid: shapeId,
+              PolyBoundsCoords: "",
+              selectedStartDate: "",
+              selectedEndDate: "",
+              countrycodes:C_countryCodes,
+
+            });
+
+
+            //  localStorage.setItem("coords", JSON.stringify(this.Coord));
+
+            //console.log("this.coord", this.Coord)
+
+            this.layerGroup.addLayer(this.circle);
+            //console.log('shapeId1111111111', shapeId);
+            //console.log("7777777777777777777")
+
+            shapeId++;
+            //console.log('shapeId22222222222', shapeId);
+
+          };
+        }
+        //console.log('layerGroup', this.layerGroup);
+
+        this.layerGroup.addTo(this.map);
+
+
+        // this.map.setView(center, this.clickZoom)
+
+
+        let  queryjson={
+          "reportName": "No Name",
+          "reportType": "9",
+          "reportTypeId": "9",
+          "TimeZone": "",
+          "RecipientUser": "",
+          "DateTimeFrom":  this.DateTimeFrom,
+          "RecipientEmail": "",
+          "DateTimeTo": this.DateTimeTo,
+          "Coordinates":this.Coord,
+          "meter": "",
+          "Devices": "",
+          "isCSVAttached": "",
+          "dataType": "",
+          "telephoneNumber": "",
+          "EDGEHEIGHT": "10",
+          "simulationId": this.simulationid.toString(),
+          "userCode": "8158 ",
+          "imsiId":"",
+          "countryCode": "",
+          "senario": "-1",
+          "BtsTypeSlected": "FixedElements"
+        };
+      
+      
+        console.log('queryjson >>', queryjson);
+      
+        for (const elt of queryjson.Coordinates) {
+          if(elt.Type==='Circle'){
+            let turfshape:any = turf.circle([elt.center.lng, elt.center.lat], elt.radius / 1000, { units: 'kilometers' });
+      
+            const intersectingRegions:any = [];
+       
+            //console.log("geoJsonData ",this.geojsonData);
+            // Iterate through each feature in the GeoJSON data
+            
+            this.geojsonData.features.forEach((feature: any) => {
+      
+              // Check if the circle intersects with the feature
+             const doesIntersect = turf.booleanOverlap(turf.simplify(feature),turf.simplify(turfshape));
+              //console.log('doesIntersect' ,doesIntersect)
+          
+              // //console.log('doesIntersect2', doesIntersect2);
+              
+          
+              if (doesIntersect) {
+                intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+               }else{
+               const doesIntersect2 = turf.booleanPointInPolygon(
+                 turf.point([elt.center.lng, elt.center.lat]), // Create a Turf.js Point from circle center
+                 feature // Assuming the GeoJSON feature is a Polygon
+               );
+                if (doesIntersect2) {
+                  intersectingRegions.push(feature.properties.iso_a2_eh); // Adjust this based on your GeoJSON structure
+                }
+              }
+      
+      
+      
+             
+            });
+        
+            console.log('zz circle>>>>',intersectingRegions);
+      
+      
+            ///
+            let  C_countryCodes:any
+          
+      
+      
+        await this.datacrowdService.getcountry(intersectingRegions).then((ress:any)=>{
+         console.log('getcountry>>>>',ress);
+         // C_subregion=ress[0];
+         // C_region=ress[1];
+         // C_Country=ress[2];
+         C_countryCodes=ress;
+       
+       }) 
+      
+      
+       elt.countrycodes=this.convertCountryCode(C_countryCodes);
+          }
+        };
+            
+      this.CdrData = await this.getSimulationData(queryjson);
+      console.log('CdrData>', this.CdrData);
+      this.datajson=this.CdrData;
+      
+      console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
+      
+      if(this.datajson.fixedelements){
+        if (this.fixedMarkersArray.length > 0) {
+          this.fixedMarkersArray.forEach((element: any, key: any) => {
+            this.map.removeLayer(element);
+      
+      
+          })
+          // this.map.removeLayer(this.fixedMarkersGroup);
+          this.fixedMarkersArray = [];
+        }
+        if (this.fixedMarkersGroup) {
+          this.map.removeLayer(this.fixedMarkersGroup);
+    
+        }
+        this.displayFixedElements(this.datajson.fixedelements);
+      
+      }
+      if(this.datajson.geo){
+        this.displayClustersforfixedelements(this.datajson.geo);
+      
+      }
+
+      }
+    });
+  }
+
+
+
+
+})
+
+   
+if(this.senarioFlag==true){
+  this.senariocount++;
+
+//this.isFormVisible = false;
+let obj22:any={
+  senarioParentName:this.senarioParentName,
+  simulationid:this.simulationid,
+  Action:"addnewMenu",
+  senariocount:this.senariocount,
+  senarioFlag:this.senarioFlag,
+  reportType:this.reportType
+}
+  
+// this.senarioIdOutput.emit(obj22);
+    this.navbarSimulId=obj22;
+
+
+    }else{
+
+      //this.isFormVisible = false;
+      let obj22:any={
+        senarioParentName:this.senarioParentName,
+        simulationid:this.simulationid,
+        Action:"addnewMenu",
+        senariocount:0,
+        senarioFlag:this.senarioFlag,
+        reportType:"9"
+      }
+        
+      // this.senarioIdOutput.emit(obj22);
+          this.navbarSimulId=obj22;
+    }
+
+    }
 }
 
 

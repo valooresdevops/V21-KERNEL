@@ -317,6 +317,9 @@ oncontextmenu="return false;"
         <span   title="Routing" (click)="toggleDropdown()">
           <i class="fa-solid fa-road"></i>
       </span>
+      <span   title="Near By" (click)="nearBy()">
+        <i class="fa-solid fa-map-signs"></i>
+    </span>
 
       <div id="dropdownContent1" class="dropdown-content1" *ngIf="showroutedicv===true">
         <span (click)="byDeviceFirst()">By devices</span>
