@@ -52,7 +52,8 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" 
+                                                    id="lbl_{{ fields.id }}" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -139,7 +140,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -180,7 +181,7 @@
                                                           'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                           'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                           'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                  <label id="lbl_{{ fields.id }}"
+                                                  <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                       [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                       {{ fields.columnDescription }}
                                                   </label>
@@ -221,7 +222,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -251,7 +252,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}" style="margin-top: 10px;"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}" style="margin-top: 10px;"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -286,7 +287,7 @@
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
                                                 <!-- <div class="col-lg-5 col-md-3 col-sm-12 col-xs-12 align-items-center"> -->
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -327,7 +328,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -358,7 +359,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -404,7 +405,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -449,7 +450,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
