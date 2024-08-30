@@ -58,14 +58,19 @@ export class ChartBuilderFormComponent implements OnInit {
   is3d: number;
   public description: String='';
   public isDescription: boolean = false;
+  public newTitle: String = '';
+  public newData : any;
 
   ngOnInit(): void {
-    console.log('data-->: ',this.data)
-    this.is3d = this.data.is3d;
-    this.chartType = this.data.chartType;
+    const newString = this.data.chartTitle.replace(/"/g, '');
+    this.newTitle = newString;
+    this.newData = JSON.stringify(this.data.info);
+
+    this.is3d = this.data.info.is3d;
+    this.chartType = this.data.info.chartType;
     let ids = this.ids
     let stockChartType;
-    this.description=this.data.description;
+    this.description=this.data.info.description;
     if(this.description != 'null'){
       this.isDescription=true;
     }
@@ -132,7 +137,7 @@ export class ChartBuilderFormComponent implements OnInit {
     // }
 
     if (this.chartType1 == 'heatmap') {
-      if (this.data.is3d == 1) { } else {
+      if (this.data.info.is3d == 1) { } else {
         this.newChartObject = [{
           chart: {
             type: 'heatmap',
@@ -235,19 +240,20 @@ export class ChartBuilderFormComponent implements OnInit {
       //done
     } else if (this.chartType1 == 'bar') {
 
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(parseInt(this.data.info.records[i].NAME));
       }
+      console.log("this.data.records = ", this.data.info.records);
 
-      if (this.data.is3d == 1) {
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [
           {
             chart: {
               type: this.chartType1,
               width: 550,
               height: '50%',
-              identifier: this.data.records[0].identifier,
+              identifier: this.data.info.records[0].identifier,
               marginTop: 60,
               marginBottom: 80,
               plotBorderWidth: 1,
@@ -259,7 +265,7 @@ export class ChartBuilderFormComponent implements OnInit {
                 viewDistance: 25
               }
             },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               categories: this.ids
             },
@@ -279,8 +285,8 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: { type: this.chartType1,
               width: 550, 
-              identifier: this.data.records[0].identifier, },
-            title: { text: this.data.records[0].TITLE },
+              identifier: this.data.info.records[0].identifier, },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               categories: this.ids
             },
@@ -297,17 +303,17 @@ export class ChartBuilderFormComponent implements OnInit {
         ];
       }
     } else if (this.chartType1 == 'pie') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].NAME);
-        this.names.push(parseInt(this.data.records[i].Y));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].NAME);
+        this.names.push(parseInt(this.data.info.records[i].Y));
       }
 
 
       let data1 = this.names.map((id, index) => {
         return { name: this.ids[index], y: id };
       });
-      if (this.data.is3d == 1) {
-        const transformedData = this.data.records.map((item: any) => [item.NAME, parseFloat(item.Y)]);
+      if (this.data.info.is3d == 1) {
+        const transformedData = this.data.info.records.map((item: any) => [item.NAME, parseFloat(item.Y)]);
 
         this.newChartObject = [{
           chart: {
@@ -321,7 +327,7 @@ export class ChartBuilderFormComponent implements OnInit {
             }
           },
           title: {
-            text: this.data.records[0].TITLE,
+            text: this.data.info.records[0].TITLE,
             align: 'left'
           },
           plotOptions: {
@@ -335,7 +341,7 @@ export class ChartBuilderFormComponent implements OnInit {
             pointFormat: '<b>{point.name}</b>: {point.y}'
           },
           series: [{
-            name: 'this.data[i].data.records[0].TITLE',
+            name: 'this.data.info[i].data.records[0].TITLE',
             data: transformedData
           }]
         }];
@@ -346,7 +352,7 @@ export class ChartBuilderFormComponent implements OnInit {
               width: 550,
               height: '50%',
               identifier: 'pie' },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             plotOptions: {
               pie: {}
             },
@@ -362,11 +368,11 @@ export class ChartBuilderFormComponent implements OnInit {
         ];
       }
     } else if (this.chartType1 == 'line') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(Number(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(Number(this.data.info.records[i].NAME));
       }
-      if (this.data.is3d == 1) {
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [
           {
             chart: {
@@ -383,7 +389,7 @@ export class ChartBuilderFormComponent implements OnInit {
               }
             },
             title: {
-              text: this.data.records[0].TITLE
+              text: this.data.info.records[0].TITLE
             },
             xAxis: {
               categories: this.ids
@@ -415,7 +421,7 @@ export class ChartBuilderFormComponent implements OnInit {
             chart: { type: 'line',
               width: 500,
               height: '55%', identifier: 'line' },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               categories: this.ids
             },
@@ -432,9 +438,9 @@ export class ChartBuilderFormComponent implements OnInit {
         ];
       }
     } else if (this.chartType1 == 'area') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(Number(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(Number(this.data.info.records[i].NAME));
       }
       if (this.data.is3d == 1) {
         this.newChartObject = [
@@ -452,7 +458,7 @@ export class ChartBuilderFormComponent implements OnInit {
                 viewDistance: 25
               }
             },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               categories: this.ids
             },
@@ -474,7 +480,7 @@ export class ChartBuilderFormComponent implements OnInit {
               identifier: 'area',
               width: 550,
               height: '50%', },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               categories: this.ids
             },
@@ -491,10 +497,10 @@ export class ChartBuilderFormComponent implements OnInit {
         ];
       }
     } else if (this.chartType1 == 'scatter') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.names.push(Number(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.names.push(Number(this.data.info.records[i].NAME));
       }
-      if (this.data.is3d == 1) {
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [
           {
             chart: {
@@ -517,7 +523,7 @@ export class ChartBuilderFormComponent implements OnInit {
               }
             },
             title: {
-              text: this.data.records[0].TITLE
+              text: this.data.info.records[0].TITLE
             },
             xAxis: {
               categories: this.ids,
@@ -550,7 +556,7 @@ export class ChartBuilderFormComponent implements OnInit {
           {
             chart: { type: 'scatter', width: 500,
               height: '40%', identifier: 'scatter' },
-            title: { text: this.data.records[0].TITLE },
+            title: { text: this.data.info.records[0].TITLE },
             xAxis: {
               title: {
                 text: 'X Axis'
@@ -570,8 +576,8 @@ export class ChartBuilderFormComponent implements OnInit {
       }
     } else if (this.chartType1 == 'semiPie') {
 
-      const transformedData = this.data.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
-      if (this.data.is3d == 1) {
+      const transformedData = this.data.info.records.map((item: any) => [item.ID, parseFloat(item.NAME)]);
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [{
           chart: {
             plotBackgroundColor: null,
@@ -588,7 +594,7 @@ export class ChartBuilderFormComponent implements OnInit {
             }
           },
           title: {
-            text: this.data.records[0].TITLE,
+            text: this.data.info.records[0].TITLE,
             align: 'center',
             verticalAlign: 'top',
             y: 60,
@@ -640,7 +646,7 @@ export class ChartBuilderFormComponent implements OnInit {
             identifier: 'semiPie'
           },
           title: {
-            text: this.data.records[0].TITLE,
+            text: this.data.info.records[0].TITLE,
             align: 'center',
             verticalAlign: 'top',
             y: 60,
@@ -681,9 +687,9 @@ export class ChartBuilderFormComponent implements OnInit {
         }];
       }
     } else if (this.chartType1 == 'column') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(Number(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(Number(this.data.info.records[i].NAME));
       }
       if (this.data.is3d == 1) {
         this.newChartObject = [{
@@ -714,7 +720,7 @@ export class ChartBuilderFormComponent implements OnInit {
             pointFormat: 'Cars sold: {point.y}'
           },
           title: {
-            text: this.data.records[0].TITLE,
+            text: this.data.info.records[0].TITLE,
             align: 'left'
           },
           // subtitle: {
@@ -738,7 +744,7 @@ export class ChartBuilderFormComponent implements OnInit {
         this.newChartObject = [{
           chart: { type: 'column', width: 550,
             height: '50%', identifier: 'column' },
-          title: { text: this.data.records[0].TITLE },
+          title: { text: this.data.info.records[0].TITLE },
           xAxis: [{ categories: this.ids }],
           yAxis: [{
             title: { text: 'Primary Axis' }
@@ -762,7 +768,7 @@ export class ChartBuilderFormComponent implements OnInit {
         }];
       }
     } else if (stockChartType == 'candlestick') {
-      const transformedData1 = this.data.records.map((item: any) => [ 
+      const transformedData1 = this.data.info.records.map((item: any) => [ 
         Number(item.timestamp),
         Number(item.open_price),
         Number(item.high_price),
@@ -782,7 +788,7 @@ export class ChartBuilderFormComponent implements OnInit {
         },
 
         title: {
-          text: this.data.records[0].title
+          text: this.data.info.records[0].title
         },
 
         credits: {
@@ -807,7 +813,7 @@ export class ChartBuilderFormComponent implements OnInit {
         }]
       }]
     } else if (stockChartType == 'ohlc') {
-      const transformedData1 = this.data.records.map((item: any) => [ 
+      const transformedData1 = this.data.info.records.map((item: any) => [ 
         Number(item.timestamp),
         Number(item.open_price),
         Number(item.high_price),
@@ -823,7 +829,7 @@ export class ChartBuilderFormComponent implements OnInit {
         },
 
         title: {
-          text: this.data.records[0].title
+          text: this.data.info.records[0].title
         },
         credits: {
           enabled: false // Disable the credits link
@@ -845,7 +851,7 @@ export class ChartBuilderFormComponent implements OnInit {
         }]
       }]
     } else if (stockChartType == 'column') {
-      const transformedData1 = this.data.records.map((item: any) => [ 
+      const transformedData1 = this.data.info.records.map((item: any) => [ 
         Number(item.timestamp),
         Number(item.volume)]);
       this.stockObject = [{
@@ -860,14 +866,14 @@ export class ChartBuilderFormComponent implements OnInit {
         },
 
         title: {
-          text: this.data.records[0].title
+          text: this.data.info.records[0].title
         },
         credits: {
           enabled: false // Disable the credits link
         },
 
         series: [{
-          name: this.data.records[0].title,
+          name: this.data.info.records[0].title,
           type: 'column',
           data: transformedData1,
           dataGrouping: {
@@ -882,7 +888,7 @@ export class ChartBuilderFormComponent implements OnInit {
         }]
       }]
     } else if (stockChartType == 'line') {
-      const transformedData1 = this.data.records.map((item: any) => [ 
+      const transformedData1 = this.data.info.records.map((item: any) => [ 
         Number(item.timestamp),
         Number(item.close_price)]);
       this.stockObject = [{
@@ -897,7 +903,7 @@ export class ChartBuilderFormComponent implements OnInit {
       },
 
       title: {
-          text: this.data.records[0].title
+          text: this.data.info.records[0].title
       },
 
         credits: {
@@ -905,7 +911,7 @@ export class ChartBuilderFormComponent implements OnInit {
         },
 
       series: [{
-          name: this.data.records[0].title,
+          name: this.data.info.records[0].title,
           type: 'line', 
           data: transformedData1,
           step: true,
@@ -915,7 +921,7 @@ export class ChartBuilderFormComponent implements OnInit {
       }]
       }]
     } else if (stockChartType == 'area') {
-      const transformedData1 = this.data.records.map((item: any) => [ 
+      const transformedData1 = this.data.info.records.map((item: any) => [ 
         Number(item.timestamp),
         Number(item.close_price)]);
       this.stockObject = [{
@@ -959,18 +965,18 @@ export class ChartBuilderFormComponent implements OnInit {
         }]
       }]
     } else if (this.chartType1 == 'VU solid') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(parseInt(this.data.info.records[i].NAME));
 
-        this.gaugeValue.push(this.data.records[i].gaugevalue);
-        this.gaugeLabel.push(this.data.records[i].gaugelabel);
-        this.gaugeTitle.push(this.data.records[i].title);
+        this.gaugeValue.push(this.data.info.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.info.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.info.records[i].title);
       }
       
-      const gaugeValueData = this.data.records[0].gaugevalue;
-      const gaugeLabelData = this.data.records[0].gaugelabel;
-      const gaugeTitleData = this.data.records[0].title;
+      const gaugeValueData = this.data.info.records[0].gaugevalue;
+      const gaugeLabelData = this.data.info.records[0].gaugelabel;
+      const gaugeTitleData = this.data.info.records[0].title;
       
       this.newChartObject = [{
         chart: {
@@ -1062,16 +1068,16 @@ export class ChartBuilderFormComponent implements OnInit {
     } else if (this.chartType1 == 'VU meter') {
       for (let i = 0; i < this.data.records.length; i++) {
         this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+        this.names.push(parseInt(this.data.info.records[i].NAME));
 
-        this.gaugeValue.push(this.data.records[i].gaugevalue);
-        this.gaugeLabel.push(this.data.records[i].gaugelabel);
-        this.gaugeTitle.push(this.data.records[i].title);
+        this.gaugeValue.push(this.data.info.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.info.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.info.records[i].title);
       }
       
-      const gaugeValueData = this.data.records[0].gaugevalue;
-      const gaugeLabelData = this.data.records[0].gaugelabel;
-      const gaugeTitleData = this.data.records[0].title;
+      const gaugeValueData = this.data.info.records[0].gaugevalue;
+      const gaugeLabelData = this.data.info.records[0].gaugelabel;
+      const gaugeTitleData = this.data.info.records[0].title;
       
       this.newChartObject = [{
         chart:
@@ -1157,18 +1163,18 @@ export class ChartBuilderFormComponent implements OnInit {
       }];
       
     } else if (this.chartType1 == 'Speedometer') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(parseInt(this.data.info.records[i].NAME));
 
-        this.gaugeValue.push(this.data.records[i].gaugevalue);
-        this.gaugeLabel.push(this.data.records[i].gaugelabel);
-        this.gaugeTitle.push(this.data.records[i].title);
+        this.gaugeValue.push(this.data.info.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.info.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.info.records[i].title);
       }
       
-      const gaugeValueData = this.data.records[0].gaugevalue;
-      const gaugeLabelData = this.data.records[0].gaugelabel;
-      const gaugeTitleData = this.data.records[0].title;
+      const gaugeValueData = this.data.info.records[0].gaugevalue;
+      const gaugeLabelData = this.data.info.records[0].gaugelabel;
+      const gaugeTitleData = this.data.info.records[0].title;
       
       this.newChartObject = [{
         chart: {
@@ -1234,18 +1240,18 @@ export class ChartBuilderFormComponent implements OnInit {
       }];
       
     } else if (this.chartType1 == 'Dual Axes Speedometer') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
         this.names.push(parseInt(this.data.records[i].NAME));
 
-        this.gaugeValue.push(this.data.records[i].gaugevalue);
-        this.gaugeLabel.push(this.data.records[i].gaugelabel);
-        this.gaugeTitle.push(this.data.records[i].title);
+        this.gaugeValue.push(this.data.info.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.info.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.info.records[i].title);
       }
       
-      const gaugeValueData = this.data.records[0].gaugevalue;
-      const gaugeLabelData = this.data.records[0].gaugelabel;
-      const gaugeTitleData = this.data.records[0].title;
+      const gaugeValueData = this.data.info.records[0].gaugevalue;
+      const gaugeLabelData = this.data.info.records[0].gaugelabel;
+      const gaugeTitleData = this.data.info.records[0].title;
       
       this.newChartObject = [{
         chart: {
@@ -1330,18 +1336,18 @@ export class ChartBuilderFormComponent implements OnInit {
       }];
       
     } else if (this.chartType1 == 'Speedometer solid') {
-      for (let i = 0; i < this.data.records.length; i++) {
-        this.ids.push(this.data.records[i].ID);
-        this.names.push(parseInt(this.data.records[i].NAME));
+      for (let i = 0; i < this.data.info.records.length; i++) {
+        this.ids.push(this.data.info.records[i].ID);
+        this.names.push(parseInt(this.data.info.records[i].NAME));
 
-        this.gaugeValue.push(this.data.records[i].gaugevalue);
-        this.gaugeLabel.push(this.data.records[i].gaugelabel);
-        this.gaugeTitle.push(this.data.records[i].title);
+        this.gaugeValue.push(this.data.info.records[i].gaugevalue);
+        this.gaugeLabel.push(this.data.info.records[i].gaugelabel);
+        this.gaugeTitle.push(this.data.info.records[i].title);
       }
       
-      const gaugeValueData = this.data.records[0].gaugevalue;
-      const gaugeLabelData = this.data.records[0].gaugelabel;
-      const gaugeTitleData = this.data.records[0].title;
+      const gaugeValueData = this.data.info.records[0].gaugevalue;
+      const gaugeLabelData = this.data.info.records[0].gaugelabel;
+      const gaugeTitleData = this.data.info.records[0].title;
 
       this.newChartObject = [{
         chart: {
@@ -1695,7 +1701,7 @@ export class ChartBuilderFormComponent implements OnInit {
       
     // }
     else {
-      this.data = null;
+      this.data.info = null;
       this.chartType = null;
       this.names = null;
       this.ids = null;

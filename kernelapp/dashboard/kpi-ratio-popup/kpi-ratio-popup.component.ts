@@ -151,25 +151,25 @@ export class KpiRatioPopupComponent implements OnInit {
 
 
 
-    // this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
-    // let selectedNodes = this.agGridSelectedNodes;
+    this.agGridSelectedNodes = this.informationService.getAgGidSelectedNode();
+    let selectedNodes = this.agGridSelectedNodes;
 
     
-    // let allData = {
-    //   kpiId: selectedNodes,
-    //   templateId: this.informationService.getSelectedTabId(),
-    // }
+    let allData = {
+      kpiId: selectedNodes,
+      templateId: this.informationService.getSelectedTabId(),
+    }
 
-    // this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
-    //   { headers: GlobalConstants.headers }).subscribe({
-    //     next: (res) => {
-    //     },
-    //     error: (error) => {
-    //     }
-    //   });
+    this.http.post<any>(GlobalConstants.addDashboardKpi, allData,
+      { headers: GlobalConstants.headers }).subscribe({
+        next: (res) => {
+        },
+        error: (error) => {
+        }
+      });
 
-    // this.commonFunctions.reloadPage('/dashboard');
-    // this.commonFunctions.navigateToPage('/dashboard');
+    this.commonFunctions.reloadPage('/dashboard');
+    this.commonFunctions.navigateToPage('/dashboard');
 
   }
 }

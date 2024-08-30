@@ -1,11 +1,12 @@
 <form [formGroup]="chartForm">
+  <h1 style="text-align: center;">{{newTitle}}</h1>
   <div  style="position:absolute;"  *ngFor="let options of newChartObject; let i = index" >
   <div class="chart-row">
      <div class="chart-container" id="chartContainer" style="width: 500px; display: flex; justify-content: center; align-items: center; padding-top: 5%;">
        <v-highcharts [sizeCheck]="true" [Highcharts]="Highcharts" [options]="options" ></v-highcharts>
      </div>
  </div>  
- <div *ngIf="isDescription">
+ <div *ngIf="isDescription" style="padding-bottom: 10px;">
 {{description}}
  </div>
  <div>

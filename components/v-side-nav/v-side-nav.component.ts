@@ -713,6 +713,7 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
     $("#myDropdown1 .section-3").show();
     $("#myDropdown1 .section-2-app-pref").hide();
   }
+
   openChartPopup() {
     const dialogRef = this.dialog.open(ChartPopupComponent, {
       // data:
@@ -740,6 +741,9 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
       width: '70%',
       height: '70%',
     });
+  }
+  openAlertPopup(){
+    
   }
 
   openDashboardAccessSettings() {

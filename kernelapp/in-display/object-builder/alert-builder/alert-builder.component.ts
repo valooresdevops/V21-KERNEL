@@ -133,7 +133,7 @@ export class AlertBuilderComponent {
         rowData: params.rowData // Pass the selected row data to the dialog
       },
       width: '35%', // Adjust dialog size as needed
-      height: '31%'
+      height: '35%'
     });
     console.log("TITLE>>>>>>",rowTitle);
     console.log("TITLE>>>>>>",rowColor);
@@ -144,7 +144,7 @@ export class AlertBuilderComponent {
 
 
     onUpdateClick() {
-      console.log("On update");
+      console.log(">>>>>>>>>>>>>>>>>>>On update");
       this.action = 'update';
       const data: any = this.informationservice.getSelectedNodeVGrid();
       const selectedNode = this.informationservice.getAgGidSelectedNode();

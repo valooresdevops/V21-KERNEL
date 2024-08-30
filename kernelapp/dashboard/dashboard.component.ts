@@ -30,6 +30,11 @@ HighchartsSolidGauge(Highcharts);
   encapsulation: ViewEncapsulation.None
 })
 export class DashboardComponent implements OnInit, AfterViewInit  {
+
+
+
+
+
   Highcharts: typeof Highcharts = Highcharts;
   checkVisibiltyDashboard : boolean = false;
   public subsVar: Subscription;
@@ -46,6 +51,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
    }
 
    
+  public chartTitle: String = '';
   public description: String='';
   public objectWidth: String='';
 
@@ -93,6 +99,12 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
 
   valueFromSecondObject: string;
 
+  // chartOptions: Highcharts.Options = {};
+  // chart: Highcharts.Chart | undefined;
+  // ids1 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Jan1', 'Feb1', 'Mar1', 'Apr1', 'May1', 'Jun1', 'Jul1','Jan2', 'Feb2', 'Mar2', 'Apr2', 'May2', 'Jun2', 'Jul2']; // Example categories
+  // names1 = [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 45, 545, 235 , 4656 ,354 ,354 ,354, 35,4341]; // Example data
+  // allData1 = [{ Title: 'Live Data Chart' }]; // Example title
+
   ngOnInit(): void {
     this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
@@ -107,10 +119,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
       this.onSelectTab();
       setTimeout(() => {
         this.showDashboard = true;
+        console.log(111)
       }, 1000);
     });
-
-    
   }
 
   
@@ -130,6 +141,18 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
    gridIndexMapping(id: number): number | undefined {
     return this.gridIndexesMapping.get(id);
   }
+
+
+  // startUpdatingData() {
+  //   setInterval(() => {
+  //     if (this.chart)
+  //     {
+  //       const x = (new Date()).getTime();
+  //       const y = Math.random() * 100;
+  //       this.chart.series[0].addPoint([x, y], true, true, true);
+  //     }
+  //   }, 1000);
+  // }
   
   onSelectTab() {
     this.checkVisibiltyDashboard = false;
@@ -323,7 +346,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                               viewDistance: 25,
                             }
                           },
-                          title: {text:this.allData[i].Title, align: 'center'},
+                          title: {text:this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
                           xAxis: {
                             categories: this.ids
                           },
@@ -356,7 +379,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       this.newChartObject = [
                         {
                           chart: {type: this.chartType},
-                          title: {text: this.allData[i].Title, align: 'center'},
+                          title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
                           xAxis: {
                             categories: this.ids
                           },
@@ -397,7 +420,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   title: {
                       text: 'Sales per employee per weekday', align: 'center',
                       style: {
-                          fontSize: '1em',
+                          fontSize: '16px',
                       }
                   },
               
@@ -505,7 +528,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           }
                         },
                         title: {
-                          text: this.allData[i].Title, align: 'center'
+                          text: this.allData[i].Title, align: 'center',style: {
+                            fontSize: '16px' // Change this to your desired font size
+                          }
                         },
                         xAxis: {
                           categories: this.ids
@@ -537,8 +562,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   }else{
                 this.newChartObject = [
                   {
+
                     chart: { type: 'line' },
-                    title: { text: this.allData[i].Title, align: 'center'},
+                    title: { text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
                     xAxis: {
                       categories: this.ids
                     },
@@ -551,6 +577,33 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       name: 'Series 1',
                       data: this.names,
                     }]
+                    
+
+                    // chart: {
+                    //   type: 'line',
+                    //   events: {
+                    //     load: () => {
+                    //       this.chart = Highcharts.charts[0];
+                    //       this.startUpdatingData();
+                    //     }
+                    //   }
+                    // },
+                    // title: {
+                    //   text: this.allData1[0].Title,
+                    //   align: 'center'
+                    // },
+                    // xAxis: {
+                    //   categories: this.ids1
+                    // },
+                    // yAxis: {
+                    //   title: {
+                    //     text: 'Value'
+                    //   }
+                    // },
+                    // series: [{
+                    //   name: 'Series 1',
+                    //   data: this.names1
+                    // }]
                   }
                 ];
               }
@@ -574,7 +627,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         }
                       },
                       title: {
-                        text: this.allData[i].Title, align: 'center'
+                        text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                       },
                       credits: {
                           enabled: false
@@ -607,7 +660,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         type: 'area'
                       },
                       title: {
-                        text: this.allData[i].Title, align: 'center'
+                        text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                       },
                       xAxis: {
                         categories: this.ids
@@ -653,7 +706,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         verticalAlign: 'top',
                         y: 60,
                         style: {
-                          fontSize: '1.1em'
+                          fontSize: '16px'
                         }
                       },
                       credits: {
@@ -704,7 +757,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     verticalAlign: 'top',
                     y: 60,
                     style: {
-                        fontSize: '1.1em'
+                        fontSize: '16px'
                     }
                 },
                 tooltip: {
@@ -751,7 +804,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     this.newChartObject = [
                       {
                         chart: { type: 'scatter'},
-                        title: { text: this.allData[i].Title, align: 'center' },
+                        title: { text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
                         credits: {
                             enabled: false
                         },
@@ -790,7 +843,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   this.newChartObject = [
                     {
                       chart: { type: 'scatter' },
-                      title: { text: this.allData[i].Title, align: 'center' },
+                      title: { text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
                       xAxis: {
                         title: {
                           text: 'X Axis'
@@ -880,7 +933,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           pointFormat: 'Cars sold: {point.y}'
                       },
                       title: {
-                          text: this.allData[i].Title, align: 'center'
+                          text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                       },
                       credits: {
                           enabled: false
@@ -912,7 +965,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     yAxis: [{
                       title: { text: 'Primary Axis' }
                     }, {
-                      title: { text: 'Pareto' },
+                      title: { text: 'Pareto', align: 'center', style: { fontSize: '16px' }},
                       opposite: true
                     }],
                     credits: {
@@ -955,8 +1008,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       }
                     },
                     title: {
-                      text: this.allData[i].Title,
-                      align: 'center' // Ensure the title is centered
+                      text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                     },
                     plotOptions: {
                       pie: {
@@ -979,8 +1031,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 } else {
                   this.newChartObject = [{
                     chart: { type: 'pie' },
-                    title: { text: this.allData[i].Title,
-                      align: 'center' },
+                    title: { text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' } },
                     plotOptions: {
                       pie: {}
                     },
@@ -1011,7 +1062,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].Title, align: 'center'
+                    text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                   },
                   credits: {
                       enabled: false
@@ -1047,7 +1098,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].Title, align: 'center'
+                    text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                   },
                   credits: {
                     enabled: false // Disable the credits link
@@ -1083,7 +1134,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
           
                   title: {
-                    text: this.allData[i].Title, align: 'center'
+                    text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                   },
                   credits: {
                     enabled: false // Disable the credits link
@@ -1114,7 +1165,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 },
         
                 title: {
-                    text: this.allData[i].Title, align: 'center'
+                    text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                 },
                 credits: {
                     enabled: false
@@ -1141,7 +1192,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                 },
         
                 title: {
-                    text: this.allData[i].Title, align: 'center'
+                    text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                 },
                 credits: {
                     enabled: false
@@ -1199,7 +1250,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   title: {
                       text: this.allData[i].Title, align: 'center',
                       style: {
-                          fontSize: '28px' // Adjusted font size to match the increased size
+                          fontSize: '16px' // Adjusted font size to match the increased size
                       }
                   },
                   credits: {
@@ -1312,7 +1363,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     title: {
                         text: this.allData[i].Title, align: 'center',
                         style: {
-                            fontSize: '14px' // Font size adjusted to match the gauge
+                            fontSize: '16px' // Font size adjusted to match the gauge
                         }
                     },
                     
@@ -1398,7 +1449,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       identifier: 'Speedometer'
                     },
                     title: {
-                      text: this.allData[i].Title, align: 'center'
+                      text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                     },
                     credits: {
                         enabled: false
@@ -1430,7 +1481,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       title: {
                         // text: this.allData[i].data.records[0].gaugevalue,
                         style: {
-                          fontSize: '17px'
+                          fontSize: '16px'
                         }
                       }
                     },
@@ -1475,7 +1526,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
             
                   title: {
-                      text: this.allData[i].Title, align: 'center'
+                      text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                   },
                   credits: {
                       enabled: false
@@ -1571,7 +1622,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   },
               
                   title: {
-                      text: this.allData[i].Title, align: 'center'
+                      text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
                   },
                   credits: {
                       enabled: false
@@ -1985,7 +2036,6 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.http.post<any>(GlobalConstants.deleteSelectedObject + this.informationservice.getSelectedTabId() + '/' + selectedObject, { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.commonFunctions.reloadPage('/dashboard');
-        // alert(111)
       })
   }
 
@@ -1999,7 +2049,13 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   openSelected(data: any) {
     let info = {};
     if (data.type == 'Chart') {
-
+      let titleInsideData:String = '';
+      const dataArray = data.data; // This is an array
+      if (dataArray && dataArray.length > 0) {
+        const firstItem = dataArray[0]; // Accessing the first object in the array
+        titleInsideData = firstItem.title.text; // Access the title's text
+      }
+      this.chartTitle = titleInsideData;
       this.http.post<any>(GlobalConstants.getQueryData + data.ID, { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
           info = res;
@@ -2008,9 +2064,10 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         dialogConfig.height = '700px';
 
         const dialogRef = this.dialog.open(ChartBuilderFormComponent, {
-          data: info,
+          data: { info,
+          chartTitle: this.chartTitle },
           width: '50%',
-          height: '45%',
+          height: '55%',
         });
       });
     } else if (data.type == 'Grid') {

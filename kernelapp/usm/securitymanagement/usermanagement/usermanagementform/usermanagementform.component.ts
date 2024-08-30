@@ -176,12 +176,55 @@ export class Usermanagementform implements OnInit {
     }
   }
 
+  // passwordCompare() {
+  //   var newPassword = this.userForm.get('newPassword').value;
+  //   var confirmNewPassword = this.userForm.get('confirmNewPassword').value;
+
+  //   if (newPassword != '' && confirmNewPassword != '') {
+  //     if (confirmNewPassword != newPassword) {
+  //       this.userForm.controls['newPassword'].setValue('');
+  //       this.userForm.controls['confirmNewPassword'].setValue('');
+  //       this.commonFunctions.alert("alert", 'Passwords do not match');
+  //     }
+  //   }
+  // }
+
   passwordCompare() {
     var newPassword = this.userForm.get('newPassword').value;
     var confirmNewPassword = this.userForm.get('confirmNewPassword').value;
-
+  
+    // Regular expressions to check for at least one character
+    var hasLetter = /[a-zA-Z]/.test(newPassword);
+    //  one capital letter
+    var hasCapitalLetter = /[A-Z]/.test(newPassword);
+    //  one special character
+    var hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+    // Check the length of the password should be more than +8
+    var isLengthValid = newPassword.length > 8;
+  
     if (newPassword != '' && confirmNewPassword != '') {
-      if (confirmNewPassword != newPassword) {
+      if (!hasLetter) {
+        // If password does not contain at least one Character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one character');
+      } else if (!hasCapitalLetter) {
+        // If password does not contain at least one capital Character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one uppercase character');
+      } else if (!hasSpecialChar) {
+        // If password does not contain at least one special character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one special character');
+      } else if (!isLengthValid) {
+        // If password length is 8 or less
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must be more than 8 characters long');
+      } else if (confirmNewPassword != newPassword) {
+        // If passwords do not match
         this.userForm.controls['newPassword'].setValue('');
         this.userForm.controls['confirmNewPassword'].setValue('');
         this.commonFunctions.alert("alert", 'Passwords do not match');

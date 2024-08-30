@@ -5553,6 +5553,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
           "isAdvancedSearch": getAllTabs.data[i].isAdvancedSearch,
           "hasMultipleSelection": getAllTabs.data[i].hasMultipleSelection,
           "isQueryForm": getAllTabs.data[i].isQueryForm,
+          "isFormFlip": getAllTabs.data[i].isFormFlip,
           "isDynamicReport": getAllTabs.data[i].isDynamicReport,
           "isGrid": isGrid,
           "objectId": getAllTabs.data[i].objectId,
