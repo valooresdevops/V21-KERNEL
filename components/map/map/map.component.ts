@@ -153,6 +153,8 @@ export class MapComponent implements OnInit {
   private markerLoop: L.MarkerClusterGroup;
   private markerclusterControl: any = L.MarkerClusterGroup;
   private fixedMarkersGroup: L.MarkerClusterGroup;
+  private bubblesGroup: L.MarkerClusterGroup;
+  private bubblesGroupLoop: L.MarkerClusterGroup;
   private fixedMarkersGroupLoop: L.MarkerClusterGroup;
   private sectorCluster: L.MarkerClusterGroup;
 
@@ -1310,6 +1312,8 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   opentimer:boolean=false;
   animatedPolylines: any[]=[];
   AnimatedMarkers: any[]=[];
+  arrayBubbles:any[]=[];
+  bubblesGroupArray:any[]=[];
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -1652,7 +1656,7 @@ console.log("generateRowData ><<><><>",this.generateRowData('device_id,number_of
 
   //  this.testflwomap();
 
-   // Add custom marker
+  //  Add custom marker
   //  const customMarker = this.createCustomMarker(51.505, -0.09, 'Start', 'red');
   //  customMarker.addTo(this.map);
 
@@ -3433,7 +3437,21 @@ if(this.geoJsonLayerArray.length!=0){
     this.map.removeLayer(elt));
 }
 this.geoJsonLayerArray=[];
-  }
+
+if(this.arrayBubbles.length!=0){
+  this.arrayBubbles.forEach((elt:any)=>
+    this.map.removeLayer(elt));
+}
+if(this.bubblesGroupArray.length!=0){
+  this.bubblesGroupArray.forEach((elt:any)=>
+    this.map.removeLayer(elt));
+}
+this.bubblesGroupArray=[];
+this.arrayBubbles=[];
+this.fixedElementMarker = [];
+
+  
+}
 
 
   onMapReady(map: L.Map) {
@@ -19007,30 +19025,56 @@ else{
 
 
 
-  }else{
+  }
+
+  else if (data[0].colName=="bts_cell_id"  && data[0].type=="Grid"){
+    let colValues: any[]=[];
+    data2.forEach((innerArray: any[]) => {
+      innerArray.forEach(item => {
+        if(item.type=="Grid"){
+          colValues.push(item.colValue);
+  
+        }
+      });
+    });
+    const numberArray:any = colValues.map(Number);
+
+    console.log("numberArray>",numberArray);
+    await this.datacrowdService
+    .getfixedelementsObject(numberArray)
+    .then(async (res: any) => {
+      //console.log('res>>', res);
+      this.displayFixedElements(res);
+  
+    });
+  
+  }
+  
+  
+  
+  else{
 
 let allData:any = data;
 console.log("hello--",this.informationservice.getAgGidSelectedNode());
 
     for(let i=0;i<data.length;i++)
       {
-        if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
-          // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
-          //   )]);
+        // if(data[i].colName=="bts_cell_id" && data[i].type=="Grid"  ){
+        //   // //console.log("data z>>>>>>>>>>",[ parseInt(data[i].colValue
+        //   //   )]);
         
         
-          await this.datacrowdService
-          .getfixedelementsObject([ parseInt(data[i].colValue)])
-          .then(async (res: any) => {
-            //console.log('res>>', res);
-            this.displayFixedElements(res);
+        //   await this.datacrowdService
+        //   .getfixedelementsObject([ parseInt(data[i].colValue)])
+        //   .then(async (res: any) => {
+        //     //console.log('res>>', res);
+        //     this.displayFixedElements(res);
         
-          });
+        //   });
         
         
-        }
-
-        else if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
+        // } else
+         if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
           await this.datacrowdService.getSelectedShapes(data[i].COLVALUE).then((res:any)=>{
             console.log("res in getSelectedShapes ",res);
             let data=JSON.parse(res); 
@@ -19821,31 +19865,26 @@ async addCurvedFlowLines(): Promise<void> {
     })
   
   }
-
-  displayBubles(object:any){
-
-  }
-
+ 
   
 async displayClusters33(AlocSimulId:any){
    this.displayclusters=true;
   let deviceInfoArray:any[]=[];
+  console.log("11111111111111--------",this.simulationid);
   await this.datacrowdService.getSimulationobject(this.simulationid).then((res: any) => {
+    // await this.datacrowdService.getSimulationobject(171503).then((res: any) => {
     this.datajson = res;
     console.log("this.datajson ------",this.datajson )
   });
   let existingDeviceArray1 = this.datajson.map((item:any) =>item[0]);
   let existingDeviceArray = [...new Set(existingDeviceArray1)];
+  // this.Devices = existingDeviceArray.join(',');
+
   console.log("existingDeviceArray ------",existingDeviceArray );
 
   let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
  
   existingDeviceArray.forEach((deviceId:any,index:any)=>{
-  //   console.log("deviceId-----",deviceId)
-
-  // let  DeviceDataArray1 = this.datajson.find((item:any) => item[0]===deviceId);
-  // console.log("111111111111 ------",DeviceDataArray1 );
-     
     deviceInfoArray.push({'deviceid':deviceId,'color':colorarray[index]})
   });
 
@@ -19857,7 +19896,7 @@ async displayClusters33(AlocSimulId:any){
   let  DeviceDataArray1 = this.datajson.filter((item:any) => item[0]==dev.deviceid);
   console.log("111111111111 ------",DeviceDataArray1 );
 
-  this.fixedMarkersGroup = new L.MarkerClusterGroup({
+  this.bubblesGroup = new L.MarkerClusterGroup({
     spiderfyOnMaxZoom: true,
     animate: true,
     singleMarkerMode: false,
@@ -19875,26 +19914,11 @@ async displayClusters33(AlocSimulId:any){
         iconSize = 80; // Large cluster icon
       }
   
-
-  // // Create a custom div icon with the same marker style
-  // const customIcon = L.divIcon({
-  //   className: 'custom-div-icon', // CSS class for styling
-  //   html: `
-  //     <div class="marker-container" style="background-color: ${color};">
-  //       <div class="marker-text">${text}</div>
-  //     </div>
-  //   `, // Keep the HTML structure the same, change color dynamically
-  //   iconSize: [30, 30], // Adjust based on your marker size
-  //   iconAnchor: [15, 15], // Center the marker
-  // });
-
-  // // Create and return the marker
-  // return L.marker([lat, lng], { icon: customIcon });;
+ 
       
       var html = `
         <div class="elementGroup11" style="width:${iconSize}px;height:${iconSize}px;line-height:${iconSize}px;">
           <img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${dev.color}.png" style="width:${iconSize}px;height:${iconSize}px;" />
-          start
         </div>
       `;
   
@@ -19905,30 +19929,46 @@ async displayClusters33(AlocSimulId:any){
       });
     },
   });
-  
+  let lastindex:number=DeviceDataArray1.length-1;
   // Assuming you already have your markers, add them to the group
-  DeviceDataArray1.forEach((object: any) => {
-    let center: any = [Number(object[4]), Number(object[3])];
-  
-    var fixedElementIcon = L.icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-'+dev.color+'.png',
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -32],
-    });
-  
-    this.fixedElementMarker = L.marker(center, {
-      icon: fixedElementIcon,
-    });
-  
-    this.fixedMarkersGroup.addLayer(this.fixedElementMarker);
-  });
-  
-  // Add the cluster group to the map
-  this.fixedMarkersGroup.addTo(this.map);
+  DeviceDataArray1.forEach((object: any,index:number) => {
+    if(index==0){
 
+    const customMarker = this.createCustomMarker(Number(object[4]), Number(object[3]), 'Start', dev.color);
+    customMarker.addTo(this.map);
+     this.arrayBubbles.push(customMarker);
+    }else if  (0 < Number(index) && Number(index) < Number(DeviceDataArray1.length - 1)) {
+
+      let center: any = [Number(object[4]), Number(object[3])];
+  
+      var fixedElementIcon:any = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-'+dev.color+'.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -32],
+      });
+    
+      let bubble = L.marker(center, {
+        icon: fixedElementIcon,
+      });
+    
+      this.bubblesGroup.addLayer(bubble);
+     this.arrayBubbles.push(bubble);
+
+    }else if(index==lastindex){
+      const customMarker = this.createCustomMarker(Number(object[4]), Number(object[3]), 'End', dev.color);
+      customMarker.addTo(this.map);
+     this.arrayBubbles.push(customMarker);
+
+    }
+   
+  }); 
+  
+  
+  this.bubblesGroup.addTo(this.map);
+  this.bubblesGroupArray.push(this.bubblesGroup);
  
-})
+});
 
 }
 
@@ -19949,13 +19989,118 @@ createCustomMarker(lat: number, lng: number, text: string, color: string): L.Mar
         <div class="marker-text">${text}</div>
       </div>
     `, // Keep the HTML structure the same, change color dynamically
-    iconSize: [30, 30], // Adjust based on your marker size
+    iconSize: [50, 50], // Adjust based on your marker size
     iconAnchor: [15, 15], // Center the marker
   });
 
   // Create and return the marker
   return L.marker([lat, lng], { icon: customIcon });;
 }
+
+byTailFirst(){
+  this.items=[
+    {label:'Start',action:this.displaybyTail.bind(this)},
+    {label:'Stop',action:this.stopRoute.bind(this)},
+    {label:'Display Data',action:this.opentimelineScreen.bind(this)}
+  ];
+  this.opentimer=true;
+ 
+  this.ShowHeader=false;
+
+  this.handleSpeedChange1(1);
+  // this.startRoute1();
+}
+displaybyTail(){
+    this.showroutedicv=false;
+    let routeDevices1:any[]=[];
+    let routeDevices:any[]=[];
+    let objcolor:any[]=[];
+    this.openTable=true;
+    this.isRunningRoute=true;
+    this.showroutebar1=true;
+    routeDevices = this.Devices.split(',');
+    this.routeDevicestable=routeDevices;
+    console.log("this.routeDevices-----------", routeDevices)
+    let colorarray:any[]=['green','red','blue','yellow','purpule','pink','orange'];
+
+     routeDevices.forEach((deviceId:any,index:any)=>{
+      routeDevices1.push({'deviceid':deviceId,'color':colorarray[index]});
+    });
+  this.displayedColumns = ['deviceid','Time','Lng', 'lat'];
+    let datajson:any;
+      datajson=this.datajson;
+      this.routedatajson=datajson;
+      let markerPositions = datajson
+      routeDevices1.forEach((a:any)=> { 
+      let deviceArray=  markerPositions.filter((elt:any)=>{
+          return  a.deviceid===elt[0]
+          });
+          objcolor.push({color:a.color,data:deviceArray,deviceId:a.deviceid,index:0,objectArray:[]});
+        });
+        this.displayPolylinesTail(markerPositions,objcolor,routeDevices);
+      }
+
+
+      displayPolylinesTail(markerPositions: any[],objcolor:any[],routeDevices:any[]): void {
+    
+        if (this.isRunningRoute==false) {
+        return;
+    }
+      const interval = setTimeout(async() => {
+        if (this.currentIndex >= markerPositions.length) {
+          clearInterval(interval); // Stop when all polylines are displayed
+          return;
+        }
+    
+        let currentDevice= markerPositions[this.currentIndex][0];
+        console.log("currentDevice-----------",currentDevice);
+      let x=  objcolor.find((elt:any)=>{
+        console.log("elt-----------",elt);
+       
+        return elt.deviceId==currentDevice});
+        console.log("x-----------",x);
+        if(x.index+1>=x.data.length)
+          {
+        
+            }
+        else if(x.index<=x.data.length) {
+          let polyline = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).arrowheads({
+            frequency: 3, // Places the arrow in the middle
+            size: '12px'
+          });
+          polyline.addTo(this.map);
+          let polyline1 = L.polyline([[x.data[x.index][4],x.data[x.index][3]],[x.data[x.index+1][4],x.data[x.index+1][3]]],{color:x.color}).addTo(this.magnifiedMap);
+       
+        
+          this.polylineRouteArray.push(polyline);
+        //  this.map.setView([x.data[x.index+1][4],x.data[x.index+1][3]], 18);
+
+          x.objectArray.push(polyline);
+          
+          if(x.objectArray.length%5==0 && x.index!=0){
+          
+            this.map.removeLayer(x.objectArray[0]);
+            this.map.removeLayer(x.objectArray[1]);
+            x.objectArray.splice(0, 2);  // Removes the first two elements
+            console.log("afterrrrrrrrrrrrrrrrrr",x.objectArray);  // Output: [3, 4, 5]
+
+           } 
+
+          this.polylineRouteArrayLoop.push(polyline1);
+          
+          // this.xroutearray.push(markerPositions[this.currentIndex]);
+          this.typeofdata='devicehistory';
+          console.log("x.index----------",x.index);
+          console.log("this.currentIndex-----------",this.currentIndex);
+  
+          this.opentableData(markerPositions[x.index],this.typeofdata);
+    }
+        this.currentIndex++;
+        x.index++;
+        console.log("this.speedTimeRoute1  ",this.speedTimeRoute1);
+        await this.displayPolylinesTail(markerPositions,objcolor,routeDevices);
+      },  6000/this.speedTimeRoute); 
+    } 
 
 }
 
