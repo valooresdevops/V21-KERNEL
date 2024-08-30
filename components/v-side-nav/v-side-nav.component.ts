@@ -17,6 +17,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
 import { from, lastValueFrom } from 'rxjs';
 import axios from 'axios';
 import { DashboardAccessRightsComponent } from '../../kernelapp/dashboard/dashboard-access-rights/dashboard-access-rights.component';
+import { AlertPopupComponent } from '../../kernelapp/dashboard/alert-popup/alert-popup.component';
 
 @Component({
   selector: 'v-side-nav',
@@ -743,7 +744,12 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
     });
   }
   openAlertPopup(){
-    
+
+    const dialogRef=this.dialog.open(AlertPopupComponent,{
+      //data:
+      width:'70%',
+      height:'70%'
+    });
   }
 
   openDashboardAccessSettings() {

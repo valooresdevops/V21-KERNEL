@@ -130,6 +130,9 @@ export class AdvancedSearchConfigurationComponent {
   onDeleteClick(){  
     let selectedColumn=this.informationservice.getAgGidSelectedNode();
     console.log("ALL GRID DATA ON DELETE>>>>>>>>",this.allGridData);
+    if(this.allGridData.length==1){
+      this.allGridData=[];
+    }
     this.allGridData = this.allGridData.filter(item => item.colName !== selectedColumn);
     this.informationservice.setAgGidSelectedNode('');
   }

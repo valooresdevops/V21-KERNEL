@@ -69,6 +69,9 @@ export class InformationService {
   public dynamicSearchApiData :any;
   public reloadGrid : boolean = true;
   public selectedNodeVGrid : object;
+  public selectedColumnFormOpening : any;
+  public selectedColumnValue : boolean = false;
+
   constructor() { }
 
   private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
@@ -622,6 +625,27 @@ getDynamicSearchApiData(){
 }
 setDynamicSearchApiData(dynamicSearchApiData:any){
   this.dynamicSearchApiData = dynamicSearchApiData;
+}
+
+
+
+getSelectedColumnValue(){
+  return this.selectedColumnValue;
+}
+setSelectedColumnValue(selectedColumnValue:any){
+  this.selectedColumnValue = selectedColumnValue;
+}
+
+
+
+getSelectedColumnFormOpening(){
+  return this.selectedColumnFormOpening;
+}
+setSelectedColumnFormOpening(selectedColumnFormOpening:any){
+  this.selectedColumnFormOpening = selectedColumnFormOpening;
+}
+removeSelectedColumnFormOpening(){
+  this.selectedColumnFormOpening = '';
 }
 
 }

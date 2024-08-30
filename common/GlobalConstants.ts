@@ -239,6 +239,7 @@ export class GlobalConstants {
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
   public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
   public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+  public static getReportsDataDropdown = GlobalConstants.qbeGateway + 'api/getReportsDataDropdown';
 
 
 
@@ -410,6 +411,8 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getDashboardGridData = GlobalConstants.inDispGatewat +'api/getDashboardGridData';
   public static getDashboardKpiData = GlobalConstants.inDispGatewat +'api/getDashboardKpiData';
   public static addDashboardChart = GlobalConstants.inDispGatewat +'api/addDashboardChart/';
+  public static addDashboardAlert = GlobalConstants.inDispGatewat +'api/addDashboardAlert/';
+
   public static getDashboardTemplateData = GlobalConstants.inDispGatewat +'api/getDashboardTemplateData/';
   public static updateDashboardTempalte = GlobalConstants.inDispGatewat +'api/updateDashboardTempalte/';
   public static addDashboardTempalte = GlobalConstants.inDispGatewat +'api/addDashboardTempalte/';
@@ -456,6 +459,9 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateAlertsDataApi = GlobalConstants.inDispGatewat + 'api/updateAlertsData/';
   public static insertAlertsDataApi = GlobalConstants.inDispGatewat + 'api/insertAlertsData/';
   public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
+
+  public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
+
 
 
   //////////////API BUILDER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\

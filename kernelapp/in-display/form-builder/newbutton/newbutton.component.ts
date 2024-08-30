@@ -31,12 +31,16 @@ export class NewbuttonComponent implements OnInit {
   ApiSelected: boolean = false;
   ApiSelected1: boolean = false;
   showApiBuilderJson: boolean = false;
+  public IsReportBuilder: boolean = false;
 
   public exportSelected: boolean = false;
 
   public AllMenus: any;
+  public IsAllColumns: boolean=false;
+
   public objectButtonId: any;
   public ALLcol : any;
+  public ALLReport : any;
   public buttonActions: number[] = [];
   public requestJsonParams:any[]=[];
   public responseJsonParams:any[]=[];
@@ -73,6 +77,8 @@ export class NewbuttonComponent implements OnInit {
     nbOfAction : new UntypedFormControl(''),
     requestJson : new UntypedFormControl(''),
     responseJson : new UntypedFormControl(''),
+    allcolumnsFormOpening : new UntypedFormControl(''),
+    IsReportBuilder : new UntypedFormControl(''),
   });
 
   closeDialog(): void {
@@ -98,6 +104,7 @@ export class NewbuttonComponent implements OnInit {
     this.AllMenus = GlobalConstants.getMenusButton;
     this.buttonPosition = GlobalConstants.getButtonPosition;
     this.AllFieldSet = GlobalConstants.getAllFieldSets + this.objectId;
+    this.ALLReport = GlobalConstants.getReportsDataDropdown;
     let isMain = this.buttonForm.controls['isMainPreview']?.value;
 
     // this.ALLcol = GlobalConstants.getColumnsApi + this.objectId;
@@ -193,9 +200,9 @@ export class NewbuttonComponent implements OnInit {
 
           if(ButtonAction == 5) {
             this.buttonForm.controls["url"].setValue(part.split("~A~")[3]);
-            this.buttonForm.controls["allColumns"].setValue(part.split("~A~")[2])
-
-            this.ApiSelected1 = true;
+            this.buttonForm.controls["IsReportBuilder"].setValue(part.split("~A~")[13]);
+            this.IsReportBuilder = true;
+            // this.ApiSelected1 = true;
           }
           if (ButtonAction == 7) {
             this.FormOpeningSelected = true;
@@ -457,9 +464,12 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
         let PATH = '';
         let jsonResponse='';
         let jsonRequest='';
+        let selectedColsFormOpening = '';
+        let reportSelected='';
         switch (buttonAction) {
           case 1:
             objectButtonId = this.buttonForm.controls['Menus']?.value;
+            selectedColsFormOpening = this.buttonForm.controls['allcolumnsFormOpening']?.value;
             condition = this.buttonForm.controls['condition']?.value;
             OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
             alertValue = this.buttonForm.controls['alertValue']?.value;
@@ -487,13 +497,14 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
             jsonResponse=JSON.stringify(this.responseSavedParams);
             break;
           case 5:
-            selectedCols = this.buttonForm.controls['allColumns']?.value;
+            selectedCols = this.buttonForm.controls['IsReportBuilder']?.value;
             URL = this.buttonForm.controls['url']?.value;
             condition = this.buttonForm.controls['condition']?.value;
             OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
             alertValue = this.buttonForm.controls['alertValue']?.value;
             thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
+            reportSelected=this.buttonForm.controls['IsReportBuilder']?.value;
             break;
           case 4:
             condition = null;
@@ -526,7 +537,7 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
         }
         console.log("4444444444444444444444");
 
-        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
+        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}~A~${selectedColsFormOpening}~A~${reportSelected}`;
         objectButtonIds.push(objectButtonIdString);
       }
       console.log("JAVA METHOD FILE>>>>>>>>>>>>>",objectButtonIds);
@@ -586,12 +597,15 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         let alertValue = '';
         let thirdCondition = '';
         let alertMessage = '';
+        let selectedColsFormOpening = '';
         let PATH = '';
+        let reportSelected='';
         console.log("888888888888888888888888888");
 
         switch (buttonAction) {
           case 1:
             objectButtonId = this.buttonForm.controls[`Menus`]?.value;
+            selectedColsFormOpening = this.buttonForm.controls['allcolumnsFormOpening']?.value;
             condition = this.buttonForm.controls['condition']?.value;
             OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
             alertValue = this.buttonForm.controls['alertValue']?.value;
@@ -622,7 +636,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
             jsonResponse=JSON.stringify(this.responseSavedParams);
             break;
           case 5:
-            selectedCols = this.buttonForm.controls['allColumns']?.value;
+            selectedCols = this.buttonForm.controls['IsReportBuilder']?.value;
             URL = this.buttonForm.controls['url']?.value;
             condition = this.buttonForm.controls['condition']?.value;
             OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
@@ -630,6 +644,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
             thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
             alertMessage = this.buttonForm.controls['alertMessage']?.value;
             objectButtonId = this.buttonForm.controls[`Menus`]?.value;
+            reportSelected=this.buttonForm.controls['IsReportBuilder']?.value;
             break;
           case 4:
             condition = null;
@@ -663,7 +678,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         }
         console.log("99999999999999999999999");
 
-        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}`;
+        let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}~A~${selectedColsFormOpening}~A~${reportSelected}`;
         objectButtonIds.push(objectButtonIdString);
       }
 
@@ -676,7 +691,6 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         "buttonId": buttonId,
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
-    console.log("12121212121212121212121212");
 
     if(this.isFromAdvancedSearchForm==false){
       console.log("0000000000000000000000000");
@@ -763,6 +777,8 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
   //       this.buttonForm.removeControl(control);
   //     }
   //   });
+  this.IsAllColumns = true;
+
   }
 
   onNbOfActionInput(): void {
@@ -803,7 +819,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       this.ApiSelected1 = true;
 
     }else if (value === 5) {
-      this.ApiSelected1 = true;
+      this.IsReportBuilder = true;
     }else if (value === 7) {
       this.FormOpeningSelected = true;
       this.Condition = true;
