@@ -1,10 +1,16 @@
-/* Button grid layout */
 .button-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* Responsive grid with minimum size of 90px */
   gap: 10px; /* Adjust spacing between buttons */
   justify-content: center; /* Center the grid within the container */
   margin-top: 20px;
+}
+
+/* Ensure no more than 7 buttons per row */
+@media (min-width: 860px) { /* Adjust the min-width as needed based on your design */
+  .button-grid {
+    grid-template-columns: repeat(7, 1fr); /* Maximum of 7 columns */
+  }
 }
 
 .container {

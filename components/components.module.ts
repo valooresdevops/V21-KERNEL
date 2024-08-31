@@ -84,6 +84,8 @@ import { TimelineComponent } from './map/timeline/timeline.component';
 import { MapOfflineComponent } from './map/map-offline/map-offline.component';
 import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-name-shape.component';
 import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
+import { ObjectSizeManagerPopupComponent } from '../kernelapp/dashboard/object-size-manager-popup/object-size-manager-popup.component';
+import { AlertComponent } from '../../alert/alert.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -147,7 +149,9 @@ import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
         TimelineComponent,
         MapOfflineComponent,
         PopupNameShapeComponent,
-        BubbleButtonComponent
+        BubbleButtonComponent,
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
 
     ],
     imports: [
@@ -219,7 +223,9 @@ import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
         TimelineComponent,
         MapOfflineComponent,
         PopupNameShapeComponent,
-        BubbleButtonComponent
+        BubbleButtonComponent,
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
 
     ],
     schemas: [

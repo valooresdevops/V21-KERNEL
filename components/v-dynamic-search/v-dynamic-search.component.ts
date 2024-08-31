@@ -577,15 +577,15 @@ fields.thirdDropdownOptions=this.thirdCombo ;
 }
   onReset(){
 
-    // this.dynamicSearchForm.reset();
+    this.dynamicSearchForm.reset();
 
-    // setTimeout(() => {
-    //   this.clearAll=true;
-    // }, 20);
+    setTimeout(() => {
+      this.clearAll=true;
+    }, 20);
 
-    // setTimeout(() => {
-    //   this.clearAll=false;
-    // }, 50);
+    setTimeout(() => {
+      this.clearAll=false;
+    }, 50);
   
    let obj = {
       result :"",

@@ -71,6 +71,7 @@ export class InformationService {
   public selectedNodeVGrid : object;
   public selectedColumnFormOpening : any;
   public selectedColumnValue : boolean = false;
+  public mainPreviewScreenType : boolean = false;
 
   constructor() { }
 
@@ -646,6 +647,14 @@ setSelectedColumnFormOpening(selectedColumnFormOpening:any){
 }
 removeSelectedColumnFormOpening(){
   this.selectedColumnFormOpening = '';
+}
+
+
+getMainPreviewScreenType(){
+  return this.mainPreviewScreenType;
+}
+setMainPreviewScreenType(mainPreviewScreenType:any){
+  this.mainPreviewScreenType = mainPreviewScreenType;
 }
 
 }

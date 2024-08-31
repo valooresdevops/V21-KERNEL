@@ -47,7 +47,7 @@
           [fieldName]="fields.thirdDropdown"
           [parentForm]="dynamicSearchForm"
           (change)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
-          [multiple]="true"
+          [multiple]="this.isForForm ? false : true"
         ></v-dropdown>
         </ng-container>
 

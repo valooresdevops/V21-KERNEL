@@ -7936,13 +7936,15 @@ let dataa:any=[];
         }
 
         this.gridStaticValue=dataa.grid;
-
-        setTimeout(()=>{
-          this.showGrid=false;
-          },100);
-          setTimeout(()=>{
-            this.showGrid = true;
-          },100);
+if (this.gridStaticValue || this.gridStaticValue.length != 0) {
+  setTimeout(()=>{
+    this.showGrid=false;
+    },100);
+    setTimeout(()=>{
+      this.showGrid = true;
+    },100);
+}
+        
       }
       // Close Popup
       else if (buttonAction == "4") {

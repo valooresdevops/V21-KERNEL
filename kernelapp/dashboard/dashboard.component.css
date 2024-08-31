@@ -690,3 +690,24 @@ button:hover {
   right: 0;
   background: white; /* Ensure background is consistent */
 }
+
+
+
+.dashboard-container {
+
+  width: 100%; /* Full width of the parent container */
+}
+
+/* Each alert item */
+.alert-item {
+  box-sizing: border-box; /* Includes padding and border in the element's total width and height */
+  display: grid;
+  gap: 16px; /* Space between items */
+}
+
+/* Optional: Additional styles for responsiveness */
+@media (max-width: 768px) {
+  .dashboard-container {
+    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); /* 1 item per row on smaller screens */
+  }
+}

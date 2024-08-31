@@ -1218,6 +1218,7 @@ export class ChartBuilderTypeComponent implements OnInit {
   }
 
   nextTab(type:any, identifier: string, e: any,) {
+    alert(type)
     if(e == 'c'){
     this.chartType = identifier;
     var sum = 0

@@ -8,7 +8,7 @@
 <div class="header-dialog">
     <div></div>
     <div class="dialogTitle"></div>
-    <button type="button" id="closeId" class="btn-close" aria-label="Close" (click)="closeDialog(true)"></button>
+    <button  [style.visibility]="mainPreviewDataInput.length===0 ? 'visible' : 'hidden'" type="button" id="closeId" class="btn-close" aria-label="Close" (click)="closeDialog(true)"></button>
 
 </div>
 
@@ -510,7 +510,8 @@
                             [showOrHideButton]="true"
                           [dataApi]="test"
                             [showOrHideButton]="false"
-                            [dataApiParam]="dataApiParam"[staticData]="gridStaticValue" >
+                            [dataApiParam]="dataApiParam"
+                            [staticData]="gridStaticValue" >
                     </v-grid>
                     <div class="row" *ngIf="tableOption.isSave == 1 && tableOption.isQueryForm!='1' && tableOption.isDynamicReport!='1'">
                         <div class="row justify-content-center">

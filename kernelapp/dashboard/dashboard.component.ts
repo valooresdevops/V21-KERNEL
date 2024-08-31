@@ -262,18 +262,27 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
             } else  if (this.allData[i].data.chartType == 10) {
               this.allData[i].stockAd = 1
            
-              this.chartType = 'line';
-            } else if (this.allData[i].data.chartType == 11) {
-              this.allData[i].stockAd = 1 
               this.chartType = 'stockLine';
+            } 
+            // else if (this.chartType == 11) {
+            //   stockChartType = 'column';
+            // } else if (this.chartType == 12) {
+            //   stockChartType = 'ohlc';
+            // } else if (this.chartType == 13) {
+            //   stockChartType = 'area';
+            // }
+            
+            else if (this.allData[i].data.chartType == 11) {
+              this.allData[i].stockAd = 1 
+              this.chartType = 'stockColumn';
             } else if (this.allData[i].data.chartType == 12) {
               this.allData[i].stockAd = 1 
       
-              this.chartType = 'stockColumn';
+              this.chartType = 'ohlc';
             } else if (this.allData[i].data.chartType == 13) {
               this.allData[i].stockAd = 1 
        
-              this.chartType = 'ohlc';
+              this.chartType = 'stockArea';
             } else if (this.allData[i].data.chartType == 14) {
               this.allData[i].stockAd = 0 
        

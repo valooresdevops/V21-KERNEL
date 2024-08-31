@@ -28,19 +28,38 @@
       <!-- <div class="box animate__animated animate__fadeIn"  style="height: 320px;"> -->
           <!-- <div>{{ gridCounter }}</div> -->
 
-    <div *ngIf="showDashboard" cdkDropList class="example-list d-flex flex-wrap" (cdkDropListDropped)="drop($event)" style="min-width: 100%;">
-      
-      <div  *ngFor="let data of allData; let i = index;"  [ngClass]="{
+
+  <!-- <div *ngIf="showDashboard" cdkDropList (cdkDropListDropped)="drop($event)" class="box">
+    <div *ngFor="let data of allData; let i = index;">
+      <ng-container *ngIf="data.type === 'Alert'; then alert"></ng-container>
+      <ng-template #alert>
+        <div>
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
+          <div cdkDrag>
+            <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title"></app-alert>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div> -->
+
+  <div *ngIf="showDashboard" cdkDropList class="example-list d-flex flex-wrap" (cdkDropListDropped)="drop($event)"
+    style="min-width: 100%;">
+
+    <div *ngFor="let data of allData; let i = index;" [ngClass]="{
         'col-md-4 mb-3': data.objectWidth === 1, 
         'col-md-7 mb-3': data.objectWidth === 2, 
         'col-md-11 mb-3': data.objectWidth === 3 
       }">
-        <div class="listContainer2">
-          <div >
-          <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
-        </div>
+      <div class="listContainer2">
+       
         <ng-container *ngIf="data.type === 'Chart'; then chart"></ng-container>
         <ng-template #chart>
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
           <div cdkDrag class="box-container" (contextmenu)="onRightClick($event, i)">
             <!-- <div class="box"> -->
             <div class="parent-div" (click)="openSelected(data)">
@@ -52,28 +71,6 @@
               </ul>
             </div>
 
-            <!-- <div class="chart-row">
-              <ng-container>
-                <div class="chart-container" *ngIf="data.stockAd == 0">
-                  <v-highcharts [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts>
-                  <div *ngIf="description != 'null'" class="description-container">
-                    <div class="description">
-                      {{allData[i].description}}
-                    </div>
-                    <button *ngIf="isDescriptionLong(allData[i].description)" (click)="openSelected(data)">
-                      Read More
-                    </button>
-                  </div>
-                </div>
-                <div class="chart-container" *ngIf="data.stockAd == 1">
-                  <v-highcharts-stocks [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts-stocks>
-                </div>
-                <div id="customContextMenu" class="custom-context-menu">
-                </div>
-              </ng-container>
-            </div> -->
-
-
             <div class="chart-row">
               <ng-container>
                 <div class="chart-container" *ngIf="data.stockAd == 0">
@@ -81,7 +78,8 @@
                   <div *ngIf="description != 'null'" class="description-container">
                     <div class="description">
                       {{allData[i].description}}
-                      <a *ngIf="isDescriptionLong(allData[i].description)" (click)="openSelected(data)" class="read-more-link">
+                      <a *ngIf="isDescriptionLong(allData[i].description)" (click)="openSelected(data)"
+                        class="read-more-link">
                         More
                       </a>
                     </div>
@@ -89,31 +87,30 @@
                 </div>
                 <div class="chart-container" *ngIf="data.stockAd == 1">
                   <v-highcharts-stocks [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts-stocks>
+                  <div *ngIf="description != 'null'" class="description-container">
+                    <div class="description">
+                      {{data.description}}
+                      <a *ngIf="isDescriptionLong(data.description)" (click)="openSelected(data)"
+                        class="read-more-link">
+                        More
+                      </a>
+                    </div>
+                  </div>
                 </div>
                 <div id="customContextMenu" class="custom-context-menu"></div>
               </ng-container>
             </div>
-            
-            
-            
-
-          <!-- </div> -->
-        </div>
+          </div>
         </ng-template>
-        
-        
-  
-
-
         <ng-container *ngIf="data.type === 'Kpi'; then KpiTemplate"></ng-container>
         <ng-template #KpiTemplate>
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
           <div cdkDrag>
             <div class="parent-div" (click)="openSelected(data)">
               <i class="fa fa-arrows-alt icon-left" aria-hidden="true"></i>
             </div>
-            <!-- <div  style="width: 100%;text-align: center;">
-              <p>{{data.Header[0].header}}</p>
-            </div> -->
 
             <div style="width: 95%; text-align: center; margin-top: 30px; font-size: 25px; margin: 30px auto;">
               <p><b>{{data.Header[0].header}}</b></p>
@@ -150,37 +147,51 @@
         </ng-template>
         <ng-container *ngIf="data.type === 'Grid'; then gridTemplate"></ng-container>
         <ng-template #gridTemplate style="width: max-content;">
-          <div  cdkDrag  class="test"  >
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
+          <div cdkDrag class="test">
             <div class="parent-div" (click)="openSelected(data)">
               <i class="fa fa-arrows-alt icon-left" aria-hidden="true"></i>
             </div>
-            
-            <!-- <div style="display: none;">{{gridIndexMapping(i)}}</div> -->
-             <!-- <div><b>{{data.Title}}</b></div> -->
-             <div style="width: 95%; text-align: center;">
+            <div style="width: 95%; text-align: center;">
               <p><b>{{data.Title}}</b></p>
             </div>
-            <v-grid id="data.ID" allowSideBar="true" [agColumns]="agColumnsJson1[gridIndexMapping(data.ID)]" [pagination]="true" [staticData]="data.Records"
-              [paginationPageSize]="3" [allowPagination]="false" [checkInput]="true" [checkPagination]="true">
+            <v-grid id="data.ID" allowSideBar="true" [agColumns]="agColumnsJson1[gridIndexMapping(data.ID)]"
+              [pagination]="true" [staticData]="data.Records" [paginationPageSize]="3" [allowPagination]="false"
+              [checkInput]="true" [checkPagination]="true">
             </v-grid>
-            <!-- {{agColumnsJson1[gridIndexMapping(data.ID)] | json}}
-            {{data.Records | json}} -->
+          </div>
+        </ng-template>
+        <ng-container *ngIf="data.type === 'Alert'; then alertTemplate"></ng-container>
+        <ng-template #alertTemplate style="width: max-content;">
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
+          <div cdkDrag class="test">
+            <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title"></app-alert>
           </div>
         </ng-template>
       </div>
-      <!-- <pre>{{ i | json }}</pre> -->
-    <!-- </div> </div> </div>-->
-  </div></div>
-    <div class="container-wrapper" *ngIf="checkVisibiltyDashboard" >
-      
-      <div class="custom-container2" style="width:98% !important; margin-left: 1%; margin-right: 1%;">
-          <h1 class="section-title"><b>About Valoores</b></h1>
-          <p class="section-text">
-            Valoores Digital Financial Service (VDFS) is at the forefront of financial technology innovation, backed by over 35 years of expertise in financial services, data security, and advanced analytics. Our VDFS platform transforms financial operations with cutting-edge solutions, including streamlined digital transaction management and real-time fraud detection. Key features include advanced screening tools for risk mitigation, comprehensive Anti-Money Laundering (AML) solutions to combat illicit activities, and an efficient Name Matching System (NMS) for precise identification and verification of individuals. By integrating these technologies, VDFS enables banks, financial institutions, and enterprises worldwide to enhance their operational efficiency, maintain regulatory compliance, and safeguard against emerging threats in the financial sector.          </p>
-      </div>
- 
+    </div>
   </div>
-     
-  
+  <div class="container-wrapper" *ngIf="checkVisibiltyDashboard">
+
+    <div class="custom-container2" style="width:98% !important; margin-left: 1%; margin-right: 1%;">
+      <h1 class="section-title"><b>About Valoores</b></h1>
+      <p class="section-text">
+        Valoores Digital Financial Service (VDFS) is at the forefront of financial technology innovation, backed by over
+        35 years of expertise in financial services, data security, and advanced analytics. Our VDFS platform transforms
+        financial operations with cutting-edge solutions, including streamlined digital transaction management and
+        real-time fraud detection. Key features include advanced screening tools for risk mitigation, comprehensive
+        Anti-Money Laundering (AML) solutions to combat illicit activities, and an efficient Name Matching System (NMS)
+        for precise identification and verification of individuals. By integrating these technologies, VDFS enables
+        banks, financial institutions, and enterprises worldwide to enhance their operational efficiency, maintain
+        regulatory compliance, and safeguard against emerging threats in the financial sector. </p>
+    </div>
+
+  </div>
+
+
 
 </v-tabs-container>

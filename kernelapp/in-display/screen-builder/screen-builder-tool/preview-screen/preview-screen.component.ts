@@ -14,6 +14,7 @@ Highcharts3D(Highcharts);
 
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import { InformationService } from 'src/app/Kernel/services/information.service';
 
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
@@ -35,12 +36,16 @@ export class PreviewScreenComponent implements OnInit {
     private sanitizer: DomSanitizer,
     @Optional() public dialogRef: MatDialogRef<PreviewScreenComponent>,
     private _Activatedroute: ActivatedRoute,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    public informationservice: InformationService,
+  ) { }
 
     async ngOnInit() {
       this.itemsData = [];
-  
+
+
       if (this.data == null || this.data == "undefined") {
+        this.informationservice.setMainPreviewScreenType(false);
         this._Activatedroute.paramMap.subscribe(async (params:any) => {
           this.menuVariable = params.get('menuVariable');
           console.log("this.menuVariable-----",this.menuVariable)
@@ -51,6 +56,8 @@ export class PreviewScreenComponent implements OnInit {
           this.itemsData = JSON.parse(data[0].screenData);
         });
       } else {
+        this.informationservice.setMainPreviewScreenType(true);
+
         this.menuVariable = this.data;
         console.log("this.menuVariable===",this.menuVariable);
   
