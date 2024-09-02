@@ -1329,6 +1329,7 @@ this.informationservice.setAgGidSelectedNode(this.selectedNodesAr);
           } else {
             console.log("FETET LA HON");
             console.log("event-->",event);
+            this.informationservice.setAgGridNodeData(event);
             this.informationservice.setSelectedNodeVGrid(event.data);
             if(this.isGrouped == true || this.informationservice.getIsRowGroup() =='1')
             {

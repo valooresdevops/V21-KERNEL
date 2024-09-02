@@ -26,6 +26,8 @@ import { LoaderService } from 'src/app/Kernel/components/map/Services/loader.ser
 
 export class PreviewFormComponent implements OnInit {
   public isGridOptions:any;
+  public isAMLoad:any;
+
   @Input() fromScreenBuilder: String = "0";
   @Input() screenBuilderObjId: any;
   public newVariableTitle: string = '';
@@ -70,6 +72,8 @@ export class PreviewFormComponent implements OnInit {
   menuForm = new UntypedFormGroup({});
   public userId: number = Number(this.informationservice.getLogeduserId());
   public isTreeGrid: boolean =false;
+  public isAdvancedHidden: boolean =false;
+
   // Variables added by Nadine
   public buttonObjectId: any;
   public amInfo: any;
@@ -579,6 +583,8 @@ export class PreviewFormComponent implements OnInit {
             "isAdvancedSearch": res[i].isAdvancedSearch,
             "isGrid": res[i].isGrid,
             "isTreeGrid":res[i].isTreeGrid,
+            "isAMLoad":res[i].isAMLoad,
+            "isAdvancedHidden":res[i].isAdvancedHidden,
             "hasMultipleSelection": res[i].hasMultipleSelection,
             "isQueryForm": res[i].isQueryForm,
             "isDynamicReport": res[i].isDynamicReport,
@@ -605,7 +611,10 @@ export class PreviewFormComponent implements OnInit {
           if (res[i].isMain == 1) {
             this.objectMain = res[i].objectId;
           }
-
+          if(res[i].isAdvancedHidden == 1){
+            this.isAdvancedHidden = true;
+            this.informationservice.setAdvancedSearchShowGridMain(false);
+          }
           if (res[i].isMain == "1") {
 
             let previousTab = this.informationservice.getPreviousMainTab();
@@ -642,7 +651,10 @@ export class PreviewFormComponent implements OnInit {
           let variableTitle = JSON.stringify(data[0].menuName);
           this.newVariableTitle = variableTitle.replace(/"/g, '');
           this.isGridOptions=this.tableOptions1[0].isGrid;
+          this.isAMLoad=this.tableOptions1[0].isAMLoad;
           console.log("IS GRID OPTIONS>>>>>>>>>>>",this.isGridOptions);
+          console.log("IS AM LOAD>>>>>>>>>>>",this.isAMLoad);
+
           this.getAllColums();
         });
       });

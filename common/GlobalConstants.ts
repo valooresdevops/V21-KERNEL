@@ -450,6 +450,11 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static editChartSize = GlobalConstants.inDispGatewat + 'api/updateSizeChart/';
   public static editGridSize = GlobalConstants.inDispGatewat + 'api/updateSizeGrid/';
   public static editKpiSize = GlobalConstants.inDispGatewat + 'api/updateSizeKpi/';
+  public static getHtmlElementDataApi = GlobalConstants.inDispGatewat +'api/getHtmlElementDataApi/';
+  public static insertHtmlElementDataApi = GlobalConstants.inDispGatewat +'api/insertHtmlElementDataApi/';
+  public static deleteHtmlElementDataById = GlobalConstants.inDispGatewat +'api/deleteHtmlElementDataById/';
+  public static updateHtmlElementData = GlobalConstants.inDispGatewat +'api/updateHtmlElementData/';
+  public static addDashboardHtmlElement = GlobalConstants.inDispGatewat +'api/addDashboardHtmlElement/';
   public static insertIconData = GlobalConstants.inDispGatewat + 'api/insertIconData/';
   public static getIconData=GlobalConstants.inDispGatewat+'api/getIconData';
   public static updateIconData = GlobalConstants.inDispGatewat + 'api/updateIconData/';
@@ -459,8 +464,9 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateAlertsDataApi = GlobalConstants.inDispGatewat + 'api/updateAlertsData/';
   public static insertAlertsDataApi = GlobalConstants.inDispGatewat + 'api/insertAlertsData/';
   public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
-
   public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
+  public static getHtmlElementData = GlobalConstants.inDispGatewat +'api/getHtmlElementData/';
+  public static editCkEditorSize = GlobalConstants.inDispGatewat + 'api/updateSizeCkEditor/';
   public static getGeneratedReport = GlobalConstants.inDispGatewat + 'api/getGeneratedReport';
 
 

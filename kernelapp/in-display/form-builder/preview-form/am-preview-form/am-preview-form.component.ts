@@ -67,6 +67,7 @@ export class AmPreviewFormComponent implements OnInit {
   public selectedTabName: any;
   public listOfAllFields : any ;
   public allData : any;
+  public choosenField: any;
   //test2
   public userId: number = Number(this.informationservice.getLogeduserId())
   public whereConditionAr: any[] = [];
@@ -1593,13 +1594,14 @@ this.informationservice.removeSelectedColumnFormOpening();
             }
           }
           let actionType;
-// console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnload.data[j] );
           if (JSON.parse(dynamicDRBOnload.data[j].actionType) == 1) {
             actionType = "saveNew";
           }
           else if (JSON.parse(dynamicDRBOnload.data[j].actionType) == 2) {
             actionType = "update";
           }
+          console.log("Action type >>>>>> : " ,actionType);
+
           if (isExcluded != 1) {
            // this.loaderService.isLoading.next(true);
            if(this.actionType == undefined){
@@ -2423,6 +2425,8 @@ this.informationservice.removeSelectedColumnFormOpening();
 
   async dynamicDRBOnSearch(objectId: number) {
     try {
+
+      console.log("0000000000000000000000000000");
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/6/0";
       const dynamicDRBOnsearchUrl = from(axios.post(url));
       const dynamicDRBOnsearch = await lastValueFrom(dynamicDRBOnsearchUrl);
@@ -2493,6 +2497,9 @@ this.informationservice.removeSelectedColumnFormOpening();
           if(this.actionType == undefined){
             this.actionType = actionType;
           }
+          console.log("ACTION TYPE 11111>>>>>>>>>>>>>",this.actionType);
+          console.log("ACTION TYPE 222222>>>>>>>>>>>>>",actionType);
+
             if (this.actionType == actionType) {
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
@@ -2509,6 +2516,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                    //   console.log("111111111111111111111111");
+                   console.log("11111111111111111111111111111111");
 
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
@@ -2753,7 +2761,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
                       //////////
                     } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
-                    //  console.log("111111111111111111111111");
+                      console.log("111111111111111111111111");
 
                       this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
                     } else if (action == "Required") {
@@ -2830,7 +2838,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                             whereCond: this.getWhereCond
                           }
                         )
-
+                        console.log("333333333333333333333333333333333333");
                         if (paramNames.data.length > 0) {
                           // Filter ROW_ID information to get only the ones for Grid
                           let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -2936,7 +2944,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                         executeOnField = ruleData[i].data;
                       }
                       if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
-                       // console.log("111111111111111111111111");
+                        console.log("111111111111111111111111");
 
                         executeOnFieldSet = ruleData[i].data;
                       }
@@ -3157,7 +3165,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Show FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
-                     //   console.log("111111111111111111111111");
+                        console.log("111111111111111111111111");
 
                       } else if (executeAction == "Hide FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
@@ -3385,6 +3393,8 @@ this.informationservice.removeSelectedColumnFormOpening();
           let included: any = '';
           let valueOfFieldSelected: any;
           let choosenValue: any;
+          let fieldToFillInValue: any;
+
           let isExcluded = JSON.parse(onChangeUrl.data[j].isExcluded);
 
 
@@ -3792,12 +3802,12 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                           }
                       }
                     }
-//console.log("choosenField=",choosenField);
+console.log("choosenField=",choosenField);
                   } else if (ruleData[i].step == 2) {
                     if (ruleData[i].data != "") {
                       condition = this.commonFunctions.filterArrayById(this.conditions, ruleData[i].data)[0].name;
                     }
-//console.log("condition=",condition);
+console.log("condition=",condition);
                   } else if (ruleData[i].step == 3) {
                     if (ruleData[i].data != "") {  // this.executionAction
                       actionDecisions = this.commonFunctions.filterArrayById(this.valueSource, ruleData[i].data)[0].name;
@@ -3806,7 +3816,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     if (ruleData[i].data != "") {
                       dateTypes = this.commonFunctions.filterArrayById(this.dateTypes, ruleData[i].data)[0].name;
                     }
-//console.log("dateTypes=",dateTypes);
+console.log("dateTypes=",dateTypes);
                   } else if (ruleData[i].step == 200) {
                     if (ruleData[i].data != "") {
                       // fieldValue = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -3928,10 +3938,13 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     if (ruleData[i].data != "") {
                       betweendate1 = ruleData[i].data;
                     }
+                    console.log("betweendate1>>>>>>",betweendate1)
                   } else if (ruleData[i].step == 23) {
                     if (ruleData[i].data != "") {
                       betweendate2 = ruleData[i].data;
                     }
+                    console.log("betweendate2>>>>>>",betweendate2)
+
                   } else if (ruleData[i].step == 24) {
                     if (ruleData[i].data != "") {
                       // fieldToFillIn = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -3941,6 +3954,9 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                       } else {
                         fieldToFillIn = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       }
+                      console.log("fieldToFillIn>>>>>>",fieldToFillIn);
+                      let fieldToFillInValue = this.dynamicForm.controls[choosenField]?.value;
+                      this.choosenField = fieldToFillIn;
                     }
                   } else if (ruleData[i].step == 26) {
                     if (ruleData[i].data != "") {
@@ -3950,28 +3966,40 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                         fillIntoChoosen = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       }
                     }
+                    console.log("fillIntoChoosen>>>>>>",fillIntoChoosen)
+
                   } else if (ruleData[i].step == 25) {
                     if (ruleData[i].data != "") {
                       fieldToFillInOrder = ruleData[i].data;
                     }
+                    console.log("fieldToFillInOrder>>>>>>",fieldToFillInOrder)
+
                   } else if (ruleData[i].step == 28) {
                     if (ruleData[i].data != "") {
                       typeOfFillInto = ruleData[i].data;
                     }
+                    console.log("typeOfFillInto>>>>>>",typeOfFillInto)
+
                   } else if (ruleData[i].step == 27) {
                     if (ruleData[i].data != "") {
                       minusCURRENT_DATE = ruleData[i].data;
 
                     }
+                    console.log("minusCURRENT_DATE>>>>>>",minusCURRENT_DATE)
+
                   }
                   else if (ruleData[i].step == 29) {
                     if (ruleData[i].data != "") {// + or -
                       operator = this.commonFunctions.filterArrayById(this.plusMinusOperator, ruleData[i].data)[0].name
                     }
+                    console.log("operator>>>>>>",operator)
+
                   } else if (ruleData[i].step == 30) {
                     if (ruleData[i].data != "") {
                       operatorOption = ruleData[i].data;
                     }
+                    console.log("operatorOption>>>>>>",operatorOption)
+
                   } else if (ruleData[i].step == 301) {
                     if (ruleData[i].data != "") {
                       operatorQuery = ruleData[i].data;
@@ -3979,12 +4007,14 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                   } else if (ruleData[i].step == 31) {
                     if (ruleData[i].data != "") {
                       valueToOperate = ruleData[i].data;
-//console.log("valueToOperate=",valueToOperate);
+console.log("valueToOperate=",valueToOperate);
                     }
                   } else if (ruleData[i].step == 210) {
                     if (ruleData[i].data != "") {
                       operations = this.commonFunctions.filterArrayById(this.operations, ruleData[i].data)[0].name;
                     }
+                    console.log("operations=",operations);
+
                   } else if (ruleData[i].step == 211) {
                     if (ruleData[i].data != "") {
                       typeOfDifference = ruleData[i].data;
@@ -4177,8 +4207,10 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                   }
                 }
               }
-//console.log("ruleAction >>>>>>>=",ruleAction)
+console.log("ruleAction >>>>>>>=",ruleAction)
               if (ruleAction == "On Change") {
+                console.log("condition >>>>>>>=",condition)
+
                 if (condition == '=' || condition == '!=') {
                   if (dateTypes == 'Value' && condition != 'between') {
                     if (executeAction == "Alert") {
@@ -4631,10 +4663,12 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     }
                   }
                 } else if (condition == 'Fill Into') {
+                  console.log("typeOfFillInto >>>>>>>=",typeOfFillInto)
 
                   if (typeOfFillInto == undefined) {
                     let choosenValue;
                     for (let i = 0; i < this.test.length; i++) {
+
                       if (this.test[i].name == choosenField) {
                         if (this.test[i].columnType == "combo") {
                           for (let j = 0; j < this.test[i].query.length; j++) {
@@ -4644,6 +4678,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                           }
                         } else {
                           choosenValue = this.dynamicForm.controls[choosenField]?.value;
+                        
                         }
                       }
                     }
@@ -4672,6 +4707,13 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - valueToOperate);
                       } else if (operator == '+') {
                         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() + valueToOperate);
+                      }else if (operator == 'Sum'){
+                        const newValue = choosenValue + valueToOperate;
+                        console.log("newValue>>>>>>>",newValue);
+                        console.log("choosenValue>>>>>>>",choosenValue);
+                        console.log("fieldToFillIn>>>>>>>",fieldToFillIn);
+                        this.dynamicForm.controls[fieldToFillIn].setValue(newValue);
+
                       }
                       let lastDate = this.datepipe.transform(thirtyDaysAgo, 'yyyy-MM-dd');
                       this.dynamicForm.controls[fieldToFillIn].setValue(lastDate);
@@ -4828,10 +4870,22 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     this.handleFormFieldValues(fieldToFillIn, time);
                   } else if (typeOfFillInto == 2) { // get the value of a choosen field rule 26
                     let valueOfField = this.dynamicForm.controls[fillIntoChoosen]?.value
-
-                    if (minusCURRENT_DATE[0] == "1") {
-                      valueOfField = this.calculateDifference(valueOfField);
+                    let fieldToFillInValue = this.dynamicForm.controls[this.choosenField]?.value;
+                    console.log('choosenField>>>>>>>>>',choosenField);
+                    console.log("valueOfField >>>>>>>=",valueOfField);
+                    if (Array.isArray(minusCURRENT_DATE) && minusCURRENT_DATE.length > 0) {
+                      if (minusCURRENT_DATE[0] === "1") {
+                        valueOfField = this.calculateDifference(valueOfField);
+                      }                 
+                     } else {
+                      console.log('valueOfField>>>>>>>>',valueOfField);
+                      console.log('fieldToFillInValue>>>>>>>>',fieldToFillInValue);
+                      valueOfField = Number(valueOfField) + Number(fieldToFillInValue);
+                        console.log('valueField.??.>>>>>>',valueOfField);
                     }
+                 
+
+  
                     this.handleFormFieldValues(fieldToFillIn, valueOfField);
 
 
@@ -4941,7 +4995,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
     }
 
     if (executeAction == "Show FieldSet") {
-     // console.log("111111111111111111111111");
+      console.log("111111111111111111111111");
       this.informationservice.setAdvancedSearchShowGrid(true);
       if (fieldsetColumns.length >= 1) {
         for (let u = 0; u < fieldsetColumns.length; u++) {
@@ -5605,6 +5659,8 @@ console.log("ruleData2 >>>>>>>>",ruleData);
           "hasMultipleSelection": getAllTabs.data[i].hasMultipleSelection,
           "isQueryForm": getAllTabs.data[i].isQueryForm,
           "isFormFlip": getAllTabs.data[i].isFormFlip,
+          "isAMLoad": getAllTabs.data[i].isAMLoad,
+          "isAdvancedHidden": getAllTabs.data[i].isAdvancedHidden,
           "isDynamicReport": getAllTabs.data[i].isDynamicReport,
           "isGrid": isGrid,
           "objectId": getAllTabs.data[i].objectId,
@@ -5679,6 +5735,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
     // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
+    this.actionType ='saveNew'
     }
     console.log("LOOKPU DATA>>>>>>>>>>>>>>",this.lookupData);
     console.log("MAIN PREVIEW DATA INPUT>>>>>>>>>>>>>",this.mainPreviewDataInput);
@@ -6055,7 +6112,6 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
         }
 
       }
-      console.log("IS GRID 1st LAST>>>>",isGrid);
 
     }
     }
@@ -6092,18 +6148,23 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     if(this.amInfo.isFromButtonClick==undefined && this.amInfo.buttonClick==14 && getTabConfigurationApi.data[0].isGrid==1){
       isGrid=1;
     }
-    console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
+    if(this.amInfo.buttonClick==14 && this.amInfo.isFromButtonClick==undefined && this.informationservice.getSelectedColumnFormOpening() != undefined){
+      this.actionType = 'saveNew';
+    }
     this.isPageGrid = isGrid == 1 ? true : false;
     //make buttons appear under a grid
     const getColumnsApiUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
     const getColumnsApi = await lastValueFrom(getColumnsApiUrl);
     let buttons: any = getColumnsApi.data.filter((el: any) => {
-      // //console.log("my val >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " ,el);
 
       return el.columnTypeCode === "14";
     });
     this.testButtons = buttons;
-
+    console.log("TTTTTTTTTTT>>>>>>>>>>>>>",getTabConfigurationApi.data[0].isAMLoad);
+    if(getTabConfigurationApi.data[0].isAMLoad=="1"){
+      console.log("main am preview Grid is Form!!!!!");
+      isGrid=1;
+    }
     if (isGrid == 0) {
       this.informationservice.setFormToOpen("yes");
     }
@@ -7803,7 +7864,7 @@ let dataa:any=[];
         console.log("99999>>>>>>",part.split("~A~")[9]);
         console.log("10101010>>>>>>",part.split("~A~")[10]);
         console.log("11111111>>>>>>",part.split("~A~")[11]);
-
+        console.log("SHOW API>>>>>>>>>>>>>>>>>>>>",url);
         const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
         const getApiJsons = await lastValueFrom(getApiJsonsApi);
 
@@ -8547,7 +8608,17 @@ if (this.gridStaticValue || this.gridStaticValue.length != 0) {
     this.dynamicDRBOnSearch(this.objectId);
 
   }
+  // onSearchSubmit(getWhereCond: any) {
+  //   // this.getWhereCond = getWhereCond.data;
+  //    this.dynamicDRBOnSearch(this.objectId);
 
+  //   //  this.getWhereCond = getWhereCond.result;
+  //   //  if(getWhereCond.reloadGrid == true){
+  //   //    this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectId + '/-1/previewForm/');
+ 
+  //   //  }
+  //   //  this.getAllColums();
+  //  }
   async onDeleteClick() {
     this.actionType = "select";
     //test2

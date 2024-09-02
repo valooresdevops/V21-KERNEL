@@ -1,0 +1,14 @@
+<v-grid
+allowSideBar="true"
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="amd"
+[dataApi]="getElementData"
+[frameworkComponents]="frameworkComponents"
+(onGridAdd)="onAddClick()"
+(onGridDelete)="onDeleteClick()"
+(onGridUpdate)="onUpdateClick($event)"
+agPrimaryKey="eId"
+agRowSelection="single"
+></v-grid>

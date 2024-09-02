@@ -24,7 +24,7 @@
         </div>
         <div class="col-lg-12">
             <v-toggle label="Show in Grid" formControlName="isMainPreview" [parentForm]="buttonForm"
-                    fieldName="isMainPreview" (click)="onActionChange()"></v-toggle>
+                    fieldName="isMainPreview" ></v-toggle>
         </div>
         <div class="col-lg-12">
             <v-dropdown formControlName="fieldSet" [dataApi]="AllFieldSet" label="Field Set" placeholder=""
@@ -37,11 +37,21 @@
                 [parentForm]="buttonForm" fieldName="nbOfAction" (input)="onNbOfActionInput()">
             </v-input>
         </div>
-        <div class="col-lg-12" *ngFor="let action of buttonActions; let i = index">
+        <!-- <div class="col-lg-12" *ngFor="let action of buttonActions; let i = index">
             <v-dropdown [formControlName]="'ButtonAction' + i" [dataJSON]="AllAction" label="Action" placeholder=""
-                required="true" [parentForm]="buttonForm" [fieldName]="'ButtonAction' + i" (onChangeEvent)="onActionChange()">
+                required="true" [parentForm]="buttonForm" [fieldName]="'ButtonAction' + i" (onChangeEvent)="onActionChange($event, i)">
             </v-dropdown>
-        </div>
+        </div> -->
+
+        <div class="row">
+            <div class="col-lg-12" *ngFor="let action of buttonActions; let i = index">
+              <v-dropdown [formControlName]="'ButtonAction' + i" [dataJSON]="AllAction" label="Action" placeholder=""
+                required="true" [parentForm]="buttonForm" [fieldName]="'ButtonAction' + i" (onChangeEvent)="onButtonActionChange($event, i)">
+              </v-dropdown>
+            </div>
+          </div>
+
+
         <div class="col-lg-12" *ngIf="FormOpeningSelected">
             <v-dropdown formControlName="Menus" [dataApi]="AllMenus" label="Menus" placeholder=""
                 [parentForm]="buttonForm" fieldName="Menus" (onChangeEvent)="showCondition()">
@@ -65,11 +75,13 @@
     </div>-->
 
 
-    <div class="col-lg-12" *ngIf="IsReportBuilder">
-        <v-dropdown formControlName="IsReportBuilder" [dataApi]="ALLReport" label="Report" placeholder=""
-        [parentForm]="buttonForm" fieldName="IsReportBuilder" [multiple]="false">
-    </v-dropdown>
-    </div>
+    <div class="row">
+        <div class="col-lg-12" *ngFor="let index of IsReportBuilderArray">
+          <v-dropdown formControlName="'IsReportBuilder' + index" [dataApi]="ALLReport" label="Report" placeholder=""
+            [parentForm]="buttonForm" fieldName="'IsReportBuilder' + index">
+          </v-dropdown>
+        </div>
+      </div>
 
         <div class="col-lg-12" *ngIf="ApiSelected1">
             <v-dropdown formControlName="url" [dataApi]="getApiBuilderListDropDown" label="APIs" placeholder=""

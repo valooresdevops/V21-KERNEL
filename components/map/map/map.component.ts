@@ -80,8 +80,7 @@ import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
 import { InformationService } from "src/app/Kernel/services/information.service";
 import { FileDownloadService } from "../Services/FileDownloadService.service";
-import * as esri from 'esri-leaflet';
-import 'leaflet-curve'; // Import the curve plugin
+//import 'leaflet-curve'; // Import the curve plugin
 // import 'leaflet-ant-path';
 import 'leaflet-arrowheads';
 

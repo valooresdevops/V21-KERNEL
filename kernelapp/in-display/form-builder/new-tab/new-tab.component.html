@@ -19,6 +19,10 @@
       </div>
 
       <div class="col-lg-4">
+        <v-toggle label="Is AM Load" formControlName="isAMLoad" [parentForm]="newTabForm" fieldName="isAMLoad"> </v-toggle>
+    </div>
+
+      <div class="col-lg-4">
         <v-toggle label="Is Tree Grid" formControlName="isTreeGrid" [parentForm]="newTabForm" fieldName="isTreeGrid"> </v-toggle>
     </div>
 
@@ -83,6 +87,11 @@
           <v-toggle label="Is Advanced Search" formControlName="isAdvancedSearch" [parentForm]="newTabForm" (toggleChange)="isAdvancedSearchChange()"
               fieldName="isAdvancedSearch"> </v-toggle>
       </div>
+
+      <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-toggle label="Is Advanced Hidden" formControlName="isAdvancedHidden" [parentForm]="newTabForm"
+            fieldName="isAdvancedHidden"> </v-toggle>
+    </div>
       <!-- <div class="col-lg-4" *ngIf="showAddSearchProcedure">
           <v-input  formControlName="addSearchProcedure" [parentForm]="newTabForm" type="lookup"
           [lookupDataApi]="getAllProcAndPack" lookupWidth="700px" lookupHeight="700px" label="Add Procedure"

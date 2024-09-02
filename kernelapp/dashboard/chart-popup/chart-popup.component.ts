@@ -110,6 +110,7 @@ export class ChartPopupComponent implements OnInit {
 
       let  chartId = selectedNodes;
       let  templateId = this.informationservice.getSelectedTabId();
+      console.log("tabId>>>>>>>>",templateId);
 
       const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
         data: "chart",

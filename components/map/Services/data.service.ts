@@ -24,6 +24,8 @@ export class DataService {
   private shapeIdDate:any;
   private valuedate:any;
   private mapType:any;
+  private headerType:any;
+
   constructor() { }
 
   getFromTimeline() {
@@ -145,5 +147,11 @@ export class DataService {
   }
   getmapType(){
     return this.mapType;
+  }
+  setheaderType(headerType:any){
+    this.headerType=headerType;
+  }
+  getheaderType(){
+    return this.headerType;
   }
 }

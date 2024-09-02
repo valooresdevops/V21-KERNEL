@@ -60,7 +60,6 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   @Input() public dropdownClass: any = -1;
   @Input() public phoneNumberValue: any;
   @Input() public isphone: boolean;
-
   // Indisplay variables
   @Input() public hasSuspendedStyle: boolean = false;
   @Input() public isForIndisplay: boolean = false;

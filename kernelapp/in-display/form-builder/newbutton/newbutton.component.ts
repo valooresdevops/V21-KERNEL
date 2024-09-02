@@ -32,6 +32,7 @@ export class NewbuttonComponent implements OnInit {
   ApiSelected1: boolean = false;
   showApiBuilderJson: boolean = false;
   public IsReportBuilder: boolean = false;
+  public IsReportBuilderArray:any = [];
 
   public exportSelected: boolean = false;
 
@@ -723,38 +724,8 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
 
 
 
-   onActionChange() {
-  //   let ButtonAction = this.buttonForm.controls['ButtonAction']?.value;
-  //   let isMain = this.buttonForm.controls['isMainPreview']?.value;
-  //   //hide the condition
-  //   this.Condition = false;
-  //   if (ButtonAction == 1) {
-  //     this.FormOpeningSelected = true;
-  //     this.ApiSelected = false;
-  //     this.ApiSelected1 = false;
-  //   }
-  //   if (ButtonAction == 2) {
-  //     this.ApiSelected = true;
-  //     this.ApiSelected1 = true;
-  //     this.FormOpeningSelected = false;
-  //   }
-  //   if(ButtonAction == 3){
-  //     this.ApiSelected = false;
-  //     this.ApiSelected1 = true;
-  //     this.FormOpeningSelected = false;
-  //   }
-  //   if(ButtonAction == 4){
-  //     this.ApiSelected = false;
-  //     this.ApiSelected1 = false;
-  //     this.FormOpeningSelected = false;
-  //   }
-  //   if(ButtonAction == 8){
-  //     this.ApiSelected = false;
-  //     this.ApiSelected1 = false;
-  //     this.exportSelected=true;
-  //     this.FormOpeningSelected = false;
-  //   }
-   }
+
+   
    showCondition(){
   //   this.Condition = true;
   // }
@@ -787,6 +758,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
     this.Condition = false;
     this.ApiSelected = false;
     this.ApiSelected1 = false;
+    this.IsReportBuilderArray = [];
 
     // Add or remove controls based on the nbOfAction value
     for (let i = 0; i < nbOfAction; i++) {
@@ -794,6 +766,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         const control = new UntypedFormControl('');
         this.buttonForm.addControl(`ButtonAction${i}`, control);
         this.buttonForm.addControl(`Menus${i}`, new UntypedFormControl(''));
+        this.buttonForm.addControl(`IsReportBuilder${i}`, new UntypedFormControl(false));
         control.valueChanges.subscribe(value => this.onButtonActionChange(value, i));
       }
     }
@@ -804,10 +777,11 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       const controlIndex = parseInt(control.replace(/\D/g, ''), 10);
       if (control.startsWith('ButtonAction') && controlIndex >= nbOfAction) {
         this.buttonForm.removeControl(control);
+        this.buttonForm.removeControl(`Menus${controlIndex}`);
+        this.buttonForm.removeControl(`IsReportBuilder${controlIndex}`);
       }
     });
   }
-
   onButtonActionChange(value: any, index: number): void {
     this.resetConditions(index);
     if (value === 1) {
@@ -819,7 +793,11 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       this.ApiSelected1 = true;
 
     }else if (value === 5) {
+
       this.IsReportBuilder = true;
+      if (!this.IsReportBuilderArray.includes(index)) {
+        this.IsReportBuilderArray.push(index);
+      }
     }else if (value === 7) {
       this.FormOpeningSelected = true;
       this.Condition = true;
@@ -827,6 +805,15 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
     }else if (value === 8) {
       this.exportSelected=true;
     }
+
+
+    // if (value === 'IsReportBuilder') {
+    //   if (!this.IsReportBuilderArray.includes(index)) {
+    //     this.IsReportBuilderArray.push(index);
+    //   }
+    // } else {
+    //   this.IsReportBuilderArray = this.IsReportBuilderArray.filter((i:any) => i !== index);
+    // }
     // Add more conditions as needed
   }
 

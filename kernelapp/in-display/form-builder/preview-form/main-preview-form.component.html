@@ -5,7 +5,7 @@
   </div>
 </div>
 
-<div *ngIf="isGridOptions==1">
+<div *ngIf="isGridOptions==1 && isAMLoad!=1">
 <div *ngFor="let tableOption of tableOptions1">
 
     <div *ngIf="tableOption.isAdvancedSearch == 1">
@@ -13,7 +13,7 @@
 
 </div>
   <div *ngIf="test_1 == '1'">
-    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery == '-1' " allowSideBar="true"
+    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery == '-1'" allowSideBar="true"
     [agRowSelection]="selectionType"
       [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [isUpdateColsDef]="isUpdateColsDef"
       [paginationPageSize]="8" [dataApi]="previewGridApi" [dataApiParam]="previewGridApiParam"
@@ -29,7 +29,7 @@
     </div>
     
     
-    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1' " 
+    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1' && this.informationservice.getAdvancedSearchShowGridMain()" 
     [agRowSelection]="selectionType"
     allowSideBar="true"
       [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [isTreeGrid]="isTreeGrid" [isUpdateColsDef]="isUpdateColsDef"
@@ -54,3 +54,7 @@
 <div *ngIf="isGridOptions==0">
 <am-preview-form [mainPreviewDataInput]="mainPreviewDataFromMain"></am-preview-form>
 </div>
+
+<div *ngIf="isGridOptions==1 && isAMLoad==1">
+  <am-preview-form [mainPreviewDataInput]="mainPreviewDataFromMain"></am-preview-form>
+  </div>

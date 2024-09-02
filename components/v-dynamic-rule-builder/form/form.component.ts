@@ -86,7 +86,9 @@ export class DynamicBuilderFormComponent implements OnInit {
     { id: 13, name: 'Get Sysdate' },
     { id: 14, name: 'Field Value' },
     { id: 15, name: 'Include' },
-    { id: 16, name: '!Include' }
+    { id: 16, name: '!Include' },
+    { id: 17, name: 'Sum' }
+
   ];
 
   public operations = [
@@ -1302,7 +1304,7 @@ export class DynamicBuilderFormComponent implements OnInit {
   //filter arrayList for changing data into dropdown 
   async filterConditionBasedOnField(stepValue: string) {
     let includedIDs1 = [1, 2, 3, 4, 6, 7, 8, 14, 15, 16];
-    let includedIDs2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    let includedIDs2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,17];
     let dateIncludesAction1 = [1, 3];
     let dateIncludesAction2 = [1];
     const getColumnsApiUrl = from(axios.get(GlobalConstants.getColumnsApi + this.lookupData[0].objectId));

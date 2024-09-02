@@ -14,7 +14,6 @@ import { NewTabComponent } from './form-builder/new-tab/new-tab.component';
 import { AgGridModule } from 'ag-grid-angular';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ScreenBuilderToolComponent } from './screen-builder/screen-builder-tool/screen-builder-tool.component';
-import { CKEditorModule } from 'ckeditor4-angular';
 import { CellRenderer } from './screen-builder/screen-builder-tool/cellRenderer';
 import { ApplicationListComponent } from './screen-builder/screen-builder-tool/application-list/application-list.component';
 import { ParentMenuListComponent } from './screen-builder/screen-builder-tool/parent-menu-list/parent-menu-list.component';
@@ -51,6 +50,10 @@ import { APIBuilderComponent } from './api-builder/api-builder.component';
 import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
 import { AdvancedSearchConfigurationComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration.component';
 import { AdvancedSearchConfigurationFormComponent } from './form-builder/new-tab/advanced-search-configuration/advanced-search-configuration-form/advanced-search-configuration-form.component';
+import { EditorComponent } from './object-builder/editor/editor.component';
+import { EditorFormComponent } from './object-builder/editor/editor-form/editor-form.component';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { EditorPreviewComponent } from './object-builder/editor/editor-preview/editor-preview.component';
 import { IconsFormComponent } from './object-builder/knowledge-graph/icons/icons-form/icons-form.component';
 import { AlertBuilderComponent } from './object-builder/alert-builder/alert-builder.component';
 import { IconsComponent } from './object-builder/knowledge-graph/icons/icons.component';
@@ -106,6 +109,9 @@ import { AlertPreviewComponent } from './object-builder/alert-builder/alert-prev
         ButtonJsonRelationComponent,
         AdvancedSearchConfigurationComponent,
         AdvancedSearchConfigurationFormComponent,
+        EditorComponent,
+        EditorFormComponent,
+        EditorPreviewComponent,
         IconsFormComponent,
         AlertBuilderComponent,
         AlertBuilderFormComponent,

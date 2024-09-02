@@ -4,7 +4,6 @@
       <div class="col-md-2">
 
         <v-dropdown
-          id="dropdown1"
           [formControlName]="fields.typeDropdown"
           [dataJSON]="fieldsCombo"
           [allowLabel]="false"
@@ -17,7 +16,6 @@
 
       <div class="col-md-2">
         <v-dropdown
-          id="dropdown2"
           [formControlName]="fields.searchType"
           [dataJSON]="fields.secondDropdownOptions"
           [allowLabel]="false"
@@ -40,7 +38,6 @@
           ></v-dropdown> -->
 
           <v-dropdown
-          id="dropdown3"
           [formControlName]="fields.thirdDropdown"
           [dataJSON]="fields.thirdDropdownOptions"
           [allowLabel]="false"
@@ -68,7 +65,6 @@
         <ng-template #textInput>
           <div    style="margin-top: 16px;">
           <v-input
-            id="txt"
             [formControlName]="fields.text"
             type="text"
             [allowLabel]="false"
@@ -83,7 +79,6 @@
         <ng-template #numberInput>
           <ng-container *ngIf="isNumber[i]; else textInput">
             <v-input
-              id="nbr"
               [formControlName]="fields.text"
               type="number"
               [allowLabel]="false"

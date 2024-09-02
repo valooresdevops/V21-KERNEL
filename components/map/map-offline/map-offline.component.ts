@@ -5400,7 +5400,7 @@ console.log("vectorLayerSector-----",this.vectorLayerSector);
       this.AoiIds = (window.parent.parent.parent[7] as any).A_AoiIds;
       console.log('AoiIds>>>>>', this.AoiIds);
       for (let i = 0; i < this.AoiIds.length; i++) {
-        this.datacrowdService.getSelectedShape(this.AoiIds[i]).then((res) => {
+        this.datacrowdService.getSelectedShapes(this.AoiIds[i]).then((res) => {
           console.log('getSelectedShape>>>>', res);
           this.Aoiresp = res;
           console.log('myres=', this.Aoiresp);
@@ -11966,7 +11966,7 @@ this.displayPolyline(x,"bts")
           if(this.DisplayCoRelationflag == 1){
             this.deviceCoordinatesArr = await this.datacrowdService.getAllCoRelationCommonLocationHits(this.coRelationId);
           }else{
-          this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId,this.deviceIdArr);
+          this.deviceCoordinatesArr =await this.datacrowdService.getCoRelationCommonLocationHits(this.coRelationId);
           }
       
         
@@ -12714,7 +12714,7 @@ this.displayPolyline(x,"bts")
       this.shapeIdArr = "";
     }
     for (let i = 0; i < this.shapeIdArr.length; i++) {
-      this.datacrowdService.getSelectedShape(this.shapeIdArr[i]).then((res) => {
+      this.datacrowdService.getSelectedShapes(this.shapeIdArr[i]).then((res) => {
         this.Aoiresp = res;
         this.coordinatesArray.push(this.Aoiresp);
         console.log("resssssssssssss----------",res);

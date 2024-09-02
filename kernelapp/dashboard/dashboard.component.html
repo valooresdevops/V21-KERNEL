@@ -172,6 +172,32 @@
             <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title"></app-alert>
           </div>
         </ng-template>
+
+        <ng-container *ngIf="data.type === 'CkEditor'; then ckEditor"></ng-container>
+        <ng-template #ckEditor style="width: max-content;">
+          <div>
+            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
+          </div>
+          <div  cdkDrag  class="test"  >
+            <div class="parent-div" (click)="openSelected(data)">
+              <i class="fa fa-arrows-alt icon-left" aria-hidden="true"></i>
+            </div>
+            
+            <!-- <div style="display: none;">{{gridIndexMapping(i)}}</div> -->
+             <!-- <div><b>{{data.Title}}</b></div> -->
+             <div style="width: 95%; text-align: center;">
+              <!-- <h1>{{ title }}</h1> -->
+              <div *ngIf="editorIndexMapping(data.ID) as sanitizedContent">
+                <div [innerHTML]="sanitizedContent"></div>
+              </div>
+              
+                          </div>
+
+            <!-- {{agColumnsJson1[gridIndexMapping(data.ID)] | json}}
+            {{data.Records | json}} -->
+          </div>
+        </ng-template>
+
       </div>
     </div>
   </div>

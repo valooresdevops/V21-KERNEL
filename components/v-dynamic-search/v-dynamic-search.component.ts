@@ -73,6 +73,7 @@ if(this.sourceQuery == null){
     const getDynamicSearchMainDropDown = await lastValueFrom(getDynamicSearchMainDropDownApi);
 
     this.allDynamicSearchData=getDynamicSearchMainDropDown.data;
+    console.log("getDynamicSearchMainDropDown.data>>>>>>>",getDynamicSearchMainDropDown.data);
 
     // const getDynamicSearchUrl = from(axios.get(GlobalConstants.getDynamicSearch + this.objectId +"/"+ this.sourceQuery ));
     // const getDynamicSearch = await lastValueFrom(getDynamicSearchUrl);
@@ -229,6 +230,7 @@ if(this.sourceQuery == null){
     });
     console.log("FORM ELEM<<<<<<<<<<<<",this.formElem);
     this.dynamicSearchForm.controls[typeDropdownKey].setValue(loadedSearchData.id);
+    this.dynamicSearchForm.controls[searchTypeKey].setValue('1');
 
   console.log("this.fieldCombo>>>>>>>>>>>",this.fieldsCombo);
   console.log("typeDropdownKey>>>>>>>>>>>>",typeDropdownKey);
@@ -236,8 +238,6 @@ if(this.sourceQuery == null){
   console.log("this.dynamicSearchForm BEFORE>>>>>>>>>>>>>>>>>>",this.dynamicSearchForm);
 
    //this.dynamicSearchForm.controls[searchTypeKey].setValue('2');
-
-
 
   console.log("FETET 11111");
   setTimeout(() => {
@@ -433,7 +433,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
       MyList.push(item1);
     }
     
-    //console.log("MY LIST>>>>>>>>>>>>>",MyList);
+    console.log("MY LIST>>>>>>>>>>>>>",MyList);
 
     const buildSearchJsonForApiApi = from(axios.post( GlobalConstants.buildSearchJsonForApi,MyList)  );
     const buildSearchJsonForApi = await lastValueFrom(buildSearchJsonForApiApi);
@@ -495,7 +495,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     if(checkIfAdvancedSearchHasFunction.data!=0){
       $("#searchFunctionButton_"+this.objectId)[0].click();
     }
-    
+    this.informationservice.setAdvancedSearchShowGridMain(true);
     this.onSearchSubmit.emit(obj);
   }
 

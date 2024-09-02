@@ -17,6 +17,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
 import { from, lastValueFrom } from 'rxjs';
 import axios from 'axios';
 import { DashboardAccessRightsComponent } from '../../kernelapp/dashboard/dashboard-access-rights/dashboard-access-rights.component';
+import { ElementBuilderPopupComponent } from '../../kernelapp/dashboard/element-builder-popup/element-builder-popup.component';
 import { AlertPopupComponent } from '../../kernelapp/dashboard/alert-popup/alert-popup.component';
 
 @Component({
@@ -861,5 +862,13 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
     localStorage.setItem('blackColor', this.blackColor);
     localStorage.setItem('backGroundColor', this.backGroundColor);
     localStorage.setItem('blueColor', this.blueColor);
+  }
+  openElementBuilderPopUp()
+  {
+    const dialogRef = this.dialog.open(ElementBuilderPopupComponent, {
+      // data:
+      width: '70%',
+      height: '70%',
+    });
   }
 }

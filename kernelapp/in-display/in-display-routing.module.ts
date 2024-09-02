@@ -25,6 +25,9 @@ import { ExecutedReportsComponent } from './object-builder/knowledge-graph/execu
 import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
 import { APIBuilderComponent } from './api-builder/api-builder.component';
 import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
+import { EditorComponent } from './object-builder/editor/editor.component';
+import { EditorFormComponent } from './object-builder/editor/editor-form/editor-form.component';
+import { EditorPreviewComponent } from './object-builder/editor/editor-preview/editor-preview.component';
 import { IconsFormComponent } from './object-builder/knowledge-graph/icons/icons-form/icons-form.component';
 import { AlertBuilderComponent } from './object-builder/alert-builder/alert-builder.component';
 import { IconsComponent } from './object-builder/knowledge-graph/icons/icons.component';
@@ -239,6 +242,35 @@ const routes: Routes = [
       ]
    },
    {
+      path: 'editor',
+      data: { breadcrumb: 'Editor '},
+      children: [
+         {
+            path: '',
+            component: EditorComponent
+         },
+      ]
+   },
+   {
+      path: 'editorForm',
+      data: { breadcrumb: 'Editor Form'},
+      children: [
+         {
+            path: '',
+            component: EditorFormComponent
+         },
+      ]
+   },
+   {
+      path: 'editorPreview',
+      data: { breadcrumb: 'Editor Preview'},
+      children: [
+         {
+            path: '',
+            component: EditorPreviewComponent
+         },
+      ]
+   },{
       path: 'kwgIcons',
       data:{breadcrumb:'icons'},
       children: [

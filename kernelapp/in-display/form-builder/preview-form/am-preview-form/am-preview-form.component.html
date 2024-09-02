@@ -24,7 +24,7 @@
 
             <!------------------------Dynamic Search on Form----------------------------------------------------->
                       
-                            <div *ngIf="tableOption.isAdvancedSearch == 1 ">
+                            <div *ngIf="tableOption.isAdvancedSearch == 1 && tableOption.isAMLoad != 1">
                                             <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
                                                 (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="true"></v-dynamic-search> 
                             </div>
@@ -535,11 +535,11 @@
                      
 
 
-                    <div *ngIf="tableOption.isAdvancedSearch == 1 && isPageGrid && test_1 == '1' ">
+                    <div *ngIf="(tableOption.isAdvancedSearch == 1 && isPageGrid && test_1 == '1') || (tableOption.isAMLoad == 1)">
                         <v-dynamic-search [objectId]="tableOption.objectId" [sourceQuery]="tableOption.sourceQuery"
-                            (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="false"></v-dynamic-search>
+                            (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="false" ></v-dynamic-search>
                     </div>
-                    <v-grid *ngIf="isPageGrid && test_1 == '1'" allowSideBar="true" [agPrimaryKey]="columnId"
+                    <v-grid *ngIf="(isPageGrid && test_1 == '1') || (tableOption.isAMLoad==1 && this.informationservice.getAdvancedSearchShowGridMain())" allowSideBar="true" [agPrimaryKey]="columnId"
                         [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [paginationPageSize]="10"
                         [dataApi]="previewGridApi" [dataApiParam]="previewGridApiParam" (onGridAdd)="onAddClick()"
                         [isAdvancedSearch]="tableOption.isAdvancedSearch" (onGridUpdate)="onUpdateClick()"

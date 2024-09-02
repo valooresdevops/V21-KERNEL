@@ -33,7 +33,10 @@ export class NewTabComponent implements OnInit {
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
   public isFormFlip:any;
+  public isAdvancedHidden:any;
   public isTreeGrid: any;
+  public isAMLoad: any;
+
   public isQueryForm: any;
   public isRowGroup: any;
   public hasMultipleSelection: any;
@@ -66,6 +69,7 @@ export class NewTabComponent implements OnInit {
     orderField: new UntypedFormControl(''),
     isGrid: new UntypedFormControl(''),
     isTreeGrid: new UntypedFormControl(''),
+    isAMLoad: new UntypedFormControl(''),
     isQueryForm: new UntypedFormControl(''),
     hasMultipleSelection: new UntypedFormControl(''),
     isDynamicReport: new UntypedFormControl(''),
@@ -87,7 +91,9 @@ export class NewTabComponent implements OnInit {
     fieldGrouping:new UntypedFormControl(''),
     isRowGroupHidden:new UntypedFormControl(''),
     fieldGroupingHidden:new UntypedFormControl(''),
-    isFormFlip:new UntypedFormControl('')
+    isFormFlip:new UntypedFormControl(''),
+    isAdvancedHidden:new UntypedFormControl(''),
+
   });
   agPrimaryKey: any;
 
@@ -335,11 +341,14 @@ console.log('data--------->',data)
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
+          isAMLoad: this.newTabForm.controls['isAMLoad']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
           IsRowGroupHidden: this.newTabForm.controls['IsRowGroupHidden']?.value,
           isFormFlip: this.newTabForm.controls['isFormFlip']?.value,
+          isAdvancedHidden: this.newTabForm.controls['isAdvancedHidden']?.value,
+
           fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -364,14 +373,16 @@ console.log('data--------->',data)
         List.push(jsonParams);
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
         this.isFormFlip = this.newTabForm.controls['isFormFlip']?.value;
+        this.isAdvancedHidden = this.newTabForm.controls['isAdvancedHidden']?.value;
         this.isTreeGrid = this.newTabForm.controls['isTreeGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
         this.isRowGroup = this.newTabForm.controls['isRowGroup']?.value;
         this.isDynamicReport = this.newTabForm.controls['isDynamicReport']?.value;
+        this.isAMLoad = this.newTabForm.controls['isAMLoad']?.value;
 
         // }
-
+        
         this.http.post<any>(GlobalConstants.createTabApi, List, { headers: GlobalConstants.headers }).subscribe(
           (res: any) => {
             if (res.status == 'Fail') {
@@ -398,7 +409,9 @@ console.log('data--------->',data)
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
           isFormFlip: this.newTabForm.controls['isFormFlip']?.value,
+          isAdvancedHidden: this.newTabForm.controls['isAdvancedHidden']?.value,
           isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
+          isAMLoad: this.newTabForm.controls['isAMLoad']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
           IsRowGroupHidden:this.newTabForm.controls['IsRowGroupHidden']?.value, 
@@ -510,13 +523,25 @@ console.log('data--------->',data)
           console.log("IS Form Flipped");
           this.newTabForm.controls['isFormFlip'].setValue(true);
         }
+        if (res[0].isAdvancedHidden == "0") {
+          this.newTabForm.controls['isAdvancedHidden'].setValue(false);
+        } else {
+          console.log("IS Form Flipped");
+          this.newTabForm.controls['isAdvancedHidden'].setValue(true);
+        }
         if (res[0].isTreeGrid == "0") {
           this.newTabForm.controls['isTreeGrid'].setValue(false);
         } else {
           console.log("IS tree GRID IS TRUE");
           this.newTabForm.controls['isTreeGrid'].setValue(true);
         }
-
+        if (res[0].isAMLoad == "0") {
+          this.newTabForm.controls['isAMLoad'].setValue(false);
+        } else {
+          console.log("IS tree GRID IS TRUE");
+          this.newTabForm.controls['isAMLoad'].setValue(true);
+        }
+        
         if (res[0].isDynamicReport == "0") {
           this.newTabForm.controls['isDynamicReport'].setValue(false);
         } else {

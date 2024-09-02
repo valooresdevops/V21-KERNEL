@@ -66,6 +66,10 @@ export class ObjectSizeManagerPopupComponent implements OnInit
       this.http.post<any>(GlobalConstants.editKpiSize+this.informationService.getAgGidSelectedNode()+'/'+objectWidthInDashboard, { headers: GlobalConstants.headers }).subscribe({})
     }
 
+    if(this.data == "CkEditor")
+      {
+        this.http.post<any>(GlobalConstants.editCkEditorSize+this.informationService.getAgGidSelectedNode()+'/'+objectWidthInDashboard, { headers: GlobalConstants.headers }).subscribe({})
+      }
 
     this.dialog.closeAll();
   }

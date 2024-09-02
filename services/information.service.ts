@@ -67,12 +67,15 @@ export class InformationService {
   public advancedSearchFunctionData:any='';
   public dashboardContentSize :number;
   public dynamicSearchApiData :any;
+  private actionType:any;
+  public agGridNodeData : Object;
   public reloadGrid : boolean = true;
   public selectedNodeVGrid : object;
   public selectedColumnFormOpening : any;
   public selectedColumnValue : boolean = false;
   public mainPreviewScreenType : boolean = false;
   public advancedSearchShowGrid : boolean = false;
+  public advancedSearchShowGridMain:boolean=true;
   constructor() { }
 
   private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
@@ -627,6 +630,21 @@ getDynamicSearchApiData(){
 setDynamicSearchApiData(dynamicSearchApiData:any){
   this.dynamicSearchApiData = dynamicSearchApiData;
 }
+setactionType(actionType: any) {
+  this.actionType = actionType;
+}
+
+getactionType() {
+  return this.actionType;
+}
+
+getAgGridNodeData(){
+  return this.agGridNodeData ;
+  }
+
+setAgGridNodeData(data : object){
+this.agGridNodeData = data;
+}
 
 
 
@@ -662,5 +680,10 @@ getAdvancedSearchShowGrid(){
 setAdvancedSearchShowGrid(advancedSearchShowGrid:any){
   this.advancedSearchShowGrid = advancedSearchShowGrid;
 }
-
+getAdvancedSearchShowGridMain(){
+  return this.advancedSearchShowGridMain;
+}
+setAdvancedSearchShowGridMain(advancedSearchShowGridMain:any){
+  this.advancedSearchShowGridMain = advancedSearchShowGridMain;
+}
 }

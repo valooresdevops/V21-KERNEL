@@ -1,12 +1,12 @@
-import { AfterViewInit, Component, OnInit, ViewEncapsulation , ChangeDetectorRef, HostListener    } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewEncapsulation , ChangeDetectorRef, HostListener, Inject, Optional    } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { GlobalConstants } from '../../common/GlobalConstants';
 import { HttpClient } from '@angular/common/http';
 import { CommonFunctions } from '../../../Kernel/common/CommonFunctions';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
-import { Subscription } from 'rxjs';
+import { from, lastValueFrom, Subscription } from 'rxjs';
 import { EventEmitterService } from '../../../Kernel/services/event-emitter.service';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { ChartBuilderFormComponent } from '../../../Kernel/kernelapp/in-display/object-builder/chart-builder-form/chart-builder-form.component';
 import { GridBuilderPreviewComponent } from '../../../Kernel/kernelapp/in-display/object-builder/grid-builder-preview/grid-builder-preview.component';
 import { KpiBuilderPreviewComponent } from '../../../Kernel/kernelapp/in-display/object-builder/kpi-builder-preview/kpi-builder-preview.component';
@@ -19,10 +19,17 @@ Highcharts3D(Highcharts);
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 import { string } from 'sql-formatter/lib/src/lexer/regexFactory';
+import axios from 'axios';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { EditorPreviewComponent } from '../in-display/object-builder/editor/editor-preview/editor-preview.component';
 
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
 
+interface SanitizedRecord {
+  ID: number;  // or the appropriate type for your IDs
+  Records: SafeHtml;
+}
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -39,16 +46,21 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   checkVisibiltyDashboard : boolean = false;
   public subsVar: Subscription;
   public showDashboard: boolean;
-  constructor(private http: HttpClient,
+  constructor(
+    private http: HttpClient,
     private eventEmitterService: EventEmitterService,
     public commonFunctions: CommonFunctions,
     private dialog: MatDialog,
     public informationservice: InformationService,
     private cdr: ChangeDetectorRef,
-  ) {document.addEventListener('click', this.onGlobalClick.bind(this));
+    private sanitizer: DomSanitizer,
+    @Optional() private dialogRef?: MatDialogRef<EditorPreviewComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public dataa?: any
+  ) {
+    document.addEventListener('click', this.onGlobalClick.bind(this));
     document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
-
-   }
+  }
+  
 
    
   public chartTitle: String = '';
@@ -71,6 +83,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   kpiRecords: any[] = [];
   gridHeader: any[] = [];
   gridRecords: any[] = [];
+  editorRecords: any[]= [];
   ids: string[] = [];
   names: number[] = [];
   gaugeValue: any[] = [];
@@ -78,6 +91,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   gaugeTitle: any[] = [];
   chartValue: any[] = [];
   kpiValue: any[] = [];
+  editorValue: any[] = [];
   allData: any[] = [];
   gridValue: any[] = [];
   barRecords: any[] = [];
@@ -96,14 +110,21 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   public gridIndexes :number[]= [];
   gridIndexesMapping :Map<number, number> = new Map();
  gridCounter : number = 0;
+ editorIndexes: number[] = [];
 
   valueFromSecondObject: string;
+
+
+  title: string;
+  content: SafeHtml;
+  sanitizedContent: SanitizedRecord[] = [];
 
   // chartOptions: Highcharts.Options = {};
   // chart: Highcharts.Chart | undefined;
   // ids1 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Jan1', 'Feb1', 'Mar1', 'Apr1', 'May1', 'Jun1', 'Jul1','Jan2', 'Feb2', 'Mar2', 'Apr2', 'May2', 'Jun2', 'Jul2']; // Example categories
   // names1 = [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 45, 545, 235 , 4656 ,354 ,354 ,354, 35,4341]; // Example data
   // allData1 = [{ Title: 'Live Data Chart' }]; // Example title
+
 
   ngOnInit(): void {
     this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
@@ -119,7 +140,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
       this.onSelectTab();
       setTimeout(() => {
         this.showDashboard = true;
-        console.log(111)
+        // console.log(111)
       }, 1000);
     });
   }
@@ -154,7 +175,73 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   //   }, 1000);
   // }
   
+  //////Sigma
+  extractScripts(html: string): string[] {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const scripts = doc.getElementsByTagName('script');
+    
+    const scriptContents: string[] = [];
+    for (let i = 0; i < scripts.length; i++) {
+      const script = scripts[i];
+      const scriptContent = script.textContent || script.innerText;
+      scriptContents.push(scriptContent);
+    }
+    
+    return scriptContents;
+  }
+  
+
+  executeScripts(scriptContents: string[]) {
+    scriptContents.forEach((scriptContent) => {
+      // console.log('Executing Script Content:', scriptContent);
+  
+      try {
+        // Clean up the script content
+        const cleanedScriptContent = scriptContent
+          .replace(/\\"/g, '"')  // Replace escaped double quotes with actual double quotes
+          .replace(/\\n/g, '\n'); // Handle escaped newline characters
+  
+        // Create a script element
+        const script = document.createElement('script');
+        script.textContent = cleanedScriptContent;
+  
+        // Append the script to the document
+        document.body.appendChild(script);
+  
+        // Remove the script after execution
+        window.setTimeout(() => {
+          document.body.removeChild(script);
+        }, 0);
+      } catch (e) {
+        console.error('Error executing script:', e);
+      }
+    });
+  }
+  
+  
+  editorIndexesMapping: Map<number, any> = new Map();
+
+  setupEditorIndexesMapping(): void {
+    this.sanitizedContent.forEach((data: SanitizedRecord) => {
+      this.editorIndexesMapping.set(data.ID, data.Records);
+    });
+    // console.log("Editor Indexes Mapping", this.editorIndexesMapping);
+  }
+  
+  
+
+  editorIndexMapping(id: number): SafeHtml | undefined {
+    return this.editorIndexesMapping.get(id);
+  }
+  
+
+  
+
   onSelectTab() {
+    this.editorValue = [];
+    this.editorRecords = [];
+    this.sanitizedContent = [];
     this.checkVisibiltyDashboard = false;
     this.gridCounter=0;
     this.gridIndexesMapping.clear();
@@ -162,13 +249,16 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.names = [];
     this.newChartObject = [];
     this.allData = this.newChartObject;
-    this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers });
+    console.log("tabId>>>>>>>>",this.informationservice.getSelectedTabId());
+    // this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers , responseType: 'text'});
+   this.data = from(axios.post(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(),{}));
     console.log("data>>>>>",this.data);
     this.tabName = this.informationservice.getSelectedTabName();
     this.data.subscribe(
       (res: any) => {
-        this.allData = res;
-        
+        console.log("entered the res")
+ 
+        this.allData = res.data;
         console.log("allData::::: ", this.allData );
         this.gridValue = [];
         for (let i = 0; i < this.allData.length; i++)
@@ -185,7 +275,16 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
             this.gridIndexes.push(i);
           }
 
+          if (this.allData[i].type == 'CkEditor')
+            {
+              this.editorValue.push(this.allData[i]);
+              this.editorIndexes.push(i);
+              // this.description=this.allData[i].description;
+            }
+            // console.log("editorValue>>>>>",this.editorValue);
+
           this.objectWidth = this.allData[i].objectWidth;
+          console.log("objectWidth>>>>",this.objectWidth);
           // alert(this.objectWidth)
        //   this.calculateFlexBasis(this.objectWidth);
         }
@@ -1979,7 +2078,69 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
              }
 
   
-    }});
+    }
+
+    //////Sigma
+    for (let i = 0; i < this.editorValue.length; i++) {
+      this.editorRecords.push(this.editorValue[i].Records);
+    
+      const record = this.editorRecords[i];
+      // console.log("typeofffff>>>>>", typeof record);
+    
+      if (typeof record === 'object') {
+        // Convert the object to a string if necessary
+        const recordStr = JSON.stringify(record);
+    
+        // Remove the JSON object markers at the beginning and end
+        const trimmedContent = recordStr.slice(13, -3);
+    
+        // Replace special character representations with their original forms
+        const decodedContent = trimmedContent
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&quot;/g, '"')     // Replace &quot; with "
+        .replace(/&apos;/g, "'")      // Replace &apos; with '
+        .replace(/&copy;/g, '©')      // Replace &copy; with ©
+        .replace(/&reg;/g, '®')       // Replace &reg; with ®
+        .replace(/&euro;/g, '€')      // Replace &euro; with €
+        .replace(/&pound;/g, '£')     // Replace &pound; with £
+        .replace(/&yen;/g, '¥')       // Replace &yen; with ¥
+    
+        // Remove any automatically added <br> tags (if they are not intended)
+        const cleanedContent = decodedContent.replace(/<br\s*\/?>/gi, '');
+    
+        // console.log("content>>>>>>>", cleanedContent);
+    
+        // Sanitize the content
+        // this.sanitizedContent.push(this.sanitizer.bypassSecurityTrustHtml(cleanedContent));
+
+// Sanitize and wrap the content with the ID
+const sanitizedObj: SanitizedRecord = {
+  ID: this.editorValue[i].ID, // Assuming `ID` is present in `editorValue`
+  Records: this.sanitizer.bypassSecurityTrustHtml(decodedContent)
+};
+
+this.sanitizedContent.push(sanitizedObj);
+
+        // Extract and execute scripts
+        const scripts = this.extractScripts(cleanedContent);
+        this.executeScripts(scripts);
+      }
+    }
+
+    this.setupEditorIndexesMapping();
+    // console.log("sanitized>>>>>>",this.sanitizedContent);
+    // for (let i = 0; i < this.editorValue.length; i++) {
+    // console.log("final Value>>>>>>>", this.editorIndexMapping(this.data.ID).value);
+    // }
+    
+  },
+    (error: any) => {
+      console.error("Error occurred:", error);
+      // Handle error here
+    });
  
     this.toggleAlertsVisibility();
   }
@@ -2055,7 +2216,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     document.removeEventListener('click', this.onGlobalClick.bind(this));
     document.removeEventListener('contextmenu', this.onGlobalRightClick.bind(this));
   }
-  openSelected(data: any) {
+  async openSelected(data: any) {
     let info = {};
     if (data.type == 'Chart') {
       let titleInsideData:String = '';
@@ -2129,6 +2290,26 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
 
       }, 1000);
 
+    }
+    else if(data.type == 'CkEditor'){
+      let selectedData =this.data = from(axios.post(GlobalConstants.getHtmlElementData + data.ID,{}));
+      const dataa = await lastValueFrom(selectedData);
+      // console.log("ckeditor data>>>>>", dataa);
+      // let selectedDataa = this.editorIndexMapping(data.ID);
+      let editorContent = dataa.data[0].html_element; // Content from CKEditor
+      let editorTitle = dataa.data[0].title; // Title from CKEditor
+    // console.log("editorContent>>>>>",editorContent);
+    // console.log("editorTitle>>>>>",editorTitle)
+      // Open a dialog with the EditorPreviewComponent
+      const dialogConfig = new MatDialogConfig();
+      dialogConfig.width = '50%';
+      dialogConfig.height = '50%';
+      dialogConfig.data = {
+        content: editorContent,
+        title: editorTitle
+      };
+      
+      this.dialog.open(EditorPreviewComponent, dialogConfig);
     }
   }
 
