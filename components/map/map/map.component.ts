@@ -468,6 +468,7 @@ mydata =[{"orgHierarchy":["173488"],"Name":"173488","id":173488},{"orgHierarchy"
   Phone_nbr: any;
   speedmarker: number=1;
   showroutedicv: boolean=false;
+  showbyRoute: boolean=false;
   IsTypechanged: number;
   heatarr: any;
   geojsonData1: any;
@@ -1625,7 +1626,7 @@ $('.magnifying-glass1').css('display', 'none');
  
 
 this.map.on('mousemove', (event:any) => {
- 
+
   if(this.openMagnifier==true){
   this.cursorlnglat = event.latlng;
   this.updateMagnifyingGlass(event);
@@ -3081,6 +3082,7 @@ if(this.indexTimeline==1){
 
 
   clearShapes() {
+    this.showbyRoute = false;
     this.opentimer=false;
     this.showroutebar1=false;
     if(this.flagInQueue == 0){
@@ -16378,6 +16380,7 @@ this.navbarSimulId=obj22;
   }
 
     toggleDropdown() {
+      this.showbyRoute=false;
       this.showroutedicv=true;
     var dropdownContent = document.getElementById("dropdownContent1");
     if (dropdownContent.style.display === "block") {
@@ -18682,14 +18685,18 @@ async DisplayFromSenario(){
 
    const jsonString = this.informationservice.getAgGidSelectedNode();
 
-   console.log("cedrikkkkk11111",jsonString);
-   console.log("cedrikkkkk2222222",JSON.parse(jsonString));
+    console.log("cedrikkkkk11111",jsonString);
+    console.log("cedrikkkkk2222222",JSON.parse(jsonString));
+   
+  
 
    setTimeout(async () => {
     
   //  let  data:any[]=[];
 
-   let data=JSON.parse(jsonString);
+     let data=JSON.parse(jsonString);
+
+
    console.log("DATAAAAAAAAAAAAA>>>>>>>>>>>>>>>>>>>",data)
    
 
@@ -19028,6 +19035,7 @@ else{
   }
 
   else if (data[0].colName=="bts_cell_id"  && data[0].type=="Grid"){
+
     let colValues: any[]=[];
     data2.forEach((innerArray: any[]) => {
       innerArray.forEach(item => {
@@ -19041,7 +19049,7 @@ else{
 
     console.log("numberArray>",numberArray);
     await this.datacrowdService
-    .getfixedelementsObject(numberArray)
+    .getfixedelementsObject([])
     .then(async (res: any) => {
       //console.log('res>>', res);
       this.displayFixedElements(res);
@@ -19516,6 +19524,8 @@ this.displayCoRelation();
 }
 
 byRouteFirst(){
+  this.showbyRoute= false;
+  this.showroutedicv= false;
   this.items=[
     {label:'Start',action:this.startRoute1.bind(this)},
     {label:'Stop',action:this.stopRoute.bind(this)},
@@ -19996,6 +20006,27 @@ createCustomMarker(lat: number, lng: number, text: string, color: string): L.Mar
   // Create and return the marker
   return L.marker([lat, lng], { icon: customIcon });;
 }
+tail(){
+  this.showroutedicv= false;
+  this.showbyRoute = false;
+}
+fullroute(){
+  this.showroutedicv= false;
+
+  this.showbyRoute = false;
+}
+mouseoverbyroute() {
+  this.showbyRoute = true;
+}
+
+
+
+
+openContextMenu(event: MouseEvent) {
+  event.preventDefault(); // Prevent the default right-click menu from appearing
+  this.showbyRoute = !  this.showbyRoute;
+}
+
 
 byTailFirst(){
   this.items=[
@@ -20073,11 +20104,17 @@ displaybyTail(){
        
         
           this.polylineRouteArray.push(polyline);
-        //  this.map.setView([x.data[x.index+1][4],x.data[x.index+1][3]], 18);
+          if(x.index==markerPositions.length-1){
+            this.map.setView([x.data[x.index][4],x.data[x.index][3]], 18);
+
+          }else{
+            this.map.setView([x.data[x.index+1][4],x.data[x.index+1][3]], 18);
+
+          }
 
           x.objectArray.push(polyline);
           
-          if(x.objectArray.length%5==0 && x.index!=0){
+          if(x.objectArray.length%5==0 && x.index!=0 && x.index!==markerPositions.length){
           
             this.map.removeLayer(x.objectArray[0]);
             this.map.removeLayer(x.objectArray[1]);
@@ -20099,7 +20136,7 @@ displaybyTail(){
         x.index++;
         console.log("this.speedTimeRoute1  ",this.speedTimeRoute1);
         await this.displayPolylinesTail(markerPositions,objcolor,routeDevices);
-      },  6000/this.speedTimeRoute); 
+      },  6/this.speedTimeRoute); 
     } 
 
 
@@ -20446,6 +20483,8 @@ let obj22:any={
     }
 
     }
+    
+    
 }
 
 

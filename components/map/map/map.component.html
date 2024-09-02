@@ -321,15 +321,22 @@ oncontextmenu="return false;"
         <i class="fa-solid fa-map-signs"></i>
     </span>
 
-      <div id="dropdownContent1" class="dropdown-content1" *ngIf="showroutedicv===true">
-        <span (click)="byDeviceFirst()">By devices</span>
-        <span (click)="byRouteFirst()">By routes</span>
-        <span (click)="byTailFirst()">By Tail</span>
+      <div id="dropdownContent1" class="dropdown-content1" *ngIf="showroutedicv === true">
+        <span (click)="byDeviceFirst()">By Devices</span>
+        <span (click)="byRouteFirst()" (contextmenu)="openContextMenu($event)">By routes </span>
         <span (click)="routeDev()">Display Routes</span>
+        <span (click)="displayClusters33(171503)">Point to point</span>
+        <span (click)="addCurvedFlowLines()">Map to map</span>
         <span (click)="clearRoutes()">Clear</span>
     </div>
-
-
+    
+    <div id="divbyroute" *ngIf="showbyRoute === true"
+     >
+       <span (click)="tail()">tail</span>
+       <span (click)="fullroute()">full route</span>
+    </div>
+    
+   
 
   </div>
   <div   id='graphtools1' class="graphtools">
@@ -840,9 +847,9 @@ openLoginUser
       OpenCorrelation
   </button>
 
-  <button id="flow" style="z-index: 9999;left: 245px;position: absolute;" (click)="displayClusters33(171503)">
+<!-- <button id="flow" style="z-index: 9999;left: 245px;position: absolute;" (click)="displayClusters33(171503)">
    Point to Point
 </button>
 <button id="flow" style="z-index: 9999;left: 330px;position: absolute;" (click)="addCurvedFlowLines()">
   Map to map
-</button>
+</button> -->

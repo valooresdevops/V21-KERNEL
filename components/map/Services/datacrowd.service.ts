@@ -921,4 +921,6 @@ async MaptoMap(SimulID :any){
   let response= await this.httpClient.post<any>(this.ipAddress +"/api/MapToMap/"+SimulID, {headers: GlobalConstants.headers}).toPromise();
   return response; 
 }
+
+
 }
