@@ -7,6 +7,7 @@ import { Observable, Subscription, from, lastValueFrom } from 'rxjs';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { CommonFunctions } from '../../common/CommonFunctions';
 import { InformationService } from '../../services/information.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'v-dynamic-search',
@@ -51,7 +52,9 @@ export class VDynamicSearchComponent implements OnInit {
   constructor(private formBuilder: UntypedFormBuilder,
      private http: HttpClient,private commonFunctions: CommonFunctions,
      public informationservice: InformationService,
-     private cdr: ChangeDetectorRef) {}
+     private cdr: ChangeDetectorRef,
+     private router: Router,
+    ) {}
 
   async ngOnInit(): Promise<void> {
     this.searchButtonId=this.objectId+"_"+this.isForForm;
@@ -116,7 +119,7 @@ if(this.sourceQuery == null){
         name: getSearchType.data[i].name
       });
     }
-
+    console.log("SPECIAL SEARCH DATA>>>>>>>>>>>>>>>>>>>>>",this.specialSearchData);
     setTimeout(() => {
       if(this.specialSearchData.length==0){
         console.log("NO GOOD>");
@@ -578,6 +581,8 @@ fields.thirdDropdownOptions=this.thirdCombo ;
   onReset(){
 
     this.dynamicSearchForm.reset();
+    console.log("this router url>>>>>>>>>>>>",this.router.url);
+    this.commonFunctions.reloadPage(this.router.url);
 
     setTimeout(() => {
       this.clearAll=true;
@@ -592,6 +597,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
       reloadGrid : true
     }
     this.onSearchSubmit.emit(obj);
+    
   }
 
 

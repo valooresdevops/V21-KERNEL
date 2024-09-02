@@ -461,6 +461,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
 
   public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
+  public static getGeneratedReport = GlobalConstants.inDispGatewat + 'api/getGeneratedReport';
 
 
 

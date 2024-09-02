@@ -499,7 +499,12 @@
                             </div>
                         </div>
                     </form>
-                    <v-grid *ngIf="showGrid" 
+
+    <!---------------------------------------------------------IMPORTANT--------------------------------------------------------------------------->
+
+    <!-------------FOR GRID TO SHOW IN FORM A RULE Show FieldSet needs to be applied on ANY FIELDSET inside the FORM------------------------------->
+                    
+                    <v-grid *ngIf="showGrid && this.informationservice.getAdvancedSearchShowGrid()" 
                             allowSideBar="false"
                             [agColumns]="gridColumns"
                             [paginationPageSize]="50"
@@ -508,11 +513,12 @@
                             [agOnGridEvents]="true"
                             (onGridEventSave)="gridEventSave($event)"
                             [showOrHideButton]="true"
-                          [dataApi]="test"
+                            [dataApi]="test"
                             [showOrHideButton]="false"
                             [dataApiParam]="dataApiParam"
                             [staticData]="gridStaticValue" >
                     </v-grid>
+    <!------------------------------------------------------------------------------------------------------------------------------------------------->
                     <div class="row" *ngIf="tableOption.isSave == 1 && tableOption.isQueryForm!='1' && tableOption.isDynamicReport!='1'">
                         <div class="row justify-content-center">
                             <div class="col-lg-1">

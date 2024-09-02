@@ -797,6 +797,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                   }
                   else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                     executeOnFieldSetAdv = ruleData[i].data;
+                //    console.log("111111111111111111111111");
                   }
                   else if (action == "Execute Rule Business") {
                     executeRuleBusiness = ruleData[i].data;
@@ -1008,6 +1009,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                   } else if (action == "Show Field" || action == "Hide Field") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                    //console.log("111111111111111111111111");
+
                     this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
                   } else if (action == "Required") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
@@ -1617,6 +1620,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                       executeOnFieldAdv = ruleData[i].data;
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                 //     console.log("111111111111111111111111");
 
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
@@ -1861,6 +1865,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
                       //////////
                     } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                      //console.log("111111111111111111111111");
+
                       this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
                     } else if (action == "Required") {
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
@@ -2040,6 +2046,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                         executeOnField = ruleData[i].data;
                       }
                       if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
+                      //  console.log("111111111111111111111111");
+
                         executeOnFieldSet = ruleData[i].data;
                       }
                       if (executeAction == "Execute Query") {
@@ -2258,6 +2266,8 @@ this.informationservice.removeSelectedColumnFormOpening();
 //console.log("Hide Button 1");
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Show FieldSet") {
+                  //      console.log("111111111111111111111111");
+
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                       } else if (executeAction == "Hide FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
@@ -2498,6 +2508,7 @@ this.informationservice.removeSelectedColumnFormOpening();
                       executeOnFieldAdv = ruleData[i].data;
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                   //   console.log("111111111111111111111111");
 
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
@@ -2742,6 +2753,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
                       //////////
                     } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                    //  console.log("111111111111111111111111");
+
                       this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
                     } else if (action == "Required") {
                       this.dynamicActionsOnChange(action, executeOnFieldAdv);
@@ -2923,6 +2936,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                         executeOnField = ruleData[i].data;
                       }
                       if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
+                       // console.log("111111111111111111111111");
+
                         executeOnFieldSet = ruleData[i].data;
                       }
                       if (executeAction == "Execute Query") {
@@ -3142,6 +3157,8 @@ this.informationservice.removeSelectedColumnFormOpening();
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Show FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                     //   console.log("111111111111111111111111");
+
                       } else if (executeAction == "Hide FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                       } else if (executeAction == "Required") {
@@ -3407,9 +3424,12 @@ this.informationservice.removeSelectedColumnFormOpening();
                   if (ruleData[i].step == 44) {
                     if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field" || action == "Hide Button" || action == "Show Button") {
                       executeOnFieldAdv = ruleData[i].data;
+
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                       executeOnFieldSetAdv = ruleData[i].data;
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
                     }
                     else if (action == "Execute Rule Business") {
                       executeRuleBusiness = ruleData[i].data;
@@ -3722,10 +3742,14 @@ this.informationservice.removeSelectedColumnFormOpening();
                       this.dynamicForm.controls[listOfFields[i]].setValue('').change();
                     }
                   } else if (action == "Show Field" || action == "Hide Field" || action == "Hide Button" || action == "Show Button") {
-//console.log("Hide Button 2");
+//console.log("Hide Button 2")
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                     this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
+                    this.informationservice.setAdvancedSearchShowGrid(true);
+                   // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
+
                   } else if (action == "Required") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Optional") {
@@ -4031,10 +4055,14 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     if (ruleData[i].data != "") {
                       if (executeAction == "Show Field" || executeAction == "Hide Field" || executeAction == "Required" || executeAction == "Optional" || executeAction == "Read Only" || executeAction == "Remove Read Only" || executeAction == "Rename Field" || executeAction == "Hide Button" || executeAction == "Show Button") {
                         executeOnField = ruleData[i].data;
+
                       }
                     }
                     if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
                       executeOnFieldSet = ruleData[i].data;
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
                     }
                     if (executeAction == "Execute Rule Business") {
                       executeRuleBusiness = ruleData[i].data;
@@ -4336,12 +4364,17 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                     }
                     if (executeAction == "Show Field" || executeAction == "Show Button") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
+
                     }
                     else if (executeAction == "Hide Field" || executeAction == "Hide Button") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     }
                     else if (executeAction == "Show FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
+
                     } else if (executeAction == "Hide FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                     } else if (executeAction == "Required") {
@@ -4813,6 +4846,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                       this.dynamicDRBOnchange(columnId, ruleId);
                     } else if (executeAction == "Show Field") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
+
                     } else if (executeAction == "Hide Field") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Hide Button") {
@@ -4821,6 +4855,10 @@ console.log("ruleData2 >>>>>>>>",ruleData);
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Show FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
+
                     } else if (executeAction == "Hide FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                     } else if (executeAction == "Required") {
@@ -4903,6 +4941,8 @@ console.log("ruleData2 >>>>>>>>",ruleData);
     }
 
     if (executeAction == "Show FieldSet") {
+     // console.log("111111111111111111111111");
+      this.informationservice.setAdvancedSearchShowGrid(true);
       if (fieldsetColumns.length >= 1) {
         for (let u = 0; u < fieldsetColumns.length; u++) {
           const field = this.dynamicForm.get(fieldsetColumns[u].columnName);
@@ -5635,6 +5675,7 @@ console.log("ruleData2 >>>>>>>>",ruleData);
   }
 
   async ngOnInit(): Promise<void> {
+    this.informationservice.setAdvancedSearchShowGrid(false);
     // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
@@ -6989,7 +7030,7 @@ let count = 0;
           this.loaderService.isLoading.next(false);
         }
         jsonData1 +="}]"
-
+        console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
          this.gridStaticValue=JSON.parse(jsonData1);
         setTimeout(()=>{
         this.showGrid=false;
@@ -8068,7 +8109,7 @@ if (this.gridStaticValue || this.gridStaticValue.length != 0) {
       });
       var link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      // link.download = 'samplePDFFile.pdf';
+       //link.download = 'samplePDFFile.pdf';
       link.target = '_blank';
       link.click();
       window.URL.revokeObjectURL(link.href);

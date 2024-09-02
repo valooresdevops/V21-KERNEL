@@ -18,11 +18,13 @@ import { Title } from '@angular/platform-browser';
 })
 export class AlertBuilderFormComponent implements OnInit {
   getqueryData = GlobalConstants.getSourceQueryApi;
+  public showFunctionality: boolean=false;
   @Input() existingImageData: string;
   public functionalities: string[] = ['Functionality 1', 'Functionality 2', 'Functionality 3'];
   public userId = this.informationService.getLogeduserId();
-  public qbe_id=this.informationService.getLookUpSubmitValue().name 
-  
+  public qbe_id=this.informationService.getLookUpSubmitValue().name;
+  public functionality = [{ id: 1, name: 'Generate Report'},{id: 2, name: 'Query'}];
+  public getGeneratedReport =GlobalConstants.getGeneratedReport;
   uploadForm = new UntypedFormGroup({
    
     title: new UntypedFormControl('', Validators.required), // New control for alert name
@@ -55,11 +57,16 @@ export class AlertBuilderFormComponent implements OnInit {
     
   }
 
+  // alertForm = new UntypedFormGroup({
+  //   buttonId: new UntypedFormControl(''),
+  //   buttonName: new UntypedFormControl(''),
+  // })
+
   ngOnInit(): void {
     this.uploadForm = this.fb.group({
       title: [this.dataa?.title || ''],
     color: [this.dataa?.color || '#FFFFFF'], // Default to white if no color provided
-    functionality: [this.dataa?.functionality || ''],
+    functionality:new UntypedFormControl(''),
     qbe_id: [null],
     });
 }
@@ -133,5 +140,13 @@ export class AlertBuilderFormComponent implements OnInit {
   }
   onCancel() {
     this.dialogRef.close();
+  }
+  showFunctionalityJsons(){
+         let functionality = this.uploadForm.controls['functionality']?.value;
+         switch (functionality) {
+          case 1:
+          this.showFunctionality = true;
+          break;
+         }
   }
 }

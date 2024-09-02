@@ -26,10 +26,19 @@
 
   <!-- Functionality Dropdown -->
   <div class="form-group">
-    <label for="functionality">Functionality:</label>
-    <select id="functionality" formControlName="functionality">
-      <option *ngFor="let func of functionalities" [value]="func">{{ func }}</option>
-    </select>
+    <v-dropdown  
+      formControlName="functionality" 
+      [parentForm]="uploadForm" 
+      [dataJSON]="functionality" 
+      label="Functionality" 
+      placeholder="" 
+      (onChangeEvent)="showFunctionalityJsons()"
+      fieldName="functionality">
+    </v-dropdown>
+  </div>
+  <div *ngIf="showFunctionality">
+    <v-dropdown  [dataApi]="getGeneratedReport" label="Generated Report" placeholder="" (onChangeEvent)="showFunctionalityJsons()">
+    </v-dropdown>
   </div>
   <div class="form-group">
     <v-input

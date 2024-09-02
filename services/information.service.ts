@@ -72,7 +72,7 @@ export class InformationService {
   public selectedColumnFormOpening : any;
   public selectedColumnValue : boolean = false;
   public mainPreviewScreenType : boolean = false;
-
+  public advancedSearchShowGrid : boolean = false;
   constructor() { }
 
   private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
@@ -655,6 +655,12 @@ getMainPreviewScreenType(){
 }
 setMainPreviewScreenType(mainPreviewScreenType:any){
   this.mainPreviewScreenType = mainPreviewScreenType;
+}
+getAdvancedSearchShowGrid(){
+  return this.advancedSearchShowGrid;
+}
+setAdvancedSearchShowGrid(advancedSearchShowGrid:any){
+  this.advancedSearchShowGrid = advancedSearchShowGrid;
 }
 
 }
