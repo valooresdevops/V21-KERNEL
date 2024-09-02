@@ -239,6 +239,7 @@ export class GlobalConstants {
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
   public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
   public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+  public static getReportsDataDropdown = GlobalConstants.qbeGateway + 'api/getReportsDataDropdown';
 
 
 
@@ -340,6 +341,9 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getDynamicSearchMainDropDown = GlobalConstants.inDispGatewat +'api/getDynamicSearchMainDropDown/';
   public static getComboQueryData = GlobalConstants.inDispGatewat +'api/getComboQueryData/';
   public static getQueryHeadersForAdvancedSearch = GlobalConstants.inDispGatewat +'api/getQueryHeadersForAdvancedSearch/';
+  public static checkIfAdvancedSearchHasFunction = GlobalConstants.inDispGatewat +'api/checkIfAdvancedSearchHasFunction/';
+  public static getSearchButtonFunctionData = GlobalConstants.inDispGatewat +'api/getSearchButtonFunctionData/';
+  public static buildSearchJsonForApi = GlobalConstants.inDispGatewat +'api/buildSearchJsonForApi/';
 
   
   
@@ -402,10 +406,13 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static deleteFieldSetApi = GlobalConstants.inDispGatewat + 'api/deleteFieldSet/';
   public static getKpiQueryData = GlobalConstants.inDispGatewat +'api/getKpiQueryData/';
   public static decodeKpiQuery = GlobalConstants.inDispGatewat +'api/decodeKpiQuery/';
+  public static decodeAlertQuery = GlobalConstants.inDispGatewat +'api/decodeAlertQuery/';
   public static getDashboardChartData = GlobalConstants.inDispGatewat +'api/getDashboardChartData';
   public static getDashboardGridData = GlobalConstants.inDispGatewat +'api/getDashboardGridData';
   public static getDashboardKpiData = GlobalConstants.inDispGatewat +'api/getDashboardKpiData';
   public static addDashboardChart = GlobalConstants.inDispGatewat +'api/addDashboardChart/';
+  public static addDashboardAlert = GlobalConstants.inDispGatewat +'api/addDashboardAlert/';
+
   public static getDashboardTemplateData = GlobalConstants.inDispGatewat +'api/getDashboardTemplateData/';
   public static updateDashboardTempalte = GlobalConstants.inDispGatewat +'api/updateDashboardTempalte/';
   public static addDashboardTempalte = GlobalConstants.inDispGatewat +'api/addDashboardTempalte/';
@@ -434,13 +441,26 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static getMasterLinks = GlobalConstants.inDispGatewat + 'api/getMasterLinks/';
   public static insertMasterLinkData = GlobalConstants.inDispGatewat + 'api/insertMasterLinkData/';
   public static executeMasterLink = GlobalConstants.inDispGatewat + 'api/executeMasterLink/';
-  public static getExecutedReports1 = GlobalConstants.inDispGatewat + 'api/getExecutedReports1';
   public static getExecutedReports = GlobalConstants.inDispGatewat + 'api/getExecutedReports/';
   public static getExecutedReportData = GlobalConstants.inDispGatewat + 'api/getExecutedReportData/';
   public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';
   public static getQueryId = GlobalConstants.inDispGatewat +'api/getQueryId/'
   public static getNodesImages = GlobalConstants.inDispGatewat + 'api/getNodesImages/';
   public static runNextLayerProcess = GlobalConstants.inDispGatewat + 'api/runNextLayerProcess/';
+  public static editChartSize = GlobalConstants.inDispGatewat + 'api/updateSizeChart/';
+  public static editGridSize = GlobalConstants.inDispGatewat + 'api/updateSizeGrid/';
+  public static editKpiSize = GlobalConstants.inDispGatewat + 'api/updateSizeKpi/';
+  public static insertIconData = GlobalConstants.inDispGatewat + 'api/insertIconData/';
+  public static getIconData=GlobalConstants.inDispGatewat+'api/getIconData';
+  public static updateIconData = GlobalConstants.inDispGatewat + 'api/updateIconData/';
+  public static deleteIconData = GlobalConstants.inDispGatewat + 'api/deleteIconData/';
+  public static getAlertsDataApi = GlobalConstants.inDispGatewat + 'api/getAlertsData/';
+  public static deleteAlertsDataApi = GlobalConstants.inDispGatewat + 'api/deleteAlertsData/';
+  public static updateAlertsDataApi = GlobalConstants.inDispGatewat + 'api/updateAlertsData/';
+  public static insertAlertsDataApi = GlobalConstants.inDispGatewat + 'api/insertAlertsData/';
+  public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
+
+  public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
 
 
 

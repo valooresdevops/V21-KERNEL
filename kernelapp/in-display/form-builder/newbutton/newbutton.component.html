@@ -47,6 +47,11 @@
                 [parentForm]="buttonForm" fieldName="Menus" (onChangeEvent)="showCondition()">
             </v-dropdown>
         </div>
+        <div class="col-lg-12" *ngIf="IsAllColumns">
+            <v-dropdown formControlName="allcolumnsFormOpening" [dataJSON]="ALLcol" label="Columns" placeholder=""
+            [parentForm]="buttonForm" fieldName="allcolumnsFormOpening" [multiple]="true">
+        </v-dropdown>
+        </div>
         <div class="col-lg-12" *ngIf="ApiSelected">
             <v-input formControlName="procedureName" type="text" label="Procedure Name" placeholder=""
                 [parentForm]="buttonForm" fieldName="procedureName">
@@ -58,6 +63,14 @@
             [parentForm]="buttonForm" fieldName="url">
         </v-input> 
     </div>-->
+
+
+    <div class="col-lg-12" *ngIf="IsReportBuilder">
+        <v-dropdown formControlName="IsReportBuilder" [dataApi]="ALLReport" label="Report" placeholder=""
+        [parentForm]="buttonForm" fieldName="IsReportBuilder" [multiple]="false">
+    </v-dropdown>
+    </div>
+
         <div class="col-lg-12" *ngIf="ApiSelected1">
             <v-dropdown formControlName="url" [dataApi]="getApiBuilderListDropDown" label="APIs" placeholder=""
                 [parentForm]="buttonForm" fieldName="url" (onChangeEvent)="showApiJsons()">

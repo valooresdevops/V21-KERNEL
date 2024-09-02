@@ -84,9 +84,8 @@ import { TimelineComponent } from './map/timeline/timeline.component';
 import { MapOfflineComponent } from './map/map-offline/map-offline.component';
 import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-name-shape.component';
 import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
-import { VTimerComponent } from './map/component/v-timer/v-timer.component';
-import { KwgCytoscapeComponent } from '../kernelapp/in-display/object-builder/knowledge-graph/executed-reports/kwg-cytoscape/kwg-cytoscape.component';
-
+import { ObjectSizeManagerPopupComponent } from '../kernelapp/dashboard/object-size-manager-popup/object-size-manager-popup.component';
+import { AlertComponent } from '../../alert/alert.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -151,8 +150,9 @@ import { KwgCytoscapeComponent } from '../kernelapp/in-display/object-builder/kn
         MapOfflineComponent,
         PopupNameShapeComponent,
         BubbleButtonComponent,
-        VTimerComponent
-        // ReplacePipe
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
+
     ],
     imports: [
         FormsModule,
@@ -224,12 +224,8 @@ import { KwgCytoscapeComponent } from '../kernelapp/in-display/object-builder/kn
         MapOfflineComponent,
         PopupNameShapeComponent,
         BubbleButtonComponent,
-        HeaderComponent,
-        PropertiesComponent,
-        TimelineComponent,
-        MapOfflineComponent,
-        PopupNameShapeComponent,
-        VTimerComponent
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
 
     ],
     schemas: [

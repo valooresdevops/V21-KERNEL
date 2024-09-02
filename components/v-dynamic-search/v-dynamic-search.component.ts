@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormArray, UntypedFormBuilder, FormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import axios from 'axios';
 import { get } from 'jquery';
@@ -36,23 +36,25 @@ export class VDynamicSearchComponent implements OnInit {
    public getWhereCond:any = '-1';
   //  public checkIfFIeldExists:any = 'exists';
   public getDynamicSearchMainDropDown:any='';
-
-
+  public allDynamicSearchData:any[]=[];
+  public specialSearchData:any[]=[];
    @Input() public objectId: any;
    @Input() public sourceQuery: any;
    @Input() public isForForm: any;
-
+  public showDynamicSearch:any=true;
    @Output() public onSearchSubmit: EventEmitter<any> = new EventEmitter();
   rowData: any;
   gridOptions: any;
   searchService: any;
-
+  public searchButtonId:any;
    
   constructor(private formBuilder: UntypedFormBuilder,
      private http: HttpClient,private commonFunctions: CommonFunctions,
-     public informationservice: InformationService,) {}
+     public informationservice: InformationService,
+     private cdr: ChangeDetectorRef) {}
 
   async ngOnInit(): Promise<void> {
+    this.searchButtonId=this.objectId+"_"+this.isForForm;
     //this.getDynamicSearchMainDropDown=GlobalConstants.getDynamicSearchMainDropDown+this.objectId;
 if(this.sourceQuery == null){
 
@@ -66,6 +68,8 @@ if(this.sourceQuery == null){
     console.log("IS FOR FORM>>>>>>>>>>>>>>>>",this.isForForm);
     const getDynamicSearchMainDropDownApi = from(axios.get(GlobalConstants.getDynamicSearchMainDropDown + this.objectId+"/"+this.isForForm));
     const getDynamicSearchMainDropDown = await lastValueFrom(getDynamicSearchMainDropDownApi);
+
+    this.allDynamicSearchData=getDynamicSearchMainDropDown.data;
 
     // const getDynamicSearchUrl = from(axios.get(GlobalConstants.getDynamicSearch + this.objectId +"/"+ this.sourceQuery ));
     // const getDynamicSearch = await lastValueFrom(getDynamicSearchUrl);
@@ -88,9 +92,22 @@ if(this.sourceQuery == null){
         isDefault: getDynamicSearchMainDropDown.data[i].isDefault,
         defaultValues: getDynamicSearchMainDropDown.data[i].defaultValues        
       });
-
+      console.log("getDynamicSearchMainDropDown.data>>>>>>>",getDynamicSearchMainDropDown.data);
       this.isDropdownStatus.push(false);
       this.isDate.push(false);
+      console.log("11111111111111111111>>>>>>>>>>>>>>>>>>",this.dynamicSearchForm);
+      if(getDynamicSearchMainDropDown.data[i].isMandatory=="1"){
+        this.specialSearchData.push({
+        id: getDynamicSearchMainDropDown.data[i].id,
+        name: getDynamicSearchMainDropDown.data[i].name,
+        colType: getDynamicSearchMainDropDown.data[i].colType,
+        cmbSQL: getDynamicSearchMainDropDown.data[i].cmbSQL,
+        isMandatory: getDynamicSearchMainDropDown.data[i].isMandatory,
+        isDefault: getDynamicSearchMainDropDown.data[i].isDefault,
+        defaultValues: getDynamicSearchMainDropDown.data[i].defaultValues   
+        })
+
+      }
     }
 
     for(let i = 0; i < getSearchType.data.length; i ++) {
@@ -100,10 +117,23 @@ if(this.sourceQuery == null){
       });
     }
 
-
     setTimeout(() => {
-      this.addCondition();
-    }, 100)
+      if(this.specialSearchData.length==0){
+        console.log("NO GOOD>");
+        this.addCondition();
+      }else{
+        for(let i=0;i<this.specialSearchData.length;i++){
+          this.addConditionOnLoad(this.specialSearchData[i]);
+        }
+      }
+
+      // if(getDynamicSearchMainDropDown.data[i].isMandatory=="1"){
+      // this.dynamicSearchForm.controls[this.formElem[0].typeDropdown].setValue(getDynamicSearchMainDropDown.data[i].id);
+      // }
+
+
+    }, 500);
+
   }
 
   addCondition() {
@@ -128,6 +158,7 @@ if(this.sourceQuery == null){
     this.dynamicSearchForm.addControl(textKey, newConditionGroup.controls[textKey]);
     this.dynamicSearchForm.addControl(thirdDropdownKey, newConditionGroup.controls[thirdDropdownKey]);
   
+    
     this.formElem.push({
       typeDropdown: typeDropdownKey,
       searchType: searchTypeKey,
@@ -149,6 +180,87 @@ if(this.sourceQuery == null){
     this.formElemNum++;
   }
 
+  addConditionOnLoad(loadedSearchData:any) {
+    console.log("SPECIAL SEARCH DATA>>>>>>>>>",loadedSearchData);
+
+    const rowIndex = this.formElemNum;
+    const typeDropdownKey = "typeDropdown_" + rowIndex;
+    const searchTypeKey = "searchType_" + rowIndex;
+    const textKey = "text_" + rowIndex;
+    const thirdDropdownKey = "thirdDropdown_" + rowIndex;
+    const secondDropdownKey = "secondDropdown_" + rowIndex;
+
+    const newConditionGroup = this.formBuilder.group({
+      [typeDropdownKey]: [''],
+      [searchTypeKey]: [[]],
+      [textKey]: [''],
+      [secondDropdownKey]: [[]],
+      [thirdDropdownKey]: [[]]
+    });
+
+
+    this.dynamicSearchForm.addControl(typeDropdownKey, newConditionGroup.controls[typeDropdownKey]);
+    this.dynamicSearchForm.addControl(searchTypeKey, newConditionGroup.controls[searchTypeKey]);
+    this.dynamicSearchForm.addControl(textKey, newConditionGroup.controls[textKey]);
+    this.dynamicSearchForm.addControl(thirdDropdownKey, newConditionGroup.controls[thirdDropdownKey]);
+
+    //this.dynamicSearchForm.controls[typeDropdownKey].setValue(loadedSearchData.id);
+
+
+    this.formElem.push({
+      typeDropdown: typeDropdownKey,
+      searchType: searchTypeKey,
+      text: textKey,
+      thirdDropdown: thirdDropdownKey,
+      secondDropdown: secondDropdownKey,
+      thirdDropdownOptions: [] ,
+      secondDropdownOptions: []
+    });
+
+    this.dynamicSearchForm.get(typeDropdownKey)?.valueChanges.subscribe(selectedValue => {
+      this.onDropdownChange(selectedValue, this.formElem[rowIndex], thirdDropdownKey, rowIndex);
+    });
+
+    this.dynamicSearchForm.get(typeDropdownKey)?.valueChanges.subscribe(selectedValue => {
+      this.onDropdownChange(selectedValue, this.formElem[rowIndex], secondDropdownKey, rowIndex);
+    });
+    console.log("FORM ELEM<<<<<<<<<<<<",this.formElem);
+    this.dynamicSearchForm.controls[typeDropdownKey].setValue(loadedSearchData.id);
+
+  console.log("this.fieldCombo>>>>>>>>>>>",this.fieldsCombo);
+  console.log("typeDropdownKey>>>>>>>>>>>>",typeDropdownKey);
+  
+  console.log("this.dynamicSearchForm BEFORE>>>>>>>>>>>>>>>>>>",this.dynamicSearchForm);
+
+   //this.dynamicSearchForm.controls[searchTypeKey].setValue('2');
+
+
+
+  console.log("FETET 11111");
+  setTimeout(() => {
+    if(loadedSearchData.isDefault=="1" && loadedSearchData.colType!="Combo" && loadedSearchData.colType!="COMBO"){
+      console.log("FETET 22222");
+       this.dynamicSearchForm.controls[textKey].setValue(loadedSearchData.defaultValues);
+    }
+  }, 200);
+
+  setTimeout(() => {
+   // this.cdr.detectChanges();
+
+      this.dynamicSearchForm.markAsDirty();
+      this.dynamicSearchForm.updateValueAndValidity();
+  }, 300);
+  // this.registerTouchedField(typeDropdownKey);
+
+    this.formElemNum++;
+  }
+
+  registerTouchedField(fieldName: string) {
+    const control = this.dynamicSearchForm.get(fieldName);
+    if (control) {
+      control.markAsTouched();
+    }
+  }
   async onDropdownChange(selectedValue: any, fields: any, DropDownChange: any, index: number): Promise<void> {
     console.log("selectedValue>>>>>>>>>>>",selectedValue);
     console.log("fields>>>>>>>>>>>",fields);
@@ -210,7 +322,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
   
               const selectedValues: string[] = ['1', '2', '3', '4', '5','8'];
 
-              this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));;
+              this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));
               this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
               // this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));;
@@ -240,6 +352,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
         }
       }
     }
+    console.log("THIS DYNAMIC FORM ON CHANGE>>>>>>>>>>>",this.dynamicSearchForm);
   }
 
   getRowNumber(){
@@ -316,7 +429,14 @@ fields.thirdDropdownOptions=this.thirdCombo ;
   
       MyList.push(item1);
     }
-    console.log("MY LIST>>>>>>>>>>>>>",MyList);
+    
+    //console.log("MY LIST>>>>>>>>>>>>>",MyList);
+
+    const buildSearchJsonForApiApi = from(axios.post( GlobalConstants.buildSearchJsonForApi,MyList)  );
+    const buildSearchJsonForApi = await lastValueFrom(buildSearchJsonForApiApi);
+    
+    console.log("buildSearchJsonForApi DATA>>>>>>>>>>>>>>>>>>",buildSearchJsonForApi.data);
+    this.informationservice.setDynamicSearchApiData(buildSearchJsonForApi.data);
     if(this.formElemNum <=1 ){
       elementSize = 0;
     }else{
@@ -365,7 +485,14 @@ fields.thirdDropdownOptions=this.thirdCombo ;
         reloadGrid : false
       }
     }
-  
+    const checkIfAdvancedSearchHasFunctionApi = from(axios.get(GlobalConstants.checkIfAdvancedSearchHasFunction+this.objectId));
+    const checkIfAdvancedSearchHasFunction = await lastValueFrom(checkIfAdvancedSearchHasFunctionApi);
+    console.log("checkIfAdvancedSearchHasFunction>>>>>>>>",checkIfAdvancedSearchHasFunction.data);
+    
+    if(checkIfAdvancedSearchHasFunction.data!=0){
+      $("#searchFunctionButton_"+this.objectId)[0].click();
+    }
+    
     this.onSearchSubmit.emit(obj);
   }
 
@@ -450,15 +577,15 @@ fields.thirdDropdownOptions=this.thirdCombo ;
 }
   onReset(){
 
-    // this.dynamicSearchForm.reset();
+    this.dynamicSearchForm.reset();
 
-    // setTimeout(() => {
-    //   this.clearAll=true;
-    // }, 20);
+    setTimeout(() => {
+      this.clearAll=true;
+    }, 20);
 
-    // setTimeout(() => {
-    //   this.clearAll=false;
-    // }, 50);
+    setTimeout(() => {
+      this.clearAll=false;
+    }, 50);
   
    let obj = {
       result :"",
@@ -467,4 +594,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     this.onSearchSubmit.emit(obj);
   }
 
+
+
+  
 }

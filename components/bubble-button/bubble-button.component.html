@@ -10,7 +10,7 @@
   </div>
 </div>
 
-<div class="button-grid" *ngIf="a">
+<div class="button-grid" *ngIf="showBubbleChild">
   <div class="container" *ngFor="let n of bubbleChildMenus">
     <div class="button-wrapper">
       <button class="fab-button"
@@ -20,4 +20,4 @@
       <div class="tooltip">{{ n.name }}</div>
     </div>
   </div>
-</div>
+</div> 

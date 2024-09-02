@@ -1,11 +1,3 @@
-<!-- <div class="navigation">
-    <ul>
-      <li *ngFor="let element of Data">
-        <a href="#{{element.FieldsetName | lowercase | replace:' ':'-'}}">{{element.FieldsetName}}</a>
-      </li>
-    </ul>
-  </div> -->
-  
 <div id="row"  *ngFor="let element of Data">    
  
        
@@ -20,14 +12,13 @@
          <v-fieldset title="{{element.FieldsetName}}" class="my-2"></v-fieldset>
 
          <div *ngFor="let elt of element.fields" style=" display: inline-flex; margin: 10px;" class="col-4 col-md-4">
-        <v-input  readonly="true" formControlName="{{elt.Name}}" [required]="true"  label="{{elt.Name}}"
+        <v-input    formControlName="{{elt.Name}}" [required]="true"  label="{{elt.Name}}"
         type="text" id="{{elt.Name}}" fieldName="{{elt.Name}}"  [value]="elt.Data"></v-input>
  
     </div>
 </div>
    <div *ngIf="element.is_grid===true"> 
-    <v-fieldset           
-    title="{{element.FieldsetName}}"  class="my-2"></v-fieldset>
+    <v-fieldset title="{{element.FieldsetName}}"  class="my-2"></v-fieldset>
 
     <app-v-ag-grid class="grid2" [headerHeight]="20" [columnDefs]="columndefs" [rowData]="rowdata"  [Title]="Data"  [distinct]="false"  [pagination]="true"  [pagination]="true" [contextmenu]="false"   >  </app-v-ag-grid>
 

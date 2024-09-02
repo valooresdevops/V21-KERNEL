@@ -5,6 +5,7 @@ import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { HttpClient } from '@angular/common/http';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { ObjectSizeManagerPopupComponent } from '../object-size-manager-popup/object-size-manager-popup.component';
 
 @Component({
   selector: 'app-grid-popup',
@@ -12,6 +13,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
   styleUrls: ['./grid-popup.component.css']
 })
 export class GridPopupComponent implements OnInit {
+  public agGridSelectedNodes: any = '';
   public getDashboardGridData = GlobalConstants.getDashboardGridData;
   public agColumnsJson: any;
   public agColumns: AgColumns[] = [];
@@ -50,21 +52,40 @@ export class GridPopupComponent implements OnInit {
     this.agColumns.push(this.agColumnsJson);
   }
   Insert() {
-    let allData = {
-      gridId: this.informationService.getAgGidSelectedNode(),
-      templateId: this.informationService.getSelectedTabId(),
+    
+    if(this.informationService.getAgGidSelectedNode() == '' || this.informationService.getAgGidSelectedNode() == null)
+    {
+      alert("Plese select a grid first")
     }
+    else
+    {
+      const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
+      data: "grid",
+      width: '40%',
+      height: '33%',
+    });
 
-    this.http.post<any>(GlobalConstants.addDashboardGrid, allData,
-      { headers: GlobalConstants.headers }).subscribe({
-        next: (res) => {
-        },
-        error: (error) => {
-        }
-      });
+    dialogRef.afterClosed().subscribe(result => {
 
+      let allData = {
+        gridId: this.informationService.getAgGidSelectedNode(),
+        templateId: this.informationService.getSelectedTabId(),
+      }
+    
+      this.http.post<any>(GlobalConstants.addDashboardGrid, allData,
+    { headers: GlobalConstants.headers }).subscribe({
+      next: (res) => {
+        console.log(res);
 
-    this.commonFunctions.reloadPage('/dashboard');
-    this.commonFunctions.navigateToPage('/dashboard');
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+  this.commonFunctions.reloadPage('/dashboard');
+  this.commonFunctions.navigateToPage('/dashboard');
+
+    });
+    }
   }
 }

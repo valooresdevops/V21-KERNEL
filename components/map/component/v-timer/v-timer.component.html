@@ -1,6 +1,0 @@
-<div class="time">
-    <div *ngFor="let item of timelineItems">
-        <button (click)="handleClick(item.action)">{{item.label}}</button>
-    </div>
-    <input type="range" [(ngModel)]="speedTime" min="1" max="100" step="1" value="5" (click)="changebar()">
-</div>

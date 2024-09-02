@@ -18,6 +18,7 @@ import { VRejectedComponent } from 'src/app/Kernel/components/v-rejected/v-rejec
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { DynamicReportSaveComponent } from '../dynamic-report-save/dynamic-report-save.component';
 import { DynamicReportResultComponent } from 'src/app/Kernel/components/v-dynamic-report/dynamic-report-result/dynamic-report-result.component';
+import { Console } from 'console';
 
 
 @Component({
@@ -76,7 +77,7 @@ export class AmPreviewFormComponent implements OnInit {
   public canDelete: string = "";
   public sourceQuery: string = "";
   public toolBar: string = "";
-  public dialogArray: any[] = [];
+  // public dialogArray: any[] = [];
   public update: boolean = false;
   public required_flag: boolean;
   public isMainTab: number;
@@ -85,6 +86,7 @@ export class AmPreviewFormComponent implements OnInit {
   public roleId: any;
   public isExcluded: string = "";
   public listOfData: any;
+  public listOfDataFormOpening: any;
   public listOfRuleData: any[] = [];
   public mainJsonForApi = "";
   public mainJsonForDataWhenSkip = "";
@@ -107,6 +109,9 @@ export class AmPreviewFormComponent implements OnInit {
   public LastObject: any = [];
   public gridColumns: AgColumns[] = [];
   public allColumnsAr: any[] = [{ id: '', name: '' }];
+  
+  public gridStaticValue: any;
+
   public operators = [
     { id: '', name: '' },
     { id: 1, name: 'And' },
@@ -550,8 +555,8 @@ export class AmPreviewFormComponent implements OnInit {
         this.dialog.closeAll();
       }
     }
-
-
+    this.listOfDataFormOpening = undefined;
+this.informationservice.removeSelectedColumnFormOpening();
   }
 
   ngOnDestroy() {
@@ -1153,10 +1158,7 @@ export class AmPreviewFormComponent implements OnInit {
 
   // After Save Functions
   async dynamicDRBOnAfterSave(objectId: number) {
-    alert(11111111);
-    console.log("entered dynamicDRBOnAfterSave>>>");
     try {
-      let mainTab = this.informationservice.getMainTab();
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/4/0";
       const dynamicDRBOnAfterSaveUrl = from(axios.post(url));
       const dynamicDRBOnAfterSave = await lastValueFrom(dynamicDRBOnAfterSaveUrl);
@@ -1193,6 +1195,9 @@ export class AmPreviewFormComponent implements OnInit {
           }
 
           if (isExcluded != 1) {
+            if(this.actionType == undefined){
+              this.actionType = actionType;
+            }
             if (this.actionType == actionType) {
               for (let i = 0; i < ruleData.length; i++) {
                 if (ruleData[i].step == 1) {
@@ -1479,6 +1484,7 @@ export class AmPreviewFormComponent implements OnInit {
                   }
                 }
               }
+              ///////Sigma
               else if(type == 8){
                 let formData = this.dynamicForm.value;
                 let selectedTabName = this.informationservice.getSelectedTabName();
@@ -1593,6 +1599,9 @@ export class AmPreviewFormComponent implements OnInit {
           }
           if (isExcluded != 1) {
            // this.loaderService.isLoading.next(true);
+           if(this.actionType == undefined){
+            this.actionType = actionType;
+           }
             if (this.actionType == actionType) {
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
@@ -2463,7 +2472,6 @@ export class AmPreviewFormComponent implements OnInit {
             }
           }
           let actionType;
-  console.log("Action type >>>>>>>>>>>>>>>>>>>>>>>>>>> : " , dynamicDRBOnsearch.data[j] );
           if (JSON.parse(dynamicDRBOnsearch.data[j].actionType) == 1) {
             actionType = "saveNew";
           }
@@ -2472,6 +2480,9 @@ export class AmPreviewFormComponent implements OnInit {
           }
           if (isExcluded != 1) {
           //  this.loaderService.isLoading.next(true);
+          if(this.actionType == undefined){
+            this.actionType = actionType;
+          }
             if (this.actionType == actionType) {
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
@@ -2755,8 +2766,6 @@ export class AmPreviewFormComponent implements OnInit {
                 }
               }
               else {
-  console.log("ruleID >>>>>>>>>",ruleId);
-  console.log("ruleData >>>>",ruleData);
 
                 TypeOfAction = ruleData[0].data;
                 console.log("TypeOfAction >>>>>>>>>",TypeOfAction);
@@ -3286,6 +3295,7 @@ export class AmPreviewFormComponent implements OnInit {
   }
 
   async dynamicDRBOnchange(columnId: number, ruleId: number) {
+
     try {
       let url = '';
       if (columnId != -1 && ruleId == -1) {
@@ -3293,6 +3303,7 @@ export class AmPreviewFormComponent implements OnInit {
       }
       if (columnId == -1 && ruleId != -1) {
         url = GlobalConstants.getDBRGridByRuleActionAndRuleIdApi + this.objectId + "/1" + "/" + ruleId;
+
       }
       const onChangeUrlApi = from(axios.post(url));
       const onChangeUrl = await lastValueFrom(onChangeUrlApi);
@@ -3300,6 +3311,7 @@ export class AmPreviewFormComponent implements OnInit {
       if (onChangeUrl.data.length > 0) {
         for (let j = 0; j < onChangeUrl.data.length; j++) {
           let ruleAction = this.commonFunctions.filterArrayById(this.ruleAction, onChangeUrl.data[j].ruleAction)[0].name;
+
           let choosenField: any;
           let checkBoxName: any;
           let comparedField;
@@ -3325,6 +3337,7 @@ export class AmPreviewFormComponent implements OnInit {
           let actionDecisions;
           let alertValue;
           let ruleData = JSON.parse(onChangeUrl.data[j].ruleData);
+          console.log('ruleData>>>>>>>>',ruleData)
           let elements: string[];
           let comboValueField: any;
           let defaultField: any;
@@ -3365,9 +3378,17 @@ export class AmPreviewFormComponent implements OnInit {
           }
           else if (JSON.parse(onChangeUrl.data[j].actionType) == 2) {
             actionType = "update";
+          }else if (JSON.parse(onChangeUrl.data[j].actionType) == 3) {
+            actionType = "onForm";
           }
+
           if (isExcluded != 1) {
-            if (actionType == this.actionType) {
+            if(this.actionType == undefined){
+              this.actionType = actionType;
+            }
+
+            if (actionType == this.actionType || actionType == "onForm") {
+
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
                   if (ruleData[i].step == 0) {
@@ -3724,7 +3745,7 @@ export class AmPreviewFormComponent implements OnInit {
                 }
               } else {
 
-//console.log("ruleData >>>>>>>>",ruleData);
+console.log("ruleData2 >>>>>>>>",ruleData);
                 for (let i = 0; i < ruleData.length; i++) {
                   if (ruleData[i].step == 0) {
                     if (ruleData[i].data != "") {
@@ -3737,6 +3758,8 @@ export class AmPreviewFormComponent implements OnInit {
                         return el.id === ruleData[i].data;
                       });
                       choosenField = data[0].name;
+                      console.log('choosenField>>>>>>>>>', choosenField )
+
                         if (choosenField == "mat-checkbox") {
                           for (let i = 0; i < this.test.length; i++) {
                             if (id == this.test[i].id) {
@@ -3744,7 +3767,6 @@ export class AmPreviewFormComponent implements OnInit {
                             }
                           }
                       }
-
                     }
 //console.log("choosenField=",choosenField);
                   } else if (ruleData[i].step == 2) {
@@ -4824,7 +4846,7 @@ export class AmPreviewFormComponent implements OnInit {
                   }
                 }
               }
-            } else {
+            }else {
 
             }
           }
@@ -5203,7 +5225,6 @@ export class AmPreviewFormComponent implements OnInit {
       this.AllTabs = [];
       this.tableOptions1 = [];
       this.test_1 = "0";
-      // let objectId=this.amInfo.objectId;
 
       // $(".nav-tabs").show();
 
@@ -5215,18 +5236,20 @@ export class AmPreviewFormComponent implements OnInit {
         this.actionType == 'update';
       }
 
-      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
-        let part:String [] =this.amInfo.objectId.split('|');
-      this.amInfo.objectId =part[1].trim();
-      }
 
       // if(this.amInfo.objectId.includes("~N~")){
       //   let part:String [] =this.amInfo.objectId.split('|');
       // this.amInfo.objectId =part[1].trim();
       // }
+
+      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
+        let part:String [] =this.amInfo.objectId.split('|');
+      this.amInfo.objectId =part[1].trim();
+      }
       const getAllTabsUrl = from(axios.get(GlobalConstants.getAllTabs + this.amInfo.objectId));
       const getAllTabs = await lastValueFrom(getAllTabsUrl);
       this.allTabsTemp=getAllTabs.data;
+      console.log("ALL TABS DATA>>>>>>>>",getAllTabs.data);
       this.loaderService.isLoading.next(true);
       for (let i = 0; i < getAllTabs.data.length; i++) {
 
@@ -5260,11 +5283,13 @@ export class AmPreviewFormComponent implements OnInit {
         // )
 
         let isGrid = 1;
+//console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == 1) {
           isGrid = 0;
         } else {
           isGrid = getAllTabs.data[i].isGrid;
         }
+//console.log("isGrid ========",isGrid);
         // If condition lookup to disable a tab on onload
         let conditionTest: any;
         let condition = getAllTabs.data[i].condition == null ? -1 : getAllTabs.data[i].condition;
@@ -5539,6 +5564,7 @@ export class AmPreviewFormComponent implements OnInit {
           "isAdvancedSearch": getAllTabs.data[i].isAdvancedSearch,
           "hasMultipleSelection": getAllTabs.data[i].hasMultipleSelection,
           "isQueryForm": getAllTabs.data[i].isQueryForm,
+          "isFormFlip": getAllTabs.data[i].isFormFlip,
           "isDynamicReport": getAllTabs.data[i].isDynamicReport,
           "isGrid": isGrid,
           "objectId": getAllTabs.data[i].objectId,
@@ -5609,6 +5635,7 @@ export class AmPreviewFormComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
     }
@@ -5627,7 +5654,6 @@ export class AmPreviewFormComponent implements OnInit {
     this.roleId = this.informationservice.getUserRoleId();
     if (this.amInfo == undefined) {
       this.amInfo = this.lookupData[0];
-      console.log('data>>>>>>>>>>>>>>',this.lookupData[0])
     }
 
     this.loadAM(false);
@@ -5652,7 +5678,7 @@ export class AmPreviewFormComponent implements OnInit {
   async getAllColums() {
     //SERVICE1998
 
-    //console.log("number into this function >>>>>>>>>>>>>>>>>")
+    console.log("number into this function >>>>>>>>>>>>>>>>>")
     this.informationservice.setDynamicService("~" + this.informationservice.getSelectedTabName() + "~", JSON.stringify(this.amInfo));
 
     this.loaderService.isLoading.next(true);
@@ -5969,6 +5995,7 @@ export class AmPreviewFormComponent implements OnInit {
 const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
     isGrid = getTabConfigurationApi.data[0].isGrid;
+    console.log("getTabConfigurationApi.data>>>>>>>>>>",getTabConfigurationApi.data)
     console.log("ELIE IS FROM BUTTON CLICK 111>>>>>>>>>>>>>>>>",this.amInfo);
     console.log("ELIE IS FROM BUTTON CLICK 2222>>>>>>>>>>>>>>>>",this.amInfo.isFromButtonClick);
     console.log("ELIE IS FROM BUTTON CLICK 3333>>>>>>>>>>>>>>>>",this.amInfo.buttonClick);
@@ -6048,9 +6075,9 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
     if (isGrid == 1 && hasSourceQuery == 0) {
       this.agColumns = [];
       this.agColumnsJson = "";
-
+console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
       let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi.data, 'select', this.amInfo));
-      //console.log("TESTTABLE>>>>>>>>>>>",jsonData);
+      console.log("TESTTABLE>>>>>>>>>>>",jsonData);
       let tableNames: string = '';
       for (let u = 0; u < jsonData.length; u++) {
         tableNames = tableNames + "," + jsonData[u].tableName;
@@ -6740,7 +6767,22 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
 
             }
           }
-
+          //load data from previous form
+          if(this.listOfDataFormOpening == undefined){
+            if(this.informationservice.getSelectedColumnFormOpening() != ''  && this.informationservice.getSelectedColumnFormOpening() != undefined ){
+              this.listOfDataFormOpening = this.informationservice.getSelectedColumnFormOpening();
+            }
+          }
+          if (this.listOfDataFormOpening != undefined) {
+            if (this.listOfDataFormOpening.columns == undefined) {
+              this.dynamicForm.patchValue(this.listOfDataFormOpening);
+              const controlNames = Object.keys(this.dynamicForm.controls);
+              let data = controlNames.filter((el: any) => {
+                return el === data_0[i].name;
+              });
+              this.handleFormFieldValues(data[0], this.dynamicForm.controls[data[0]]?.value);
+            }
+          }
           // close a dialog and return data
           if(this.listOfData == undefined){
             if(this.informationservice.getListOfData() != ''){
@@ -6765,7 +6807,8 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
               this.test_1 = '1';
             }
           } else {
-            this.listOfHeaders.push(data_0[i])
+            this.listOfHeaders.push(data_0[i]);
+            console.log('listOfHeaders>>>>>>>>',this.listOfHeaders);
           }
           this.loaderService.isLoading.next(false);
         }
@@ -6790,19 +6833,29 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
           const getDynamicReportData = await lastValueFrom(getDynamicReportDataUrl);
           dataa = getDynamicReportData.data;
         }else{
-          //console.log("JSON VAL>>>>>>>>>>>>>>>>>>>>",jsonVal);
           const getDynamicFormDataUrl = from(axios.post(GlobalConstants.getDynamicFormData, jsonVal));
           const getDynamicFormData = await lastValueFrom(getDynamicFormDataUrl);
           dataa = getDynamicFormData.data;
         }
 
-
-
+       
+let jsonData1='[';
+let count = 0;
         for (let i = 0; i < dataa.length; i++) {
           this.loaderService.isLoading.next(true);
           let colName = dataa[i].colName.toUpperCase();
           let colValue = dataa[i].colValue;
           let colType = dataa[i].colType;
+
+          if(this.listOfHeaders.some(header => header.name === colName)){
+            if(count == 0){
+              jsonData1 +="{\""+colName+"\":"+colValue; 
+              count = 1;
+            }else{
+              jsonData1 +=",\""+colName+"\":"+colValue; 
+            }
+
+          }
           // Remove time from date value
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
@@ -6908,6 +6961,7 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
 
           if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
             this.handleFormFieldValues(colName, colValue);
+           
           }
 
           if (colType == "hidden") {
@@ -6934,38 +6988,33 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
                   }
           this.loaderService.isLoading.next(false);
         }
+        jsonData1 +="}]"
 
-        // Load field dependencies
-        // setTimeout(async () => {
+         this.gridStaticValue=JSON.parse(jsonData1);
+        setTimeout(()=>{
+        this.showGrid=false;
+        },100);
+          this.showGrid = true;
+
           this.loadFieldDependencyForForm();
-        // }, 100);
 
         this.dynamicDRBOnload(this.objectId);
       }
       this.isFromGridClick = 0;
 
       // Hide all fieldsets that contain all it's fields hidden
-      // setTimeout(() => {
         this.handleFormFieldsetsAfterLoad();
         this.showTheGridIntoForm();
-      // }, 150);
 
       // Run Dynamic Rule Builder onLoad rules
-      // setTimeout(() => {
-//console.log("befor calling the load rules");
         this.dynamicDRBOnload(this.objectId);
-      // }, 1200)
     }
-    // setTimeout(() => {
       this.handleSaveButton();
-    // }, 900);
 
     this.loaderService.isLoading.next(false);
     this.listOfData = undefined;
-    //fill the form (after close a popup)
+    this.listOfDataFormOpening = undefined;
     this.allData = this.test;
-    //console.log("in the end of getAllColums ==",this.columnTypeCode);
-    //console.log("this.amInfo=",this.amInfo)
 
     //test2
     let selectedTabName = this.informationservice.getSelectedTabName();
@@ -7300,19 +7349,38 @@ console.log('COLUMN_ID--------------------->',data[i])
       }
     }
   }
-//jp
-  async onShowButtonForm(buttonId: number) {
+
+  /////////IMPORTANT AN DYNAMIC BUTTON AND DYNAMIC SEARCH\\\\\\\\\\\\\\\\\\
+
+  async onShowButtonForm(buttonId: number,fromButtonOrSearch:string) {
+    console.log("BUTTON TRIGGERED!!!!!!!!!!!!!");
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
     let mainTab = this.informationservice.getMainTab();
-    const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
-    const getButtonData = await lastValueFrom(getButtonDataUrl);
-    let data1 = getButtonData.data;
-    this.columnTypeCode = data1.columnType;
+    let data1:any;
+    let decodedString='';
+    console.log("fromButtonOrSearch>>>>>>>>>>>>>>>",fromButtonOrSearch);
+    if(fromButtonOrSearch=="dynamicButton"){
 
-    if (data1.blobFile != null && data1.blobFile != undefined) {
-      const base64EncodedString = data1.blobFile;
-      const decodedString = atob(base64EncodedString);
+        const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
+        const getButtonData = await lastValueFrom(getButtonDataUrl);
+        data1 = getButtonData.data;
+        this.columnTypeCode = data1.columnType;
+        const base64EncodedString = data1.blobFile;
+        decodedString = atob(base64EncodedString);
+
+    }else{
+
+        const getSearchButtonFunctionDataApi = from(axios.get(GlobalConstants.getSearchButtonFunctionData + this.objectId));
+        const getSearchButtonFunctionData = await lastValueFrom(getSearchButtonFunctionDataApi);
+        data1 = getSearchButtonFunctionData.data[0];
+        this.columnTypeCode = 14;
+        decodedString=getSearchButtonFunctionData.data[0].blobFile;
+    }
+    console.log("DATA111111>>>>>>>>>>>>>",data1);
+    if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
+      
       let splitedString = decodedString.split("|");
+      console.log("SPLITED STRING>>>>>>>>>>>>>>",splitedString);
       splitedString.forEach(async (part, index) => {
 
       let procedureName = part.split("~A~")[0];
@@ -7327,8 +7395,24 @@ console.log('COLUMN_ID--------------------->',data[i])
       let alertMessage = part.split("~A~")[9];
       let jsonRequest = part.split("~A~")[10];
       let jsonResponse = part.split("~A~")[11];
+      let selectedColsFormOpening = part.split("~A~")[12];
+
+
 
       this.buttonObjectId = procedureName;
+        console.log("procedureName>>>>>>>>>",procedureName);
+        console.log("buttonAction>>>>>>>>>",buttonAction);
+        console.log("isMainPreview>>>>>>>>>",isMainPreview);
+        console.log("params>>>>>>>>>",params);
+        console.log("url>>>>>>>>>",url);
+        console.log("otherCondition>>>>>>>>>",otherCondition);
+        console.log("alertValue>>>>>>>>>",alertValue);
+        console.log("thirdCondition>>>>>>>>>",thirdCondition);
+        console.log("alertMessage>>>>>>>>>",alertMessage);
+        console.log("jsonRequest>>>>>>>>>",jsonRequest);
+        console.log("jsonResponse>>>>>>>>>",jsonResponse);
+        console.log("selectedColsFormOpening>>>>>>>>>",selectedColsFormOpening);
+
 
       // Call Procedure
       if (buttonAction == 2) {
@@ -7507,13 +7591,20 @@ console.log('COLUMN_ID--------------------->',data[i])
             for (let i = 0; i < arrayFromString.length; i++) {
               let formControlName = "";
               if ($("#field_" + arrayFromString[i]).length > 0) {
-                formControlName = $("#field_" + arrayFromString[i]).attr("class").split(" ")[0];
-                if (i == 0) {
-                  allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                const element = $("#field_" + arrayFromString[i]);
+                const classAttribute = element.attr("class");
+              
+                if (classAttribute) {
+                  formControlName = classAttribute.split(" ")[0];
+                  if (i == 0) {
+                    allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  } else {
+                    allParameters = allParameters + "~" + formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  }
                 } else {
-                  allParameters = allParameters + "~" + formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  console.warn(`Element with ID 'field_${arrayFromString[i]}' does not have a class attribute.`);
                 }
-              } else if ($(".field_" + arrayFromString[i]).length > 0) {
+               }else if ($(".field_" + arrayFromString[i]).length > 0) {
                 formControlName = $(".field_" + arrayFromString[i]).attr("class").split(" ")[0];
                 if (i == 0) {
                   allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
@@ -7577,15 +7668,45 @@ console.log('COLUMN_ID--------------------->',data[i])
       // Form Opening
       else if (buttonAction == "1") {
 
+
+
         let formData = this.dynamicForm.value;
         console.log('formData>>>>>>>>>>',formData);
+    if (selectedColsFormOpening !== undefined && selectedColsFormOpening !== null && selectedColsFormOpening !== '') {
+          const selectedColsName = from(axios.post(GlobalConstants.getColNameByColIds +selectedColsFormOpening));
+  const selectedColsNameVal = await lastValueFrom(selectedColsName);
+  const formattedArrayKeys = selectedColsNameVal.data.map((key:any) => key.toUpperCase());
+
+// Get the common keys
+const commonKeys = formattedArrayKeys.filter((key:any) => key in formData);
+
+// Create the new object with only common keys
+const resultObject: { [key: string]: string } = commonKeys.reduce((acc: { [x: string]: any; }, key: string | number) => {
+    acc[key] = formData[key];
+    return acc;
+}, {});
+console.log('tthis.informationservice.getSelectedColumnFormOpening()',this.informationservice.getSelectedColumnFormOpening());
+if(this.informationservice.getSelectedColumnFormOpening() != undefined){
+let object = this.informationservice.getSelectedColumnFormOpening();
+
+const mergedObject = {
+  ...object,
+  ...resultObject
+};
+
+this.informationservice.setSelectedColumnFormOpening(mergedObject);
+
+}else{
+  this.informationservice.setSelectedColumnFormOpening(resultObject);
+}
+}
+     
         //test2
         let selectedTabName = this.informationservice.getSelectedTabName();
         console.log('selectedTabName>>>>>>>>>>',selectedTabName);
 
         if(formData){
           this.listOfData = JSON.parse(JSON.stringify(formData));
-          console.log('listOfData>>>>>>>>>>',this.listOfData);
 
         }
         this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
@@ -7594,7 +7715,6 @@ console.log('COLUMN_ID--------------------->',data[i])
        if(this.informationservice.getAgGidSelectedNodeRule() != undefined && this.informationservice.getAgGidSelectedNodeRule() != null && this.informationservice.getAgGidSelectedNodeRule() != ''){
         params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
        }
-       console.log("params>>>>>>>>>>>",params);
         let data = [{
           actionType: this.amInfo.actionType,
           objectId: this.buttonObjectId,
@@ -7614,15 +7734,20 @@ console.log('COLUMN_ID--------------------->',data[i])
         this.dataservice.PushdialogArray(this.dialogRef);
         //test2
         this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+        // if(this.informationservice.getSelectedColumnFormOpening() != undefined){
+        //   this.listOfData = this.informationservice.getSelectedColumnFormOpening();
+        // }
         this.informationservice.setListOFData(this.listOfData);
         this.dialogRef.disableClose = true;
       }
       // Call Api
       else if (buttonAction == "3") {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 let dataa:any=[];
         let formData = this.dynamicForm.value;
         if (formData) {
           this.listOfData = JSON.parse(JSON.stringify(formData));
+          this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
         }
         console.log("Button Data>>>>>>>",part);
         console.log("button action 1>>>>>>",formData);
@@ -7656,7 +7781,10 @@ let dataa:any=[];
         //   responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i].jsonParameter+"#",JSON.parse(jsonResponse)[i].fieldName);
         // }
         // console.log("method id>>>>>>>>>>>>>>",url);
-
+        
+        if(fromButtonOrSearch!='dynamicButton'){
+          requestJsonString=this.informationservice.getDynamicSearchApiData();
+        }
 
         console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
         console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
@@ -7666,16 +7794,20 @@ let dataa:any=[];
            const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
            const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
         console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
+        console.log("this.listOfHeaders>>>>>>>>>>",this.listOfHeaders);
+//jp1111111111111111111111111111
 
           dataa=runDynamicBuilt.data;
-        console.log("DATAAAA>>>>>>>>>>>",dataa)
-        for (let i = 0; i < dataa.length; i++) {
+        console.log("DATAAAA>>>>>>>>>>>",dataa);
+        // let jsonData1='[';
+        let count = 0;
+        for (let i = 0; i < dataa.form.length; i++) {
           console.log("FETET");
           this.loaderService.isLoading.next(true);
-          let colName = dataa[i].colName.toUpperCase();
-          let colValue = dataa[i].colValue;
-          let colType = dataa[i].colType;
-          // Remove time from date value
+          let colName = dataa.form[i].colName.toUpperCase();
+          let colValue = dataa.form[i].colValue;
+          let colType = dataa.form[i].colType;
+
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
             colValue = date.toISOString().substring(0, 10);
@@ -7800,212 +7932,19 @@ let dataa:any=[];
             }
           }
 
-          // if (foreignId === colName) {
-          //     this.handleFormFieldValues(colName, colValue);
-          // } else if (colName === this.amInfo.primaryColumn) {
-          //     this.handleFormFieldValues(colName, colValue);
-          //         }
           this.loaderService.isLoading.next(false);
         }
-       // console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
 
-        //  const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));
-      //  const getApiMethodUrl = await lastValueFrom(getApiMethodDataApi);
-      // let fullUrl=getApiMethodUrl.data;
-
-        // let customerId = -1;
-        // let sessionId = -1;
-        // //test2
-        // let userId = this.informationservice.getLogeduserId();
-
-        // let nearBy = 0;
-        // let sameSession = 0;
-        // //test2
-        // if (this.informationservice.getStatusOfCheckExisting() == "nearMatch") {
-        //   nearBy = 1;
-        // } else {
-        //   nearBy = 0;
-        // }
-
-        // if(this.informationservice.getSameSession() == "sameSession"){
-        //   sameSession = 1;
-        // }else{
-        //   sameSession = 0;
-        // }
-
-
-        // if (params == '') {
-        //   //test2
-        //   params = this.informationservice.getAgGidSelectedNode();
-
-        //   if (!isNaN(Number(params))) {
-
-        //   } else {
-        //     if (params.indexOf(",") != -1) {
-        //       customerId = Number(params.split(",")[0].split('=')[1].trim());
-        //       sessionId = Number(params.split(",")[1].split('=')[1].trim());
-        //     } else {
-        //       customerId = Number(params.split('=')[1].trim());
-        //     }
-        //   }
-
-
-        //   let globalInfo = "{";
-        //   globalInfo += "\"" + "colName" + "\"" + ":" + "\"" + "customer_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"" + "},";
-        //   globalInfo += "{" + "\"" + "colName" + "\"" + ":" + "\"" + "session_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + sessionId + "\"" + "}";
-
-        //   let jsonArr: string = "{";
-        //   //test2
-        //   let ListOfData = JSON.parse(this.informationservice.getMainJsonForDataWhenSkip());
-
-        //   jsonArr += "\"" + "columns" + "\" : [";
-        //   for (let i = 0; i < ListOfData.columns.length; i++) {
-        //     jsonArr += "{";
-
-        //     jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + ListOfData.columns[i].colName + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + ListOfData.columns[i].colVal + "\"";
-
-        //     if (i == ListOfData.columns.length - 1) {
-        //       jsonArr += "}," + globalInfo;
-        //     } else {
-        //       jsonArr += "},";
-        //     }
-        //   }
-        //   //console.log("hey 3333 >>>>>>>>>>>");
-        //   // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
-        //   jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-        //   // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
-        //   this.mainJsonForApi = jsonArr;
-        //   //test2
-        //   this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForApi);
-        // }
-        // else {
-        //   //globalJson ---> to get the session and the customer id
-        //   let globalInfo: any[] = this.handleSelectedRowIds(this.amInfo.selectedRowId, "grid,form,button");
-        //   let globalJson = "{";
-        //   if (globalInfo.toString() == "-1") {
-        //     globalJson = "";
-        //   } else {
-        //     for (let y = 0; y < globalInfo.length; y++) {
-        //       if (globalInfo.length - 1 == y) {
-        //         globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"";
-        //       } else {
-        //         globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"" + ",";
-        //       }
-        //     }
-        //     globalJson += "}";
-        //   }
-
-        //   const arrayFromString = params.split(',').map(Number);
-        //   const dynamicDRBOnBeforeSaveUrl = from(axios.post(GlobalConstants.getColNameAndColId, arrayFromString));
-        //   const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
-
-        //   const dynamicDRBOnBeforeSaveUrl1 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
-        //   const ApiResultGetAllColums = await lastValueFrom(dynamicDRBOnBeforeSaveUrl1);
-
-        //   //creating Json to use it when i do a skip
-        //   let JsonForDataWhenSkip = "{";
-        //   JsonForDataWhenSkip += "\"" + "columns" + "\" : [";
-        //   for (let i = 0; i < ApiResultGetAllColums.data.length; i++) {
-        //     JsonForDataWhenSkip += "{";
-
-        //     JsonForDataWhenSkip += "\"" + "colName" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[ApiResultGetAllColums.data[i].name]?.value + "\"" + "," + "\"" + "colId" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].id + "\"";
-
-        //     if (i == ApiResultGetAllColums.data.length - 1) {
-        //       if (globalJson == "") {
-        //         JsonForDataWhenSkip += "}";
-        //       } else {
-        //         JsonForDataWhenSkip += "}," + globalJson;
-        //       }
-        //     } else {
-        //       JsonForDataWhenSkip += "},";
-        //     }
-        //   }
-        //   //console.log("hrty213234562436244356");
-        //   JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-        //   this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
-        //   this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
-
-
-        //   let jsonArr: string = "{";
-        //   jsonArr += "\"" + "columns" + "\" : [";
-        //   for (let i = 0; i < dynamicDRBOnBeforeSave.data.length; i++) {
-        //     jsonArr += "{";
-
-        //     jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + dynamicDRBOnBeforeSave.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[dynamicDRBOnBeforeSave.data[i].name]?.value + "\"";
-
-        //     if (i == dynamicDRBOnBeforeSave.data.length - 1) {
-        //       if (globalJson == "") {
-        //         jsonArr += "}";
-        //       } else {
-        //         jsonArr += "}," + globalJson;
-        //       }
-        //     } else {
-        //       jsonArr += "},";
-        //     }
-        //   }
-        //   //console.log("hommmmmmmmm2 >>>>>>");
-        //   jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
-        //   this.mainJsonForApi = jsonArr;
-        // }
-
-        // //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
-        // let apiUrl = GlobalConstants.callingApi + url;
-        // const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
-        // const ResultOfCallingApi = await lastValueFrom(callingApi);
-        // //test2
-        // this.informationservice.setStatusOfCheckExisting(ResultOfCallingApi.data.status);
-        // this.informationservice.setSameSession(ResultOfCallingApi.data.code);
-
-        // if (ResultOfCallingApi.data.description == "alert") {
-        //   this.listOfData = [];
-        //   this.commonFunctions.alert("alert", ResultOfCallingApi.data.status);
-        //   if (ResultOfCallingApi.data.showSaveButton == 1) {
-        //     this.showAndHideButtons(1234, this.idOfCheckExisting);
-        //   }
-        // }
-        // else if (ResultOfCallingApi.data.description == "open") {
-
-        //   //test2
-        //   this.informationservice.setCheckExisting('yes');
-        //   let result = ResultOfCallingApi.data.objectId;
-        //   let data = [{
-        //     objectId: result.split("~A~")[0],
-        //     isFromGridClick: 0,
-        //     isFromButtonClick: 1,
-        //     primaryColumn: this.columnId,
-        //     buttonClick: this.columnTypeCode,
-        //     selectedRowId: JSON.parse(result.split("~A~")[1])
-        //   }];
-
-        //   this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
-        //     width: "80%",
-        //     height: "80%",
-        //     data: data
-        //   });
-
-        //   this.dataservice.PushdialogArray(this.dialogRef);
-        //   //test2
-        //   this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
-
-        //   //test2
-        //   this.informationservice.setTabToBeSelectedOnValidate(this.informationservice.getSelectedTabId());
-
-        // }
-        // else if (ResultOfCallingApi.data.description == "validate") {
-        //   // let ValidatedSessionId = ResultOfCallingApi.data.code;
-        //   //test2
-        //   this.listOfData = [];
-        //   if (this.informationservice.getPopupBreadcrumb().includes("Initiation")) {
-        //     this.dialog.closeAll();
-        //   }
-        //   else {
-        //     localStorage.setItem("closeTwice","true");
-        //     this.closeDialog(true);
-        //   }
-        // }
-
-        // //console.log("this.listOfData ====",this.listOfData);
-        // this.informationservice.setListOFData(this.listOfData);
+        this.gridStaticValue=dataa.grid;
+if (this.gridStaticValue || this.gridStaticValue.length != 0) {
+  setTimeout(()=>{
+    this.showGrid=false;
+    },100);
+    setTimeout(()=>{
+      this.showGrid = true;
+    },100);
+}
+        
       }
       // Close Popup
       else if (buttonAction == "4") {
@@ -8013,46 +7952,134 @@ let dataa:any=[];
         this.closeDialog(true);
 
       } else if (buttonAction == "5") {
-        let customerId = -1;
-        let userId = this.informationservice.getLogeduserId();
-        let params = this.informationservice.getAgGidSelectedNode();
-        customerId = JSON.parse(params)[0].COLVALUE;
-        let customerType=JSON.parse(params)[2].COLVALUE;
-        //console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
-        let jsonArr: string = "{";
-        jsonArr += "\"" + "columns" + "\" : [";
-        jsonArr += "{";
-        jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "custId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
-        jsonArr += "}"
-        jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
-        //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
-        //  const ResultOfCallingApi = await lastValueFrom(callingApi);
-        let headerOptions = new HttpHeaders({
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf'
-          //   'Accept': 'application/octet-stream', // for excel file
-        });
-        let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
 
-        if(customerType==='7'){
-          url=url.replace("31900","31899");
+        let formData = this.dynamicForm.value;
+        if (formData) {
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+          this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
         }
-        // url is : executeReportwithOneParam/31849
-        let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7001/api/" + url;
+        
+        console.log("Button Data>>>>>>>",part);
+        console.log("button action 1>>>>>>",formData);
+        console.log("11111>>>>>>",part.split("~A~")[0]);
+        console.log("22222>>>>>>",part.split("~A~")[1]);
+        console.log("33333>>>>>>",part.split("~A~")[2]);
+        console.log("44444>>>>>>",part.split("~A~")[3]);
+        console.log("55555>>>>>>",part.split("~A~")[5]);
+        console.log("66666>>>>>>",part.split("~A~")[6]);
+        console.log("77777>>>>>>",part.split("~A~")[7]);
+        console.log("88888>>>>>>",part.split("~A~")[8]);
+        console.log("99999>>>>>>",part.split("~A~")[9]);
+        console.log("10101010>>>>>>",part.split("~A~")[10]);
+        console.log("11111111>>>>>>",part.split("~A~")[11]);
+        console.log("1212121212>>>>>>",part.split("~A~")[12]);
+        console.log("131313131313>>>>>>",part.split("~A~")[13]);
+        let reportId=part.split("~A~")[13];
 
-        this.http.post(ApiUrl, JSON.parse(jsonArr), requestOptions).pipe(map((data: any) => {
-          let blob = new Blob([data], {
-            type: 'application/pdf' // must match the Accept type
+          const checkParametersApi = from(axios.get(GlobalConstants.checkParameters +reportId));
+          const checkParameters = await lastValueFrom(checkParametersApi);
+
+          console.log("CHECK PARAMETERS>>>>>>>>>>>>>>",checkParameters.data);
+
+          const formControlsArray: Array<{ key: string; value: any }> = [];
+
+          Object.keys(this.dynamicForm.controls).forEach(key => {
+            const control = this.dynamicForm.get(key);
+            if (control instanceof UntypedFormControl) {
+              formControlsArray.push({ key, value: control.value });
+            }
+            //  else if (control instanceof UntypedFormGroup) {
+            //   const nestedControls = getFormControlsValues(control);
+            //   if (nestedControls.length > 0) {
+            //     formControlsArray.push({ key, value: JSON.parse(nestedControls) });
+            //   }
+            // }
           });
-          var link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          // link.download = 'samplePDFFile.pdf';
-          link.target = '_blank';
-          link.click();
-          window.URL.revokeObjectURL(link.href);
+        
+        console.log("FORM CONTROLS ARRAY>>>>>>>>>>>>",formControlsArray);
+        let jsonarray:any[]=[];
 
-        })).subscribe((result: any) => {
-        });
+        for(let i=0;i<formControlsArray.length;i++){
+          for(let j=0;j<checkParameters.data.length;j++){
+            if(formControlsArray[i].key==checkParameters.data[j].paramName){
+              jsonarray.push({colName:formControlsArray[i].key,colVal:formControlsArray[i].value});
+            }else{
+              jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1676667"});
+            }
+          }
+        }
+        let jsonParams = {
+          columns: jsonarray
+        };
+                                                    // let customerId = -1;
+                                                    // let userId = this.informationservice.getLogeduserId();
+                                                    // let params = this.informationservice.getAgGidSelectedNode();
+                                                    // customerId = JSON.parse(params)[0].COLVALUE;
+                                                    // let customerType=JSON.parse(params)[2].COLVALUE;
+                                                    // //console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
+                                                    // let jsonArr: string = "{";
+                                                    // jsonArr += "\"" + "columns" + "\" : [";
+                                                    // jsonArr += "{";
+                                                    // jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "custId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
+                                                    // jsonArr += "}"
+                                                    // jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
+                                                    // //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
+                                                    // //  const ResultOfCallingApi = await lastValueFrom(callingApi);
+                                                    // let headerOptions = new HttpHeaders({
+                                                    //   'Content-Type': 'application/json',
+                                                    //   'Accept': 'application/pdf'
+                                                    //   //   'Accept': 'application/octet-stream', // for excel file
+                                                    // });
+                                                    //  let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+
+                                                    // if(customerType==='7'){
+                                                    //   url=url.replace("31900","31899");
+                                                    // }
+        // url is : executeReportwithOneParam/31849
+              // let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7001/api/" + url;
+
+              // this.http.post(ApiUrl, JSON.parse(jsonArr), requestOptions).pipe(map((data: any) => {
+              //   let blob = new Blob([data], {
+              //     type: 'application/pdf' // must match the Accept type
+              //   });
+              //   var link = document.createElement('a');
+              //   link.href = window.URL.createObjectURL(blob);
+              //   // link.download = 'samplePDFFile.pdf';
+              //   link.target = '_blank';
+              //   link.click();
+              //   window.URL.revokeObjectURL(link.href);
+
+              // })).subscribe((result: any) => {
+              // });
+
+              let urlParam=GlobalConstants.executeReportwithParameters;
+              let headerOptions = new HttpHeaders({
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/pdf'
+                  
+                  //   'Accept': 'application/octet-stream', // for excel file
+              });
+              let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+                   
+  this.http.post(urlParam+reportId, jsonParams, requestOptions).pipe(map((data: any) => {
+      let blob = new Blob([data], {
+          type: 'application/pdf' // must match the Accept type
+          // type: 'application/octet-stream' // for excel 
+      });
+      var link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      // link.download = 'samplePDFFile.pdf';
+      link.target = '_blank';
+      link.click();
+      window.URL.revokeObjectURL(link.href);
+
+  })).subscribe((result: any) => {
+  });
+
+
+
+
+
       }else if (buttonAction == "7") {
 
         let formData = this.dynamicForm.value;
@@ -8088,6 +8115,8 @@ let dataa:any=[];
         this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
         this.informationservice.setListOFData(this.listOfData);
         this.dialogRef.disableClose = true;
+      }else if (buttonAction == "9"){
+        this.submitForm();
       }
     });
     }
@@ -8141,7 +8170,9 @@ let dataa:any=[];
           });
         }
       }
+      console.log("this.test>>>>>>>>>",this.test);
       this.gridColumns.push(this.agColumnsJson);
+      console.log("gridColumns>>>>>>>",this.gridColumns)
       this.showGrid = true;
     }
 

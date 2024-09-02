@@ -32,6 +32,7 @@ export class NewTabComponent implements OnInit {
   public getTabTables: string = "";
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public isGrid: any;
+  public isFormFlip:any;
   public isTreeGrid: any;
   public isQueryForm: any;
   public isRowGroup: any;
@@ -86,6 +87,7 @@ export class NewTabComponent implements OnInit {
     fieldGrouping:new UntypedFormControl(''),
     isRowGroupHidden:new UntypedFormControl(''),
     fieldGroupingHidden:new UntypedFormControl(''),
+    isFormFlip:new UntypedFormControl('')
   });
   agPrimaryKey: any;
 
@@ -337,7 +339,7 @@ console.log('data--------->',data)
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
           IsRowGroupHidden: this.newTabForm.controls['IsRowGroupHidden']?.value,
-
+          isFormFlip: this.newTabForm.controls['isFormFlip']?.value,
           fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
           isDynamicReport: this.newTabForm.controls['isDynamicReport']?.value,
           isQueryFormSelectedButtons:JSON.stringify(this.newTabForm.controls['isQueryFormSelectedButtons']?.value),
@@ -361,6 +363,7 @@ console.log('data--------->',data)
         };
         List.push(jsonParams);
         this.isGrid = this.newTabForm.controls['isGrid']?.value;
+        this.isFormFlip = this.newTabForm.controls['isFormFlip']?.value;
         this.isTreeGrid = this.newTabForm.controls['isTreeGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
@@ -394,6 +397,7 @@ console.log('data--------->',data)
           objectPId: this.objectPId,
           orderNo: this.newTabForm.controls['orderField']?.value,
           isGrid: this.newTabForm.controls['isGrid']?.value,
+          isFormFlip: this.newTabForm.controls['isFormFlip']?.value,
           isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
@@ -500,7 +504,12 @@ console.log('data--------->',data)
           console.log("IS GRID IS TRUE");
           this.newTabForm.controls['isGrid'].setValue(true);
         }
-
+        if (res[0].isFormFlip == "0") {
+          this.newTabForm.controls['isFormFlip'].setValue(false);
+        } else {
+          console.log("IS Form Flipped");
+          this.newTabForm.controls['isFormFlip'].setValue(true);
+        }
         if (res[0].isTreeGrid == "0") {
           this.newTabForm.controls['isTreeGrid'].setValue(false);
         } else {

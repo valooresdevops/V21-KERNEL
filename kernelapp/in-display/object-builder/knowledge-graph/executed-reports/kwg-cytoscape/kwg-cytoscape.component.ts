@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ComponentFactoryResolver, ElementRef, Input, NgZone, Optional, ViewChild, ViewContainerRef,OnChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, ComponentFactoryResolver, ElementRef, Input, NgZone, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { GridOptions } from 'ag-grid-community';
 import cytoscape, { NodeDataDefinition } from 'cytoscape';
@@ -14,7 +14,6 @@ import { MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dial
 import { NextLayerFormComponent } from '../next-layer-form/next-layer-form.component';
 import axios from 'axios';
 import { from, lastValueFrom } from 'rxjs';
-import { DataService } from 'src/app/Kernel/components/map/Services/data.service';
 
 @Component({
   selector: 'app-kwg-cytoscape',
@@ -33,7 +32,7 @@ export class KwgCytoscapeComponent {
   //   private route: Router,
   //   public informationservice: InformationService) { }
 
-    @Input()  displayPlace:any;
+
     @ViewChild('popup') popup: any;
     @ViewChild('createNodePopup') createpopup: any;
     @ViewChild('gridPopup') gridpopup: any;
@@ -58,9 +57,6 @@ export class KwgCytoscapeComponent {
     darkmode:any = false;
     inputValue: number | any;
     linkCountInput: number | any;
-    ShowHeader:boolean=false;
-    showbtnmap:boolean=false;
-    oldselectedvalue:any;
     legendItems = [
       { imgSrc: 'assets/Profile-PNG-File.png', title: 'Title 1' },
       { imgSrc: 'assets/Profile-PNG-File.png', title: 'Title 2' },
@@ -97,8 +93,7 @@ export class KwgCytoscapeComponent {
       private http: HttpClient,
       public informationservice: InformationService,
       private dialogNext: MatDialog,
-      @Optional()public dialogRef: MatDialogRef<KwgCytoscapeComponent>,
-      private dataservice:DataService
+      public dialogRef: MatDialogRef<KwgCytoscapeComponent>,
     )
       {}
     private cy: any;
@@ -136,16 +131,9 @@ export class KwgCytoscapeComponent {
       console.log("infromation service>>>>>>>>>>>>",this.informationservice.getAgGidSelectedNode());
       //this.getGraph(this.informationservice.getAgGidSelectedNode());
       this.refreshsimualtionGraph();
-      if(this.displayPlace=='vcis'){
-        this.showbtnmap=true;
-      }else{
-        this.showbtnmap=false;
-      }
-      this.oldselectedvalue=this.informationservice.getAgGidSelectedNode();
-
     }
   
-   
+  
     generateRandomLebaneseMobileNumber() {
       const prefixes = ['03', '70', '71', '76', '78', '79'];
       const selectedPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
@@ -209,7 +197,6 @@ export class KwgCytoscapeComponent {
     // //  this.storeName =(window.parent.parent.parent[7] as any).A_StoreName;
     // //  this.itemName =(window.parent.parent.parent[7] as any).A_ItemName;
     // //  this.masterId =(window.parent.parent.parent[7] as any).A_MasterId;
-    console.log("this.informationservice.getAgGidSelectedNode()--------",this.informationservice.getAgGidSelectedNode());
     this.reportID=this.informationservice.getAgGidSelectedNode();
     //this.reportID =(window.parent.parent.parent[7] as any).A_ReportId;
   
@@ -1154,10 +1141,7 @@ export class KwgCytoscapeComponent {
 
       this.getUpdGraph(runNextLayerProcess.data);
     }
-    showHeader(){
-      this.ShowHeader=!this.ShowHeader;
-      this.dataservice.setHeaderFromKwg(true);
-    }
+
   }
   
   

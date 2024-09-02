@@ -21,7 +21,14 @@
             </v-dropdown>
             <div class="error-msg" *ngIf="searchConfigForm.get('colType').errors?.['required']"></div>
         </div>
-        
+        <div class="form-group">
+
+        <v-input formControlName="searchDescription" type="text" label="Search Display Name" placeholder=""
+        [parentForm]="searchConfigForm" fieldName="searchDescription" required="true">
+        </v-input>
+        <div class="error-msg" *ngIf="searchConfigForm.get('searchDescription').errors?.['required']"></div>
+
+</div>
         <div *ngIf="isCombo">
             <v-input formControlName="comboSql" type="textarea" label="Combo Query" placeholder=""
             [parentForm]="searchConfigForm" fieldName="comboSql" (change)="requireRevalidation()">

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BubbleButtonComponent } from './bubble-button.component';
+import { IconsFormComponent } from './icons-form.component';
 
-describe('BubbleButtonComponent', () => {
-  let component: BubbleButtonComponent;
-  let fixture: ComponentFixture<BubbleButtonComponent>;
+describe('IconsFormComponent', () => {
+  let component: IconsFormComponent;
+  let fixture: ComponentFixture<IconsFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BubbleButtonComponent]
+      imports: [IconsFormComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(BubbleButtonComponent);
+    fixture = TestBed.createComponent(IconsFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

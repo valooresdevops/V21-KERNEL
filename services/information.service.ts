@@ -65,6 +65,14 @@ export class InformationService {
   public bubbleButton: any;
   public selectedGridNode : any;
   public advancedSearchFunctionData:any='';
+  public dashboardContentSize :number;
+  public dynamicSearchApiData :any;
+  public reloadGrid : boolean = true;
+  public selectedNodeVGrid : object;
+  public selectedColumnFormOpening : any;
+  public selectedColumnValue : boolean = false;
+  public mainPreviewScreenType : boolean = false;
+
   constructor() { }
 
   private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
@@ -591,6 +599,62 @@ setAdvancedSearchFunctionData(advancedSearchFunctionData: any) {
 
 getAdvancedSearchFunctionData() {
   return this.advancedSearchFunctionData;
+}
+getreloadGrid(){
+  return this.reloadGrid;
+}
+setreloadGrid(check : boolean){
+  this.reloadGrid = check;
+}
+getSelectedNodeVGrid(){
+  return this.selectedNodeVGrid;
+}
+setSelectedNodeVGrid(node : object){
+this.selectedNodeVGrid = node;
+}
+
+setDashboardContentSize(dashboardContentSize: any) {
+  this.dashboardContentSize = dashboardContentSize;
+}
+
+getDashboardContentSize() {
+  return this.dashboardContentSize;
+}
+
+getDynamicSearchApiData(){
+  return this.dynamicSearchApiData;
+}
+setDynamicSearchApiData(dynamicSearchApiData:any){
+  this.dynamicSearchApiData = dynamicSearchApiData;
+}
+
+
+
+getSelectedColumnValue(){
+  return this.selectedColumnValue;
+}
+setSelectedColumnValue(selectedColumnValue:any){
+  this.selectedColumnValue = selectedColumnValue;
+}
+
+
+
+getSelectedColumnFormOpening(){
+  return this.selectedColumnFormOpening;
+}
+setSelectedColumnFormOpening(selectedColumnFormOpening:any){
+  this.selectedColumnFormOpening = selectedColumnFormOpening;
+}
+removeSelectedColumnFormOpening(){
+  this.selectedColumnFormOpening = '';
+}
+
+
+getMainPreviewScreenType(){
+  return this.mainPreviewScreenType;
+}
+setMainPreviewScreenType(mainPreviewScreenType:any){
+  this.mainPreviewScreenType = mainPreviewScreenType;
 }
 
 }

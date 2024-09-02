@@ -2,7 +2,8 @@
   <div *ngFor="let fields of formElem; let i = index" [formGroup]="fields.formGroup">
     <div class="row mt-2" *ngIf="!clearAll">
       <div class="col-md-2">
-        <v-dropdown  
+
+        <v-dropdown
           id="dropdown1"
           [formControlName]="fields.typeDropdown"
           [dataJSON]="fieldsCombo"
@@ -46,7 +47,7 @@
           [fieldName]="fields.thirdDropdown"
           [parentForm]="dynamicSearchForm"
           (change)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
-          [multiple]="true"
+          [multiple]="this.isForForm ? false : true"
         ></v-dropdown>
         </ng-container>
 

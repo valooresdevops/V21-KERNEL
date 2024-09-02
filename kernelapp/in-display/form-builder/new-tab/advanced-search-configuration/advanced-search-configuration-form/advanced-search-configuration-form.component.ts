@@ -28,6 +28,7 @@ export class AdvancedSearchConfigurationFormComponent {
     isMandatory: new UntypedFormControl(''),
     isDefault: new UntypedFormControl(''),
     defaultValues: new UntypedFormControl(''),
+    searchDescription: new UntypedFormControl('')
   });
 
   constructor(private dialog: MatDialog, private http: HttpClient, private _Activatedroute: ActivatedRoute, private commonFunctions: CommonFunctions,public router:Router,
@@ -97,6 +98,8 @@ export class AdvancedSearchConfigurationFormComponent {
       isForForm:this.searchConfigForm.get('isForForm').value,
       isDefault:this.searchConfigForm.get('isDefault').value,
       defaultValues:this.searchConfigForm.get('defaultValues').value,
+      searchDescription:this.searchConfigForm.get('searchDescription').value,
+
     }
     this.closeDialogWithData(newConfigurationObject);
   }else{
@@ -107,10 +110,8 @@ export class AdvancedSearchConfigurationFormComponent {
   switchMainDropDownValues(){
     if(this.searchConfigForm.get('isForForm').value==true){
       this.getColumnNames=GlobalConstants.getColumnsForDynamicSearch+this.data.objectId
-
     }else{
       this.getColumnNames=GlobalConstants.getQueryHeadersForAdvancedSearch+this.data.objectId
-
     }
 
   }
