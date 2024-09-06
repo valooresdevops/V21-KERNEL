@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, OnInit, ViewEncapsulation , ChangeDetectorRef, HostListener, Inject, Optional    } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { GlobalConstants } from '../../common/GlobalConstants';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonFunctions } from '../../../Kernel/common/CommonFunctions';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
-import { from, lastValueFrom, Subscription } from 'rxjs';
+import { catchError, map, of,from, lastValueFrom, Subscription } from 'rxjs';
 import { EventEmitterService } from '../../../Kernel/services/event-emitter.service';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import { ChartBuilderFormComponent } from '../../../Kernel/kernelapp/in-display/object-builder/chart-builder-form/chart-builder-form.component';
@@ -14,12 +14,14 @@ import { ChartFromKpiBuilderComponent } from '../../../Kernel/kernelapp/in-displ
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import Highcharts from 'highcharts';
 import Highcharts3D from 'highcharts/highcharts-3d';
+
 Highcharts3D(Highcharts);
 
 import HighchartsMore from 'highcharts/highcharts-more';
 import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
 import { string } from 'sql-formatter/lib/src/lexer/regexFactory';
 import axios from 'axios';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { EditorPreviewComponent } from '../in-display/object-builder/editor/editor-preview/editor-preview.component';
 
@@ -39,6 +41,7 @@ interface SanitizedRecord {
 export class DashboardComponent implements OnInit, AfterViewInit  {
 
 
+parentForm:FormGroup;
 
 
 
@@ -53,6 +56,8 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     private dialog: MatDialog,
     public informationservice: InformationService,
     private cdr: ChangeDetectorRef,
+    private fb: FormBuilder,
+    public informationService: InformationService,
     private sanitizer: DomSanitizer,
     @Optional() private dialogRef?: MatDialogRef<EditorPreviewComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public dataa?: any
@@ -60,12 +65,20 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     document.addEventListener('click', this.onGlobalClick.bind(this));
     document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
   }
-  
 
-   
+  public intervalIdColumn: any;
+  public intervalIdLine: any;
+  public intervalIdBar: any;
+  public intervalIdArea: any;
+
   public chartTitle: String = '';
   public description: String='';
   public objectWidth: String='';
+  public liveData : any[] = [];
+  public chartBarCount: Number = 0;
+  public chartLineCount: Number = 0;
+  public chartAreaCount: Number = 0;
+  public chartColumnCount: Number = 0;
 
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any[] = [];
@@ -85,7 +98,9 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   gridRecords: any[] = [];
   editorRecords: any[]= [];
   ids: string[] = [];
+  ids1: any[] = [];
   names: number[] = [];
+ names1: number[] = [];
   gaugeValue: any[] = [];
   gaugeLabel: any[] = [];
   gaugeTitle: any[] = [];
@@ -94,6 +109,7 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   editorValue: any[] = [];
   allData: any[] = [];
   gridValue: any[] = [];
+  liveDataValue: any[] = [];
   barRecords: any[] = [];
   radarRecords: any[] = [];
   public chartData :any;
@@ -103,30 +119,40 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
   tabName : string = "";
   transformedData: { NAME: string, Y: number }[] = [];
 
+  liveBarChartNames:any [] = [];
+  liveBarChartIds:any [] = [];
+  liveLineChartIds:any [] = [];
+  liveLineChartNames:any [] = [];
+
   newChartObject:any;
   stockObject: any;
   public data : any;
   allDataa : any[] = [];
   public gridIndexes :number[]= [];
+  public  :number[]= [];
   gridIndexesMapping :Map<number, number> = new Map();
- gridCounter : number = 0;
+  liveDataIndexesMapping :Map<number, number> = new Map();
+  gridCounter : number = 0;
+  liveChartsCounter : number = 0;
+
  editorIndexes: number[] = [];
 
   valueFromSecondObject: string;
-
 
   title: string;
   content: SafeHtml;
   sanitizedContent: SanitizedRecord[] = [];
 
-  // chartOptions: Highcharts.Options = {};
-  // chart: Highcharts.Chart | undefined;
-  // ids1 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul','Jan1', 'Feb1', 'Mar1', 'Apr1', 'May1', 'Jun1', 'Jul1','Jan2', 'Feb2', 'Mar2', 'Apr2', 'May2', 'Jun2', 'Jul2']; // Example categories
-  // names1 = [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 45, 545, 235 , 4656 ,354 ,354 ,354, 35,4341]; // Example data
-  // allData1 = [{ Title: 'Live Data Chart' }]; // Example title
-
+  chartOptions: Highcharts.Options = {};
+  chartBar: Highcharts.Chart | undefined;
+  chartLine: Highcharts.Chart | undefined;
+  chartArea: Highcharts.Chart | undefined;
+  chartColumn: Highcharts.Chart | undefined;
 
   ngOnInit(): void {
+    this.parentForm = this.fb.group({
+      report_id: [''] // Initialize form control with default value
+    });
     this.http.post<any>(GlobalConstants.getDashboardTemplateTab + this.informationservice.getLogeduserId(), { headers: GlobalConstants.headers }).subscribe(
       (res: any) => {
         this.tabs = res;
@@ -163,17 +189,17 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     return this.gridIndexesMapping.get(id);
   }
 
-
-  // startUpdatingData() {
-  //   setInterval(() => {
-  //     if (this.chart)
-  //     {
-  //       const x = (new Date()).getTime();
-  //       const y = Math.random() * 100;
-  //       this.chart.series[0].addPoint([x, y], true, true, true);
-  //     }
-  //   }, 1000);
+  // setupLiveDataIndexes(): void {
+  //   this.liveDataValue.forEach((data, index) => {
+  //     this.liveDataIndexesMapping.set(data.ID, index);
+  //     this.liveChartsCounter++;
+  //   });
+  //   console.log("maps", this.gridIndexesMapping);
   // }
+  //  liveDataMapping(id: number): number | undefined {
+  //   return this.liveDataIndexesMapping.get(id);
+  // }
+
   
   //////Sigma
   extractScripts(html: string): string[] {
@@ -235,10 +261,11 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     return this.editorIndexesMapping.get(id);
   }
   
-
-  
-
   onSelectTab() {
+    this.chartBarCount = 0;
+    this.chartLineCount = 0;
+    this.chartAreaCount = 0;
+    this.chartColumnCount = 0;
     this.editorValue = [];
     this.editorRecords = [];
     this.sanitizedContent = [];
@@ -247,19 +274,27 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
     this.gridIndexesMapping.clear();
     this.ids = [];
     this.names = [];
+    this.names1 = [];
     this.newChartObject = [];
     this.allData = this.newChartObject;
+    this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers });
+
     console.log("tabId>>>>>>>>",this.informationservice.getSelectedTabId());
     // this.data=this.http.post<any>(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(), { headers: GlobalConstants.headers , responseType: 'text'});
-   this.data = from(axios.post(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(),{}));
+  //  this.data = from(axios.post(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(),{}));
     console.log("data>>>>>",this.data);
+    
+    this.informationservice.setBreakLiveDataBar(true);
+    this.informationservice.setBreakLiveDataLine(true);
+    this.informationservice.setBreakLiveDataArea(true);
+    this.informationservice.setBreakLiveDataColumn(true);
+
     this.tabName = this.informationservice.getSelectedTabName();
     this.data.subscribe(
       (res: any) => {
         console.log("entered the res")
- 
-        this.allData = res.data;
-        console.log("allData::::: ", this.allData );
+        this.allData = res;
+        console.log("allData::::: ", this.allData);
         this.gridValue = [];
         for (let i = 0; i < this.allData.length; i++)
         {
@@ -267,12 +302,39 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
           {
             this.chartValue.push(this.allData[i]);
             this.description=this.allData[i].description;
+            
+            if(this.allData[i].isLive == 1)
+              {
+                if(this.allData[i].data.chartType == 3) // bar
+                {
+                  this.chartBarCount = i;
+                  this.informationservice.setBreakLiveDataBar(false);
+                }
+                if(this.allData[i].data.chartType == 4) // line
+                {
+                  this.chartLineCount = i;
+                  this.informationservice.setBreakLiveDataLine(false);
+                }
+                if (this.allData[i].data.chartType == 5) // area
+                {
+                  this.chartAreaCount = i;
+                  this.informationservice.setBreakLiveDataArea(false);
+                }
+                if (this.allData[i].data.chartType == 7) // column
+                {
+                  this.chartColumnCount = i;
+                  this.informationservice.setBreakLiveDataColumn(false);
+                }
+              }
           }
           
           if(this.allData[i].type == 'Grid')
           {
             this.gridValue.push(this.allData[i]);
             this.gridIndexes.push(i);
+
+            console.log("gridValue == ", this.gridValue);
+            console.log("gridIndexes == ", this.gridIndexes);
           }
 
           if (this.allData[i].type == 'CkEditor')
@@ -282,7 +344,6 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
               // this.description=this.allData[i].description;
             }
             // console.log("editorValue>>>>>",this.editorValue);
-
           this.objectWidth = this.allData[i].objectWidth;
           console.log("objectWidth>>>>",this.objectWidth);
           // alert(this.objectWidth)
@@ -294,23 +355,12 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
         this.gridCounter = this.gridIndexes.length;
     
         this.gridHeader = [];
-        
+        this.agColumnsJson1 = [];
+
         for (let i = 0; i < this.gridValue.length; i++)
         {
           this.gridRecords.push(this.gridValue[i].Records);
 
-          // for(let x = 0; x < this.gridValue[i].Header.length; x ++)
-          // {
-          //   if(this.gridValue[i].Header[x].headerName != "TITLE")
-          //   {
-          //     alert(1)
-          //   }
-          //   else
-          //   {
-          //     alert(2)
-          //   }
-          // }
-          
           this.gridHeader.push(this.gridValue[i].Header);
 
           this.agColumnsJson[i] = this.gridValue[i].Header;
@@ -434,88 +484,207 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
           
         
           
-            if (this.chartType == 'bar'){
-
-                  for (let j = 0; j < this.allData[i].data.records.length; j++)
-                    {
-                      this.ids.push(this.allData[i].data.records[j].ID);
-                      this.names.push(Number(this.allData[i].data.records[j].NAME));
-                    }
-  
-                    if(this.allData[i].is3d == 1){
-                      this.newChartObject = [
-                        {
-                          chart: {type: this.chartType,
-                            options3d: {
-                              enabled: true,
-                              alpha: 10,
-                              beta: 25,
-                              depth: 70,
-                              viewDistance: 25,
+             
+            if (this.chartType == 'bar')
+              {
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                {
+                  this.ids.push(this.allData[i].data.records[j].ID);
+                  this.names.push(Number(this.allData[i].data.records[j].NAME));
+                  this.names1.push(Number(this.allData[i].data.records[j].NAME));
+                }
+                      if(this.allData[i].is3d == 1){
+                        this.newChartObject = [
+                          {
+                            chart: {type: this.chartType,
+                              options3d: {
+                                enabled: true,
+                                alpha: 10,
+                                beta: 25,
+                                depth: 70,
+                                viewDistance: 25,
+                              }
+                            },
+                            title: {text:this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
+                            xAxis: {
+                              categories: this.ids
+                            },
+                            yAxis: {
+                              title: {
+                                text: 'Value'
+                              }
+                            },
+                            plotOptions: {
+                              series: {
+                                pointPadding: 1,
+                                groupPadding: 0.8,
+                                borderWidth: 0,
+                              }
+                            },
+                            tooltip: {
+                              headerFormat: '',
+                              pointFormat: '{point.y}'
+                            },
+                            series: [{
+                              name: this.allData[i].Title,
+                              data: this.names,
+                            }],
+                            credits: {
+                                enabled: false
+                            },
+                          }
+                        ]
+                      }else 
+                      if (this.allData[i].isLive == 1) {
+                          // Initialize ids and names arrays
+                          this.ids1 = [];
+                          this.names = [];
+                          this.names1 = [];
+                          
+                          // Populate ids and names with data
+                          for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                            const id = this.allData[i].data.records[j].ID;
+                            const name = Number(this.allData[i].data.records[j].NAME);
+                            this.ids1.push(id);    // Store real IDs
+                            this.names.push(name); // Store names (data values)
+                            this.names1.push(name); // For initial display
+                          }
+                          
+                          const windowSize = 1; // Number of values to move each interval
+                          const maxValues = 4; // Maximum number of values to display at any time
+                          
+                          // Function to slide array values
+                          const slideArray = <T>(arr: T[]): T[] => {
+                            if (arr.length === 0) {
+                              console.warn("Array is empty, cannot slide.");
+                              return arr;
                             }
-                          },
-                          title: {text:this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
-                          xAxis: {
-                            categories: this.ids
-                          },
-                          yAxis: {
-                            title: {
-                              text: 'Value'
+                            // Slide the array: move the first element to the end
+                            const [firstElement, ...rest] = arr;
+                            return [...rest, firstElement];
+                          };
+                          
+                          this.newChartObject = [
+                            {
+                              chart: {
+                                type: this.chartType,
+                                events: {
+                                  load: () => {
+                                    this.chartBar = Highcharts.charts[this.chartBarCount.valueOf()];
+                                    console.log("Chart loaded>>>", this.chartBar);
+                        
+                                    // Update the chart with the initial data
+                                    this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                        
+                                    
+        
+        
+                                    this.intervalIdBar = setInterval(() => {
+                                      if (this.chartBar) {
+                                        // Slide ids array
+                                        this.ids1 = slideArray(this.ids1);
+                                    
+                                        // Slide names array if needed
+                                        this.names1 = slideArray(this.names1);
+                                    
+                                        // Trim to the last 'maxValues' values
+                                        if (this.ids1.length > maxValues) {
+                                          this.ids1 = this.ids1.slice(-maxValues);
+                                        }
+                                        if (this.names1.length > maxValues) {
+                                          this.names1 = this.names1.slice(-maxValues);
+                                        }
+                                    
+                                        // Update the chart with the rotated values
+                                        this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    
+                                        // Update xAxis categories and force redraw
+                                        this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                        this.chartBar.redraw(); // Force chart redraw
+                                    
+                                        // Log current state (for debugging purposes)
+                                        console.log("Updated names:", this.names1);
+                                        console.log("Updated IDs1:", this.ids1);
+                                    
+                                        // Stop condition (if needed)
+                                        if (this.informationservice.getBreakLiveDataArea()) {
+                                          clearInterval(this.intervalIdBar);
+                                        }
+                                      }
+                                    }, 1500); // Update interval (1.5 seconds)
+                                    
+                                  }
+                                }
+                              },
+                              title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
+                              xAxis: {
+                                categories: this.ids
+                              },
+                              yAxis: {
+                                title: {
+                                  text: 'Value', align: 'center'
+                                }
+                              },
+                              plotOptions: {
+                                series: {
+                                  pointPadding: 1, // Adjust the spacing between bars
+                                  groupPadding: 0.2, // Adjust the spacing between groups
+                                  borderWidth: 0,
+                                }
+                              },
+                              tooltip: {
+                                headerFormat: '',
+                                pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                              },
+                              series: [{
+                                name: this.allData[i].Title,
+                                data: this.names,
+                                color: 'green',
+                              }]
                             }
-                          },
-                          plotOptions: {
-                            series: {
-                              pointPadding: 1,
-                              groupPadding: 0.8,
-                              borderWidth: 0,
-                            }
-                          },
-                          tooltip: {
-                            headerFormat: '',
-                            pointFormat: '{point.y}'
-                          },
-                          series: [{
-                            name: this.allData[i].Title,
-                            data: this.names,
-                          }],
-                          credits: {
-                              enabled: false
-                          },
-                        }
-                      ]
-                    }else{
-                      this.newChartObject = [
-                        {
-                          chart: {type: this.chartType},
-                          title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
-                          xAxis: {
-                            categories: this.ids
-                          },
-                          yAxis: {
-                            title: {
-                              text: 'Value', align: 'center'
-                            }
-                          },
-                          plotOptions: {
-                            series: {
-                              pointPadding: 1, // Adjust the spacing between bars
-                              groupPadding: 0.2, // Adjust the spacing between groups
-                              borderWidth: 0,
-                            }
-                          },
-                          tooltip: {
-                            headerFormat: '',
-                            pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
-                          },
-                          series: [{
-                            name: this.allData[i].Title,
-                            data: this.names,
-                          }]
-                        }
-                      ];
-                    }
-                 
-              } else if (this.chartType == 'heatmap') {
+                          ];
+                      }
+                      
+                      
+                      else{
+                        
+                        this.newChartObject = [
+                          {
+                            chart: {type: this.chartType},
+                            title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
+                            xAxis: {
+                              categories: this.ids
+                            },
+                            yAxis: {
+                              title: {
+                                text: 'Value', align: 'center'
+                              }
+                            },
+                            plotOptions: {
+                              series: {
+                                pointPadding: 1, // Adjust the spacing between bars
+                                groupPadding: 0.2, // Adjust the spacing between groups
+                                borderWidth: 0,
+                              }
+                            },
+                            tooltip: {
+                              headerFormat: '',
+                              pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                            },
+                            series: [{
+                              name: this.allData[i].Title,
+                              data: this.names,
+                            }]
+                          }
+                        ];
+                        
+                        
+                      }
+                   
+              }
+              
+              else if (this.chartType == 'heatmap') {
                 this.newChartObject = [{
                   chart: {
                       type: this.chartType,
@@ -614,14 +783,21 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                   }
               }];
   
-              } else if(this.chartType == 'line'){
+              } 
+              
+              
+              
+              else if(this.chartType == 'line'){
+                
   
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
                     this.ids.push(this.allData[i].data.records[j].ID);
                     this.names.push(Number(this.allData[i].data.records[j].NAME));
+
+                    this.liveLineChartNames.push(Number(this.allData[i].data.records[j].NAME));
+                    this.liveLineChartIds.push(Number(this.allData[i].data.records[j].NAME));
                   }
-  
                   if(this.allData[i].is3d == 1){
                     this.newChartObject = [
                       {
@@ -641,7 +817,10 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                           }
                         },
                         xAxis: {
-                          categories: this.ids
+                          categories: this.ids, 
+                          tickLength: 0,
+                          min: 0, // Start from the first category
+                          max: null, // Let Highcharts automatically adjust this
                         },
                         yAxis: {
                           title: {
@@ -667,7 +846,108 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                         }]
                       }
                     ];
-                  }else{
+                  }
+                  else
+                  if (this.allData[i].isLive == 1) {
+                      // Initialize ids and names arrays
+                      this.ids1 = [];
+                      this.names = [];
+                      this.names1 = [];
+                      
+                      // Populate ids and names with data
+                      for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                        const id = this.allData[i].data.records[j].ID;
+                        const name = Number(this.allData[i].data.records[j].NAME);
+                        this.ids1.push(id);    // Store real IDs
+                        this.names.push(name); // Store names (data values)
+                        this.names1.push(name); // For initial display
+                      }
+                      
+                      const windowSize = 1; // Number of values to move each interval
+                      const maxValues = 4; // Maximum number of values to display at any time
+                      
+                      // Function to slide array values
+                      const slideArray = <T>(arr: T[]): T[] => {
+                        if (arr.length === 0) {
+                          console.warn("Array is empty, cannot slide.");
+                          return arr;
+                        }
+                        // Slide the array: move the first element to the end
+                        const [firstElement, ...rest] = arr;
+                        return [...rest, firstElement];
+                      };
+                      
+                      this.newChartObject = [
+                        {
+                          chart: {
+                            type: 'line',
+                            events: {
+                              load: () => {
+                                this.chartLine = Highcharts.charts[this.chartLineCount.valueOf()];
+                                console.log("Chart loaded>>>", this.chartLine);
+                    
+                                // Update the chart with the initial data
+                                this.chartLine.series[0].setData(this.names1, true, true, true);
+                                this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                    
+                                
+    
+    
+                                this.intervalIdLine = setInterval(() => {
+                                  if (this.chartLine) {
+                                    // Slide ids array
+                                    this.ids1 = slideArray(this.ids1);
+                                
+                                    // Slide names array if needed
+                                    this.names1 = slideArray(this.names1);
+                                
+                                    // Trim to the last 'maxValues' values
+                                    if (this.ids1.length > maxValues) {
+                                      this.ids1 = this.ids1.slice(-maxValues);
+                                    }
+                                    if (this.names1.length > maxValues) {
+                                      this.names1 = this.names1.slice(-maxValues);
+                                    }
+                                
+                                    // Update the chart with the rotated values
+                                    this.chartLine.series[0].setData(this.names1, true, true, true);
+                                
+                                    // Update xAxis categories and force redraw
+                                    this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                    this.chartLine.redraw(); // Force chart redraw
+                                
+                                    // Log current state (for debugging purposes)
+                                    console.log("Updated names:", this.names1);
+                                    console.log("Updated IDs1:", this.ids1);
+                                
+                                    // Stop condition (if needed)
+                                    if (this.informationservice.getBreakLiveDataArea()) {
+                                      clearInterval(this.intervalIdLine);
+                                    }
+                                  }
+                                }, 1500); // Update interval (1.5 seconds)
+                                
+                              }
+                            }
+                          },
+                          title: { text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
+                    xAxis: {
+                      categories: this.ids
+                    },
+                    yAxis: {
+                      title: {
+                        text: 'Value'
+                      }
+                    },
+                    series: [{
+                      name: this.allData[i].Title,
+                      data: this.names,
+                      color: 'green'
+                    }]
+                        }
+                      ];
+                  }
+                  else{
                 this.newChartObject = [
                   {
 
@@ -685,40 +965,18 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       name: 'Series 1',
                       data: this.names,
                     }]
-                    
-
-                    // chart: {
-                    //   type: 'line',
-                    //   events: {
-                    //     load: () => {
-                    //       this.chart = Highcharts.charts[0];
-                    //       this.startUpdatingData();
-                    //     }
-                    //   }
-                    // },
-                    // title: {
-                    //   text: this.allData1[0].Title,
-                    //   align: 'center'
-                    // },
-                    // xAxis: {
-                    //   categories: this.ids1
-                    // },
-                    // yAxis: {
-                    //   title: {
-                    //     text: 'Value'
-                    //   }
-                    // },
-                    // series: [{
-                    //   name: 'Series 1',
-                    //   data: this.names1
-                    // }]
                   }
                 ];
               }
-              } else if (this.chartType == 'area') {
+              } 
+              
+              else if (this.chartType == 'area') {
+                
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
                   this.ids.push(this.allData[i].data.records[j].ID);
+                  this.ids1.push(this.allData[i].data.records[j].ID);
                   this.names.push(Number(this.allData[i].data.records[j].NAME));
+                  this.names1.push(Number(this.allData[i].data.records[j].NAME));
                 }
               
                 if (this.allData[i].is3d == 1) {
@@ -761,7 +1019,119 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       }]
                     }
                   ];
-                } else {
+                }
+                else
+                if (this.allData[i].isLive == 1) {
+                    // Initialize ids and names arrays
+                    this.ids1 = [];
+                    this.names = [];
+                    this.names1 = [];
+                    
+                    // Populate ids and names with data
+                    for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                      const id = this.allData[i].data.records[j].ID;
+                      const name = Number(this.allData[i].data.records[j].NAME);
+                      this.ids1.push(id);    // Store real IDs
+                      this.names.push(name); // Store names (data values)
+                      this.names1.push(name); // For initial display
+                    }
+                    
+                    const windowSize = 1; // Number of values to move each interval
+                    const maxValues = 4; // Maximum number of values to display at any time
+                    
+                    // Function to slide array values
+                    const slideArray = <T>(arr: T[]): T[] => {
+                      if (arr.length === 0) {
+                        console.warn("Array is empty, cannot slide.");
+                        return arr;
+                      }
+                      // Slide the array: move the first element to the end
+                      const [firstElement, ...rest] = arr;
+                      return [...rest, firstElement];
+                    };
+                    
+                    this.newChartObject = [
+                      {
+                        chart: {
+                          type: 'area',
+                          events: {
+                            load: () => {
+                              this.chartArea = Highcharts.charts[this.chartAreaCount.valueOf()];
+                              console.log("Chart loaded>>>", this.chartArea);
+                  
+                              // Update the chart with the initial data
+                              this.chartArea.series[0].setData(this.names1, true, true, true);
+                              this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                  
+                              this.intervalIdArea = setInterval(() => {
+                                if (this.chartArea) {
+                                  // Slide ids array
+                                  this.ids1 = slideArray(this.ids1);
+                              
+                                  // Slide names array if needed
+                                  this.names1 = slideArray(this.names1);
+                              
+                                  // Trim to the last 'maxValues' values
+                                  if (this.ids1.length > maxValues) {
+                                    this.ids1 = this.ids1.slice(-maxValues);
+                                  }
+                                  if (this.names1.length > maxValues) {
+                                    this.names1 = this.names1.slice(-maxValues);
+                                  }
+                              
+                                  // Update the chart with the rotated values
+                                  this.chartArea.series[0].setData(this.names1, true, true, true);
+                              
+                                  // Update xAxis categories and force redraw
+                                  this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                  this.chartArea.redraw(); // Force chart redraw
+                              
+                                  // Log current state (for debugging purposes)
+                                  console.log("Updated names:", this.names1);
+                                  console.log("Updated IDs1:", this.ids1);
+                              
+                                  // Stop condition (if needed)
+                                  if (this.informationservice.getBreakLiveDataArea()) {
+                                    clearInterval(this.intervalIdArea);
+                                  }
+                                }
+                              }, 1500); // Update interval (1.5 seconds)
+  
+  
+                            }
+                          }
+                        },
+                        title: {
+                          text: this.allData[i].Title,
+                          align: 'center',
+                          style: { fontSize: '16px' }
+                        },
+                        xAxis: {
+                          categories: this.ids1.map(id => id.toString()) // Initially set categories to IDs
+                        },
+                        yAxis: {
+                          title: {
+                            text: 'Value'
+                          }
+                        },
+                        legend: {
+                          enabled: true,
+                          layout: 'horizontal',
+                          align: 'center',
+                          verticalAlign: 'bottom',
+                          borderWidth: 0
+                        },
+                        series: [
+                          {
+                            name: this.allData[i].Title,
+                            data: this.names1, // Initially load the data
+                            color: 'green'
+                          }
+                        ]
+                      }
+                    ];
+                }
+                else {
                   this.newChartObject = [
                     {
                       chart: {
@@ -792,7 +1162,11 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                     }
                   ];
                 }
-              } else if(this.chartType == 'semiPie')
+              } 
+              
+              
+              
+              else if(this.chartType == 'semiPie')
                 {
                   const transformedData = this.allData[i].data.records.map((item:any) => [item.ID, parseFloat(item.NAME)]);
                   if(this.allData[i].is3d == 1){
@@ -971,130 +1345,218 @@ export class DashboardComponent implements OnInit, AfterViewInit  {
                       }]
                     }
                   ];}
-              } else if(this.chartType == 'column'){
+              } 
+              
+              
+              
+              else if(this.chartType == 'column'){
                   
              
-                  for (let j = 0; j < this.allData[i].data.records.length; j++)
-                    {
-                      this.ids.push(this.allData[i].data.records[j].ID);
-                      this.names.push(Number(this.allData[i].data.records[j].NAME));
-                      // console.log(this.ids);
-                    }
-  // console.log( this.allData[i].data)
-                    if(this.allData[i].is3d == 1){
-  
-  
-                      // this.newChartObject  = [{
-                      //   chart: { type: 'column',
-                      //     options3d: {
-                      //       enabled: true,
-                      //       alpha: 15,
-                      //       beta: 15,
-                      //       depth: 50,
-                      //       viewDistance: 25
-                      //   }},
-                      //   title: { text: this.allData[i].Title},
-                      //   xAxis: [{ categories: this.ids}],
-                      //   yAxis: [{
-                      //     title: { text: 'Primary Axis' }
-                      //   }, {
-                      //     title: { text: 'Pareto' },
-                      //     opposite: true
-                      //   }],
-                      //   tooltip: { shared: true },
-                      //   series: [{
-                      //     name: 'Primary',
-                      //     type: 'column',
-                      //     data: this.names
-                      //   }, {
-                      //     name: 'Pareto',
-                      //     type: 'line',
-                      //     yAxis: 1,
-                      //     data:this.names,
-                      //     zIndex: 10,
-                      //     dashStyle: 'ShortDot'
-                      //   }]
-                      // }];
-
-                      this.newChartObject  = [{
-                        chart: {
-                          renderTo: 'container',
-                          type: 'column',
-                          options3d: {
-                              enabled: true,
-                              alpha: 15,
-                              beta: 15,
-                              depth: 50,
-                              viewDistance: 25
-                          }
-                      },
-                      xAxis: {
-                          categories:this.ids,
-                      },
-                      yAxis: {
-                          title: {
-                              enabled: false
-                          }
-                      },
-                      tooltip: {
-                          headerFormat: '<b>{point.key}</b><br>',
-                          pointFormat: 'Cars sold: {point.y}'
-                      },
-                      title: {
-                          text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
-                      },
-                      credits: {
-                          enabled: false
-                      },
-                      // subtitle: {
-                      //     text: this.allData[i].Title,
-                      //     align: 'left'
-                      // },
-                      legend: {
-                          enabled: false
-                      },
-                      plotOptions: {
-                          column: {
-                              depth: 25
-                          }
-                      },
-                      series: [{
-                          data: this.names,
-                          colorByPoint: true
-                      }]
-                      }]
-                    }else{
-  
-                    
-                  this.newChartObject  = [{
-                    chart: { type: 'column' },
-                    title: { text: this.allData[i].Title },
-                    xAxis: [{ categories: this.ids}],
-                    yAxis: [{
-                      title: { text: 'Primary Axis' }
-                    }, {
-                      title: { text: 'Pareto', align: 'center', style: { fontSize: '16px' }},
-                      opposite: true
-                    }],
+                
+                for (let j = 0; j < this.allData[i].data.records.length; j++)
+                  {
+                    this.ids.push(this.allData[i].data.records[j].ID);
+                    this.names.push(Number(this.allData[i].data.records[j].NAME));
+                  }
+                  if(this.allData[i].is3d == 1){
+                    this.newChartObject  = [{
+                      chart: {
+                        renderTo: 'container',
+                        type: 'column',
+                        options3d: {
+                            enabled: true,
+                            alpha: 15,
+                            beta: 15,
+                            depth: 50,
+                            viewDistance: 25
+                        }
+                    },
+                    xAxis: {
+                        categories:this.ids,
+                    },
+                    yAxis: {
+                        title: {
+                            enabled: false
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.key}</b><br>',
+                        pointFormat: 'Cars sold: {point.y}'
+                    },
+                    title: {
+                        text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }
+                    },
                     credits: {
                         enabled: false
                     },
-                    tooltip: { shared: true },
+                    // subtitle: {
+                    //     text: this.allData[i].Title,
+                    //     align: 'left'
+                    // },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        column: {
+                            depth: 25
+                        }
+                    },
                     series: [{
-                      name: 'Primary',
-                      type: 'column',
-                      data: this.names
-                    }, {
-                      name: 'Pareto',
-                      type: 'line',
-                      yAxis: 1,
-                      data:this.names,
-                      zIndex: 10,
-                      dashStyle: 'ShortDot'
+                        data: this.names,
+                        colorByPoint: true
                     }]
-                  }];}
-            
-              } else if (this.chartType == 'pie') {
+                    }]
+                  }
+                  
+                  
+                  else
+                  
+                    if (this.allData[i].isLive == 1) {
+                      // Initialize ids and names arrays
+                      this.ids1 = [];
+                      this.names = [];
+                      this.names1 = [];
+                      
+                      // Populate ids and names with data
+                      for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                        const id = this.allData[i].data.records[j].ID;
+                        const name = Number(this.allData[i].data.records[j].NAME);
+                        this.ids1.push(id);    // Store real IDs
+                        this.names.push(name); // Store names (data values)
+                        this.names1.push(name); // For initial display
+                      }
+                      
+                      const windowSize = 1; // Number of values to move each interval
+                      const maxValues = 4; // Maximum number of values to display at any time
+                      
+                      // Function to slide array values
+                      const slideArray = <T>(arr: T[]): T[] => {
+                        if (arr.length === 0) {
+                          console.warn("Array is empty, cannot slide.");
+                          return arr;
+                        }
+                        // Slide the array: move the first element to the end
+                        const [firstElement, ...rest] = arr;
+                        return [...rest, firstElement];
+                      };
+                      
+                      this.newChartObject = [
+                        {
+                          chart: {
+                            type: 'column',
+                            events: {
+                              load: () => {
+                                this.chartColumn = Highcharts.charts[this.chartColumnCount.valueOf()];
+                                console.log("Chart loaded>>>", this.chartColumn);
+                    
+                                // Update the chart with the initial data
+                                this.chartColumn.series[0].setData(this.names1, true, true, true);
+                                this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                    
+                                
+
+
+                                this.intervalIdColumn = setInterval(() => {
+                                  if (this.chartColumn) {
+                                    // Slide ids array
+                                    this.ids1 = slideArray(this.ids1);
+                                
+                                    // Slide names array if needed
+                                    this.names1 = slideArray(this.names1);
+                                
+                                    // Trim to the last 'maxValues' values
+                                    if (this.ids1.length > maxValues) {
+                                      this.ids1 = this.ids1.slice(-maxValues);
+                                    }
+                                    if (this.names1.length > maxValues) {
+                                      this.names1 = this.names1.slice(-maxValues);
+                                    }
+                                
+                                    // Update the chart with the rotated values
+                                    this.chartColumn.series[0].setData(this.names1, true, true, true);
+                                
+                                    // Update xAxis categories and force redraw
+                                    this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                    this.chartColumn.redraw(); // Force chart redraw
+                                
+                                    // Log current state (for debugging purposes)
+                                    console.log("Updated names:", this.names1);
+                                    console.log("Updated IDs1:", this.ids1);
+                                
+                                    // Stop condition (if needed)
+                                    if (this.informationservice.getBreakLiveDataArea()) {
+                                      clearInterval(this.intervalIdColumn);
+                                    }
+                                  }
+                                }, 1500); // Update interval (1.5 seconds)
+                                
+                              }
+                            }
+                          },
+                          title: {
+                            text: this.allData[i].Title,
+                            align: 'center',
+                            style: { fontSize: '16px' }
+                          },
+                          xAxis: {
+                            categories: this.ids1.map(id => id.toString()) // Initially set categories to IDs
+                          },
+                          yAxis: {
+                            title: {
+                              text: 'Value'
+                            }
+                          },
+                          legend: {
+                            enabled: true,
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom',
+                            borderWidth: 0
+                          },
+                          series: [
+                            {
+                              name: this.allData[i].Title,
+                              data: this.names1, // Initially load the data
+                              color: 'green'
+                            }
+                          ]
+                        }
+                      ];
+                    }
+                    else{
+
+                  
+                this.newChartObject  = [{
+                  chart: { type: 'column' },
+                  title: { text: this.allData[i].Title },
+                  xAxis: [{ categories: this.ids}],
+                  yAxis: [{
+                    title: { text: 'Primary Axis' }
+                  }, {
+                    title: { text: 'Pareto', align: 'center', style: { fontSize: '16px' }},
+                    opposite: true
+                  }],
+                  credits: {
+                      enabled: false
+                  },
+                  tooltip: { shared: true },
+                  series: [{
+                    name: 'Primary',
+                    type: 'column',
+                    data: this.names
+                  }, {
+                    name: 'Pareto',
+                    type: 'line',
+                    yAxis: 1,
+                    data:this.names,
+                    zIndex: 10,
+                    dashStyle: 'ShortDot'
+                  }]
+                }];}
+          
+            } 
+              
+              else if (this.chartType == 'pie') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
                   this.ids.push(this.allData[i].data.records[j].NAME);
@@ -2310,7 +2772,7 @@ this.sanitizedContent.push(sanitizedObj);
       };
       
       this.dialog.open(EditorPreviewComponent, dialogConfig);
-    }
+  }
   }
 
   drop(event: CdkDragDrop<any[]>) {
@@ -2398,6 +2860,199 @@ this.sanitizedContent.push(sanitizedObj);
   
   
   
+// generateReport(id : number){
+  
+//   this.http.post(GlobalConstants.getGeneratedReportBlob + "/" +id, Headers).pipe(map((data: any) => {
+//     let blob = new Blob([data], {
+//         type: 'application/pdf' // must match the Accept type
+//         // type: 'application/octet-stream' // for excel 
+//     });
+//     console.log("blob>>>>>>>",blob)
+//     var link = document.createElement('a');
+//     link.href = window.URL.createObjectURL(blob);
+//      link.download = 'samplePDFFile.pdf';
+//     link.target = '_blank';
+//     link.click();
+//     window.URL.revokeObjectURL(link.href);
+
+// })).subscribe((result: any) => {
+// });
+
+// }
+
+
+// generateReport(id: number) {
+//   console.log("TESTTTTTT");
+//   this.http.post(GlobalConstants.getGeneratedReportBlob + "/" + id, Headers, { responseType: 'text' }).pipe(
+//     map((base64Data: string) => {
+//       console.log(">>>>",base64Data);
+//       // Decode Base64 string to binary data
+//       let byteCharacters = atob(base64Data);
+//       let byteNumbers = new Array(byteCharacters.length);
+//       for (let i = 0; i < byteCharacters.length; i++) {
+//         byteNumbers[i] = byteCharacters.charCodeAt(i);
+//       }
+//       let byteArray = new Uint8Array(byteNumbers);
+
+//       // Create Blob from binary data
+//       let blob = new Blob([byteArray], {
+//         type: 'application/pdf' // or 'application/octet-stream' for Excel
+//       });
+//       console.log("blob>>>>>>>", blob);
+
+//       // Create a link element and trigger the download
+//       var link = document.createElement('a');
+//       link.href = window.URL.createObjectURL(blob);
+//      // link.download = 'samplePDFFile.pdf'; // Adjust the filename as needed
+//       link.target = '_blank';
+//       link.click();
+//       window.URL.revokeObjectURL(link.href);
+//     })
+//   ).subscribe();
+// }
+
+// generateReport(id: number) {
+//   console.log("Fetching report...");
+//   this.http.post(GlobalConstants.getGeneratedReportBlob + "/" + id, Headers, { responseType: 'text' }).pipe(
+//     map((htmlContent: string) => {
+//       console.log("HTML content received:", htmlContent);
+
+//       // Create a Blob from the HTML content
+//       let blob = new Blob([htmlContent], { type: 'text/html' });
+
+//       // Create a link element and trigger the download
+//       var link = document.createElement('a');
+//       link.href = window.URL.createObjectURL(blob);
+//       // link.download = 'report.html'; // Adjust the filename as needed
+//       link.target = '_blank';
+//       link.click();
+
+//       // Clean up the URL object
+//       window.URL.revokeObjectURL(link.href);
+//     })
+//   ).subscribe();
+// }
+showDropdownMenu = false;
+dropdownPosition = { top: '0px', left: '0px' };
+getGeneratedReport = GlobalConstants.getGeneratedReport;
+handleRightClick(event: MouseEvent) {
+  this.showDropdownMenu = true;
+  this.dropdownPosition = {
+    top: `${event.clientY}px`,
+    left: `${event.clientX}px`
+  };
+}
+
+onDropdownChange(event: any) {
+  console.log('Dropdown selection changed:', event);
+
+  // Get the value directly from the form control
+  const selectedReportId = this.parentForm.get('report_id')?.value; 
+  console.log("Selected Report ID from form control:", selectedReportId);
+
+  if (selectedReportId) {
+    console.log("Triggering action for the selected report...");
+    this.showDropdownMenu = false; // Hide the dropdown after selection
+
+    // Call the method to perform the action with the selected report ID
+    this.performActionOnReport(selectedReportId);
+  }
+  this.showDropdownMenu = false; 
+}
+
+
+
+// performActionOnReport(selectedReportId: number) {
+//   if (!selectedReportId) {
+//     console.error('Report ID not found');
+//     return;
+//   }
+  
+//   console.log("Performing action on report ID:", selectedReportId);
+  
+//   this.http.post(`${GlobalConstants.getGeneratedReportById}/${selectedReportId}`, Headers, { responseType: 'text' }).pipe(
+//     map((htmlContent: string) => {
+//       console.log("HTML content received:", htmlContent);
+
+//       // Create a Blob from the HTML content
+//       let blob = new Blob([htmlContent], { type: 'text/html' });
+
+//       // Create a link element and trigger the download
+//       var link = document.createElement('a');
+//       link.href = window.URL.createObjectURL(blob);
+//       link.target = '_blank';
+//       link.click();
+
+//       // Clean up the URL object
+//       window.URL.revokeObjectURL(link.href);
+//     })
+//   ).subscribe();
+// }
+performActionOnReport(selectedReportId: number) {
+  if (!selectedReportId) {
+    console.error('Report ID not found');
+    return;
+  }
+
+  console.log("Performing action on report ID:", selectedReportId);
+
+  // Ensure headers are properly defined
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json', // Adjust this if necessary
+    // Add any other necessary headers
+  });
+
+  this.http.post(`${GlobalConstants.getGeneratedReportById}/${selectedReportId}`, null, { headers: headers, responseType: 'text' }).pipe(
+    map((htmlContent: string) => {
+      console.log("HTML content received:", htmlContent);
+
+      // Create a Blob from the HTML content
+      let blob = new Blob([htmlContent], { type: 'text/html' });
+
+      // Create a link element and trigger the download
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.target = '_blank';
+      link.click();
+
+      // Clean up the URL object
+      window.URL.revokeObjectURL(link.href);
+    }),
+    catchError((error: any) => {
+      console.error('Error fetching report:', error);
+      // Optionally, display a user-friendly message or handle error further
+      return of(null); // or EMPTY if you do not want further handling
+    })
+  ).subscribe();
+}
+@HostListener('document:click', ['$event'])
+onDocumentClick2(event: MouseEvent) {
+  console.log("ON DOCUMENT CLICK 2")
+  const clickedInside = (event.target as HTMLElement).closest('.custom-dropdown-cont');
+  if (!clickedInside) {
+    this.showDropdownMenu = false;
+  }
+}
+
+// Ensure you handle the right-click event from the AlertComponent
+// onAlertRightClick(event: MouseEvent) {
+//   this.handleRightClick(event);
+// }
+handleRightClickAlert(event: MouseEvent, functionality: String) {
+  console.log("HANDLE RIGHT >>>>>>>>")
+  console.log("FUNCTIONALITY>>>>>>>>",functionality)
+  if (functionality === "1") {
+    console.log("IF HANDLE RIGHT ")
+    this.showDropdownMenu = true;
+    this.dropdownPosition = {
+      top: `${event.clientY}px`,
+      left: `${event.clientX}px`
+    };
+  } else {
+    console.log("ELSE IN HANDLE RIGHTCLICK")
+    this.showDropdownMenu = false;
+  }
+}
 
   export(data: any) {
     console.log("data>>>>>>>>>>>>:::",data);

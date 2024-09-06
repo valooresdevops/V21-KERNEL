@@ -52,4 +52,40 @@
     padding: 10px 20px;
 }
 
+.ag-theme-alpine {
+    /* Set row height to 30px */
+    --ag-row-height: 28px !important;
+}
 
+/* Add soft shadow-like borders between rows */
+.ag-theme-alpine .ag-row {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Light shadow */
+    border-bottom: 0.5px solid rgba(191, 187, 187, 0.5); /* Thin border with transparency for light feel */
+}
+
+/* Ensure consistent height for rows */
+.ag-theme-alpine .ag-row {
+    height: 30px !important;
+    line-height: 30px;
+}
+
+/* Remove borders between columns */
+.ag-theme-alpine .ag-cell {
+    border-right: none; /* No vertical borders between cells */
+}
+
+/* Ensure header remains unchanged */
+.ag-theme-alpine .ag-header-cell {
+    height: 35px !important;
+    line-height: normal; /* Keep the header style as is */
+}
+
+/* Adjust cell padding to align content properly */
+.ag-theme-alpine .ag-cell {
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: 30px; /* Vertically align text within the cells */
+}
+
+  
+  

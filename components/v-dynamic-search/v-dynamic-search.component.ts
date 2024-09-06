@@ -24,7 +24,7 @@ export class VDynamicSearchComponent implements OnInit {
    public fieldsCombo: any[] = [];
    public firstCombo: any[] = [];
    public thirdCombo: any[] = [];
-
+    public fieldsComboStoredData:any[]=[];
    public formElem: any[] = [];
    public isDropdownStatus: boolean[] = [];
    public isDate: boolean[] = [];
@@ -218,7 +218,8 @@ if(this.sourceQuery == null){
       thirdDropdown: thirdDropdownKey,
       secondDropdown: secondDropdownKey,
       thirdDropdownOptions: [] ,
-      secondDropdownOptions: []
+      secondDropdownOptions: [],
+      isMandatory:loadedSearchData.isMandatory
     });
 
     this.dynamicSearchForm.get(typeDropdownKey)?.valueChanges.subscribe(selectedValue => {
@@ -275,13 +276,25 @@ if(this.sourceQuery == null){
   
     this.dynamicSearchForm.get(fields.searchType)?.setValue(null);
     this.dynamicSearchForm.get(fields.text)?.setValue(null);
-  
-    this.query = "";
+    
+    let fieldIndexSelected=null;
+    for(let i=0;i<this.fieldsCombo.length;i++){
+      if(selectedValue==this.fieldsCombo[i].id){
+        fieldIndexSelected=i;
+        break;
+      }
+    }
 
-    if (this.fieldsCombo[index]) {
+    this.query = "";
+    console.log("this.fieldsCombo[index]",this.fieldsCombo[index]);
+    if (this.fieldsCombo[fieldIndexSelected]) {
+      
       for (let i = 0; i < keyArray.length; i++) {
-        if (selectedValue == this.fieldsCombo[i].id) {
-          if (this.fieldsCombo[i].colType == 'Combo' || this.fieldsCombo[i].colType == 'COMBO') {
+        console.log("this.fieldsCombo[i].colType>>>>>>>>>>>>>>>>",this.fieldsCombo[fieldIndexSelected].colType);
+
+        if (selectedValue == this.fieldsCombo[fieldIndexSelected].id) {
+
+          if (this.fieldsCombo[fieldIndexSelected].colType == 'Combo' || this.fieldsCombo[fieldIndexSelected].colType == 'COMBO') {
 
             this.isDropdownStatus[index] = true;
             this.isDate[index] = false;
@@ -294,7 +307,7 @@ if(this.sourceQuery == null){
             this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
 
-            const getComboQueryDataApi = from(axios.get(GlobalConstants.getComboQueryData+this.fieldsCombo[i].cmbSQL));
+            const getComboQueryDataApi = from(axios.get(GlobalConstants.getComboQueryData+this.fieldsCombo[fieldIndexSelected].cmbSQL));
             const getComboQueryData = await lastValueFrom(getComboQueryDataApi);   
               for(let y = 0; y <getComboQueryData.data.length; y++) {
 
@@ -314,10 +327,12 @@ if(this.sourceQuery == null){
            
           }
 
-fields.thirdDropdownOptions=this.thirdCombo ;
+        fields.thirdDropdownOptions=this.thirdCombo ;
 
+          console.log("111111111111111111111111111111111111");
+          } else if (this.fieldsCombo[fieldIndexSelected].colType == 'DATE' || this.fieldsCombo[fieldIndexSelected].colType == 'Date') {
+            console.log("22222222222222222222222222222222222222");
 
-          } else if (this.fieldsCombo[i].colType == 'DATE' || this.fieldsCombo[i].colType == 'Date') {
               this.isDate[index] = true;
               this.isDropdownStatus[index] = false;
               this.isNumber[index] = false;
@@ -327,11 +342,11 @@ fields.thirdDropdownOptions=this.thirdCombo ;
 
               this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));
               this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
-
+            console.log("SECOND DROPDOWN optoins for date>>>>>>>>",this.formElem[index].secondDropdownOptions);
               // this.formElem[index].secondDropdownOptions = this.firstCombo.filter(item => selectedValues.includes(item.id));;
               // this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
-          } else if (this.fieldsCombo[i].colType == 'Text' || this.fieldsCombo[i].colType == 'TEXT' ) {
+          } else if (this.fieldsCombo[fieldIndexSelected].colType == 'Text' || this.fieldsCombo[fieldIndexSelected].colType == 'TEXT' ) {
               this.isDate[index] = false;
               this.isDropdownStatus[index] = false;
               this.isNumber[index] = false;
@@ -341,7 +356,7 @@ fields.thirdDropdownOptions=this.thirdCombo ;
               this.dynamicSearchForm.get(DropDownChange)?.setValue(null);
 
   
-          } else if (this.fieldsCombo[i].colType == 'NUMBER' || this.fieldsCombo[i].colType == 'Number') {
+          } else if (this.fieldsCombo[fieldIndexSelected].colType == 'NUMBER' || this.fieldsCombo[fieldIndexSelected].colType == 'Number') {
               this.isNumber[index] = true;
               this.isDate[index] = false;
               this.isDropdownStatus[index] = false;
@@ -364,17 +379,19 @@ fields.thirdDropdownOptions=this.thirdCombo ;
 
   removeCondition(index: number) {
     const removedRow = this.formElem[index];
-
+    console.log("Condtion to REmove>>>>>>>>>>>>",this.formElem[index]);
+    if(removedRow.isMandatory!='1'){
     this.formElem.splice(index, 1);
     this.isDropdownStatus.splice(index, 1);
     // this.isDate.splice(index, 1);
-  
     this.dynamicSearchForm.removeControl(removedRow.typeDropdown);
     this.dynamicSearchForm.removeControl(removedRow.searchType);
     this.dynamicSearchForm.removeControl(removedRow.text);
     this.dynamicSearchForm.removeControl(removedRow.secondDropdown);
     this.dynamicSearchForm.removeControl(removedRow.thirdDropdown);
   }
+}
+
   
   async onSubmit() {
 
@@ -494,6 +511,12 @@ fields.thirdDropdownOptions=this.thirdCombo ;
     
     if(checkIfAdvancedSearchHasFunction.data!=0){
       $("#searchFunctionButton_"+this.objectId)[0].click();
+
+      // setTimeout(() => {
+      //   $("#searchFunctionButton_"+this.objectId)[0].click();
+
+      // }, 1500);
+      
     }
     this.informationservice.setAdvancedSearchShowGridMain(true);
     this.onSearchSubmit.emit(obj);

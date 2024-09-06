@@ -198,5 +198,14 @@ console.log('FAIL')
           
   }
 
+  async generateReport(){
+        let json={
+          query:atob(this.currentQuery)
+        }
+        console.log("QUERY TO BE SENT>>>>>>>>",json);
+       const generateReportApi=from(axios.post("http://10.10.10.70:3033/report/"+atob(this.currentQuery)));
+       const generatedReport=await lastValueFrom(generateReportApi);
+
+  }
 
 }

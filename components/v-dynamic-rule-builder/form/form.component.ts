@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material/dialog';
 import axios from 'axios';
 import { from, lastValueFrom } from 'rxjs';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
@@ -10,6 +10,7 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
 import { AdvancedFormComponent } from './advanced-form/advanced-form.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { ButtonJsonRelationComponent } from 'src/app/Kernel/kernelapp/in-display/form-builder/newbutton/button-json-relation/button-json-relation.component';
 
 @Component({
   selector: 'dynamic-builder-form',
@@ -43,7 +44,12 @@ export class DynamicBuilderFormComponent implements OnInit {
   public step4_1: any;
   public columnTypeCode: any;
   public AllMenus: any;
-
+  public getApiBuilderListDropDown = GlobalConstants.getApiBuilderListDropDown;
+  public requestJsonParams:any[]=[];
+  public responseJsonParams:any[]=[];
+  public requestSavedParams:any[]=[];
+  public responseSavedParams:any[]=[];
+  showApiBuilderJson: boolean = false;
 
   //Variables needed for certain controls
   public actionType: string = '';
@@ -182,6 +188,7 @@ export class DynamicBuilderFormComponent implements OnInit {
   public AllFieldsID: any = [];
   public conditionsBckp = this.conditions;
   public valueSourcebckp = this.valueSource;
+  ApiSelected1: boolean = false;
 
   form = new UntypedFormGroup({
     ruleDescription: new UntypedFormControl(''),
@@ -260,6 +267,12 @@ export class DynamicBuilderFormComponent implements OnInit {
     step_4_6: new UntypedFormControl(''),
     step_4_7: new UntypedFormControl(''),
     step_8: new UntypedFormControl(''),
+    //api
+    url: new UntypedFormControl(''),
+    requestJson: new UntypedFormControl(''),
+    responseJson: new UntypedFormControl(''),
+
+
     // step_4_8
     // step_4_9
   });
@@ -813,6 +826,12 @@ export class DynamicBuilderFormComponent implements OnInit {
         this.form_onAfterSave.controls["step_4_5"].setValue(ruleData[i].data);
       } else if (ruleData[i].step == 46) {
         this.form_onAfterSave.controls["step_4_6"].setValue(ruleData[i].data);
+      } else if (ruleData[i].step == 9) {
+        this.form_onAfterSave.controls["url"].setValue(ruleData[i].data);
+      }else if (ruleData[i].step == 91) {
+        this.form_onAfterSave.controls["requestJson"].setValue(ruleData[i].data);
+      }else if (ruleData[i].step == 92) {
+        this.form_onAfterSave.controls["responseJson"].setValue(ruleData[i].data);
       }
       else {
         if (ruleData[i].step == 31) {
@@ -1278,9 +1297,11 @@ export class DynamicBuilderFormComponent implements OnInit {
       let newValueSource = [
         { id: 4, name: 'Call Procedure' },
         { id: 5, name: 'Call Rest API' },
+        { id: 9, name: 'Call Api' },
         { id: 6, name: 'Form Fields' },
         { id: 7, name: 'Execute Query' },
         { id: 8, name: 'Form Opening' }
+        
       ];
       this.actionDecisions = newValueSource;
     } else {
@@ -1952,6 +1973,11 @@ export class DynamicBuilderFormComponent implements OnInit {
             $(".onAfterSave .step_4").hide();
             this.AllMenus = GlobalConstants.getMenusButton;
 
+          }
+          //Call Api
+          if(stepValue == "9"){
+            console.log("in call api");   
+            this.ApiSelected1 = true
           }
         }
         if (value == "step_3") {
@@ -4149,6 +4175,10 @@ export class DynamicBuilderFormComponent implements OnInit {
         let step_4_5 = this.form_onAfterSave.controls['step_4_5']?.value;
         let step_4_6 = this.form_onAfterSave.controls['step_4_6']?.value;
         let step_4_7 = this.form_onAfterSave.controls['step_4_7']?.value;
+        let url = this.form_onAfterSave.controls['url']?.value;
+        let requestJson = this.form_onAfterSave.controls['requestJson']?.value;
+        let responseJson = this.form_onAfterSave.controls['responseJson']?.value;
+
 
         ruleData = [
           // 
@@ -4165,7 +4195,10 @@ export class DynamicBuilderFormComponent implements OnInit {
           { step: 45, data: step_4_5 },
           { step: 46, data: step_4_6 },
           { step: 47, data: step_4_7 },
-          { step: 0, data: step_0 }
+          { step: 0, data: step_0 },
+          { step: 9, data: url },
+          { step: 91, data: requestJson },
+          { step: 92, data: responseJson }
 
         ];
 
@@ -4236,7 +4269,10 @@ export class DynamicBuilderFormComponent implements OnInit {
         let step_4_6 = this.form_onAfterSave.controls['step_4_6']?.value;
         let step_4_7 = this.form_onAfterSave.controls['step_4_7']?.value;
         let step_8 = this.form_onAfterSave.controls['step_8']?.value;
-console.log('step_8>>>>>>>>>>>>>>>>>',step_8)
+        let url = this.form_onAfterSave.controls['url']?.value;
+        let requestJson = this.form_onAfterSave.controls['requestJson']?.value;
+        let responseJson = this.form_onAfterSave.controls['responseJson']?.value;
+
         ruleData = [
           { step: 1, data: step_1 },
           { step: 2, data: step_2 },
@@ -4251,7 +4287,10 @@ console.log('step_8>>>>>>>>>>>>>>>>>',step_8)
           { step: 45, data: step_4_5 },
           { step: 46, data: step_4_6 },
           { step: 47, data: step_4_7 },
-          { step: 8,  data: step_8 }
+          { step: 8,  data: step_8 },
+          { step: 9, data: url },
+          { step: 91, data: requestJson },
+          { step: 92, data: responseJson }
         ];
 
         let excludedToggle = this.form.controls['isExcluded']?.value;
@@ -4411,4 +4450,90 @@ console.log('step_8>>>>>>>>>>>>>>>>>',step_8)
       }
     });
   }
+
+
+  async showApiJsons(){
+    this.showApiBuilderJson=true;
+
+    const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + this.form_onAfterSave.get('url').value));
+    const getApiJsons = await lastValueFrom(getApiJsonsApi);
+    this.form_onAfterSave.controls['requestJson'].setValue(getApiJsons.data[0].requestJson);
+    this.form_onAfterSave.controls['responseJson'].setValue(getApiJsons.data[0].responseJson);
+    
+    const hashTagRegex = /#([^#]+)#/g;
+
+    let matchesRequest = getApiJsons.data[0].requestJson.match(hashTagRegex);
+    let matchesResponse = getApiJsons.data[0].responseJson.match(hashTagRegex);
+    // let requestJsonParams=[];
+    // let responseJsonParams=[];
+    
+    if (matchesRequest) {
+      this.requestJsonParams = matchesRequest.map((match: string | any[]) => match.slice(1, -1)); 
+      } 
+
+    if (matchesResponse) {
+      this.responseJsonParams = matchesResponse.map((match: string | any[]) => match.slice(1, -1)); 
+      } 
+
+      console.log("requestJsonParams>>>>>>>>>>>",this.requestJsonParams); 
+      console.log("responseJsonParams>>>>>>>>>",this.responseJsonParams); 
+
+  }
+
+  openRelationRequestPopup(){
+    let info={
+    // objectId:this.objectId,
+    jsonData:this.requestJsonParams
+    }
+
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '700px';
+    dialogConfig.height = '700px';
+  
+    const dialogRef = this.dialog.open(ButtonJsonRelationComponent, {
+      data: info,
+      width: '50%',
+      height: '60%',
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+      if(result==undefined){
+
+      }else{
+        console.log("close json relation data>>>>>>>>>>>>>>",result);
+        this.requestSavedParams=result;
+      }
+
+    });
+  }
+  
+  openRelationResponsePopup(){
+    let info={
+   // objectId:this.objectId,
+    jsonData:this.responseJsonParams
+    }
+
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '700px';
+    dialogConfig.height = '700px';
+  
+    const dialogRef = this.dialog.open(ButtonJsonRelationComponent, {
+      data: info,
+      width: '50%',
+      height: '60%',
+    });
+  
+    dialogRef.afterClosed().subscribe(result => {
+  if(result==undefined){
+
+      }else{
+        console.log("close json relation data>>>>>>>>>>>>>>",result);
+        this.responseSavedParams=result;
+      }    
+    });
+  }
+
+
 }

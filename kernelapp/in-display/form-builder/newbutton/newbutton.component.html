@@ -26,6 +26,12 @@
             <v-toggle label="Show in Grid" formControlName="isMainPreview" [parentForm]="buttonForm"
                     fieldName="isMainPreview" ></v-toggle>
         </div>
+
+        <div class="col-lg-12">
+            <v-toggle label="Mandatory" formControlName="Mandatory" [parentForm]="buttonForm"
+                    fieldName="Mandatory" ></v-toggle>
+        </div>
+
         <div class="col-lg-12">
             <v-dropdown formControlName="fieldSet" [dataApi]="AllFieldSet" label="Field Set" placeholder=""
                  [parentForm]="buttonForm" fieldName="fieldSet" required="true">
@@ -76,11 +82,11 @@
 
 
     <div class="row">
-        <div class="col-lg-12" *ngFor="let index of IsReportBuilderArray">
-          <v-dropdown formControlName="'IsReportBuilder' + index" [dataApi]="ALLReport" label="Report" placeholder=""
-            [parentForm]="buttonForm" fieldName="'IsReportBuilder' + index">
+        <!-- <div class="col-lg-12" *ngFor="let index of IsReportBuilderArray"> -->
+          <v-dropdown formControlName="IsReportBuilder" [dataApi]="ALLReport" label="Report" placeholder=""
+            [parentForm]="buttonForm" fieldName="IsReportBuilder">
           </v-dropdown>
-        </div>
+        <!-- </div> -->
       </div>
 
         <div class="col-lg-12" *ngIf="ApiSelected1">

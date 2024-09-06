@@ -106,14 +106,35 @@ export class InputComponent implements ControlValueAccessor {
         value = (<HTMLInputElement>event.target).value;
         this.changed(value);
         this.parentForm.controls[this.fieldName].markAsTouched();
+      }else if(this.type == 'amount'){
+        value = value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }else {
         let inputElement = <HTMLInputElement>event.target;
 
         let value = inputElement.value;
 
+      /////////Sigma
        if (value.match(this.emojiRegex)) {
          value = value.replace(this.emojiRegex, '');} 
+
+      /////////Sigma
+    //   if (/\d/.test(value)) {
+    //     // Remove existing commas before processing
+    //     const cleanedValue = value.replace(/,/g, '');
+    
+    //     // Extract and format the numeric part
+    //     const formattedValue = cleanedValue.replace(/\d+/g, (match) => {
+    //         return new Intl.NumberFormat().format(Number(match));
+    //     });
+    
+    //     // Replace the original numeric part with the formatted part
+    //     value = formattedValue;
+    // }
+    
+      // end new code
       
+      
+
          this.parentForm.controls[this.fieldName].setValue(value);
    this.parentForm.controls[this.fieldName].markAsTouched();
 

@@ -52,7 +52,12 @@
   padding-bottom: 2px;
   float: right !important;
 }
-
+.item1{
+  overflow-x:hidden !important;
+}
+.item2{
+  overflow-x:hidden !important;
+}
 .m22 {
   margin-left: -21px;
 }
@@ -183,4 +188,14 @@
   min-width: 200px;
   max-width: 300px;
   margin-top: -15px;
+}
+
+
+
+
+.bottom-dropdown .dropdown-list {
+  position: absolute;
+  bottom: 100%; /* Position the dropdown above the field */
+  left: 0;
+  z-index: 1000;
 }

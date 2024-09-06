@@ -1,0 +1,30 @@
+<div mat-dialog-content class="dialog-content" >
+  <div class="content-wrapper">
+    <button class="query-button" [ngStyle]="{'background-color': buttonColor}" (click)="buttonAction()" (contextmenu)="onRightClick($event)">
+      <span class="button-text">{{title}}</span>
+    </button>
+<!-- Dropdown -->
+<!-- <div *ngIf="showDropdownMenu" [ngStyle]="{'top': dropdownPosition.top, 'left': dropdownPosition.left, 'position': 'absolute', 'z-index': '1000'}">
+  <v-dropdown 
+    [dataApi]="getGeneratedReport" 
+    label="Generated Report" 
+    placeholder="Select Report" 
+    (onChangeEvent)="onDropdownChange($event)"
+  ></v-dropdown>
+</div> -->
+<!-- <div *ngIf="showDropdownMenu" [ngStyle]="{'top': dropdownPosition.top, 'left': dropdownPosition.left, 'position': 'absolute', 'z-index': '1000', 'background-color': 'white', 'border': '1px solid black'}">
+  <p>Dropdown Test</p>
+</div> -->
+    <!-- Display query results -->
+    <div class="results-wrapper">
+      <div class="results-container">
+        <div class="results-content" >
+          <!-- Dynamically render each part -->
+          <span>{{ formattedContentParts.beforeCount }}</span>
+          <span class="count-bold">{{ formattedContentParts.count }}</span>
+          <span>{{ formattedContentParts.afterCount }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

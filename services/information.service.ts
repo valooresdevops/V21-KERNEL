@@ -76,6 +76,13 @@ export class InformationService {
   public mainPreviewScreenType : boolean = false;
   public advancedSearchShowGrid : boolean = false;
   public advancedSearchShowGridMain:boolean=true;
+  public isDisplayAll:boolean=false;
+  public breakLiveDataBar: any;
+  public breakLiveDataLine: any;
+  public breakLiveDataArea: any;
+  public breakLiveDataColumn: any;
+  public formRecentData : any[] =[];
+
   constructor() { }
 
   private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
@@ -686,4 +693,48 @@ getAdvancedSearchShowGridMain(){
 setAdvancedSearchShowGridMain(advancedSearchShowGridMain:any){
   this.advancedSearchShowGridMain = advancedSearchShowGridMain;
 }
+setIsDisplayALL(DisplayALL: boolean) {
+  this.isDisplayAll = DisplayALL;
+}
+
+getIsDisplayALL() {
+  return this.isDisplayAll;
+}
+
+getBreakLiveDataBar(){
+  return this.breakLiveDataBar;
+}
+setBreakLiveDataBar(breakLiveDataBar:any){
+  this.breakLiveDataBar = breakLiveDataBar;
+}
+
+getBreakLiveDataLine(){
+  return this.breakLiveDataLine;
+}
+setBreakLiveDataLine(breakLiveDataLine:any){
+  this.breakLiveDataLine = breakLiveDataLine;
+}
+
+getBreakLiveDataArea(){
+  return this.breakLiveDataArea;
+}
+setBreakLiveDataArea(breakLiveDataArea:any){
+  this.breakLiveDataArea = breakLiveDataArea;
+}
+
+getBreakLiveDataColumn(){
+  return this.breakLiveDataColumn;
+}
+setBreakLiveDataColumn(breakLiveDataColumn:any){
+  this.breakLiveDataColumn = breakLiveDataColumn;
+}
+
+setFormRecentData(formRecentData: any[]) {
+  this.formRecentData = formRecentData;
+}
+
+getFormRecentData() {
+  return this.formRecentData;
+}
+
 }

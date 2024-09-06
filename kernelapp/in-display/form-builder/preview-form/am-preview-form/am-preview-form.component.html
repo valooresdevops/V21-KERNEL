@@ -7,7 +7,10 @@
 
 <div class="header-dialog">
     <div></div>
-    <div class="dialogTitle"></div>
+    <div class="dialogTitle">
+            <span>{{ dialogTitle }}{{ getFieldDynamicTitleValue }}</span>
+
+    </div>
     <button  [style.visibility]="mainPreviewDataInput.length===0 ? 'visible' : 'hidden'" type="button" id="closeId" class="btn-close" aria-label="Close" (click)="closeDialog(true)"></button>
 
 </div>
@@ -45,16 +48,16 @@
 
                                     <!-- Inputs -->
                                     <div class="form-ele-parent mb-3"
-                                        *ngIf="(fields.columnTypeCode == 1 || fields.columnTypeCode == 2 || fields.columnTypeCode == 6 || fields.columnTypeCode == 16) && fields.columnType != 'hidden'">
+                                        *ngIf="(fields.columnTypeCode == 1 || fields.columnTypeCode == 2 || fields.columnTypeCode == 6 || fields.columnTypeCode == 16 || fields.columnTypeCode == 20) && fields.columnType != 'hidden'">
                                         <div class="row">
                                             <div class="align-items-center"
                                                 [ngClass]="{'col-lg-5': fields.sizeField == 1, 'col-lg-7': fields.sizeField == 2,
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" 
+                                                <label [style.margin-right]="tableOption.isFormFlip === 1 ? '50px !important' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''" [style.font-size]="'small'"
                                                     id="lbl_{{ fields.id }}" id="lbl_{{ fields.id }}"
-                                                    [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
+                                                    [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}" style="margin: -2% !important;">
                                                     {{ fields.columnDescription }}
                                                 </label>
                                             </div>
@@ -74,7 +77,8 @@
                                                         [readonly]="tableOption.isReadOnly ? true : fields.qbeReadOnly"
                                                         (change)="registerTouchedField(fields.name);dynamicDRBOnchange(fields.id,-1);EmailValidation(fields.name)"
                                                         (keydown)="onKeyDown($event)" appNumericInput
-                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}">
+                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}"
+                                                        >
                                                     <div *ngFor="let elem of showRequiredMessage">
                                                         <div *ngIf="fields.name == elem">
                                                             <div
@@ -86,7 +90,33 @@
                                                 </div>
 
                                                 <div class="form-ele-child"
-                                                    *ngIf="fields.isArabic == '13' && fields.columnType !='e-mail'">
+                                                *ngIf="fields.columnType =='amount' && fields.columnType !='e-mail'">
+                                                <input type="text" separator
+                                                    [formControlName]="fields.name"
+                                                    class="{{ fields.name }} fieldSet_{{ fields.fieldSetId }} v-input-style"
+                                                    [maxlength]="fields.columnLength" id="field_{{ fields.id }}"
+                                                    [required]="fields.isMandatory ? true : fields.mandatoryQuery"
+                                                    [readonly]="tableOption.isReadOnly ? true : fields.qbeReadOnly"
+                                                    (change)="registerTouchedField(fields.name);dynamicDRBOnchange(fields.id,-1);"
+                                                    (keydown)="onKeyDown($event)" 
+                                                    [ngClass]="{'disabled-field': tableOption.isReadOnly}">
+                                                <div *ngFor="let elem of showRequiredMessage">
+                                                    <div *ngIf="fields.name == elem">
+                                                        <div
+                                                            class="requiredMessage">
+                                                            Required
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+
+
+
+                                                <div class="form-ele-child"
+                                                    *ngIf="fields.isArabic == '13' && fields.columnType !='e-mail' && fields.columnType !='amount'">
                                                     <input type="{{ fields.columnType }}"
                                                         [formControlName]="fields.name"
                                                         class="{{ fields.name }} fieldSet_{{ fields.fieldSetId }} v-input-style"
@@ -95,7 +125,8 @@
                                                         [readonly]="tableOption.isReadOnly ? true : fields.qbeReadOnly"
                                                         (change)="registerTouchedField(fields.name);dynamicDRBOnchange(fields.id,-1)"
                                                         (keydown)="onKeyDown($event)" appNumericInput
-                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}">
+                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}"
+                                                        style="margin: -2% !important;">
                                                     <div *ngFor="let elem of showRequiredMessage">
                                                         <div *ngIf="fields.name == elem">
                                                             <div
@@ -116,7 +147,8 @@
                                                         (change)="registerTouchedField(fields.name);dynamicDRBOnchange(fields.id,-1); checkIfArabic(fields)"
                                                         (input)="checkIfArabic(fields)" (keydown)="onKeyDown($event)"
                                                         appNumericInput
-                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}">
+                                                        [ngClass]="{'disabled-field': tableOption.isReadOnly}"
+                                                        style="margin: -2% !important;">
                                                     <div *ngFor="let elem of showRequiredMessage">
                                                         <div *ngIf="fields.name == elem">
                                                             <div
@@ -140,7 +172,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''"  [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -181,7 +213,7 @@
                                                           'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                           'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                           'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                  <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                  <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''"   [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                       [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                       {{ fields.columnDescription }}
                                                   </label>
@@ -212,6 +244,8 @@
                                               </div>
                                           </div>
                                       </div>
+<!-------------------------------------------------------------------------------------->
+
 
                                     <!-- Signature -->
                                     <div class="form-ele-parent mb-3"
@@ -222,7 +256,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -247,17 +281,17 @@
                                     <div class="form-ele-parent mb-3"
                                         *ngIf="(fields.columnTypeCode == 18) && fields.columnType != 'hidden'">
                                         <div class="row">
-                                            <div class="align-items-center"
+                                            <div class="align-items-center" 
                                                 [ngClass]="{'col-lg-5': fields.sizeField == 1, 'col-lg-7': fields.sizeField == 2,
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}" style="margin-top: 10px;"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}" style="margin-top: 10px;"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
                                             </div>
-                                            <div
+                                            <div style="margin-top:20px"
                                                 [ngClass]="{'col-lg-7': fields.sizeField == 1, 'col-lg-5': fields.sizeField == 2,
                                                         'col-lg-3': fields.sizeField == 3, 'col-md-7': fields.sizeField == 1,
                                                         'col-md-5': fields.sizeField == 2, 'col-md-3': fields.sizeField == 3,
@@ -287,7 +321,7 @@
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
                                                 <!-- <div class="col-lg-5 col-md-3 col-sm-12 col-xs-12 align-items-center"> -->
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -319,37 +353,42 @@
                                         </div>
                                     </div>
 
-                                    <!-- CheckBox -->
-                                    <div class="form-ele-parent mb-3"
-                                        *ngIf="(fields.columnTypeCode == 5 ) && fields.columnType != 'hidden'">
+                                    <div class="form-ele-parent mb-3" *ngIf="(fields.columnTypeCode == 5 ) && fields.columnType != 'hidden'">
                                         <div class="row">
-                                            <div class="align-items-center"
-                                                [ngClass]="{'col-lg-5': fields.sizeField == 1, 'col-lg-7': fields.sizeField == 2,
-                                                        'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
-                                                        'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
-                                                        'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
-                                                    [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
-                                                    {{ fields.columnDescription }}
-                                                </label>
+                                          <div class="align-items-center"
+                                               [ngClass]="{'col-lg-5': fields.sizeField == 1, 'col-lg-7': fields.sizeField == 2,
+                                                           'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
+                                                           'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
+                                                           'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
+                                            <div class="label-tooltip-container">
+                                              <label [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''"
+                                                     [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"
+                                                     [style.font-size]="'small'"
+                                                     id="lbl_{{ fields.id }}"
+                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 
+                                                                 'required': fields.isMandatory ? true : fields.mandatoryQuery, 
+                                                                 'label': !fields.isMandatory ? true : fields.mandatoryQuery}" tabindex="0">
+                                                {{ fields.columnDescription }}
+                                                <div class="label-tooltip-text">{{ fields.columnDescription }}</div>
+                                              </label>
                                             </div>
-                                            <div
-                                                [ngClass]="{'col-lg-7': fields.sizeField == 1, 'col-lg-5': fields.sizeField == 2,
-                                                        'col-lg-3': fields.sizeField == 3, 'col-md-7': fields.sizeField == 1,
-                                                        'col-md-5': fields.sizeField == 2, 'col-md-3': fields.sizeField == 3,
-                                                        'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <div class="form-ele-child">
-                                                    <mat-checkbox [formControlName]="fields.name"
-                                                        id="field_{{ fields.id }}"
-                                                        class="{{ fields.name }} fieldSet_{{ fields.fieldSetId }} w-100"
-                                                        [required]="fields.isMandatory ? true : fields.mandatoryQuery"
-                                                        (change)="registerTouchedField(fields.name);dynamicDRBOnchange(fields.id,-1)">
-                                                    </mat-checkbox>
-                                                </div>
+                                          </div>
+                                          <div [ngClass]="{'col-lg-7': fields.sizeField == 1, 'col-lg-5': fields.sizeField == 2,
+                                                            'col-lg-3': fields.sizeField == 3, 'col-md-7': fields.sizeField == 1,
+                                                            'col-md-5': fields.sizeField == 2, 'col-md-3': fields.sizeField == 3,
+                                                            'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
+                                            <div class="form-ele-child">
+                                              <mat-checkbox [formControlName]="fields.name"
+                                                            id="field_{{ fields.id }}"
+                                                            class="{{ fields.name }} fieldSet_{{ fields.fieldSetId }} w-100"
+                                                            [required]="fields.isMandatory ? true : fields.mandatoryQuery"
+                                                            (change)="registerTouchedField(fields.name); dynamicDRBOnchange(fields.id,-1)">
+                                              </mat-checkbox>
                                             </div>
+                                          </div>
                                         </div>
-                                    </div>
-
+                                      </div>
+                                      
                                     <!-- LookUp -->
                                     <div class="form-ele-parent mb-3"
                                         *ngIf="fields.columnTypeCode == 4 && fields.columnType != 'hidden'">
@@ -359,8 +398,8 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
-                                                    [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
+                                                    [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}" >
                                                     {{ fields.columnDescription }}
                                                 </label>
                                             </div>
@@ -405,7 +444,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -450,7 +489,7 @@
                                                         'col-lg-9': fields.sizeField == 3, 'col-md-5': fields.sizeField == 1,
                                                         'col-md-7': fields.sizeField == 2, 'col-md-9': fields.sizeField == 3,
                                                         'col-sm-12': fields.sizeField == 1 || fields.sizeField == 2 || fields.sizeField == 3}">
-                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" id="lbl_{{ fields.id }}"
+                                                <label  [style.margin-right]="tableOption.isFormFlip === 1 ? '50px' : ''" [style.margin-left]="tableOption.isFormFlip !== 1 ? '50px' : ''"[style.font-size]="'small'" id="lbl_{{ fields.id }}"
                                                     [ngClass]="{'label-required': fields.isMandatory ? true : fields.mandatoryQuery, 'required': fields.isMandatory ? true : fields.mandatoryQuery, 'label': !fields.isMandatory ? true : fields.mandatoryQuery}">
                                                     {{ fields.columnDescription }}
                                                 </label>
@@ -503,12 +542,12 @@
     <!---------------------------------------------------------IMPORTANT--------------------------------------------------------------------------->
 
     <!-------------FOR GRID TO SHOW IN FORM A RULE Show FieldSet needs to be applied on ANY FIELDSET inside the FORM------------------------------->
-                    
+                <div class="container-grid-test">
                     <v-grid *ngIf="showGrid && this.informationservice.getAdvancedSearchShowGrid()" 
                             allowSideBar="false"
                             [agColumns]="gridColumns"
                             [paginationPageSize]="50"
-                            agToolBar="ad"
+                            agToolBar=""
                             [allowPagination]="false"
                             [agOnGridEvents]="true"
                             (onGridEventSave)="gridEventSave($event)"
@@ -516,8 +555,9 @@
                             [dataApi]="test"
                             [showOrHideButton]="false"
                             [dataApiParam]="dataApiParam"
-                            [staticData]="gridStaticValue" >
+                            [staticData]="gridStaticValue" > 
                     </v-grid>
+                </div>
     <!------------------------------------------------------------------------------------------------------------------------------------------------->
                     <div class="row" *ngIf="tableOption.isSave == 1 && tableOption.isQueryForm!='1' && tableOption.isDynamicReport!='1'">
                         <div class="row justify-content-center">

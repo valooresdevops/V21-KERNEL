@@ -4,46 +4,6 @@
       <div class="tabName">{{tabName}}</div>
     </div>
   </v-tab>
-   
-  <div class="container-wrapper" *ngIf="checkVisibiltyDashboard">
-    <div class="custom-container">
-      <div class="button-section">
-        <div class="button-text-group">
-          <button class="btn-red" style="max-width: 33%; min-width: 33%;">Alert</button>
-          <p><b>5</b> devices detected entering Lebanon from suspicious areas in Syria on <b>August 5, 2024</b>.</p>
-        </div>
-        <div class="button-text-group">
-          <button class="btn-green" style="max-width: 33%; min-width: 33%;">To Do</button>
-          <p>Database Update: <b>34,854,310</b> records successfully added on <b>August 5, 2024</b>.</p>
-        </div>
-        <div class="button-text-group">
-          <button class="btn-yellow" style="max-width: 33%; min-width: 33%;">Shortcut</button>
-          <p><b>65</b> devices detected entering Lebanon on <b>August 5, 2024</b>.</p>
-        </div>
-      </div>
-    </div>
-  </div> 
-   
-  
-      <!-- <div class="box animate__animated animate__fadeIn"  style="height: 320px;"> -->
-          <!-- <div>{{ gridCounter }}</div> -->
-
-
-  <!-- <div *ngIf="showDashboard" cdkDropList (cdkDropListDropped)="drop($event)" class="box">
-    <div *ngFor="let data of allData; let i = index;">
-      <ng-container *ngIf="data.type === 'Alert'; then alert"></ng-container>
-      <ng-template #alert>
-        <div>
-          <div>
-            <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
-          </div>
-          <div cdkDrag>
-            <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title"></app-alert>
-          </div>
-        </div>
-      </ng-template>
-    </div>
-  </div> -->
 
   <div *ngIf="showDashboard" cdkDropList class="example-list d-flex flex-wrap" (cdkDropListDropped)="drop($event)"
     style="min-width: 100%;">
@@ -53,10 +13,11 @@
         'col-md-7 mb-3': data.objectWidth === 2, 
         'col-md-11 mb-3': data.objectWidth === 3 
       }">
-      <div class="listContainer2">
+      
        
         <ng-container *ngIf="data.type === 'Chart'; then chart"></ng-container>
         <ng-template #chart>
+          <div class="listContainer2">
           <div>
             <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
           </div>
@@ -75,7 +36,7 @@
               <ng-container>
                 <div class="chart-container" *ngIf="data.stockAd == 0">
                   <v-highcharts [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts>
-                  <div *ngIf="description != 'null'" class="description-container">
+                  <div *ngIf="allData[i].description != 'null'" class="description-container">
                     <div class="description">
                       {{allData[i].description}}
                       <a *ngIf="isDescriptionLong(allData[i].description)" (click)="openSelected(data)"
@@ -101,9 +62,11 @@
               </ng-container>
             </div>
           </div>
+          </div>
         </ng-template>
         <ng-container *ngIf="data.type === 'Kpi'; then KpiTemplate"></ng-container>
         <ng-template #KpiTemplate>
+          <div class="listContainer2">
           <div>
             <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
           </div>
@@ -144,9 +107,11 @@
               (click)="openGrid(data)"></v-button>
 
           </div>
+          </div>
         </ng-template>
         <ng-container *ngIf="data.type === 'Grid'; then gridTemplate"></ng-container>
         <ng-template #gridTemplate style="width: max-content;">
+          <div class="listContainer2">
           <div>
             <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
           </div>
@@ -158,18 +123,40 @@
               <p><b>{{data.Title}}</b></p>
             </div>
             <v-grid id="data.ID" allowSideBar="true" [agColumns]="agColumnsJson1[gridIndexMapping(data.ID)]"
-              [pagination]="true" [staticData]="data.Records" [paginationPageSize]="3" [allowPagination]="false"
+              [pagination]="true" [staticData]="data.Records" [paginationPageSize]="4" [allowPagination]="false"
               [checkInput]="true" [checkPagination]="true">
             </v-grid>
           </div>
+        </div>
         </ng-template>
+        
+        
         <ng-container *ngIf="data.type === 'Alert'; then alertTemplate"></ng-container>
         <ng-template #alertTemplate style="width: max-content;">
+          <div class="listContainerAlert">
           <div>
             <button class="exit-button" (click)="onExitButtonClick(data)">&times;</button>
           </div>
           <div cdkDrag class="test">
-            <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title"></app-alert>
+            <!-- <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title" [id]="data.ID" (click)="generateReport(data.ID)"></app-alert> -->
+            <!-- <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title" [id]="data.ID" (rightClick)="onAlertRightClick($event)" ></app-alert> -->
+            <app-alert [color]="data.Color" [content]="data.record[0].content" [title]="data.Title" [id]="data.ID" [functionality]="data.Functionality" (rightClick)="handleRightClickAlert($event.event, $event.functionality)" ></app-alert>
+
+          </div>
+          </div>
+          <!-- Button to toggle the dropdown -->
+
+          <div *ngIf="showDropdownMenu" [ngStyle]="{'top': dropdownPosition.top, 'left': dropdownPosition.left, 'position': 'absolute', 'z-index': '1000'}" class="custom-dropdown-cont">
+            <form [formGroup]="parentForm">
+              <v-dropdown
+              class="custom-dropdown"
+                [parentForm]="parentForm"
+                fieldName="report_id"
+                [dataApi]="getGeneratedReport"
+                placeholder="Choose Report"
+                (onChangeEvent)="onDropdownChange($event)">
+              </v-dropdown>
+            </form>
           </div>
         </ng-template>
 
@@ -183,40 +170,28 @@
               <i class="fa fa-arrows-alt icon-left" aria-hidden="true"></i>
             </div>
             
-            <!-- <div style="display: none;">{{gridIndexMapping(i)}}</div> -->
-             <!-- <div><b>{{data.Title}}</b></div> -->
+
              <div style="width: 95%; text-align: center;">
-              <!-- <h1>{{ title }}</h1> -->
               <div *ngIf="editorIndexMapping(data.ID) as sanitizedContent">
                 <div [innerHTML]="sanitizedContent"></div>
               </div>
               
-                          </div>
 
-            <!-- {{agColumnsJson1[gridIndexMapping(data.ID)] | json}}
-            {{data.Records | json}} -->
           </div>
+        </div>
         </ng-template>
 
       </div>
     </div>
-  </div>
-  <div class="container-wrapper" *ngIf="checkVisibiltyDashboard">
 
-    <div class="custom-container2" style="width:98% !important; margin-left: 1%; margin-right: 1%;">
-      <h1 class="section-title"><b>About Valoores</b></h1>
+  <!-- <div class="container-wrapper" *ngIf="checkVisibiltyDashboard"> -->
+
+    <footer class="custom-container2" style="width:98% !important; margin-left: 1%; margin-right: 1%;">
       <p class="section-text">
-        Valoores Digital Financial Service (VDFS) is at the forefront of financial technology innovation, backed by over
-        35 years of expertise in financial services, data security, and advanced analytics. Our VDFS platform transforms
-        financial operations with cutting-edge solutions, including streamlined digital transaction management and
-        real-time fraud detection. Key features include advanced screening tools for risk mitigation, comprehensive
-        Anti-Money Laundering (AML) solutions to combat illicit activities, and an efficient Name Matching System (NMS)
-        for precise identification and verification of individuals. By integrating these technologies, VDFS enables
-        banks, financial institutions, and enterprises worldwide to enhance their operational efficiency, maintain
-        regulatory compliance, and safeguard against emerging threats in the financial sector. </p>
-    </div>
+       &copy; <span id="year"></span> Valoores. All rights reserved.   </p>
+      </footer>
 
-  </div>
+  <!-- </div> -->
 
 
 

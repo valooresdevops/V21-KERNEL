@@ -105,6 +105,6 @@
   max-width: 100%;
 }
 
-.count {
+.count-bold {
   font-weight: bold !important; /* Makes the count bold */
 }

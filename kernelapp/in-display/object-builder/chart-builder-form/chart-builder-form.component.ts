@@ -47,12 +47,17 @@ export class ChartBuilderFormComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     public datepipe: DatePipe,) { }
   ids: String[] = [];
+  ids1: String[] = [];
   names: number[] = [];
+  names1: number[] = [];
   gaugeType: string[] = [];
   gaugeValue: number[] = [];
   gaugeLabel: string[] = [];
   gaugeTitle: string[] = [];
   gaugeAppendText: string[] = [];
+
+  
+  public liveData : any[] = [];
 
   chartType: number;
   is3d: number;
@@ -60,6 +65,24 @@ export class ChartBuilderFormComponent implements OnInit {
   public isDescription: boolean = false;
   public newTitle: String = '';
   public newData : any;
+  public isLiveValue: number;
+
+
+  chartOptions: Highcharts.Options = {};
+  chartBar: Highcharts.Chart | undefined;
+  chartLine: Highcharts.Chart | undefined;
+  chartArea: Highcharts.Chart | undefined;
+  chartColumn: Highcharts.Chart | undefined;
+
+  public x: number = 1;
+  public y: number = 1;
+  
+  public intervalIdColumn: any;
+  public intervalIdBar: any;
+  public intervalIdArea: any;
+  public intervalIdLine: any;
+
+
 
   ngOnInit(): void {
     const newString = this.data.chartTitle.replace(/"/g, '');
@@ -67,6 +90,7 @@ export class ChartBuilderFormComponent implements OnInit {
     this.newData = JSON.stringify(this.data.info);
 
     this.is3d = this.data.info.is3d;
+    this.isLiveValue = this.data.info.isLive
     this.chartType = this.data.info.chartType;
     let ids = this.ids
     let stockChartType;
@@ -243,6 +267,7 @@ export class ChartBuilderFormComponent implements OnInit {
       for (let i = 0; i < this.data.info.records.length; i++) {
         this.ids.push(this.data.info.records[i].ID);
         this.names.push(parseInt(this.data.info.records[i].NAME));
+        this.names1.push(parseInt(this.data.info.records[i].NAME));
       }
       console.log("this.data.records = ", this.data.info.records);
 
@@ -280,7 +305,113 @@ export class ChartBuilderFormComponent implements OnInit {
             }]
           }
         ]
-      } else {
+      } else 
+      if (this.data.info.isLive == 1) {
+        // Initialize ids and names arrays
+        this.ids1 = [];
+        this.names = [];
+        this.names1 = [];
+        
+        // Populate ids and names with data
+        for (let j = 0; j < this.data.info.records.length; j++) {
+          const id = this.data.info.records[j].ID;
+          const name = Number(this.data.info.records[j].NAME);
+          this.ids1.push(id);    // Store real IDs
+          this.names.push(name); // Store names (data values)
+          this.names1.push(name); // For initial display
+        }
+                          
+        const windowSize = 1; // Number of values to move each interval
+        const maxValues = 4; // Maximum number of values to display at any time
+                          
+        // Function to slide array values
+        const slideArray = <T>(arr: T[]): T[] => {
+        if (arr.length === 0) {
+                              console.warn("Array is empty, cannot slide.");
+                              return arr;
+                            }
+                            // Slide the array: move the first element to the end
+                            const [firstElement, ...rest] = arr;
+                            return [...rest, firstElement];
+                          };
+                          
+                          this.newChartObject = [
+                            {
+                              chart: {
+                                type: 'bar',
+                                events: {
+                                  load: () => {
+                                    this.chartBar = Highcharts.charts[0];
+                                    console.log("Chart loaded>>>", this.chartBar);
+                        
+                                    // Update the chart with the initial data
+                                    this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                        
+                                    
+        
+        
+                                    this.intervalIdBar = setInterval(() => {
+                                      if (this.chartBar) {
+                                        // Slide ids array
+                                        this.ids1 = slideArray(this.ids1);
+                                    
+                                        // Slide names array if needed
+                                        this.names1 = slideArray(this.names1);
+                                    
+                                        // Trim to the last 'maxValues' values
+                                        if (this.ids1.length > maxValues) {
+                                          this.ids1 = this.ids1.slice(-maxValues);
+                                        }
+                                        if (this.names1.length > maxValues) {
+                                          this.names1 = this.names1.slice(-maxValues);
+                                        }
+                                    
+                                        // Update the chart with the rotated values
+                                        this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    
+                                        // Update xAxis categories and force redraw
+                                        this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                        this.chartBar.redraw(); // Force chart redraw
+                                    
+                                        // Log current state (for debugging purposes)
+                                        console.log("Updated names Bar:", this.names1);
+                                        console.log("Updated IDs1 Bar:", this.ids1);
+                                      }
+                                    }, 1500); // Update interval (1.5 seconds)
+                                    
+                                  }
+                                }
+                              },
+                              title: {text: this.data.info.Title, align: 'center', style: { fontSize: '16px' }},
+                              xAxis: {
+                                categories: this.ids
+                              },
+                              yAxis: {
+                                title: {
+                                  text: 'Value', align: 'center'
+                                }
+                              },
+                              plotOptions: {
+                                series: {
+                                  pointPadding: 1, // Adjust the spacing between bars
+                                  groupPadding: 0.2, // Adjust the spacing between groups
+                                  borderWidth: 0,
+                                }
+                              },
+                              tooltip: {
+                                headerFormat: '',
+                                pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                              },
+                              series: [{
+                                name: this.data.info.Title,
+                                data: this.names,
+                                color: 'green'
+                              }]
+                            }
+                          ];
+      }
+      else {
         this.newChartObject = [
           {
             chart: { type: this.chartType1,
@@ -415,7 +546,106 @@ export class ChartBuilderFormComponent implements OnInit {
             }]
           }
         ];
-      } else {
+      } 
+      else
+      if (this.data.info.isLive == 1) {
+          // Initialize ids and names arrays
+          this.ids1 = [];
+          this.names = [];
+          this.names1 = [];
+          
+          // Populate ids and names with data
+          for (let j = 0; j < this.data.info.records.length; j++) {
+            const id = this.data.info.records[j].ID;
+            const name = Number(this.data.info.records[j].NAME);
+            this.ids1.push(id);    // Store real IDs
+            this.names.push(name); // Store names (data values)
+            this.names1.push(name); // For initial display
+          }
+          
+          const windowSize = 1; // Number of values to move each interval
+          const maxValues = 4; // Maximum number of values to display at any time
+          
+          // Function to slide array values
+          const slideArray = <T>(arr: T[]): T[] => {
+            if (arr.length === 0) {
+              console.warn("Array is empty, cannot slide.");
+              return arr;
+            }
+            // Slide the array: move the first element to the end
+            const [firstElement, ...rest] = arr;
+            return [...rest, firstElement];
+          };
+          
+          this.newChartObject = [
+            {
+              chart: {
+                type: 'line',
+                events: {
+                  load: () => {
+                    this.chartLine = Highcharts.charts[0];
+                    console.log("Chart loaded>>>", this.chartLine);
+        
+                    // Update the chart with the initial data
+                    this.chartLine.series[0].setData(this.names1, true, true, true);
+                    this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+        
+                    
+
+
+                    this.intervalIdLine = setInterval(() => {
+                      if (this.chartLine) {
+                        // Slide ids array
+                        this.ids1 = slideArray(this.ids1);
+                    
+                        // Slide names array if needed
+                        this.names1 = slideArray(this.names1);
+                    
+                        // Trim to the last 'maxValues' values
+                        if (this.ids1.length > maxValues) {
+                          this.ids1 = this.ids1.slice(-maxValues);
+                        }
+                        if (this.names1.length > maxValues) {
+                          this.names1 = this.names1.slice(-maxValues);
+                        }
+                    
+                        // Update the chart with the rotated values
+                        this.chartLine.series[0].setData(this.names1, true, true, true);
+                    
+                        // Update xAxis categories and force redraw
+                        this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                        this.chartLine.redraw(); // Force chart redraw
+                    
+                        // Log current state (for debugging purposes)
+                        console.log("Updated names:", this.names1);
+                        console.log("Updated IDs1:", this.ids1);
+                    
+                      }
+                    }, 1500); // Update interval (1.5 seconds)
+                    
+                  }
+                }
+              },
+              title: { text: this.data.info.records[0].TITLE, align: 'center', style: { fontSize: '16px' }},
+        xAxis: {
+          categories: this.ids
+        },
+        yAxis: {
+          title: {
+            text: 'Value'
+          }
+        },
+        series: [{
+          name: this.data.info.records[0].TITLE,
+          data: this.names,
+          color: 'green'
+        }]
+            }
+          ];
+      }
+      
+      
+      else {
         this.newChartObject = [
           {
             chart: { type: 'line',
@@ -442,7 +672,7 @@ export class ChartBuilderFormComponent implements OnInit {
         this.ids.push(this.data.info.records[i].ID);
         this.names.push(Number(this.data.info.records[i].NAME));
       }
-      if (this.data.is3d == 1) {
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [
           {
             chart: {
@@ -473,7 +703,118 @@ export class ChartBuilderFormComponent implements OnInit {
             }]
           }
         ];
-      } else {
+      } 
+      else
+      if (this.data.info.isLive == 1) {
+          // Initialize ids and names arrays
+          this.ids1 = [];
+          this.names = [];
+          this.names1 = [];
+          
+          // Populate ids and names with data
+          for (let j = 0; j < this.data.info.records.length; j++) {
+            const id = this.data.info.records[j].ID;
+            const name = Number(this.data.info.records[j].NAME);
+            this.ids1.push(id);    // Store real IDs
+            this.names.push(name); // Store names (data values)
+            this.names1.push(name); // For initial display
+          }
+          
+          const windowSize = 1; // Number of values to move each interval
+          const maxValues = 4; // Maximum number of values to display at any time
+          
+          // Function to slide array values
+          const slideArray = <T>(arr: T[]): T[] => {
+            if (arr.length === 0) {
+              console.warn("Array is empty, cannot slide.");
+              return arr;
+            }
+            // Slide the array: move the first element to the end
+            const [firstElement, ...rest] = arr;
+            return [...rest, firstElement];
+          };
+          
+          this.newChartObject = [
+            {
+              chart: {
+                type: 'area',
+                events: {
+                  load: () => {
+                    this.chartArea = Highcharts.charts[0];
+                    console.log("Chart loaded>>>", this.chartArea);
+        
+                    // Update the chart with the initial data
+                    this.chartArea.series[0].setData(this.names1, true, true, true);
+                    this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+        
+                    this.intervalIdArea = setInterval(() => {
+                      if (this.chartArea) {
+                        // Slide ids array
+                        this.ids1 = slideArray(this.ids1);
+                    
+                        // Slide names array if needed
+                        this.names1 = slideArray(this.names1);
+                    
+                        // Trim to the last 'maxValues' values
+                        if (this.ids1.length > maxValues) {
+                          this.ids1 = this.ids1.slice(-maxValues);
+                        }
+                        if (this.names1.length > maxValues) {
+                          this.names1 = this.names1.slice(-maxValues);
+                        }
+                    
+                        // Update the chart with the rotated values
+                        this.chartArea.series[0].setData(this.names1, true, true, true);
+                    
+                        // Update xAxis categories and force redraw
+                        this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                        this.chartArea.redraw(); // Force chart redraw
+                    
+                        // Log current state (for debugging purposes)
+                        console.log("Updated names:", this.names1);
+                        console.log("Updated IDs1:", this.ids1);
+                      }
+                    }, 1500); // Update interval (1.5 seconds)
+
+
+                  }
+                }
+              },
+              title: {
+                text:this.data.info.records[0].TITLE,
+                align: 'center',
+                style: { fontSize: '16px' }
+              },
+              xAxis: {
+                categories: this.ids1.map(id => id.toString()) // Initially set categories to IDs
+              },
+              yAxis: {
+                title: {
+                  text: 'Value'
+                }
+              },
+              legend: {
+                enabled: true,
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+              },
+              series: [
+                {
+                  name: this.data.info.records[0].TITLE,
+                  data: this.names1, // Initially load the data
+                  color: 'green'
+                }
+              ]
+            }
+          ];
+      }
+      
+      
+      
+      
+      else {
         this.newChartObject = [
           {
             chart: { type: 'area',
@@ -691,7 +1032,7 @@ export class ChartBuilderFormComponent implements OnInit {
         this.ids.push(this.data.info.records[i].ID);
         this.names.push(Number(this.data.info.records[i].NAME));
       }
-      if (this.data.is3d == 1) {
+      if (this.data.info.is3d == 1) {
         this.newChartObject = [{
           chart: {
             renderTo: 'container',
@@ -740,7 +1081,117 @@ export class ChartBuilderFormComponent implements OnInit {
             colorByPoint: true
           }]
         }];
-      } else {
+      }
+      else
+      
+      if (this.data.info.isLive == 1) {
+        // Initialize ids and names arrays
+        this.ids1 = [];
+        this.names = [];
+        this.names1 = [];
+        
+        // Populate ids and names with data
+        for (let j = 0; j < this.data.info.records.length; j++) {
+          const id = this.data.info.records[j].ID;
+          const name = Number(this.data.info.records[j].NAME);
+          this.ids1.push(id);    // Store real IDs
+          this.names.push(name); // Store names (data values)
+          this.names1.push(name); // For initial display
+        }
+        
+        const windowSize = 1; // Number of values to move each interval
+        const maxValues = 4; // Maximum number of values to display at any time
+        
+        // Function to slide array values
+        const slideArray = <T>(arr: T[]): T[] => {
+          if (arr.length === 0) {
+            console.warn("Array is empty, cannot slide.");
+            return arr;
+          }
+          // Slide the array: move the first element to the end
+          const [firstElement, ...rest] = arr;
+          return [...rest, firstElement];
+        };
+        
+        this.newChartObject = [
+          {
+            chart: {
+              type: 'column',
+              events: {
+                load: () => {
+                  this.chartColumn = Highcharts.charts[0];
+                  console.log("Chart loaded>>>", this.chartColumn);
+      
+                  // Update the chart with the initial data
+                  this.chartColumn.series[0].setData(this.names1, true, true, true);
+                  this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+      
+                  
+
+
+                  this.intervalIdColumn = setInterval(() => {
+                    if (this.chartColumn) {
+                      // Slide ids array
+                      this.ids1 = slideArray(this.ids1);
+                  
+                      // Slide names array if needed
+                      this.names1 = slideArray(this.names1);
+                  
+                      // Trim to the last 'maxValues' values
+                      if (this.ids1.length > maxValues) {
+                        this.ids1 = this.ids1.slice(-maxValues);
+                      }
+                      if (this.names1.length > maxValues) {
+                        this.names1 = this.names1.slice(-maxValues);
+                      }
+                  
+                      // Update the chart with the rotated values
+                      this.chartColumn.series[1].setData(this.names1, true, true, true);
+                  
+                      // Update xAxis categories and force redraw
+                      this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                      this.chartColumn.redraw(); // Force chart redraw
+
+                  
+                      // Log current state (for debugging purposes)
+                      console.log("Updated names:", this.names1);
+                      console.log("Updated IDs1:", this.ids1);
+                    }
+                  }, 1500); // Update interval (1.5 seconds)
+                  
+                }
+              }
+            },
+            title: {
+              text: this.data.info.records[0].TITLE,
+              align: 'center',
+              style: { fontSize: '16px' }
+            },
+            xAxis: {
+              categories: this.ids1.map(id => id.toString()) // Initially set categories to IDs
+            },
+            yAxis: {
+              title: {
+                text: 'Value'
+              }
+            },
+            legend: {
+              enabled: true,
+              layout: 'horizontal',
+              align: 'center',
+              verticalAlign: 'bottom',
+              borderWidth: 0
+            },
+            series: [
+              {
+                name: this.data.info.records[0].TITLE,
+                data: this.names1, // Initially load the data
+                color: 'green'
+              }
+            ]
+          }
+        ];
+      }else {
         this.newChartObject = [{
           chart: { type: 'column', width: 550,
             height: '50%', identifier: 'column' },

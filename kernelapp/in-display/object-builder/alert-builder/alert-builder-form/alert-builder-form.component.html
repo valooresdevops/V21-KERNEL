@@ -37,8 +37,26 @@
     </v-dropdown>
   </div>
   <div *ngIf="showFunctionality">
-    <v-dropdown  [dataApi]="getGeneratedReport" label="Generated Report" placeholder="" (onChangeEvent)="showFunctionalityJsons()">
-    </v-dropdown>
+    <v-dropdown 
+    formControlName="report_id" 
+    [parentForm]="uploadForm"
+    [dataApi]="getGeneratedReport"
+    label="Generated Report" 
+    placeholder="Select a report"
+    (onChangeEvent)="onReportChange($event)"
+    fieldName="id">
+  </v-dropdown>
+    <!-- <v-input
+      formControlName="report_id"
+      [parentForm]="uploadForm"
+      type="lookup"
+      [lookupDataApi]="getGeneratedReport"
+      lookupWidth="400px"
+      lookupHeight="200px"
+      label="Report"
+      fieldName="report_id"
+      (ngModelChange)="onReportChange($event)"
+    ></v-input> -->
   </div>
   <div class="form-group">
     <v-input

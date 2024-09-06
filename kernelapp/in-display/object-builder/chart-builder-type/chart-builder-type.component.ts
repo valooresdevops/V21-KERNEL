@@ -57,6 +57,7 @@ export class ChartBuilderTypeComponent implements OnInit {
     Column: new UntypedFormControl(''),
     describtion: new UntypedFormControl(''),
     is3d: new UntypedFormControl(''),
+    isLive: new UntypedFormControl(''),
     isHorizental: new UntypedFormControl(''),
     isShowLegend: new UntypedFormControl(''),
     isSerie: new UntypedFormControl(''),
@@ -85,6 +86,7 @@ export class ChartBuilderTypeComponent implements OnInit {
             let toggleIs3dValue;
             let toggleIsHorizontalValue;
             let toggleisDrilldownValue;
+            let toggleisLiveValue;
 
             if (res[0].is3d == 1) {
               toggleIs3dValue = true;
@@ -96,6 +98,11 @@ export class ChartBuilderTypeComponent implements OnInit {
               toggleisDrilldownValue = true;
             } else {
               toggleisDrilldownValue = false;
+            }
+            if (res[0].drilldown == 1) {
+              toggleisLiveValue = true;
+            } else {
+              toggleisLiveValue = false;
             }
             if (res[0].isShowLegend == 1) {
               toggleshowlegendValue = true;
@@ -115,6 +122,7 @@ export class ChartBuilderTypeComponent implements OnInit {
             this.chartForm.get("isHorizental").setValue(toggleIsHorizontalValue);
             this.chartForm.get("isShowLegend").setValue(toggleshowlegendValue);
             this.chartForm.get("isDrilldown").setValue(toggleisDrilldownValue);
+            this.chartForm.get("isLive").setValue(toggleisLiveValue);
             //describtion
             this.chartForm.get("describtion").setValue(res[0].chartDescription);
 
@@ -1328,6 +1336,7 @@ export class ChartBuilderTypeComponent implements OnInit {
     let toggleIs3dValue;
     let toggleIsHorizontalValue;
     let toggleisDrilldownValue;
+    let toggleisLiveValue
     let type;
     if (this.chartForm.get("isShowLegend").value == true) {
       toggleshowlegendValue = 1;
@@ -1348,6 +1357,11 @@ export class ChartBuilderTypeComponent implements OnInit {
       toggleisDrilldownValue = 1;
     } else {
       toggleisDrilldownValue = 0;
+    }
+    if (this.chartForm.get("isLive").value == true) {
+      toggleisLiveValue = 1;
+    } else {
+      toggleisLiveValue = 0;
     }
     if (this.chartType == "heatmap") {
       type = 1;
@@ -1422,6 +1436,7 @@ export class ChartBuilderTypeComponent implements OnInit {
         serieType: 0,
         drilldown: toggleisDrilldownValue,
         drilldownType: 1,
+        isLive: toggleisLiveValue,
         chartType: type,
       }
       this.http.post<any>(GlobalConstants.updateChartApi, allData, { headers: GlobalConstants.headers }).subscribe(
@@ -1457,6 +1472,7 @@ export class ChartBuilderTypeComponent implements OnInit {
         queryFieldName: localStorage.getItem("agGidSelectedLookup_(query)_name"),
         drilldown: toggleisDrilldownValue,
         drilldownType: 1,
+        isLive: toggleisLiveValue,
         chartType: type,
       }
       this.http.post<any>(GlobalConstants.addChartApi, allData, { headers: GlobalConstants.headers }).subscribe(

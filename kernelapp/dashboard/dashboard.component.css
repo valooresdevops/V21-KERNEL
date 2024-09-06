@@ -326,6 +326,22 @@ button:hover {
   /* min-height: 380px; */
   height: 380px;
 }
+
+
+.listContainerAlert {
+  border: 0.5px solid #ddd; /* Light border */
+  border-radius: 8px; /* Rounded corners */
+  position: relative;
+  width: 95%; 
+  max-width: 100%;
+  background-color: var(--app-background-color);
+  margin: 10px; 
+  padding: 10px; 
+  border: 0.5px solid #ddd; 
+  border-radius: 8px; 
+  transition: transform 0.2s;
+  min-height: min-content;
+}
 /* 
   .box {
     margin: 10px;
@@ -711,4 +727,29 @@ button:hover {
   .dashboard-container {
     grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); /* 1 item per row on smaller screens */
   }
+}
+.custom-dropdown {
+  background-color: white !important;
+  /* Add other styles as needed */
+}
+
+ng-multiselect-dropdown {
+  display: flex;
+  width:100% !important;
+  min-width: 100px !important;
+  background-color: white; /* Set background color to white */
+  border: 1px solid #ccc; /* Optional: Add border */
+  /* Optional: Add padding */
+  border-radius: 4px; /* Optional: Add border radius */
+}
+
+/* If you need to target a specific instance */
+#v-dropdown_report_id {
+  display: flex;
+  width:100% !important;
+  min-width: 100px !important;
+    background-color: white; /* Set background color to white */
+  border: 1px solid #ccc; /* Optional: Add border */
+   /* Optional: Add padding */
+  border-radius: 4px; /* Optional: Add border radius */
 }

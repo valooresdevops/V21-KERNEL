@@ -1,19 +1,21 @@
-<div mat-dialog-content class="dialog-content" [ngStyle]="{'background-color': lighterBackgroundColor}">
-    <div class="content-wrapper">
-      
-      
-        <button class="query-button"
-          [ngStyle]="{'background-color': buttonColor}"
-          (click)="executeQuery()"
-        >
-        <span class="button-text">{{ data?.title }}</span>
-        </button>
-      
-      <!-- Display query results -->
-      <div class="results-wrapper" *ngIf="result">
-        <div class="results-container">
-          <pre class="results-content" [ngStyle]="{'background-color': lighterBackgroundColor} " >{{ result[0].content }}</pre>
+<div mat-dialog-content class="dialog-content">
+  <div class="content-wrapper">
+    <button class="query-button"
+      [ngStyle]="{'background-color': buttonColor}"
+      (click)="executeQuery()"
+    >
+      <span class="button-text">{{ data?.title }}</span>
+    </button>
+    
+    <!-- Display query results -->
+    <div class="results-wrapper" *ngIf="result">
+      <div class="results-container">
+        <div class="results-content" >
+          <span>{{ formattedContentParts.beforeCount }}</span>
+            <span class="count">{{ formattedContentParts.count }}</span>
+            <span>{{ formattedContentParts.afterCount }}</span>
         </div>
       </div>
     </div>
   </div>
+</div>

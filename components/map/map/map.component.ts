@@ -80,7 +80,7 @@ import { DataService } from "../Services/data.service";
 import 'leaflet.markercluster';
 import { InformationService } from "src/app/Kernel/services/information.service";
 import { FileDownloadService } from "../Services/FileDownloadService.service";
-//import 'leaflet-curve'; // Import the curve plugin
+import 'leaflet-curve'; // Import the curve plugin
 // import 'leaflet-ant-path';
 import 'leaflet-arrowheads';
 
@@ -7133,7 +7133,14 @@ console.log("iconvarrrrrrrrrrrrrrrrrrrrrrrrrr"+iconVar);
             this.fixedElementMarkerLoop = this.binddataforfixedElements(element[4], element[3], element[2] + "  " + element.percentage + " %", iconVar).on('click', e => e.target.remove());
           }
           else {
-            this.fixedElementMarker = this.binddataforfixedElements(element[4], element[3], element[1], iconVar).on('click', e => e.target.remove()).bindPopup(`<strong>${element[1]}</strong>`);;
+            this.fixedElementMarker = this.binddataforfixedElements(element[4], element[3], element[1], iconVar).on('click', e => e.target.remove()).bindPopup(`
+              <strong>${element[1]}</strong>
+               <nav class="alertify-buttons"><button id="export-${element[1]}" class="alertify-button normaleColor alertify-button-ok" >Export Html</button></nav>
+            `).on('popupopen', () => {
+              document.getElementById(`export-${element[1]}`).addEventListener('click', () => {
+                this.exporthtmlFxdElts(element[1]);
+              });
+            });
             this.fixedElementMarkerLoop = this.binddataforfixedElements(element[4], element[3], element[1], iconVar).on('click', e => e.target.remove()).bindPopup(`<strong>${element[1]}</strong>`);;
           }
           //console.log('fixedElementMarker>>>', this.fixedElementMarker);
@@ -18658,10 +18665,11 @@ let obj22:any={
 //       }}
 
 async DisplayFromSenario(){
+ 
   let ISExport:boolean=this.informationservice.getISExport();
-  
-  //console.log('ISExport:',ISExport); // Debugging log
-  
+  let ISdisplayAll:boolean=this.informationservice.getIsDisplayALL();
+
+  console.log('ISdisplayAll:',ISExport); // Debugging log
 
   let data2:any=JSON.parse("["+this.informationservice.getAgGidSelectedNode()+"]");
 
@@ -18676,7 +18684,7 @@ async DisplayFromSenario(){
   });
   
 
-  if(ISExport==false){
+  if(ISExport==false && ISdisplayAll==false){
 
 
         
@@ -18684,18 +18692,14 @@ async DisplayFromSenario(){
 
    const jsonString = this.informationservice.getAgGidSelectedNode();
 
-    console.log("cedrikkkkk11111",jsonString);
-    console.log("cedrikkkkk2222222",JSON.parse(jsonString));
-   
-  
+   console.log("cedrikkkkk11111",jsonString);
+   console.log("cedrikkkkk2222222",JSON.parse(jsonString));
 
    setTimeout(async () => {
     
   //  let  data:any[]=[];
 
-     let data=JSON.parse(jsonString);
-
-
+   let data=JSON.parse(jsonString);
    console.log("DATAAAAAAAAAAAAA>>>>>>>>>>>>>>>>>>>",data)
    
 
@@ -19048,7 +19052,7 @@ else{
 
     console.log("numberArray>",numberArray);
     await this.datacrowdService
-    .getfixedelementsObject([])
+    .getfixedelementsObject([numberArray])
     .then(async (res: any) => {
       //console.log('res>>', res);
       this.displayFixedElements(res);
@@ -19082,22 +19086,16 @@ console.log("hello--",this.informationservice.getAgGidSelectedNode());
         
         // } else
          if (data[i].COLNAME=="LOCATION_MAP_OBJECT_SHAPE_ID"  && data[i].TYPE=="GRID"){
-          await this.datacrowdService.getSelectedShapes(data[i].COLVALUE).then((res:any)=>{
-            console.log("res in getSelectedShapes ",res);
-            let data=JSON.parse(res); 
-            console.log("data  <<<<  ",data);
-
-            for( let i =0 ; i< data.length ; i++){
-              console.log("IIIIIIIIIIIIIIIIII  ",data[i]);
-              this.displayShapes2([data[i]]);
        
-            }
+          
+          await this.datacrowdService.getSelectedShapes(colValues).then((res:any)=>{
+            this.datajson=JSON.parse(res); 
           });
 
+          for( let i =0 ; i< this.datajson.length ; i++){
+            this.displayShapes2([this.datajson[i]]);
 
-      
-        
-        
+          }
         }
         else if(data[0].COLNAME=="COTRAVELER_DATA" && data[i].TYPE=="GRID"){
         console.log("dddddd--->",allData);
@@ -19112,7 +19110,17 @@ console.log("hello--",this.informationservice.getAgGidSelectedNode());
   }, 1000);
 
 
-  }}
+  }else if(ISdisplayAll ==true && ISExport==false){
+    await this.datacrowdService
+    .getfixedelementsObject([])
+    .then(async (res: any) => {
+      console.log('res111111111111>>', res);
+      this.displayFixedElements(res);
+  
+    });
+    this.drawBoundaries([{'country_alpha2':'LB'}]);
+  }
+}
 
     getsenarioId(obj:any){
       console.log("obj><><><<>",obj);
@@ -20328,8 +20336,8 @@ await this.datacrowdService.getSimulationId().then(async (res:any)=>{
 
         let  queryjson={
           "reportName": "No Name",
-          "reportType": "9",
-          "reportTypeId": "9",
+          "reportType": "8",
+          "reportTypeId": "8",
           "TimeZone": "",
           "RecipientUser": "",
           "DateTimeFrom":  this.DateTimeFrom,
@@ -20416,27 +20424,28 @@ await this.datacrowdService.getSimulationId().then(async (res:any)=>{
       
       console.log('this.BtsTypeSlected>', this.BtsTypeSlected);
       
-      if(this.datajson.fixedelements){
-        if (this.fixedMarkersArray.length > 0) {
-          this.fixedMarkersArray.forEach((element: any, key: any) => {
-            this.map.removeLayer(element);
+      // if(this.datajson.fixedelements){
+      //   if (this.fixedMarkersArray.length > 0) {
+      //     this.fixedMarkersArray.forEach((element: any, key: any) => {
+      //       this.map.removeLayer(element);
       
       
-          })
-          // this.map.removeLayer(this.fixedMarkersGroup);
-          this.fixedMarkersArray = [];
-        }
-        if (this.fixedMarkersGroup) {
-          this.map.removeLayer(this.fixedMarkersGroup);
+      //     })
+      //     // this.map.removeLayer(this.fixedMarkersGroup);
+      //     this.fixedMarkersArray = [];
+      //   }
+      //   if (this.fixedMarkersGroup) {
+      //     this.map.removeLayer(this.fixedMarkersGroup);
     
-        }
-        this.displayFixedElements(this.datajson.fixedelements);
+      //   }
+      //   this.displayFixedElements(this.datajson.fixedelements);
       
-      }
-      if(this.datajson.geo){
-        this.displayClustersforfixedelements(this.datajson.geo);
+      // }
+      // if(this.datajson.geo){
+      //   this.displayClustersforfixedelements(this.datajson.geo);
       
-      }
+      // }
+        this.displayFixedElements(this.datajson);
 
       }
     });
@@ -20483,7 +20492,12 @@ let obj22:any={
 
     }
     
-    
+  
+    async exporthtmlFxdElts(branch:any){
+      // alert('branch'+branch);
+   await   this.datacrowdService.BranchReport(branch);
+   this.fileDownloadService.downloadFile2(branch,666);
+    }
 }
 
 

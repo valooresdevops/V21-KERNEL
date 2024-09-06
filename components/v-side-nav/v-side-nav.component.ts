@@ -111,6 +111,13 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
   // Function used to navigate to child menus based on clicked parent
   toggleActiveMenu(menuCode: String, appAbrv: String, childMenusCount: String,menuName:String) {
     
+    if(childMenusCount == "0")
+    {
+      this.informationservice.setBreakLiveDataBar(true);
+      this.informationservice.setBreakLiveDataLine(true);
+      this.informationservice.setBreakLiveDataArea(true);
+      this.informationservice.setBreakLiveDataColumn(true);
+    }
     // if(this.a == true){
 
       
@@ -613,7 +620,8 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
     private dialog: MatDialog,
     private commonFunctions: CommonFunctions,
     public loaderService: LoaderService,
-    public informationservice: InformationService) { }
+    public informationservice: InformationService,
+    public informationService: InformationService) { }
 
   ngOnInit(): void {
 

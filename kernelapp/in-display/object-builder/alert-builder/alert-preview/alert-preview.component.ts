@@ -7,28 +7,31 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 @Component({
   selector: 'app-alert-preview',
   templateUrl: './alert-preview.component.html',
-  styleUrl: './alert-preview.component.css'
+  styleUrls: ['./alert-preview.component.css'] // Fixed typo here
 })
-export class AlertPreviewComponent implements OnInit{
-  buttonColor: string ;
+export class AlertPreviewComponent implements OnInit {
+  buttonColor: string;
   lighterBackgroundColor: string = '#f5f5f5';
   result: any = null;
-  queryResults: any;
-  constructor( public dialogRef: MatDialogRef<AlertPreviewComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any){
-   
-      this.buttonColor = this.data?.color || this.buttonColor;
+  formattedContentParts = {
+    beforeCount: '',
+    count: '',
+    afterCount: ''
+  };
+
+  constructor(
+    public dialogRef: MatDialogRef<AlertPreviewComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    this.buttonColor = this.data?.color || '#000000'; // Default color if not provided
     this.lighterBackgroundColor = this.adjustColorLightness(this.buttonColor, 1.5); // Adjust lightness
   }
-  
-    ngOnInit(): void {
-      this.buttonColor = this.data?.color || '#000000'; // Default color if not provided
-      console.log('Button Color>>>>>>>>>>>>>>', this.buttonColor);
-      this.lighterBackgroundColor = this.adjustColorLightness(this.buttonColor, 2);
-      this.executeQuery(); // Execute query on dialog open
-  }
 
-  
+  ngOnInit(): void {
+    this.buttonColor = this.data?.color || '#000000'; // Default color if not provided
+    this.lighterBackgroundColor = this.adjustColorLightness(this.buttonColor, 2);
+    this.executeQuery(); // Execute query on dialog open
+  }
 
   adjustColorLightness(color: string, factor: number): string {
     let [r, g, b] = [0, 0, 0];
@@ -51,23 +54,35 @@ export class AlertPreviewComponent implements OnInit{
   
     return `rgb(${r}, ${g}, ${b})`;
   }
-  
 
   async executeQuery() {
-    const Id=this.data.alertId
+    const Id = this.data.alertId;
     const apiUrl = `${GlobalConstants.decodeAlertQuery}${Id}`;
 
     const insertOrUpdateAlertDataApi = from(axios.post(apiUrl));
     const insertOrUpdateAlertData = await lastValueFrom(insertOrUpdateAlertDataApi);
     const responseData = insertOrUpdateAlertData.data;
-    console.log("Response Data:", responseData);
-    this.result=responseData;
-    console.log("jason>>>>>>>>>>",this.result[0].content);
+    this.result = responseData;
+
+    // Assuming `result[0].content` holds your query result string
+    const originalContent = this.result[0]?.content || ''; 
+
+    // Regular expression to find the number in the text
+    const match = originalContent.match(/(\d+)/);
+
+    if (match) {
+      // Split the content into three parts: before, count, after
+      const index = match.index!;
+      this.formattedContentParts.beforeCount = originalContent.slice(0, index);
+      this.formattedContentParts.count = match[0];
+      this.formattedContentParts.afterCount = originalContent.slice(index + match[0].length);
+    } else {
+      // Fallback if no number is found
+      this.formattedContentParts.beforeCount = originalContent;
+    }  
   }
+
   onClose(): void {
     this.dialogRef.close();
   }
-
-
-
 }

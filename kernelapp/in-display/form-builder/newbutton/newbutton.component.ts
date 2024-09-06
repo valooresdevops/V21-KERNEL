@@ -25,7 +25,7 @@ export class NewbuttonComponent implements OnInit {
   public AllFieldSet: any;
   public actionType: string = '';
   public buttonId: number;
-  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'},{id: 9,name: 'Save New'}];
+  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'},{id: 9,name: 'Save New'},{id: 10,name: 'Display All'}];
   public FormOpeningSelected: boolean = false;
   Condition: boolean= false;
   ApiSelected: boolean = false;
@@ -50,6 +50,7 @@ export class NewbuttonComponent implements OnInit {
   // public getAllTablesCombo: any = GlobalConstants.getAllTablesCombo;
   public getSourceQuery = GlobalConstants.getSourceQueryApi;
   public getApiBuilderListDropDown = GlobalConstants.getApiBuilderListDropDown;
+  public isDisplayAll: boolean = false;
 
   constructor(private http: HttpClient,
     @Optional()@Inject(MAT_DIALOG_DATA) public lookupData: any,
@@ -80,6 +81,8 @@ export class NewbuttonComponent implements OnInit {
     responseJson : new UntypedFormControl(''),
     allcolumnsFormOpening : new UntypedFormControl(''),
     IsReportBuilder : new UntypedFormControl(''),
+    Mandatory : new UntypedFormControl(''),
+
   });
 
   closeDialog(): void {
@@ -118,7 +121,7 @@ export class NewbuttonComponent implements OnInit {
 
     if (this.actionType == "update" || this.advancedSearchActionType=="update") {
       let decodedString='';
-      let data: { columnName: any; orderNo: any; groupId: any; columnId: any; };
+      let data: { columnName: any; orderNo: any; groupId: any; columnId: any;buttonMandatory: any; };
       if(this.isFromAdvancedSearchForm==false){
         console.log("DATA111111111111111111111");
 
@@ -165,6 +168,12 @@ export class NewbuttonComponent implements OnInit {
                 this.buttonForm.controls["buttonOrder"].setValue('');
                 this.buttonForm.controls["fieldSet"].setValue('');
                 this.buttonForm.controls["buttonId"].setValue('');
+                
+          }
+          if(data.buttonMandatory == '1'){
+            this.buttonForm.controls["Mandatory"].setValue(true);
+          }else{
+            this.buttonForm.controls["Mandatory"].setValue(false);
           }
           this.buttonForm.controls["Menus"].setValue(menuId);
           this.buttonForm.controls["ButtonAction"].setValue(ButtonAction);
@@ -212,6 +221,11 @@ export class NewbuttonComponent implements OnInit {
 
           if (ButtonAction == 8) {
             this.exportSelected=true;
+
+          }
+          
+          if (ButtonAction == 10) {
+            this.isDisplayAll=true;
 
           } 
       
@@ -437,23 +451,23 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm.status);
 console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
 
   if (this.buttonForm.status !== 'INVALID') {
-    console.log("11111111111111111111111");
    if (this.actionType === 'saveNew') {
-
-    console.log("222222222222222222222222");
 
       let buttonName = this.buttonForm.controls['buttonName']?.value;
       let buttonOrder = this.buttonForm.controls['buttonOrder']?.value;
       let fieldSet = this.buttonForm.controls['fieldSet']?.value;
       let isMainPreview = this.buttonForm.controls['isMainPreview']?.value;
       let buttonId = null;
-
+      let buttonMandatory='';
+      if(this.buttonForm.controls['Mandatory']?.value){
+        buttonMandatory = '1';
+      }else{
+        buttonMandatory = '0';
+      }
       let objectButtonIds = [];
 
       for (let i = 0; i < this.buttonActions.length; i++) {
         let buttonAction = this.buttonForm.controls[`ButtonAction${i}`]?.value;
-        console.log("333333333333333333333333");
-
         let objectButtonId = '';
         let selectedCols = '';
         let URL = '';
@@ -467,6 +481,7 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
         let jsonRequest='';
         let selectedColsFormOpening = '';
         let reportSelected='';
+        
         switch (buttonAction) {
           case 1:
             objectButtonId = this.buttonForm.controls['Menus']?.value;
@@ -548,6 +563,7 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
         "order": buttonOrder,
         "fieldSet": fieldSet,
         "createdBy": this.informationservice.getLogeduserId(),
+        "buttonMandatory":buttonMandatory,
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
     console.log("5555555555555555555555555");
@@ -586,6 +602,12 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       let jsonResponse='';
       let jsonRequest='';
       let objectButtonIds = [];
+      let buttonMandatory='';
+      if(this.buttonForm.controls['Mandatory']?.value){
+        buttonMandatory = '1';
+      }else{
+        buttonMandatory = '0';
+      }
 
       for (let i = 0; i < this.buttonActions.length; i++) {
         let buttonAction = this.buttonForm.controls[`ButtonAction${i}`]?.value;
@@ -690,6 +712,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         "fieldSet": fieldSet,
         "updatedBy": this.informationservice.getLogeduserId(),
         "buttonId": buttonId,
+        "buttonMandatory": buttonMandatory,
         "objectButtonId": `~N~${this.buttonActions.length}~N~|${objectButtonIds.join('|')}`
     };
 
@@ -766,7 +789,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
         const control = new UntypedFormControl('');
         this.buttonForm.addControl(`ButtonAction${i}`, control);
         this.buttonForm.addControl(`Menus${i}`, new UntypedFormControl(''));
-        this.buttonForm.addControl(`IsReportBuilder${i}`, new UntypedFormControl(false));
+      //  this.buttonForm.addControl(`IsReportBuilder${i}`, new UntypedFormControl(false));
         control.valueChanges.subscribe(value => this.onButtonActionChange(value, i));
       }
     }
@@ -778,7 +801,7 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       if (control.startsWith('ButtonAction') && controlIndex >= nbOfAction) {
         this.buttonForm.removeControl(control);
         this.buttonForm.removeControl(`Menus${controlIndex}`);
-        this.buttonForm.removeControl(`IsReportBuilder${controlIndex}`);
+       // this.buttonForm.removeControl(`IsReportBuilder${controlIndex}`);
       }
     });
   }
@@ -795,9 +818,9 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
     }else if (value === 5) {
 
       this.IsReportBuilder = true;
-      if (!this.IsReportBuilderArray.includes(index)) {
-        this.IsReportBuilderArray.push(index);
-      }
+      // if (!this.IsReportBuilderArray.includes(index)) {
+      //   this.IsReportBuilderArray.push(index);
+      // }
     }else if (value === 7) {
       this.FormOpeningSelected = true;
       this.Condition = true;
@@ -806,7 +829,11 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
       this.exportSelected=true;
     }
 
-
+    else if (value === 10) {
+      this.isDisplayAll=true;
+    }else if (value === 10) {
+      this.isDisplayAll=true;
+    }
     // if (value === 'IsReportBuilder') {
     //   if (!this.IsReportBuilderArray.includes(index)) {
     //     this.IsReportBuilderArray.push(index);

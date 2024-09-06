@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, forwardRef, Input, OnChanges, OnInit,ViewChild, Output, SimpleChanges, ViewEncapsulation, Renderer2, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, EventEmitter, forwardRef, Input, OnChanges, OnInit,ViewChild, Output, SimpleChanges, ViewEncapsulation, Renderer2, ElementRef } from '@angular/core';
 import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR, FormGroupDirective, NgForm, } from '@angular/forms';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
@@ -75,8 +75,44 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
     return this.parentForm.get(this.fieldName) as UntypedFormControl;
   }
 
+  private observer: MutationObserver;
+
   constructor(private http: HttpClient, private commonFunctions: CommonFunctions,
     private renderer: Renderer2, private el: ElementRef) { }
+
+    ngAfterViewInit() {
+      this.checkIfAtBottom();
+      this.initObserver();
+    }
+  
+    ngOnDestroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+    }
+
+    private checkIfAtBottom() {
+      const rect = this.el.nativeElement.getBoundingClientRect();
+      const threshold = window.innerHeight * 0.35;
+      const isAtBottom = window.innerHeight - rect.bottom < threshold;
+    
+      if (isAtBottom) {
+        this.renderer.addClass(this.el.nativeElement, 'bottom-dropdown');
+      } else {
+        this.renderer.removeClass(this.el.nativeElement, 'bottom-dropdown');
+      }
+    }
+  
+    private initObserver() {
+      this.observer = new MutationObserver(() => {
+        this.checkIfAtBottom();
+      });
+  
+      this.observer.observe(this.el.nativeElement, {
+        childList: true,
+        subtree: true
+      });
+    }
 
   ngOnInit(): void
   {

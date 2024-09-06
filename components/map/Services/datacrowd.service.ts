@@ -921,6 +921,10 @@ async MaptoMap(SimulID :any){
   let response= await this.httpClient.post<any>(this.ipAddress +"/api/MapToMap/"+SimulID, {headers: GlobalConstants.headers}).toPromise();
   return response; 
 }
+async BranchReport(BranchName :any){
 
+  let response= await this.httpClient.post<any>(this.ipAddress +"/api/BranchReport/"+BranchName, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
 
 }

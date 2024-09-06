@@ -99,7 +99,7 @@ export class ColumnModifierComponent implements OnInit {
     //   this.isLinkFlag = false;
     // }
 
-    this.columnType = GlobalConstants.getSysLinesDataWithIdsApi + 426 + "/" + "1,2,3,4,6,11,5,13,15,16,17,18,19";
+    this.columnType = GlobalConstants.getSysLinesDataWithIdsApi + 426 + "/" + "1,2,3,4,6,11,5,13,15,16,17,18,19,20";
     this.getAllColumns = GlobalConstants.getColumnsApi + this.objectId;
     this.getAllFieldSets = GlobalConstants.getAllFieldSetsApi + this.objectId;
 

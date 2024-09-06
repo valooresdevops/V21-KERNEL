@@ -91,11 +91,11 @@ export class VFileComponent implements ControlValueAccessor
     }
     else
     {
-      this.changed(base64Data);
-      // this.changed(formData);
+     // this.changed(base64Data);
+       this.changed(formData);
+
     }
   }
-
   // Write value to the file input
   public writeValue(value: string): void
   {

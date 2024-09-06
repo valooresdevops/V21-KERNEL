@@ -59,6 +59,17 @@
       <!-- (onChangeEvent)="onParamSelect($event)" -->
       <!-- ------------------------------------------- -->
       <div class="col-lg-4">
+        <v-toggle label="Has View" formControlName="hasView" [parentForm]="newTabForm" fieldName="hasView" (toggleChange)="hasViewChange()"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+        <v-input *ngIf="showViews" formControlName="formView" [parentForm]="newTabForm" type="lookup"
+        [lookupDataApi]="getViewList" lookupWidth="700px" lookupHeight="700px" label="View"
+        fieldName="formView">
+        </v-input>
+    </div>
+
+
+      <div class="col-lg-4">
         <v-toggle label="Is Title" formControlName="isDynamicTitleEnabled" [parentForm]="newTabForm" (toggleChange)="isTitleChange()"
             fieldName="isDynamicTitleEnabled"> </v-toggle>
     </div>

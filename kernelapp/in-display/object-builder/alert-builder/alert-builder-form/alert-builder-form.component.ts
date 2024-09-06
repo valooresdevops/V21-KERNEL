@@ -17,23 +17,35 @@ import { Title } from '@angular/platform-browser';
   styleUrl: './alert-builder-form.component.css'
 })
 export class AlertBuilderFormComponent implements OnInit {
-  getqueryData = GlobalConstants.getSourceQueryApi;
+  public getqueryData = GlobalConstants.getSourceQueryApi;
   public showFunctionality: boolean=false;
+
   @Input() existingImageData: string;
-  public functionalities: string[] = ['Functionality 1', 'Functionality 2', 'Functionality 3'];
+  // public functionalities: string[] = ['Functionality 1', 'Functionality 2', 'Functionality 3'];
   public userId = this.informationService.getLogeduserId();
   public qbe_id=this.informationService.getLookUpSubmitValue().name;
   public functionality = [{ id: 1, name: 'Generate Report'},{id: 2, name: 'Query'}];
-  public getGeneratedReport =GlobalConstants.getGeneratedReport;
-  uploadForm = new UntypedFormGroup({
+  public  getGeneratedReport =GlobalConstants.getGeneratedReport;
+  public selectedItems: any[] = [];
+  public multiple: boolean = true; // Adjust based on your requirement
+  public selectedValues: any[] = [];
+
+  public generatedReports: any[] = []; 
+  // public selectedItems: any[] = [];
+  //public formField: UntypedFormControl = new UntypedFormControl();
+  // uploadForm = new UntypedFormGroup({
    
-    title: new UntypedFormControl('', Validators.required), // New control for alert name
-    color: new UntypedFormControl('', Validators.required), // New control for alert color
-    functionality: new UntypedFormControl('', Validators.required), // New control for selecting functionality
-    qbe_id: new UntypedFormControl('', Validators.required) // Ensure this matches
-  });
+  //   title: new UntypedFormControl('', Validators.required),
+  //   color: new UntypedFormControl('', Validators.required), 
+  //   functionality: new UntypedFormControl('', Validators.required), 
+  //   qbe_id: new UntypedFormControl('', Validators.required),
+  //   report_id: new UntypedFormControl('')
+  // });
+  uploadForm: UntypedFormGroup;
+  
 
   isUpdate: boolean = false;
+  report_id: any;
 
   constructor(
     private fb: FormBuilder,
@@ -64,13 +76,44 @@ export class AlertBuilderFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.uploadForm = this.fb.group({
-      title: [this.dataa?.title || ''],
-    color: [this.dataa?.color || '#FFFFFF'], // Default to white if no color provided
-    functionality:new UntypedFormControl(''),
-    qbe_id: [null],
+      title: [this.dataa?.title || '', Validators.required],
+      color: [this.dataa?.color || '#FFFFFF', Validators.required],
+      functionality: [this.dataa?.functionality || '', Validators.required],
+      qbe_id: [this.qbe_id || '',],
+      report_id: [null]
     });
 }
 
+
+onReportChange(event: any): void {
+  console.log("ON REPORT CHANGE event:", event);
+  
+  const selectedReportId = event?.id; 
+  if (selectedReportId) {
+    this.uploadForm.get('report_id')?.setValue(selectedReportId);
+    console.log('Selected Report ID:', selectedReportId);
+  }
+}
+
+onItemSelect(items: any[]) {
+  if (!items) {
+    console.error("No items selected or items is undefined.");
+    return;
+  }
+
+  this.selectedItems = items;
+  console.log("Selected Items:", this.selectedItems);
+
+  if (this.selectedItems.length > 0) {
+    if (this.multiple) {
+      this.selectedValues = this.selectedItems.map(item => item.id);
+    } else {
+      this.selectedValues = [this.selectedItems[0].id];
+    }
+
+    console.log("Selected Values:", this.selectedValues);
+  }
+}
 
 
   // populateForm(dataa: any): void {
@@ -98,6 +141,7 @@ export class AlertBuilderFormComponent implements OnInit {
   async onSubmit() {
 
     console.log("qbe_id>>>>>>>>>>>>>>>>>",this.qbe_id);
+    console.log("report_id>>>>>>>>>>>>>>>>",this.report_id);
     if (this.uploadForm.valid) {
       const currentDateISO = new Date().toISOString();
     // Convert to desired format: '2024-08-28 14:30:00'
@@ -108,6 +152,7 @@ export class AlertBuilderFormComponent implements OnInit {
         color: this.uploadForm.get('color')?.value, // Add alert color
         functionality: this.uploadForm.get('functionality')?.value, 
         qbe_id: localStorage.getItem("agGidSelectedLookup_(query)_id"),// Add functionality selection
+        report_id: this.uploadForm.get('report_id')?.value,
         username:this.userId,
         creation_date:currentDate
       };
@@ -141,12 +186,30 @@ export class AlertBuilderFormComponent implements OnInit {
   onCancel() {
     this.dialogRef.close();
   }
+
+  // onReportChange(event: any): void {
+  //   console.log("ON REPORT CHANGE>>>>");
+  //   console.log("EVENT>>>>>>>>>>",event);
+  //   // Assuming the event contains the selected report object with an 'id' property
+  //   const selectedReportId = event?.id; // Adjust this based on your event structure
+  //   if (selectedReportId) {
+  //     this.uploadForm.get('report_id')?.setValue(selectedReportId); // Update the form control
+  //     console.log('Selected Report ID:', selectedReportId); // Debug log
+  //   }
+  // }
   showFunctionalityJsons(){
          let functionality = this.uploadForm.controls['functionality']?.value;
          switch (functionality) {
           case 1:
           this.showFunctionality = true;
           break;
+          case 2:
+this.showFunctionality=false;
+          break;
          }
+  }
+  
+  onSelectionChange() {
+    // Handle selection change logic here
   }
 }

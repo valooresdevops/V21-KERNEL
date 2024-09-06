@@ -138,7 +138,7 @@ this.agColumns.push(this.agColumnsJson);
       });
     }
   }
-  Insert() {
+  async Insert() {
 
     console.log("insert entereddddd>>>>>>>>>>>>>>>>>>>>>>>");
     // Check if any alert is selected in the grid
@@ -155,14 +155,14 @@ this.agColumns.push(this.agColumnsJson);
   
       console.log("DIALOG REF OPEN>>>>>>>>");
       // Open dialog to manage object size
-      const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
-        data: "alert", // Pass 'alert' to indicate this is for alert management
-        width: '40%',
-        height: '33%',
-      });
+      // const dialogRef = this.dialog.open(ObjectSizeManagerPopupComponent, {
+      //   data: "alert", // Pass 'alert' to indicate this is for alert management
+      //   width: '40%',
+      //   height: '33%',
+      // });
   
-      dialogRef.afterClosed().subscribe(async result => {
-        // Prepare data to send to the backend
+      // dialogRef.afterClosed().subscribe(async result => {
+      //   // Prepare data to send to the backend
         let allData = {
           alertId: alertId,  // Use 'alertId' instead of 'chartId'
           templateId: templateId
@@ -191,9 +191,9 @@ this.agColumns.push(this.agColumnsJson);
         // Refresh the page and navigate back to the dashboard
         // this.commonFunctions.reloadPage('/dashboard');
         // this.commonFunctions.navigateToPage('/dashboard');
-      });
+      };
     }
   }
     
 
-}
+

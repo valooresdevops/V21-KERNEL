@@ -17,6 +17,7 @@ export class AddressbookComponent implements OnInit {
   public agGridSelectedNodes: any = '';
   public comboDatasource = [{}];
   subsVar: Subscription;
+  public getData = GlobalConstants.getAddressBookData;
 
  // Update Form Variables
  // public getUSMUsersApi: any = GlobalConstants.fetchUSMUsersApi;
@@ -33,10 +34,10 @@ export class AddressbookComponent implements OnInit {
   ngOnInit(): void {
     this.agColumnsJson = [
       { headerName: '',field: '',checkboxSelection: true,width: '25px', headerCheckboxSelection: true },
-      { headerName: 'Code',field: 'code', filter: 'agTextColumnFilter' },
-      { headerName: 'Address Book Email',field: 'addrbookemail', filter: 'agTextColumnFilter' },
-      { headerName: 'Short Description',field: 'desc', filter: 'agTextColumnFilter' },
-      { headerName: 'Related BP',field: 'relatedbp', filter: 'agTextColumnFilter' },
+      { headerName: 'Code',field: 'addrbookid', filter: 'agTextColumnFilter' },
+      { headerName: 'Address Book Email',field: 'email', filter: 'agTextColumnFilter' },
+      { headerName: 'Short Description',field: 'shortdesc', filter: 'agTextColumnFilter' },
+      { headerName: 'Related BP',field: 'relatedbpcount', filter: 'agTextColumnFilter' },
     ];
     this.agColumns.push(this.agColumnsJson);
     

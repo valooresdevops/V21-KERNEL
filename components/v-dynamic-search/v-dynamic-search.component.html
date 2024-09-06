@@ -12,6 +12,8 @@
           (onChangeEvent)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
           class="dropdown-hover"
         ></v-dropdown>
+        <!-- [disabled]="fields.isMandatory==='1' ? true : false" -->
+
       </div>
 
       <div class="col-md-2">
@@ -23,6 +25,8 @@
           [parentForm]="dynamicSearchForm"
           (change)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
         ></v-dropdown>
+        <!-- [disabled]="fields.isMandatory==='1' ? true : false" -->
+
       </div>
 
       <div class="col-md-2">

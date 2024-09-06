@@ -517,6 +517,41 @@
                 [dataJSON]="actionDecisions" id="step_1" label="Action" [parentForm]="form_onAfterSave"
                 fieldName="step_1"></v-dropdown>
         </div>
+        <div class="col-lg-12" *ngIf="ApiSelected1">
+            <v-dropdown formControlName="url" [dataApi]="getApiBuilderListDropDown" label="APIs" placeholder=""
+                [parentForm]="form_onAfterSave" fieldName="url" (onChangeEvent)="showApiJsons()">
+            </v-dropdown>
+        </div>
+
+
+        <div class="col-lg-12" *ngIf="showApiBuilderJson">
+            <v-input formControlName="requestJson" type="textarea" label="Request Json" placeholder=""
+            [parentForm]="form_onAfterSave" fieldName="requestJson" [readonly]="true">
+        </v-input>
+        </div>
+        <div class="col-lg-12" *ngIf="showApiBuilderJson">
+            <v-input formControlName="responseJson" type="textarea" label="Response Json" placeholder=""
+            [parentForm]="form_onAfterSave" fieldName="responseJson" [readonly]="true">
+        </v-input>
+        </div>
+
+        <div class="col-lg-12" *ngIf="showApiBuilderJson">
+        <div style="position:flex">
+        <v-button btnType="form" value="Json Request Relation" (click)="openRelationRequestPopup()" class="submit-button"></v-button>
+        <v-button btnType="form" value="Json Response Relation" (click)="openRelationResponsePopup()" class="submit-button"></v-button>
+    </div>    
+    </div>
+
+
+
+
+
+
+
+
+
+
+
         <div class="col-lg-12 step_8">
             <v-dropdown formControlName="step_8" [dataApi]="AllMenus" label="Menus" placeholder=""
                 [parentForm]="form_onAfterSave" fieldName="step_8"  id="step_8">

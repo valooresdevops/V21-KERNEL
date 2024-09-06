@@ -371,15 +371,14 @@ export class Usermanagementform implements OnInit {
     var confirmPassword = this.userForm.get('confirmNewPassword').value;
     var oldPassword = this.userForm.get('oldPassword').value;
     var password = this.userForm.get('password').value;
-
+    console.log("USERFORM>>>>>>>>>>>>",this.userForm);
     if (this.userForm.status != 'INVALID') {
       if (this.actionType == 'create') {
         if (newPassword == confirmPassword) {
           const formData = new FormData();
 
           if (this.userForm.get('media').value.get('media') != '') {
-            formData.append('media', this.userForm.get('media').value.get('media')
-            );
+          formData.append('media', this.userForm.get('media').value.get('media'));
           } else {
             var f = new File(['dummyFile'], 'DummyTxtFile.txt', {
               type: 'text/plain',
@@ -414,7 +413,7 @@ export class Usermanagementform implements OnInit {
           formData.append('pwdExpPrdNbr', this.userForm.get('passwordExpiresPeriodNbr').value);
           formData.append('pwdExpPrd', this.userForm.get('passwordExpiresPeriodically').value);
           formData.append('pwdExpDate', this.datepipe.transform(this.userForm.get('passwordExpires').value, 'MM-dd-YYYY'));
-
+            console.log("FORM DATA>>>>>>>>>>",formData);
           const addUSMUser = from(axios.post(GlobalConstants.addUSMUserApi, formData));
           const addUSMUserUrl = await lastValueFrom(addUSMUser);
           let res = addUSMUserUrl.data;

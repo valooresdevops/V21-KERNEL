@@ -246,6 +246,10 @@ export class GlobalConstants {
 
   // --------------------------------------------------------------------------------
   // -- WFM APIs used in the application
+
+  public static getVacationCoverageData = GlobalConstants.wfmGatewat + 'api/getVacationCoverageData';
+  public static getAddressBookData = GlobalConstants.wfmGatewat + 'api/getAddressBookData';
+  public static getHyperLinksData = GlobalConstants.wfmGatewat + 'api/getHyperLinksData';
   // --------------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------------
@@ -344,6 +348,9 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static checkIfAdvancedSearchHasFunction = GlobalConstants.inDispGatewat +'api/checkIfAdvancedSearchHasFunction/';
   public static getSearchButtonFunctionData = GlobalConstants.inDispGatewat +'api/getSearchButtonFunctionData/';
   public static buildSearchJsonForApi = GlobalConstants.inDispGatewat +'api/buildSearchJsonForApi/';
+  public static fetchColumnAndViewData = GlobalConstants.inDispGatewat +'api/fetchColumnAndViewData/';
+  public static getViewList = GlobalConstants.inDispGatewat +'api/getViewList/';
+  public static checkViewExists = GlobalConstants.inDispGatewat +'api/checkViewExists/';
 
   
   
@@ -464,10 +471,20 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateAlertsDataApi = GlobalConstants.inDispGatewat + 'api/updateAlertsData/';
   public static insertAlertsDataApi = GlobalConstants.inDispGatewat + 'api/insertAlertsData/';
   public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
+  public static getAlertsFunctionality = GlobalConstants.inDispGatewat + 'api/getAlertsFunctionality';
+
+
   public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
   public static getHtmlElementData = GlobalConstants.inDispGatewat +'api/getHtmlElementData/';
   public static editCkEditorSize = GlobalConstants.inDispGatewat + 'api/updateSizeCkEditor/';
   public static getGeneratedReport = GlobalConstants.inDispGatewat + 'api/getGeneratedReport';
+  public static getGeneratedReportBlob = GlobalConstants.inDispGatewat + 'api/getGeneratedReportBlob';
+  public static getGeneratedReportById = GlobalConstants.inDispGatewat + 'api/getGeneratedReportById';
+  public static LatestReports = GlobalConstants.inDispGatewat + 'api/LatestReports';
+
+
+  
+
 
 
 

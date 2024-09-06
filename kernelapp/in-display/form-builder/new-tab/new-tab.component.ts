@@ -38,6 +38,7 @@ export class NewTabComponent implements OnInit {
   public isAMLoad: any;
 
   public isQueryForm: any;
+  public hasView:any;
   public isRowGroup: any;
   public hasMultipleSelection: any;
   public isDynamicReport: any;
@@ -54,10 +55,11 @@ export class NewTabComponent implements OnInit {
   showAddSearchProcedure:any;
   showIsRowGroupHidden:any;
   showQueryFormButtonCombo:any;
+  showViews:any;
   public getAllProcAndPack: string = '';
   public getAllColumns: any;
   public getAllButtonsUnderObject='';
-
+  public getViewList=GlobalConstants.getViewList;
   
   queryFormpossibleButtons:any[]=[{id:'1',name:'Save'},{id:'2',name:'Execute'},{id:'3',name:'Rule'}];
 
@@ -71,11 +73,13 @@ export class NewTabComponent implements OnInit {
     isTreeGrid: new UntypedFormControl(''),
     isAMLoad: new UntypedFormControl(''),
     isQueryForm: new UntypedFormControl(''),
+    hasView: new UntypedFormControl(''),
     hasMultipleSelection: new UntypedFormControl(''),
     isDynamicReport: new UntypedFormControl(''),
     readOnlyQbeId: new UntypedFormControl(''),
     isAdvancedSearch: new UntypedFormControl(''),
     sourceQuery: new UntypedFormControl(''),
+    formView: new UntypedFormControl(''),
     canAdd: new UntypedFormControl(''),
     canDelete: new UntypedFormControl(''),
     canModify: new UntypedFormControl(''),
@@ -297,6 +301,8 @@ console.log('data--------->',data)
   submitForm() {
     if (this.newTabForm.status != "INVALID") {
       let sourceQuery = this.newTabForm.controls['sourceQuery']?.value;
+      let formView = this.newTabForm.controls['formView']?.value;
+
         let canAdd = this.newTabForm.controls['canAdd']?.value;
         let canDelete = this.newTabForm.controls['canDelete']?.value;
         let canModify = this.newTabForm.controls['canModify']?.value;
@@ -330,6 +336,9 @@ console.log('data--------->',data)
         if(sourceQuery == ""){
           sourceQuery = null;
         }
+        if(formView == ""){
+          formView = null;
+        }
         if(readOnlyQbeId == undefined){
           readOnlyQbeId = 0;
         }
@@ -344,6 +353,7 @@ console.log('data--------->',data)
           isAMLoad: this.newTabForm.controls['isAMLoad']?.value,
           hasMultipleSelection: this.newTabForm.controls['hasMultipleSelection']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          hasView: this.newTabForm.controls['hasView']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
           IsRowGroupHidden: this.newTabForm.controls['IsRowGroupHidden']?.value,
           isFormFlip: this.newTabForm.controls['isFormFlip']?.value,
@@ -356,6 +366,7 @@ console.log('data--------->',data)
           isReadOnly: isReadOnly,
           isAdvancedSearch: this.newTabForm.controls['isAdvancedSearch']?.value,
           sourceQuery: sourceQuery,
+          formView:formView,
           canAdd: canAdd,
           canDelete: canDelete,
           canModify: canModify,
@@ -377,6 +388,7 @@ console.log('data--------->',data)
         this.isTreeGrid = this.newTabForm.controls['isTreeGrid']?.value;
         this.hasMultipleSelection = this.newTabForm.controls['hasMultipleSelection']?.value;
         this.isQueryForm = this.newTabForm.controls['isQueryForm']?.value;
+        this.hasView = this.newTabForm.controls['hasView']?.value;
         this.isRowGroup = this.newTabForm.controls['isRowGroup']?.value;
         this.isDynamicReport = this.newTabForm.controls['isDynamicReport']?.value;
         this.isAMLoad = this.newTabForm.controls['isAMLoad']?.value;
@@ -413,6 +425,7 @@ console.log('data--------->',data)
           isTreeGrid: this.newTabForm.controls['isTreeGrid']?.value,
           isAMLoad: this.newTabForm.controls['isAMLoad']?.value,
           isQueryForm: this.newTabForm.controls['isQueryForm']?.value,
+          hasView: this.newTabForm.controls['hasView']?.value,
           isRowGroup: this.newTabForm.controls['isRowGroup']?.value,
           IsRowGroupHidden:this.newTabForm.controls['IsRowGroupHidden']?.value, 
           fieldGrouping: this.newTabForm.controls['fieldGrouping']?.value,
@@ -424,6 +437,7 @@ console.log('data--------->',data)
           isReadOnly: isReadOnly,
           isAdvancedSearch: this.newTabForm.controls['isAdvancedSearch']?.value,
           sourceQuery: sourceQuery,
+          formView:formView,
           dynamicTitleName: dynamicTitleName,
           canAdd: canAdd,
           canDelete: canDelete,
@@ -482,6 +496,7 @@ console.log('data--------->',data)
         this.newTabForm.controls['orderField'].setValue(res[0].orderNo);
 
         this.newTabForm.controls['sourceQuery'].setValue(res[0].sourceQuery);
+        this.newTabForm.controls['formView'].setValue(res[0].formView);
 
         this.newTabForm.controls['canAdd'].setValue(res[0].canAdd);
 
@@ -586,6 +601,19 @@ console.log('data--------->',data)
 
 
         }
+        if (res[0].hasView == "0") {
+          this.newTabForm.controls['hasView'].setValue(false);
+          this.showViews=false;
+          this.newTabForm.controls['formView'].setValue('');
+
+        } else {
+          this.newTabForm.controls['hasView'].setValue(true);
+          this.showViews=true;
+                   this.newTabForm.controls['formView'].setValue(res[0].formView);
+
+
+
+        }
         // if (res[0].isReadOnly == "0") {
         //   this.newTabForm.controls['isReadOnly'].setValue(false);
         // } else {
@@ -615,6 +643,7 @@ console.log('data--------->',data)
         this.commonFunctions.handleLookupElem("canDelete", this.newTabForm);
         this.commonFunctions.handleLookupElem("sourceQuery", this.newTabForm);
         this.commonFunctions.handleLookupElem("readOnlyQbeId", this.newTabForm);
+       // this.commonFunctions.handleLookupElem("formView", this.newTabForm);
 
         res.objectId = this.objectId;
 
@@ -631,12 +660,18 @@ console.log('data--------->',data)
   isQueryFormChange(){
     if(this.newTabForm.get('isQueryForm').value==true){
       this.showQueryFormButtonCombo=true;
-      //this.newTabForm.controls['isQueryFormSelectedButtons'].setValue('');
     }else{
       this.showQueryFormButtonCombo=false;
     }
   }
-
+  hasViewChange(){
+      if(this.newTabForm.get('hasView').value==true){
+        this.showViews=true;
+      }else{
+        this.showViews=false;
+      }
+  
+  }
   isRowGroupChange(){
     
     if(this.newTabForm.get('isRowGroup').value==true){
