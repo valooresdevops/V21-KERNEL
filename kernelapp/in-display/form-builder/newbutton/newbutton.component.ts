@@ -231,7 +231,6 @@ export class NewbuttonComponent implements OnInit {
           if(ButtonAction == 11) {
             this.buttonForm.controls["url"].setValue(decodedString.split("~A~")[3]);
             this.buttonForm.controls["allColumns"].setValue(decodedString.split("~A~")[2])
-
             this.ApiSelected = false;
             this.ApiSelected1 = true;
             this.FormOpeningSelected = false;
@@ -844,7 +843,11 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
     }else if (value === 3) {
       this.ApiSelected1 = true;
 
-    }else if (value === 5) {
+    }
+  else if (value === 11) {
+    this.ApiSelected1 = true;
+
+  }else if (value === 5) {
 
       this.IsReportBuilder = true;
       // if (!this.IsReportBuilderArray.includes(index)) {

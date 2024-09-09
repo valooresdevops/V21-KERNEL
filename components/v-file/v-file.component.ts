@@ -45,7 +45,7 @@ export class VFileComponent implements ControlValueAccessor
   @Input() public hasSuspendedStyle: boolean = false;
   @Input() public readonly: any;
   @Input() public fileClass : any = -1;
-  @Input() public maxLength: number ; 
+  @Input() public maxLength: number=10000000000 ; 
 
   @Output() fileSelected = new EventEmitter<File>();
 
@@ -56,7 +56,7 @@ export class VFileComponent implements ControlValueAccessor
   }
 
   constructor(private renderer: Renderer2) { if(this.required){
-    alert(111111);
+    //alert(111111);
   }else{console.log("nooo")}
   }
 

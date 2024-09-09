@@ -77,11 +77,9 @@ export class InformationService {
   public advancedSearchShowGrid : boolean = false;
   public advancedSearchShowGridMain:boolean=true;
   public isDisplayAll:boolean=false;
-  public breakLiveDataBar: any;
-  public breakLiveDataLine: any;
-  public breakLiveDataArea: any;
-  public breakLiveDataColumn: any;
+  public breakLiveData: boolean = true;
   public formRecentData : any[] =[];
+  public isFromMainPreviewForm: any;
 
   constructor() { }
 
@@ -701,33 +699,13 @@ getIsDisplayALL() {
   return this.isDisplayAll;
 }
 
-getBreakLiveDataBar(){
-  return this.breakLiveDataBar;
+getBreakLiveData(){
+  return this.breakLiveData;
 }
-setBreakLiveDataBar(breakLiveDataBar:any){
-  this.breakLiveDataBar = breakLiveDataBar;
-}
-
-getBreakLiveDataLine(){
-  return this.breakLiveDataLine;
-}
-setBreakLiveDataLine(breakLiveDataLine:any){
-  this.breakLiveDataLine = breakLiveDataLine;
+setBreakLiveData(breakLiveData:boolean){
+  this.breakLiveData = breakLiveData;
 }
 
-getBreakLiveDataArea(){
-  return this.breakLiveDataArea;
-}
-setBreakLiveDataArea(breakLiveDataArea:any){
-  this.breakLiveDataArea = breakLiveDataArea;
-}
-
-getBreakLiveDataColumn(){
-  return this.breakLiveDataColumn;
-}
-setBreakLiveDataColumn(breakLiveDataColumn:any){
-  this.breakLiveDataColumn = breakLiveDataColumn;
-}
 
 setFormRecentData(formRecentData: any[]) {
   this.formRecentData = formRecentData;
@@ -736,5 +714,11 @@ setFormRecentData(formRecentData: any[]) {
 getFormRecentData() {
   return this.formRecentData;
 }
+setIsFromMainPreviewForm(isFromMainPreviewForm: any) {
+  this.isFromMainPreviewForm = isFromMainPreviewForm;
+}
 
+getIsFromMainPreviewForm() {
+  return this.isFromMainPreviewForm;
+}
 }

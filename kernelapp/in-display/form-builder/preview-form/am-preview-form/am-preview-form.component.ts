@@ -1,7 +1,7 @@
 import { DatePipe, ɵNullViewportScroller } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, Input, NgZone, OnInit, Renderer2 ,Optional, ViewEncapsulation} from '@angular/core';
-import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Subscription, from, lastValueFrom, map } from 'rxjs';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
@@ -150,6 +150,7 @@ public hasSourceQuery:any;  // maxFileSize: number = 5 * 1024 * 1024; // 5MB in 
   public ruleCallApiData:any=[];
   public getFieldDynamicTitle:any;
   public getFieldDynamicTitleValue: string = '';
+  public submitGridData :number = 0;
 
   constructor(@Optional() private dialogRef: MatDialogRef<AmPreviewFormComponent>,
     @Optional() @Inject(MAT_DIALOG_DATA) public lookupData: any,
@@ -680,9 +681,7 @@ this.informationservice.removeSelectedColumnFormOpening();
   async dynamicDRBOnBeforeSave(objectId: number) {
     try {
       this.canProceedWithSave = true;
-      const control = this.dynamicForm.get('MEDIA_PATH');
-const maxLength = control?.value?.length; // Log the actual length of the file data
-console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
+
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/3/0";
       const dynamicDRBOnBeforeSaveUrl = from(axios.post(url));
       const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
@@ -1735,6 +1734,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
     },100);
     setTimeout(()=>{
       this.showGrid = true;
+      this.informationservice.setAdvancedSearchShowGrid(true);
     },100);
 }
               }
@@ -4464,7 +4464,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                      }else{
                       this.dynamicForm.removeControl(defaultField);
                       // this.dynamicForm.addControl(defaultField, new UntypedFormControl('', [this.maxFileSizeAndLength(5)]));
-                      this.dynamicForm.addControl(defaultField, new UntypedFormControl(''));
+                      this.dynamicForm.addControl(defaultField,new UntypedFormControl(''));
 
                       data[0].query = [];
                       this.cdr.detectChanges();
@@ -5776,7 +5776,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
           }
         }
 
-        this.hiddenForm.addControl("hidden_" + getAllTabs.data[i].menuName + "_objId", new UntypedFormControl(''));
+        this.hiddenForm.addControl("hidden_" + getAllTabs.data[i].menuName + "_objId",new UntypedFormControl(''));
         this.hiddenForm.controls["hidden_" + getAllTabs.data[i].menuName + "_objId"].setValue(getAllTabs.data[i].objectId);
 
         // Handling Read Only under Tab with Parameters
@@ -5949,7 +5949,6 @@ console.log("ruleAction >>>>>>>=",ruleAction)
   }
 
   async ngOnInit(): Promise<void> {
-    this.informationservice.setAdvancedSearchShowGrid(false);
     // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
@@ -6377,9 +6376,16 @@ const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigura
       console.log("7777777777777777777777");
 
     }
-    if(this.amInfo.buttonClick==14 && this.amInfo.isFromButtonClick==undefined && this.informationservice.getSelectedColumnFormOpening() != undefined){
+    //////////////BWE\\\\\\\\\\\\\\\
+    if(this.amInfo.isFromButtonClick==undefined && this.amInfo.buttonClick==14 && getTabConfigurationApi.data[0].isGrid==0  && this.amInfo.isFromGridClick==0 && this.amInfo.actionType=="update"){
+      isGrid=0;
+      console.log("TTTTESTTTTTTT");
+
+    }else if(this.amInfo.buttonClick==14 && this.amInfo.isFromButtonClick==undefined && this.informationservice.getSelectedColumnFormOpening() != undefined){
+      console.log("Transformed to Save New");
       this.actionType = 'saveNew';
     }
+  
     this.isPageGrid = isGrid == 1 ? true : false;
     console.log("888888888888888888888");
 
@@ -6953,7 +6959,7 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
 
           // Append field to dynamicForm
           //add Validators.email
-          this.dynamicForm.addControl(data_0[i].name, new UntypedFormControl('')) // Adjust maxSizeMB as needed;
+          this.dynamicForm.addControl(data_0[i].name,  new UntypedFormControl('')) // Adjust maxSizeMB as needed;
 
           // Handle basic standard columns automatically
           if (data_0[i].name == "UPDATE_DATE") {
@@ -7195,13 +7201,21 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
           const getDynamicReportData = await lastValueFrom(getDynamicReportDataUrl);
           dataa = getDynamicReportData.data;
         }else{
+
+          try{
+          console.log("IS GETTING FORM DATA");
+          console.log("JSON VAL>>>>>>>>>>>>>>",jsonVal);
           const getDynamicFormDataUrl = from(axios.post(GlobalConstants.getDynamicFormData, jsonVal));
           const getDynamicFormData = await lastValueFrom(getDynamicFormDataUrl);
           dataa = getDynamicFormData.data;
+          }catch(error){
+            console.log("ERROR>>>>>>>>",error);
+            dataa=this.amInfo.selectedRowId.form;
+          }
         }
 
        
-//let jsonData1='[';
+let jsonData1='[';
 let count = 0;
         for (let i = 0; i < dataa.length; i++) {
           this.loaderService.isLoading.next(true);
@@ -7209,15 +7223,15 @@ let count = 0;
           let colValue = dataa[i].colValue;
           let colType = dataa[i].colType;
 
-          // if(this.listOfHeaders.some(header => header.name === colName)){
-          //   // if(count == 0){
-          //   //   jsonData1 +="{\""+colName+"\":"+colValue; 
-          //   //   count = 1;
-          //   // }else{
-          //   //   jsonData1 +=",\""+colName+"\":"+colValue; 
-          //   // }
+          if(this.listOfHeaders.some(header => header.name === colName)){
+            if(count == 0){
+              jsonData1 +="{\""+colName+"\":"+colValue; 
+              count = 1;
+            }else{
+              jsonData1 +=",\""+colName+"\":"+colValue; 
+            }
 
-          // }
+          }
           // Remove time from date value
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
@@ -7350,13 +7364,14 @@ let count = 0;
                   }
           this.loaderService.isLoading.next(false);
         }
-       // jsonData1 +="}]"
-      //  console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
-        //  this.gridStaticValue=JSON.parse(jsonData1);
-        setTimeout(()=>{
-        this.showGrid=false;
-        },100);
-          this.showGrid = true;
+        jsonData1 +="}]"
+       console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
+      this.gridStaticValue=JSON.parse(jsonData1);
+      if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
+        this.showGrid = true;
+        this.informationservice.setAdvancedSearchShowGrid(true);
+      }
+        
 
           this.loadFieldDependencyForForm();
 
@@ -7497,7 +7512,7 @@ let count = 0;
 
         if (this.dynamicForm.get(currentFieldName)) {
           this.dynamicForm.removeControl(currentFieldName);
-          this.dynamicForm.addControl(currentFieldName, new UntypedFormControl('')) // Adjust maxSizeMB as needed);
+          this.dynamicForm.addControl(currentFieldName,  new UntypedFormControl('')) // Adjust maxSizeMB as needed);
 
           if (value == null || value == 'null' || value == 'empty') {
             value = '';
@@ -7761,13 +7776,7 @@ console.log('COLUMN_ID--------------------->',data[i])
     }
     console.log("BUTTON PASSED>>>>>>>>>",buttonPassed);
     if(buttonPassed){
-      const control = this.dynamicForm.get('MEDIA_PATH');
-const maxLength = control?.value?.length; // Log the actual length of the file data
-console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
-      console.log("this.dynamicForm>>>>>>",this.dynamicForm);
-      console.log("this.isPageGrid>>>>>>",this.isPageGrid);
-      console.log("data1:::::::::::::::::" ,data1);
-      console.log("data1.blobFile>>>>>>>>",data1.blobFile)
+
     if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
       
       let splitedString = decodedString.split("|");
@@ -8045,9 +8054,24 @@ console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
           }
         }
 
+      //   const invalidControls:any[] = [];
 
+      //   Object.keys(this.dynamicForm.controls).forEach(key => {
+      //     const control = this.dynamicForm.get(key);
+          
+      //     if (control instanceof UntypedFormControl && control.invalid) {
+      //       invalidControls.push(key);
+      //     } else if ((control instanceof UntypedFormGroup || control instanceof UntypedFormArray) && control.invalid) {
+      //       invalidControls.push(key);
+      //     }
+      //   });
+      //   console.log("IVALID FORM CONTROLS>>>>>>>",invalidControls);
+      //   console.log("DYNAMIC FORM>>>>>>>>>>>",this.dynamicForm);
+      //   console.log("REVERSE IS PAGE GRID>>>>>>",!this.isPageGrid);
+      //  console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+        //this.dynamicForm.get("MEDIA_PATH").markAsDirty();
         if (this.dynamicForm.status == "INVALID" && !this.isPageGrid) {
-          console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+
           this.commonFunctions.alert("alert", "Please fill in mandatory fields");
         } else {
           this.http.post(GlobalConstants.callProcedure, obj).subscribe((data: any) => {
@@ -8062,9 +8086,9 @@ console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
 
 
 console.log("dynamicFormStatus>>>>>>>", this.dynamicForm);
-const control = this.dynamicForm.get('MEDIA_PATH');
-const maxLength = control?.value?.length; // Log the actual length of the file data
-console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
+// const control = this.dynamicForm.get('MEDIA_PATH');
+// const maxLength = control?.value?.length; // Log the actual length of the file data
+// console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
         let formData = this.dynamicForm.value;
         if (this.gridStaticValue != undefined) {
           const gridData = this.gridStaticValue[0];
@@ -8346,12 +8370,8 @@ let dataa:any=[];
 
         this.gridStaticValue=dataa.grid;
 if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
-  setTimeout(()=>{
-    this.showGrid=false;
-    },100);
-    setTimeout(()=>{
       this.showGrid = true;
-    },100);
+      this.informationservice.setAdvancedSearchShowGrid(true);
 }
         
       }
@@ -8407,6 +8427,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
         
         console.log("FORM CONTROLS ARRAY>>>>>>>>>>>>",formControlsArray);
         let jsonarray:any[]=[];
+        let jsonarrayToBeSent:any[]=[];
 
 
 
@@ -8428,9 +8449,10 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
 
               if(fetchColumnAndViewData.data[i].colName==checkParameters.data[j].paramName){
                 jsonarray.push({colName:fetchColumnAndViewData.data[i].colName,colVal:fetchColumnAndViewData.data[i].colVal});
-              }else{
-                jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
-              }
+               }
+              //  else{
+              //    jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
+              //  }
             }
           }
 
@@ -8441,17 +8463,30 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           for(let j=0;j<checkParameters.data.length;j++){
             if(formControlsArray[i].key==checkParameters.data[j].paramName){
               jsonarray.push({colName:formControlsArray[i].key,colVal:formControlsArray[i].value});
-            }else{
-              jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"802660"});
-            }
+
+            // else{
+            //   jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
+            // }
           }
+
         }
 
       }
+      console.log("JSON ARRAY>>>>>>",jsonarray);
+      let z=0;
+      for(let i=0;i<checkParameters.data.length;i++){
+        if(JSON.stringify(jsonarray).includes(checkParameters.data[i].paramName)){
+          jsonarrayToBeSent.push({colName:jsonarray[z].colName,colVal:jsonarray[z].colVal});
+          z++;
+        }
+        else{
+          jsonarrayToBeSent.push({colName:checkParameters.data[i].paramName,colVal:"1"});
 
-
+        }
+      }
+      console.log("ARRAY TO BE SENT>>>>>>>>>",jsonarrayToBeSent);
         let jsonParams = {
-          columns: jsonarray
+          columns: jsonarrayToBeSent
         };
 
 
@@ -8539,7 +8574,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
   
      
 
-
+        }
 
 
       }
@@ -8724,7 +8759,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
               jsonArr += "},";
             }
           }
-          //console.log("hommmmmmmmm2 >>>>>>");
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForApi = jsonArr;
         }
@@ -8796,6 +8830,8 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
 
   showTheGridIntoForm() {
     if (this.listOfHeaders.length > 0) {
+      //this.showGrid = true;
+      //this.informationservice.setAdvancedSearchShowGrid(true);
       this.agColumnsJson = [];
       this.agColumnsJson.push(
         {
@@ -8813,7 +8849,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           for (let t = 0; t < this.listOfHeaders[i].query.length; t++) {
             let item = {
               id: this.listOfHeaders[i].query[t].ID,
-              name: this.listOfHeaders[i].query[t].NAME
+              // name: this.listOfHeaders[i].query[t].NAME
             };
             lastvalue.push(item);
           }
@@ -8851,13 +8887,36 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
   }
 
   gridEventSave(event: any) {
+    console.log('event>>>>>>>>',event);
     this.LastObject = [];
     const addList = event[0].addList;
+    console.log('addList>>>>>>>>',addList);
+
     this.addList = JSON.stringify(addList);
     this.LastObject = JSON.parse(this.addList);
-  }
+    console.log('LastObject>>>>>>>>',this.LastObject);
 
+  }
+  generateFinalResult = (jsonData: any[], lastObject: any[]) => {
+    return jsonData.map(table => {
+        // Filter columns for the current table based on the lastObject
+        const filteredColumns = lastObject.flatMap(entry => 
+            table.columns.filter((column:any) => column.colName in entry).map((column:any) => ({
+                ...column,
+                colValue: entry[column.colName]
+            }))
+        );
+
+        // Collect the result for the current table
+        return {
+            tableName: table.tableName,
+            orderNo: table.orderNo,
+            columns: filteredColumns
+        };
+    }).filter(table => table.columns.length > 0); // Remove tables with no columns
+};
   async submitForm() {
+    this.submitGridData++;
 console.log("HONEEE333333333333");
     let ProbInGridIntoForm: any = 0;
     if(this.tableOptionTemp[0].isDynamicReport!='1'){
@@ -8882,27 +8941,27 @@ console.log("HONEEE333333333333");
     const imageMimeType = /image\/.*/;
     /////Sigma
     if (this.canProceedWithSave) {
-      Object.keys(this.dynamicForm.controls).forEach(field => {
-        const control = this.dynamicForm.get(field);
+//       Object.keys(this.dynamicForm.controls).forEach(field => {
+//         const control = this.dynamicForm.get(field);
     
-        if (control) {
-          const value = control.value;
+//         if (control) {
+//           const value = control.value;
     
-          // Check if the value is a URL or MIME type
-          if (value && typeof value === 'string' &&
-              (fileExtensions.test(value) || imageMimeType.test(value))) {
-            const actualLength = value.length;
-    
-            // Dynamically set the maxLength validator
-            control.setValidators([Validators.maxLength(actualLength)]);
-            control.updateValueAndValidity();
-            console.log("Value being checked:", value);
-console.log("File extensions match:", fileExtensions.test(value));
-console.log("Image MIME type match:", imageMimeType.test(value));
+//           // Check if the value is a URL or MIME type
+//           if (value && typeof value === 'string' &&
+//               (fileExtensions.test(value) || imageMimeType.test(value))) {
+//             const actualLength = value.length;
+//             console.log("actualLength>>>>>>>>>",actualLength);
+//             // Dynamically set the maxLength validator
+//             control.setValidators([Validators.maxLength(actualLength)]);
+//             control.updateValueAndValidity();
+//             console.log("Value being checked:", value);
+// console.log("File extensions match:", fileExtensions.test(value));
+// console.log("Image MIME type match:", imageMimeType.test(value));
 
-          }
-        }
-      });
+//           }
+//         }
+//       });
     
     
       
@@ -8969,12 +9028,14 @@ console.log("Image MIME type match:", imageMimeType.test(value));
                 } else {
                   params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
                 }
+                let gridData: any[]=[];
 
                 let jsonVal = [{
                   objectId: this.objectId,
                   selectedRowId: params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button")),
                   primaryColumn: "ROW_ID",
-                  dynamicTable: jsonData
+                  dynamicTable: jsonData,
+                  gridData:gridData
                 }];
 
                 this.ruleCallApiData=params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button"));
@@ -9020,17 +9081,103 @@ console.log("Image MIME type match:", imageMimeType.test(value));
                   this.insertDynamicReport(jsonVal);
                   }
                   }else{
-                    //console.log("IS IN DISPLAY INSERT");
-                    this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
-                      (res: any) => {
-                        this.commonFunctions.alert("alert", res.description);
-                        this.informationservice.setOpenLikeForm("no");
-                        this.dynamicDRBOnAfterSave(this.objectId);
-                      },
-                      (error) => {
-                        this.commonFunctions.alert("alert", error.error.message);
-                        this.counterOfSave = 0;
+
+
+                    if (this.LastObject.length > 1){
+                      const columnsInLastObject: { columns: any[]; tableName: any; orderNo: any; }[] = [];
+                      const columnsNotInLastObject: { columns: any[]; tableName: any; orderNo: any; }[] = [];
+                      
+                      // Create a set of column names from LastObject for filtering
+                      const lastObjectColumnNames = new Set(
+                          this.LastObject.flatMap((entry:any) => Object.keys(entry))
+                      );
+                      
+                      // Process each table in jsonData
+                      jsonData.forEach((table:any) => {
+                          const tableColumnsInLastObject: any[] = [];
+                          const tableColumnsNotInLastObject: any[] = [];
+                      
+                          table.columns.forEach((column:any) => {
+                              if (lastObjectColumnNames.has(column.colName)) {
+                                  // Columns present in LastObject
+                                  const updatedColumn = { ...column }; // Clone the column to avoid mutation
+                                  this.LastObject.forEach((values:any) => {
+                                      if (values[column.colName] !== undefined) {
+                                          updatedColumn.colValue = values[column.colName];
+                                      }
+                                  });
+                                  tableColumnsInLastObject.push(updatedColumn);
+                              } else {
+                                  // Columns not present in LastObject
+                                  tableColumnsNotInLastObject.push(column);
+                              }
+                          });
+                      
+                          // Aggregate results
+                          if (tableColumnsInLastObject.length > 0) {
+                              columnsInLastObject.push({
+                                  columns: tableColumnsInLastObject,
+                                  tableName: table.tableName,
+                                  orderNo: table.orderNo
+                              });
+                          }
+                      
+                          if (tableColumnsNotInLastObject.length > 0) {
+                              columnsNotInLastObject.push({
+                                  columns: tableColumnsNotInLastObject,
+                                  tableName: table.tableName,
+                                  orderNo: table.orderNo
+                              });
+                          }
                       });
+                      
+                      // Combine columnsInLastObject and columnsNotInLastObject into finalResult
+                      const finalResult = jsonData.map((table:any) => {
+                          const inLastObject = columnsInLastObject.find(t => t.tableName === table.tableName);
+                          const notInLastObject = columnsNotInLastObject.find(t => t.tableName === table.tableName);
+                      
+                          return {
+                              tableName: table.tableName,
+                              orderNo: table.orderNo,
+                              columns: [
+                                  ...(inLastObject ? inLastObject.columns : []),
+                                  ...(notInLastObject ? notInLastObject.columns : [])
+                              ]
+                          };
+                      });
+                         const finalData = this.generateFinalResult(jsonData,this.LastObject);
+                            jsonVal = [{
+                              objectId: this.objectId,
+                              selectedRowId: params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button")),
+                              primaryColumn: "ROW_ID",
+                              dynamicTable: columnsNotInLastObject,
+                              gridData: finalData
+                            }];
+                            console.log('jsonVal>>>>>',jsonVal)
+                            this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
+                              (res: any) => {
+                                this.commonFunctions.alert("alert", res.description);
+                                this.informationservice.setOpenLikeForm("no");
+                                this.dynamicDRBOnAfterSave(this.objectId);
+                              },
+                              (error) => {
+                                this.commonFunctions.alert("alert", error.error.message);
+                                this.counterOfSave = 0;
+                              });
+                      
+                      }else{
+                        this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
+                          (res: any) => {
+                            this.commonFunctions.alert("alert", res.description);
+                            this.informationservice.setOpenLikeForm("no");
+                            this.dynamicDRBOnAfterSave(this.objectId);
+                          },
+                          (error) => {
+                            this.commonFunctions.alert("alert", error.error.message);
+                            this.counterOfSave = 0;
+                          });
+                      }
+                    //console.log("IS IN DISPLAY INSERT");
                   }
 
 
@@ -9389,7 +9536,7 @@ updateDialogTitle(title: string) {
 
       let value = this.dynamicForm.get(name).value;
       this.dynamicForm.removeControl(name);
-      this.dynamicForm.addControl(name, new UntypedFormControl());
+      this.dynamicForm.addControl(name, new UntypedFormControl(''));
 
       if (value != "" && value != null) {
         this.handleFormFieldValues(name, value);
@@ -9962,7 +10109,7 @@ updateDialogTitle(title: string) {
     // }
     this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe(async (data: any) => {
       for (let i = 0; i < data.length; i++) {
-        this.menuForm.addControl(data[i].name, new UntypedFormControl(''));
+        this.menuForm.addControl(data[i].name,  new UntypedFormControl(''));
         // nadine
         if (data[i].columnTypeCode == 14) {
 

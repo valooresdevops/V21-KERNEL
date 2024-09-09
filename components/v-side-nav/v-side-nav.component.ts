@@ -111,12 +111,9 @@ public parentMenu : Boolean = true; // used to check if the menu selected is the
   // Function used to navigate to child menus based on clicked parent
   toggleActiveMenu(menuCode: String, appAbrv: String, childMenusCount: String,menuName:String) {
     
-    if(childMenusCount == "0")
+    if(childMenusCount == "0" || menuName == "Intra")
     {
-      this.informationservice.setBreakLiveDataBar(true);
-      this.informationservice.setBreakLiveDataLine(true);
-      this.informationservice.setBreakLiveDataArea(true);
-      this.informationservice.setBreakLiveDataColumn(true);
+      this.informationservice.setBreakLiveData(true);
     }
     // if(this.a == true){
 

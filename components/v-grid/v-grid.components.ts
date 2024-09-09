@@ -160,6 +160,7 @@ export class AGGridComponent implements OnInit, OnChanges {
   @Input() public treeGridHeader: any[] ;
   @Input() public treeGridData: any[];
   @Input() public isUpdateColsDef: number = 0;
+  @Input() public submitEventData: number = 0;
 
   @Input() public isTreeGrid: boolean = false;
   public lookupIds: any;
@@ -358,6 +359,11 @@ getChildren(parentId: number): any[] {
       alert(6)
           this.updateColsdef();
 
+    }
+
+    if (changes['submitEventData'] ) {
+      this.onGridEventSave.emit();
+      this.onGridEventSaveFn();
     }
 
   }

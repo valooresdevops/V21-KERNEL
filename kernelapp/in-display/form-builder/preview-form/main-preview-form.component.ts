@@ -74,7 +74,7 @@ export class PreviewFormComponent implements OnInit {
   public isTreeGrid: boolean =false;
   public isAdvancedHidden: boolean =false;
   public columnTypeCode: Number;
-
+  public dataReceivedFromDynnamicApi:any[]=[];
   // Variables added by Nadine
   public buttonObjectId: any;
   public amInfo: any;
@@ -685,7 +685,7 @@ export class PreviewFormComponent implements OnInit {
       previousTab: "-1"
     }];
     console.log("DATA SENT TO AM PREVIEW FORM>>>>>>>>",data);
-
+    this.informationservice.setIsFromMainPreviewForm(true);
     const dialogRef = this.dialog.open(AmPreviewFormComponent, {
       width: "80%",
       height: "80%",
@@ -695,7 +695,10 @@ export class PreviewFormComponent implements OnInit {
     this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
     dialogRef.disableClose = true;
 
+
     dialogRef.afterClosed().subscribe(result => {
+      this.informationservice.setIsFromMainPreviewForm(false);
+
       this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectMain + '/-1/previewForm/');
     });
   }
@@ -987,7 +990,7 @@ export class PreviewFormComponent implements OnInit {
         });
       }
       else if(buttonAction == "3") {
-        
+        console.log("HERE FIRST");
         
         console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         let dataa:any=[];
@@ -1060,9 +1063,10 @@ export class PreviewFormComponent implements OnInit {
              //   console.log("this.listOfHeaders>>>>>>>>>>",this.listOfHeaders);
         //jp1111111111111111111111111111
         
-                  dataa=runDynamicBuilt.data;
-                console.log("DATAAAA>>>>>>>>>>>",dataa);
-                
+              //    dataa=runDynamicBuilt.data;
+                this.dataReceivedFromDynnamicApi=runDynamicBuilt.data;
+                console.log("DATAAAA>>>>>>>>>>>",this.dataReceivedFromDynnamicApi);
+
         }
                 
         
@@ -1096,21 +1100,48 @@ export class PreviewFormComponent implements OnInit {
       
 
       else if (buttonAction == "1") {
+        console.log("MENU OBJECT ID>>>>>>>>>>>",part.split("~A~")[0]);
+
+        setTimeout(() => {
+        console.log("HERE SECOND");
+
+        let data:any;
+        if(JSON.stringify(this.dataReceivedFromDynnamicApi)=="[]"){
+          
         let selectedRowIdd = this.informationservice.getAgGidSelectedNode();
         let nodeData = JSON.parse(selectedRowIdd);
         let newSelectedRowIdd = nodeData.filter((el: any) => {
           return el.TYPE === "BUTTON";
         });
+        console.log("DATA button222>>>",nodeData);
+        console.log("DATA button3333>>>",newSelectedRowIdd);
+
+
         let params = '';
-        
-        let data = [{
+        console.log(" this.handleSelectedRowIds(newSelectedRowIdd,>>>>>>>>>>>>>>>",this.handleSelectedRowIds(newSelectedRowIdd, "button"));
+        console.log("GRID DATA");
+
+        data = [{
           actionType:'update',
-          objectId: decodedString.split("~A~")[0],
+          objectId: part.split("~A~")[0],
           isFromGridClick: 0,
           primaryColumn: this.columnId,
           buttonClick: 14,
           selectedRowId: this.handleSelectedRowIds(newSelectedRowIdd, "button")
         }];
+      }else{
+        console.log("API DATA");
+        data = [{
+          actionType:'update',
+          objectId: part.split("~A~")[0],
+          isFromGridClick: 0,
+          primaryColumn: this.columnId,
+          buttonClick: 14,
+          selectedRowId: this.dataReceivedFromDynnamicApi
+        }];
+      }
+      console.log("DATA TO BE SENT FROM MAIN PREVIEW FORM TO AM PREVIEW FORM EITHER BY GRID OR BY API>>>>>>>>>>>",data);
+        
         let dialogRef = this.dialog.open(AmPreviewFormComponent, {
           width: "80%",
           height: "80%",
@@ -1119,10 +1150,11 @@ export class PreviewFormComponent implements OnInit {
         this.dataservice.PushdialogArray(dialogRef);
         this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
         this.dialogArray.push(dialogRef);
-
+        console.log("objectId>>>>>>>>>>>",this.objectId);
+        console.log("objectMain>>>>>>>>>>>",data[0].objectId);
         dialogRef.afterClosed().subscribe(result =>
         {
-          this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + data[0].objectId + '/-1/previewForm/');
+          this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectId + '/-1/previewForm/');
 
           $(".nav-tabs").show();
           $(".nav-tabs").css({ "flex-direction": "row" });
@@ -1157,6 +1189,8 @@ export class PreviewFormComponent implements OnInit {
             }
           }
         });
+      }, 2000);
+
       }else if(buttonAction == "6"){
         this.informationservice.setISExport(false);
         this.informationservice.setIsDisplayALL(false);
@@ -1195,27 +1229,37 @@ this.informationservice.setISExport(true);
     let newDD: any;
     try {
       let dd: any;
+      console.log("DATA RECEIVED>>>>>>>>>",data);
       if (typeof (data) == "string") {
         let d = data.toLowerCase();
         dd = JSON.parse(d);
+        console.log("DATA RECEIVED22222222222>>>>>>>>>",dd);
+
       } else {
         let d = JSON.stringify(data);
         dd = JSON.parse(d.toLowerCase());
+        console.log("DATA RECEIVED3333333>>>>>>>>>",dd);
+
       }
 
 
       if (compare.indexOf(",") != -1) {
         newDD = dd.filter((el: any) => {
+          console.log("NEW DDDDDDDD1111111");
+
           return el.type.toLowerCase() === compare.split(",")[0] || el.type.toLowerCase() === compare.split(",")[1];
         });
       } else {
         newDD = dd.filter((el: any) => {
+          console.log("NEW DDDDDDD2222222");
+
           return el.type.toLowerCase() === compare.toLowerCase();
         });
       }
     } catch (error) {
       newDD = -1;
     }
+    console.log("NEW DDDDDDDD");
     return newDD;
   }
 

@@ -35,7 +35,7 @@
             <div class="chart-row">
               <ng-container>
                 <div class="chart-container" *ngIf="data.stockAd == 0">
-                  <v-highcharts [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts>
+                  <v-highcharts  id="data.ID" [Highcharts]="Highcharts" [options]="data.data[0]"></v-highcharts>
                   <div *ngIf="allData[i].description != 'null'" class="description-container">
                     <div class="description">
                       {{allData[i].description}}
