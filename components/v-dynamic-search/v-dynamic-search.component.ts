@@ -605,7 +605,12 @@ if(this.sourceQuery == null){
 
     this.dynamicSearchForm.reset();
     console.log("this router url>>>>>>>>>>>>",this.router.url);
-    this.commonFunctions.reloadPage(this.router.url);
+    console.log("isForForm dynamic search>>>>>>>>>>>",this.isForForm);
+
+    if(this.isForForm){
+        this.commonFunctions.reloadPage(this.router.url);
+    }
+    //this.commonFunctions.reloadPage(this.router.url);
 
     setTimeout(() => {
       this.clearAll=true;

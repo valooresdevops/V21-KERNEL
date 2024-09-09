@@ -1,7 +1,7 @@
 import { DatePipe, ɵNullViewportScroller } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, Input, NgZone, OnInit, Renderer2 ,Optional, ViewEncapsulation} from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Subscription, from, lastValueFrom, map } from 'rxjs';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
@@ -114,6 +114,9 @@ export class AmPreviewFormComponent implements OnInit {
   dialogTitle: string = '';
   public isGeneralGrid:any;
   public gridStaticValue: any;
+public hiddenColumns:any[]=[];
+public queryType:any;
+public hasSourceQuery:any;  // maxFileSize: number = 5 * 1024 * 1024; // 5MB in bytes
 
   public operators = [
     { id: '', name: '' },
@@ -162,12 +165,39 @@ export class AmPreviewFormComponent implements OnInit {
     private elRef: ElementRef,
     private refreshService: RefreshDialogService,
     private ngZone: NgZone,
-    public informationservice: InformationService
+    public informationservice: InformationService,
+    private fb: UntypedFormBuilder
   ) {
   }
 
 
-
+  // maxLength: number = 20000;  // Example value, can be dynamic
+////////Sigma
+  // maxFileSizeAndLength(maxSizeMB: number): ValidatorFn {
+  //   return (control: AbstractControl): { [key: string]: any } | null => {
+  //     if (control.value) {
+  //       const file = control.value as File;
+  //       const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  //       const actualLength = file.size;
+  
+  //       // Dynamically set maxLength based on actual length
+  //       this.maxLength = actualLength;
+  
+  //       // Validate file size
+  //       if (file.size > maxSizeBytes) {
+  //         return { 'maxFileSizeExceeded': true };
+  //       }
+  
+  //       // Validate actual length vs maxLength (if any other condition applies)
+  //       if (this.maxLength && file.size > this.maxLength) {
+  //         return { 'actualLengthExceeded': true };
+  //       }
+  //     }
+  
+  //     return null; // No errors
+  //   };
+  // }
+  
 
   async loadAllFormColumns(objectId: number) {
     this.loaderService.isLoading.next(true);
@@ -495,6 +525,7 @@ export class AmPreviewFormComponent implements OnInit {
   }
 
   closeDialog(clickOnTab: boolean): void {
+    console.log("CLICK ON TAB>>>>>>>>>>>",clickOnTab);
     let TimeNumber;
     this.informationservice.setSameSession("");
     //test2
@@ -549,6 +580,8 @@ export class AmPreviewFormComponent implements OnInit {
             }
             for (let i = 0; i < activeTabsList.length; i++) {
               if (i == activeTabsList.length - 1) {
+                console.log("TAB>>>>>>>>>>>>>>>>>>>","#" + activeTabsList[i].offsetParent.id + " .tab .tab-title");
+
                 $("#" + activeTabsList[i].offsetParent.id + " .tab .tab-title")[0].click();
               }
             }
@@ -647,6 +680,9 @@ this.informationservice.removeSelectedColumnFormOpening();
   async dynamicDRBOnBeforeSave(objectId: number) {
     try {
       this.canProceedWithSave = true;
+      const control = this.dynamicForm.get('MEDIA_PATH');
+const maxLength = control?.value?.length; // Log the actual length of the file data
+console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/3/0";
       const dynamicDRBOnBeforeSaveUrl = from(axios.post(url));
       const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
@@ -4427,7 +4463,9 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       this.handleFormFieldValues(defaultField,queryRes);
                      }else{
                       this.dynamicForm.removeControl(defaultField);
+                      // this.dynamicForm.addControl(defaultField, new UntypedFormControl('', [this.maxFileSizeAndLength(5)]));
                       this.dynamicForm.addControl(defaultField, new UntypedFormControl(''));
+
                       data[0].query = [];
                       this.cdr.detectChanges();
                       data[0].query = queryRes;
@@ -6693,6 +6731,9 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
       const getAllFieldSetsApiUrl = from(axios.get(GlobalConstants.getAllFieldSetsApi + this.objectId));
       const getAllFieldSetsApi = await lastValueFrom(getAllFieldSetsApiUrl);
       this.dynamicForm = new UntypedFormGroup({});
+      // this.dynamicForm = new UntypedFormGroup({
+      //   file: new UntypedFormControl(null, [this.maxFileSize(5)]) // Max file size 5 MB
+      // });
       this.loaderService.isLoading.next(true);
       const fieldSetsMap = new Map<number, any[]>();
       for (const column of getColumnsApi3.data) {
@@ -6722,9 +6763,12 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
           }
           // Handle Mandatory Fields
           if (data_0[i].isMandatory == 1 || data_0[i].isMandatory == 2) {
+            // console.log("data_0[i].isMandatory = true>>>>>>>",data_0[i])
             data_0[i].isMandatory = true;
           } else {
+            // console.log("data_0[i].isMandatory = false>>>>>>>",data_0[i])
             data_0[i].isMandatory = false;
+            // console.log("data_0[i].isMandatory>>>>>",data_0[i].isMandatory , data_0[i])
           }
 
           // Handle Mandatory on fields based on a query
@@ -6806,7 +6850,8 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
           } else {
             data_0[i].mandatoryQuery = false;
           }
-          console.log('data_0[i]>>>',data_0)
+          // console.log('data_0[i]>>>',data_0)
+
           // Handle suspended Fields
         
           if (data_0[i].isSuspended == 1) {
@@ -6908,7 +6953,7 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
 
           // Append field to dynamicForm
           //add Validators.email
-          this.dynamicForm.addControl(data_0[i].name, new UntypedFormControl(''));
+          this.dynamicForm.addControl(data_0[i].name, new UntypedFormControl('')) // Adjust maxSizeMB as needed;
 
           // Handle basic standard columns automatically
           if (data_0[i].name == "UPDATE_DATE") {
@@ -7409,7 +7454,7 @@ let count = 0;
     this.dynamicForm.controls[fieldName].setValue('');
     if (this.dynamicForm.get(fieldName)) {
       this.dynamicForm.removeControl(fieldName);
-      this.dynamicForm.addControl(fieldName, new UntypedFormControl(''));
+      this.dynamicForm.addControl(fieldName, new UntypedFormControl('')) // Adjust maxSizeMB as needed);
       if (value == 0) {
         this.dynamicForm.controls[fieldName].setValue('0');
       } else {
@@ -7452,7 +7497,7 @@ let count = 0;
 
         if (this.dynamicForm.get(currentFieldName)) {
           this.dynamicForm.removeControl(currentFieldName);
-          this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
+          this.dynamicForm.addControl(currentFieldName, new UntypedFormControl('')) // Adjust maxSizeMB as needed);
 
           if (value == null || value == 'null' || value == 'empty') {
             value = '';
@@ -7716,6 +7761,13 @@ console.log('COLUMN_ID--------------------->',data[i])
     }
     console.log("BUTTON PASSED>>>>>>>>>",buttonPassed);
     if(buttonPassed){
+      const control = this.dynamicForm.get('MEDIA_PATH');
+const maxLength = control?.value?.length; // Log the actual length of the file data
+console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
+      console.log("this.dynamicForm>>>>>>",this.dynamicForm);
+      console.log("this.isPageGrid>>>>>>",this.isPageGrid);
+      console.log("data1:::::::::::::::::" ,data1);
+      console.log("data1.blobFile>>>>>>>>",data1.blobFile)
     if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
       
       let splitedString = decodedString.split("|");
@@ -7995,6 +8047,7 @@ console.log('COLUMN_ID--------------------->',data[i])
 
 
         if (this.dynamicForm.status == "INVALID" && !this.isPageGrid) {
+          console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
           this.commonFunctions.alert("alert", "Please fill in mandatory fields");
         } else {
           this.http.post(GlobalConstants.callProcedure, obj).subscribe((data: any) => {
@@ -8008,7 +8061,10 @@ console.log('COLUMN_ID--------------------->',data[i])
       else if (buttonAction == "1") {
 
 
-
+console.log("dynamicFormStatus>>>>>>>", this.dynamicForm);
+const control = this.dynamicForm.get('MEDIA_PATH');
+const maxLength = control?.value?.length; // Log the actual length of the file data
+console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
         let formData = this.dynamicForm.value;
         if (this.gridStaticValue != undefined) {
           const gridData = this.gridStaticValue[0];
@@ -8465,17 +8521,17 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
               });
               let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
                    
-  this.http.post(urlParam+reportId, jsonParams, requestOptions).pipe(map((data: any) => {
-      let blob = new Blob([data], {
-          type: 'application/pdf' // must match the Accept type
-          // type: 'application/octet-stream' // for excel 
-      });
-      var link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-       //link.download = 'samplePDFFile.pdf';
-      link.target = '_blank';
-      link.click();
-      window.URL.revokeObjectURL(link.href);
+              this.http.post(urlParam+reportId, jsonParams, requestOptions).pipe(map((data: any) => {
+                  let blob = new Blob([data], {
+                      type: 'application/pdf' // must match the Accept type
+                      // type: 'application/octet-stream' // for excel 
+                  });
+                  var link = document.createElement('a');
+                  link.href = window.URL.createObjectURL(blob);
+                  //link.download = 'samplePDFFile.pdf';
+                  link.target = '_blank';
+                  link.click();
+                  window.URL.revokeObjectURL(link.href);
 
   })).subscribe((result: any) => {
   });
@@ -8486,7 +8542,8 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
 
 
 
-      }else if (buttonAction == "7") {
+      }
+      else if (buttonAction == "7") {
 
         let formData = this.dynamicForm.value;
         let selectedTabName = this.informationservice.getSelectedTabName();
@@ -8523,6 +8580,213 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
         this.dialogRef.disableClose = true;
       }else if (buttonAction == "9"){
         this.submitForm();
+      }   else if(buttonAction == "11"){
+    // if (foreignId === colName) {
+    //               this.handleFormFieldValues(colName, colValue);
+    //           } else if (colName === this.amInfo.primaryColumn) {
+    //               this.handleFormFieldValues(colName, colValue);
+    //                   }
+          this.loaderService.isLoading.next(false);
+                
+       console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
+
+         const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));
+       const getApiMethodUrl = await lastValueFrom(getApiMethodDataApi);
+      let fullUrl=getApiMethodUrl.data;
+
+        let customerId = -1;
+        let sessionId = -1;
+        //test2
+        let userId = this.informationservice.getLogeduserId();
+
+        let nearBy = 0;
+        let sameSession = 0;
+        //test2
+        if (this.informationservice.getStatusOfCheckExisting() == "nearMatch") {
+          nearBy = 1;
+        } else {
+          nearBy = 0;
+        }
+
+        if(this.informationservice.getSameSession() == "sameSession"){
+          sameSession = 1;
+        }else{
+          sameSession = 0;
+        }
+
+
+        if (params == '') {
+          //test2
+          params = this.informationservice.getAgGidSelectedNode();
+
+          if (!isNaN(Number(params))) {
+
+          } else {
+            if (params.indexOf(",") != -1) {
+              customerId = Number(params.split(",")[0].split('=')[1].trim());
+              sessionId = Number(params.split(",")[1].split('=')[1].trim());
+            } else {
+              customerId = Number(params.split('=')[1].trim());
+            }
+          }
+
+
+          let globalInfo = "{";
+          globalInfo += "\"" + "colName" + "\"" + ":" + "\"" + "customer_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"" + "},";
+          globalInfo += "{" + "\"" + "colName" + "\"" + ":" + "\"" + "session_id" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + sessionId + "\"" + "}";
+
+          let jsonArr: string = "{";
+          //test2
+          let ListOfData = JSON.parse(this.informationservice.getMainJsonForDataWhenSkip());
+
+          jsonArr += "\"" + "columns" + "\" : [";
+          for (let i = 0; i < ListOfData.columns.length; i++) {
+            jsonArr += "{";
+
+            jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + ListOfData.columns[i].colName + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + ListOfData.columns[i].colVal + "\"";
+
+            if (i == ListOfData.columns.length - 1) {
+              jsonArr += "}," + globalInfo;
+            } else {
+              jsonArr += "},";
+            }
+          }
+          //console.log("hey 3333 >>>>>>>>>>>");
+          // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
+          jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+          // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
+          this.mainJsonForApi = jsonArr;
+          //test2
+          this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForApi);
+        }
+        else {
+          //globalJson ---> to get the session and the customer id
+          let globalInfo: any[] = this.handleSelectedRowIds(this.amInfo.selectedRowId, "grid,form,button");
+          let globalJson = "{";
+          if (globalInfo.toString() == "-1") {
+            globalJson = "";
+          } else {
+            for (let y = 0; y < globalInfo.length; y++) {
+              if (globalInfo.length - 1 == y) {
+                globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"";
+              } else {
+                globalJson += "\"" + "colName" + "\"" + ":" + "\"" + globalInfo[y].colname + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + globalInfo[y].colvalue + "\"" + ",";
+              }
+            }
+            globalJson += "}";
+          }
+
+          const arrayFromString = params.split(',').map(Number);
+          const dynamicDRBOnBeforeSaveUrl = from(axios.post(GlobalConstants.getColNameAndColId, arrayFromString));
+          const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
+
+          const dynamicDRBOnBeforeSaveUrl1 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
+          const ApiResultGetAllColums = await lastValueFrom(dynamicDRBOnBeforeSaveUrl1);
+
+          //creating Json to use it when i do a skip
+          let JsonForDataWhenSkip = "{";
+          JsonForDataWhenSkip += "\"" + "columns" + "\" : [";
+          for (let i = 0; i < ApiResultGetAllColums.data.length; i++) {
+            JsonForDataWhenSkip += "{";
+
+            JsonForDataWhenSkip += "\"" + "colName" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[ApiResultGetAllColums.data[i].name]?.value + "\"" + "," + "\"" + "colId" + "\"" + ":" + "\"" + ApiResultGetAllColums.data[i].id + "\"";
+
+            if (i == ApiResultGetAllColums.data.length - 1) {
+              if (globalJson == "") {
+                JsonForDataWhenSkip += "}";
+              } else {
+                JsonForDataWhenSkip += "}," + globalJson;
+              }
+            } else {
+              JsonForDataWhenSkip += "},";
+            }
+          }
+          //console.log("hrty213234562436244356");
+          JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+          this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
+          this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
+
+
+          let jsonArr: string = "{";
+          jsonArr += "\"" + "columns" + "\" : [";
+          for (let i = 0; i < dynamicDRBOnBeforeSave.data.length; i++) {
+            jsonArr += "{";
+
+            jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + dynamicDRBOnBeforeSave.data[i].name + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + this.dynamicForm.controls[dynamicDRBOnBeforeSave.data[i].name]?.value + "\"";
+
+            if (i == dynamicDRBOnBeforeSave.data.length - 1) {
+              if (globalJson == "") {
+                jsonArr += "}";
+              } else {
+                jsonArr += "}," + globalJson;
+              }
+            } else {
+              jsonArr += "},";
+            }
+          }
+          //console.log("hommmmmmmmm2 >>>>>>");
+          jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
+          this.mainJsonForApi = jsonArr;
+        }
+
+        //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
+        let apiUrl = GlobalConstants.callingApi + url;
+        const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
+        const ResultOfCallingApi = await lastValueFrom(callingApi);
+        //test2
+        this.informationservice.setStatusOfCheckExisting(ResultOfCallingApi.data.status);
+        this.informationservice.setSameSession(ResultOfCallingApi.data.code);
+
+        if (ResultOfCallingApi.data.description == "alert") {
+          this.listOfData = [];
+          this.commonFunctions.alert("alert", ResultOfCallingApi.data.status);
+          if (ResultOfCallingApi.data.showSaveButton == 1) {
+            this.showAndHideButtons(1234, this.idOfCheckExisting);
+          }
+        }
+        else if (ResultOfCallingApi.data.description == "open") {
+
+          //test2
+          this.informationservice.setCheckExisting('yes');
+          let result = ResultOfCallingApi.data.objectId;
+          let data = [{
+            objectId: result.split("~A~")[0],
+            isFromGridClick: 0,
+            isFromButtonClick: 1,
+            primaryColumn: this.columnId,
+            buttonClick: this.columnTypeCode,
+            selectedRowId: JSON.parse(result.split("~A~")[1])
+          }];
+
+          this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
+            width: "80%",
+            height: "80%",
+            data: data
+          });
+
+          this.dataservice.PushdialogArray(this.dialogRef);
+          //test2
+          this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+
+          //test2
+          this.informationservice.setTabToBeSelectedOnValidate(this.informationservice.getSelectedTabId());
+
+        }
+        else if (ResultOfCallingApi.data.description == "validate") {
+          // let ValidatedSessionId = ResultOfCallingApi.data.code;
+          //test2
+          this.listOfData = [];
+          if (this.informationservice.getPopupBreadcrumb().includes("Initiation")) {
+            this.dialog.closeAll();
+          }
+          else {
+            localStorage.setItem("closeTwice","true");
+            this.closeDialog(true);
+          }
+        }
+
+        //console.log("this.listOfData ====",this.listOfData);
+        this.informationservice.setListOFData(this.listOfData);
       }
     });
     }
@@ -8610,10 +8874,52 @@ console.log("HONEEE333333333333");
       }
     }
   }
-}
+  }
     await this.dynamicDRBOnBeforeSave(this.objectId);
+    console.log("this.TestingDynmicForm>>>>>>", this.dynamicForm);
+
+    const fileExtensions = /\.(xlsx|xls|csv|doc|docx|ppt|pptx|txt|pdf)$/i;
+    const imageMimeType = /image\/.*/;
+    /////Sigma
     if (this.canProceedWithSave) {
+      Object.keys(this.dynamicForm.controls).forEach(field => {
+        const control = this.dynamicForm.get(field);
+    
+        if (control) {
+          const value = control.value;
+    
+          // Check if the value is a URL or MIME type
+          if (value && typeof value === 'string' &&
+              (fileExtensions.test(value) || imageMimeType.test(value))) {
+            const actualLength = value.length;
+    
+            // Dynamically set the maxLength validator
+            control.setValidators([Validators.maxLength(actualLength)]);
+            control.updateValueAndValidity();
+            console.log("Value being checked:", value);
+console.log("File extensions match:", fileExtensions.test(value));
+console.log("Image MIME type match:", imageMimeType.test(value));
+
+          }
+        }
+      });
+    
+    
+      
+      
       console.log("honeee22222222222>>>>>",ProbInGridIntoForm);
+      console.log("this.TestDynmicForm>>>>>>",this.dynamicForm);
+//       const control = this.dynamicForm.get('MEDIA_PATH');
+// if (control) {
+//   const actualLength = control.value ? control.value.length : 0;
+  
+//   // Set the maxLength validator dynamically to match actual length
+//   control.setValidators([Validators.maxLength(actualLength)]);
+
+//   // Update the form control validity
+//   control.updateValueAndValidity();
+// }
+
 
       this.loaderService.isLoading.next(true);
       //for the grid into the form
@@ -8796,6 +9102,7 @@ console.log("HONEEE333333333333");
         }
       }
       else if (this.dynamicForm.status == 'INVALID' && ProbInGridIntoForm == 0) {
+        console.log("this.InvaliddynamicForm>>>>>>>>", this.dynamicForm);
         console.log("TESTTTTTTTTTTTTTTTTTTTTT");
         const formControls: { [key: string]: AbstractControl } = this.dynamicForm.controls;
         let requiredFields: string = '';
@@ -8838,6 +9145,8 @@ console.log("HONEEE333333333333");
           }
         }
         requiredFields = requiredFields.slice(0, -2);
+        console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+        console.log("requiredFields>>>>>>>>",requiredFields);
         this.commonFunctions.alert("alert", "Please fill in the following mandatory fields = " + requiredFields);
       }
       this.loaderService.isLoading.next(false);
@@ -8918,9 +9227,12 @@ console.log("HONEEE333333333333");
   // }
   onSearchSubmit(getWhereCond: any) {
     // this.getWhereCond = getWhereCond.data;
+    console.log("RESET FETET HON????????");
     setTimeout(() => {
+
       this.dynamicDRBOnSearch(this.objectId);
      
+      console.log("WHERE CONDITION>>>>>>>>>>>>>>>",getWhereCond);
 
       console.log("IS GENERAL GRID>>>>>>>>>>>>>>>",this.isGeneralGrid);
  
@@ -8928,7 +9240,7 @@ console.log("HONEEE333333333333");
       if(this.isGeneralGrid==1){
        console.log("NNNNNNNNNNNNNNN>>>>>>>>>>>>><<<<<<<<<<<<<");
         //this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectId + '/-1/previewForm/');
-        this.getAllColums(); 
+        this.getAllColumsForGrid(); 
       }
     }, 1000);
     
@@ -9276,7 +9588,422 @@ updateDialogTitle(title: string) {
       }
     }
   }
+
+
+
+ getAllColumsForGrid() {
+    // Filter array on needed data
+    let getMainTab = this.AllTabs.filter(function (el: any) {
+      return el.isMain == 1;
+    });
+
+    this.objectId = getMainTab[0].objectId;
+    let x = this.tableOptions1[0].canAdd == null ? -1 : this.tableOptions1[0].canAdd;
+    let y = this.tableOptions1[0].canDelete == null ? -1 : this.tableOptions1[0].canDelete;
+    let z = this.tableOptions1[0].canModify == null ? -1 : this.tableOptions1[0].canModify;
+    let w = this.tableOptions1[0].sourceQuery == null ? -1 : this.tableOptions1[0].sourceQuery;
+    //this.jsonQbe = [];
+
+    if (this.getWhereCond == undefined) {
+      this.getWhereCond = ' ';
+
+    } else {
+    //  this.getWhereCond = this.formatWhereCond(this.getWhereCond);
+    this.getWhereCond =this.getWhereCond ;
+    }
+
+    let jsonQbe_canAdd: any[] = [];
+    jsonQbe_canAdd.push(
+      {
+        queryId: x,
+        parameters: [
+          {
+            paramName: 'actionType',
+            paramValue: '' + this.actionType + ''
+          },
+          {
+            paramName: 'userId',
+            paramValue: this.userId
+          }
+        ],
+        link: [],
+        isHidden: [],
+        whereCond: this.getWhereCond
+      }
+    )
+
+    this.http.post<any>(GlobalConstants.getQbeIdApi + x + "/0", jsonQbe_canAdd, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+      this.canAdd = data[0];
+
+      let jsonQbe_canDelete: any[] = [];
+      jsonQbe_canDelete.push(
+        {
+          queryId: y,
+          parameters: [
+            {
+              paramName: 'actionType',
+              paramValue: '' + this.actionType + ''
+            },
+            {
+              paramName: 'userId',
+              paramValue: this.userId
+            }
+          ],
+          link: [],
+          isHidden: [],
+          whereCond: this.getWhereCond
+
+        }
+      )
+
+      this.http.post<any>(GlobalConstants.getQbeIdApi + y + "/0", jsonQbe_canDelete, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+        this.canDelete = data[0];
+
+        let jsonQbe_canUpdate: any[] = [];
+        jsonQbe_canUpdate.push(
+          {
+            queryId: y,
+            parameters: [
+              {
+                paramName: 'actionType',
+                paramValue: '' + this.actionType + ''
+              },
+              {
+                paramName: 'userId',
+                paramValue: this.userId
+              }
+            ],
+            link: [],
+            isHidden: [],
+            whereCond: this.getWhereCond
+          }
+        )
+
+        this.http.post<any>(GlobalConstants.getQbeIdApi + z + "/0", jsonQbe_canUpdate, { headers: GlobalConstants.headers }).subscribe(async (data: any) => {
+          this.canUpdate = data[0];
+
+          if (this.canAdd == "1") {
+            this.toolBar += "a";
+          }
+
+          if (this.canUpdate == "1") {
+            this.toolBar += "m";
+          }
+
+          if (this.canDelete == "1") {
+            this.toolBar += "d";
+          }
+
+          // this.http.get<any>(GlobalConstants.getParamsNameApi + w, { headers: GlobalConstants.headers }).subscribe((data0: any) => {
+          //   if (data0 != null && data0.length != 0) {
+          //     let colName = data0[0].paramName;
+          //     let colVal = this.informationservice.getAgGidSelectedNode();
+          //     colName = data0[0].paramName;
+          //     if (colName == "userId") {
+          //       this.jsonQbe = [
+          //         {
+          //           queryId: w,
+          //           parameters: [
+          //             {
+          //               paramName: colName,
+          //               paramValue: this.informationservice.getLogeduserId()
+          //             }
+          //           ],
+          //           link: []
+          //         }
+          //       ]
+          //     } else {
+          //       this.jsonQbe = [
+          //         {
+          //           queryId: w,
+          //           parameters: [
+          //             {
+          //               paramName: colName,
+          //               paramValue: colVal
+          //             }
+          //           ],
+          //           link: []
+          //         }
+          //       ]
+          //     }
+          //   } else {
+          //     this.jsonQbe = [
+          //       {
+          //         queryId: w,
+          //         parameters: [
+          //           {
+          //             paramName: '',
+          //             paramValue: ''
+          //           }
+          //         ],
+          //         link: []
+          //       }
+          //     ]
+          //   }
+
+          const getColumnsApiUrl0 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
+          const getColumns0Api = await lastValueFrom(getColumnsApiUrl0);
+          let linkColumn: any = getColumns0Api.data.filter((el: any) => {
+            return el.isLink === "1";
+          });
+          let hiddenColumn: any = getColumns0Api.data.filter((el: any) => {
+            return el.isGridHidden === "1";
+          });
+
+
+          //elie///////////////////////////////////////////
+          if(w!='' || w!=null){
+          const getColumnsQueryApi = from(axios.get(GlobalConstants.getColumnsQuery + w));
+          const getColumnsQuery = await lastValueFrom(getColumnsQueryApi);
+
+          if(getColumnsQuery.data.length!=0){
+          let linkQueryColumn: any = getColumnsQuery.data.filter((el: any) => {
+            return el.isLink === "1";
+          });
+          for (let f = 0; f < linkQueryColumn.length; f++) {
+            let item = {
+              colName: linkQueryColumn[f].name,
+              isLink: linkQueryColumn[f].isLink,
+              menuName: linkQueryColumn[f].menus,
+              colDesc:linkQueryColumn[f].columnDescription
+            }
+            this.testLinks.push(item);
+          }
+        }
+      }
+          /////////////////////////////////////////////////
+
+          for (let f = 0; f < linkColumn.length; f++) {
+            let item = {
+              colName: linkColumn[f].name,
+              isLink: linkColumn[f].isLink,
+              menuName: linkColumn[f].menus,
+              colDesc:linkColumn[f].columnDescription
+            }
+            this.testLinks.push(item);
+
+          }
+          for (let f = 0; f < hiddenColumn.length; f++) {
+            let item = {
+              colName: hiddenColumn[f].name,
+              isGridHidden: hiddenColumn[f].isGridHidden,
+              menuName: hiddenColumn[f].menus,
+              colDesc:hiddenColumn[f].columnDescription
+            }
+            this.hiddenColumns.push(item);
+
+          }
+
+          let jsonQbe_sourceQuery: any[] = [];
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: 'actionType',
+                  paramValue: '' + this.actionType + ''
+                },
+                {
+                  paramName: 'userId',
+                  paramValue: this.userId
+                }
+              ],
+              link: [],
+              isHidden: [],
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+            }
+          )
+
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: '',
+                  paramValue: ''
+                }
+              ],
+              link: this.testLinks,
+              isHidden:[],
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+
+            }
+          );
+
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: '',
+                  paramValue: ''
+                }
+              ],
+              link:[],
+              isHidden: this.hiddenColumns,
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+
+            }
+          );
+         this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            if(data == 2){
+              this.queryType =3;
+            }else{
+              this.queryType =1;
+            }
+
+          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/"+this.queryType, jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            this.sourceQuery = data;
+            if (this.sourceQuery != "-1") {
+              this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
+                // let tableName = dataa[0].tableName;
+
+                let gridHeaders = data[0].headers[0];
+                let gridResults = data[0].result[0];
+                this.agColumns = [];
+                this.columnId = "ROW_ID";
+                this.agColumnsJson = gridHeaders;
+                this.agColumns.push(this.agColumnsJson);
+                this.gridStaticData = gridResults;
+                this.test_1 = '1';
+                this.hasSourceQuery = 1;
+              });
+            } else {
+
+              let jsonArr: string = "[";
+
+              this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((data: any) => {
+
+                let dataa = data.filter((el: any) => {
+                  return el.columnTypeCode != 14;
+                });
+                let uniqueArray = dataa.filter(
+                  (item: any, index: any, self: any) =>
+                    index === self.findIndex((t: any) => t.tableName === item.tableName)
+                );
+
+                setTimeout(() => {
+
+                  let tblName: any;
+                  let tableName = '';
+                  let count = 0;
+                  for (let k = 0; k < uniqueArray.length; k++) {
+                    jsonArr += "{\"" + "columns" + "\" : [";
+                    tableName = uniqueArray[k].tableName
+                    for (let i = 0; i < dataa.length; i++) {
+                      count++;
+                      if (tableName == dataa[i].tableName) {
+                        // tblName = tableName;
+                        let colName = dataa[i].name;
+                        jsonArr += "{";
+                        if (i == dataa.length - 1) {
+                          jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + colName + "\"";
+                          jsonArr += "}";
+                        } else {
+                          jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + colName + "\"";
+                          jsonArr += "},";
+                        }
+                      }
+                    }
+
+                    if (k == uniqueArray.length - 1) {
+                      jsonArr += "],";
+                      jsonArr += "\"" + "tableName" + "\"" + ":" + "\"" + tableName + "\"";
+                      jsonArr += "}]";
+                    }
+                    else {
+                      jsonArr += "],";
+                      jsonArr += "\"" + "tableName" + "\"" + ":" + "\"" + tableName + "\"";
+                      jsonArr += "},";
+                    }
+                    jsonArr = jsonArr.replace("},]", "}]");
+                  }
+
+                  let jsonData = JSON.parse(jsonArr);
+                  let tableNames: string = '';
+                  for (let u = 0; u < jsonData.length; u++) {
+                    tableNames = tableNames + "," + jsonData[u].tableName;
+                  }
+                  tableNames = tableNames.substring(1);
+                  this.http.post<any>(GlobalConstants.getColumnIdApi, tableNames).subscribe((data: any) => {
+                    this.columnId = data.description;
+                    this.informationservice.setROW_ID(data.description);
+
+                    let jsonVal = [{
+                      objectId: this.objectId,
+                      selectedRowId: -1,
+                      primaryColumn: this.columnId,
+                      dynamicTable: JSON.parse(jsonArr)
+                    }];
+
+                    this.http.post<any>(GlobalConstants.getDynamicGridHeaders, jsonVal, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+                      this.agColumnsJson = data;
+                      this.agColumns.push(this.agColumnsJson);
+                      this.previewGridApi = GlobalConstants.getDynamicGridData;
+                      this.previewGridApiParam = jsonVal;
+                      this.test_1 = '1';
+                      // this.getAllColums();
+                    });
+                  });
+                }, 1000);
+              });
+            }
+          });
+        });
+          // });
+          // }
+        });
+      });
+    });
+    //   }
+    // }
+    this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe(async (data: any) => {
+      for (let i = 0; i < data.length; i++) {
+        this.menuForm.addControl(data[i].name, new UntypedFormControl(''));
+        // nadine
+        if (data[i].columnTypeCode == 14) {
+
+          const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + data[i].id));
+          const getButtonData = await lastValueFrom(getButtonDataUrl);
+
+          let data1 = getButtonData.data;
+          console.log("DATA BUTTON>>>>>>",data1);
+
+          if (data1.blobFile != null && data1.blobFile != undefined) {
+            const base64EncodedString = data1.blobFile;
+            const decodedString = atob(base64EncodedString);
+            console.log("DECODED STRING",decodedString);
+            let n = decodedString.split("~A~");
+            // let lastPart = n.pop();
+            let lastPart = decodedString.split("~A~")[4];
+            console.log("LAST PART>>>>>>>>>",lastPart);
+            if (lastPart == "false") {
+              data[i].mainAndPreview = false;
+            } else {
+              data[i].mainAndPreview = true;
+            }
+          }
+        }
+      }
+      this.test = data;
+     // console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
+    });
+  }
+
+
+
+
 }
+
+
+
+
+
+
+
 
 
 class DropdownCellRenderer {

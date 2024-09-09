@@ -9,7 +9,7 @@ margin: 0;">
             </div>
             <div class="col-lg-8 col-md-9 col-sm-12 col-xs-12">
                 <div class="form-ele-child">
-                    <input type="file" required="{{ required }}"  (input)="onChange($event)" (blur)="touched" [disabled]="isDisabled" accept="{{ acceptedFileTypes }}">
+                    <input type="file" required="{{ required }}"  (input)="onFileSelected($event)" (blur)="touched" [disabled]="isDisabled" accept="{{ acceptedFileTypes }}">
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@ margin: 0;">
 <div class="form-group" *ngIf="isForIndisplay">
     <div class="form-ele-parent">
         <div class="form-ele-child">
-            <input type="file" class="hidden" id="uploadBtn_{{fieldName}}" required="{{ required }}" (change)="onChange($event)" (blur)="touched" [disabled]="isDisabled" accept="{{ acceptedFileTypes }}" >
+            <input type="file" class="hidden" id="uploadBtn_{{fieldName}}" required="{{ required }}" (change)="onFileSelected($event)" (blur)="touched" [disabled]="isDisabled" accept="{{ acceptedFileTypes }}" >
             <div style="display: flex; justify-content: center; align-items: center; gap: 10px">
                 
                 <input type="text" [(ngModel)]="filename" id="myInputId" (dblclick)="clearInputValue()" class="{{fileClass}} v-input-style disabled-field" readonly/>

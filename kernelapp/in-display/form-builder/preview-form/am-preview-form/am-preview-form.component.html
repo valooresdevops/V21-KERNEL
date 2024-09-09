@@ -18,7 +18,7 @@
 <v-tabs-container>
     <form [formGroup]="hiddenForm" #hiddenFormElem></form>
     <ng-container *ngFor="let tableOption of tableOptions1">
-        <v-tab id="{{tableOption.tabId}}" [tabTitle]="tableOption.tableName" menuVariable="augmentedConfig"
+        <v-tab tabId="{{tableOption.tabId}}" [tabTitle]="tableOption.tableName" menuVariable="augmentedConfig"
             (tabActionClick)="getAllColums()" *ngIf="tableOption.condition !== 0">
             <div id="screen-container">
                 <div class="body" *ngIf="tableOption.tableName == selectedTabName">
@@ -506,7 +506,9 @@
                                                         [readonly]="tableOption.isReadOnly ? true : fields.qbeReadOnly"
                                                         [fieldName]="fields.name" acceptedFileTypes="all"
                                                         [isForIndisplay]="true"
-                                                        fileClass="{{ fields.name }}"></v-file>
+                                                        fileClass="{{ fields.name }}"
+                                                        [maxFileSize]="fields.maxFileSize"
+                                                        ></v-file>
                                                     <div *ngFor="let elem of showRequiredMessage">
                                                         <div *ngIf="fields.name == elem">
                                                             <div

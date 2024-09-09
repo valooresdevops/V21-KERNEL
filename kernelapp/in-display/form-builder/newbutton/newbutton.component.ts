@@ -25,7 +25,7 @@ export class NewbuttonComponent implements OnInit {
   public AllFieldSet: any;
   public actionType: string = '';
   public buttonId: number;
-  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'},{id: 9,name: 'Save New'},{id: 10,name: 'Display All'}];
+  public AllAction: any = [{ id: 1, name: 'Form Opening' }, { id: 2, name: 'Call Procedure' },{ id: 3, name: 'Call Api' },{ id: 4, name: 'Close Popup'},{ id: 5, name: 'Generate Report'},{ id: 6, name: 'Next Action'},{ id: 7, name: 'Form Opening No Link'},{ id: 8, name: 'Export'},{id: 9,name: 'Save New'},{id: 10,name: 'Display All'},{ id: 11, name: 'Call Api No Builder' }];
   public FormOpeningSelected: boolean = false;
   Condition: boolean= false;
   ApiSelected: boolean = false;
@@ -228,7 +228,15 @@ export class NewbuttonComponent implements OnInit {
             this.isDisplayAll=true;
 
           } 
-      
+          if(ButtonAction == 11) {
+            this.buttonForm.controls["url"].setValue(decodedString.split("~A~")[3]);
+            this.buttonForm.controls["allColumns"].setValue(decodedString.split("~A~")[2])
+
+            this.ApiSelected = false;
+            this.ApiSelected1 = true;
+            this.FormOpeningSelected = false;
+            this.Condition = false;
+          }
         });
       
     }
@@ -550,7 +558,17 @@ console.log("BUTTON SAVE BUTTON CLICKED!>>>>>>>>>>>",this.buttonForm);
               thirdCondition = null;
               alertMessage = null;
               break; 
-        }
+            case 11:
+                selectedCols = this.buttonForm.controls['allColumns']?.value;
+                URL = this.buttonForm.controls['url']?.value;
+                isMainPreview = this.buttonForm.controls['isMainPreview']?.value;
+                condition = this.buttonForm.controls['condition']?.value;
+                OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
+                alertValue = this.buttonForm.controls['alertValue']?.value;
+                thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
+                alertMessage = this.buttonForm.controls['alertMessage']?.value;
+                break; 
+              }
         console.log("4444444444444444444444");
 
         let objectButtonIdString = `${objectButtonId}~A~${buttonAction}~A~${selectedCols}~A~${URL}~A~${isMainPreview}~A~${condition}~A~${OtherCondition}~A~${alertValue}~A~${thirdCondition}~A~${alertMessage}~A~${jsonRequest}~A~${jsonResponse}~A~${selectedColsFormOpening}~A~${reportSelected}`;
@@ -698,6 +716,17 @@ console.log("objectButtonIdString for advanced search on SAVE NEW>>>>>>>>",objec
               thirdCondition = null;
               alertMessage = null;
               break;
+              case 11:
+                objectButtonId = this.buttonForm.controls[`Menus`]?.value;
+                selectedCols = this.buttonForm.controls['allColumns']?.value;
+                URL = this.buttonForm.controls['url']?.value;
+                isMainPreview = this.buttonForm.controls['isMainPreview']?.value;
+                condition = this.buttonForm.controls['condition']?.value;
+                OtherCondition = this.buttonForm.controls['OtherCondition']?.value;
+                alertValue = this.buttonForm.controls['alertValue']?.value;
+                thirdCondition = this.buttonForm.controls['thirdCondition']?.value;
+                alertMessage = this.buttonForm.controls['alertMessage']?.value;
+                break; 
         }
         console.log("99999999999999999999999");
 

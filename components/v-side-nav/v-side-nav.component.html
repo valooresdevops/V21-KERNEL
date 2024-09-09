@@ -72,7 +72,7 @@
 
             <div style="display:flex;flex-direction: row">
                     <span  *ngFor="let n of this.informationservice.getNavBreadCrumb()">
-                       <b  (click)="fetchUserAccessRights(n.route, 'breadcrumb',n.name,true)"> {{n.name}} /</b>
+                       <b  style="font-size: 11px;"  (click)="fetchUserAccessRights(n.route, 'breadcrumb',n.name,true)"> {{n.name}} /</b>
                     </span>           
                  
         </div>
