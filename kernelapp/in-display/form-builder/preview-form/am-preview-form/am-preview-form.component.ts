@@ -569,7 +569,7 @@ public hasSourceQuery:any;  // maxFileSize: number = 5 * 1024 * 1024; // 5MB in 
 
 
         this.informationservice.setDynamicService("formData_" + selectedTabName, '');
-
+if(!this.informationservice.getIsFromMainPreviewForm()){
         setTimeout(() => {
           if (clickOnTab) {
             let tabs = $(".tab-title");
@@ -588,6 +588,8 @@ public hasSourceQuery:any;  // maxFileSize: number = 5 * 1024 * 1024; // 5MB in 
             }
           }
         }, 1000);
+      }else{
+      }
       } else {
         this.dialog.closeAll();
       }
@@ -681,7 +683,9 @@ this.informationservice.removeSelectedColumnFormOpening();
   async dynamicDRBOnBeforeSave(objectId: number) {
     try {
       this.canProceedWithSave = true;
-
+      //const control = this.dynamicForm.get('MEDIA_PATH');
+//const maxLength = control?.value?.length; // Log the actual length of the file data
+//console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/3/0";
       const dynamicDRBOnBeforeSaveUrl = from(axios.post(url));
       const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
@@ -1734,7 +1738,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
     },100);
     setTimeout(()=>{
       this.showGrid = true;
-      this.informationservice.setAdvancedSearchShowGrid(true);
     },100);
 }
               }
@@ -5949,6 +5952,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
   }
 
   async ngOnInit(): Promise<void> {
+    this.informationservice.setAdvancedSearchShowGrid(true);
     // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
     if(this.lookupData==null){
     this.lookupData=this.mainPreviewDataInput;
@@ -5968,6 +5972,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
     //test2
     this.roleId = this.informationservice.getUserRoleId();
     if (this.amInfo == undefined) {
+      console.log("LOOKUPDATA>>>>>>>>>",this.lookupData[0]);
       this.amInfo = this.lookupData[0];
     }
 
@@ -6012,7 +6017,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
     this.actionType = this.amInfo.actionType;
     objectId = this.amInfo.objectId;
-
+    console.log("AM PREVIEW ON BUTTON CLICK ACTION TYPE>>>>>>>>>>>>>>",this.actionType);
 //console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
     const getMenuNameApiUrl = from(axios.get(GlobalConstants.getMenuNameApi + objectId));
     const getMenuNameApi = await lastValueFrom(getMenuNameApiUrl);
@@ -7183,10 +7188,11 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
 
       
       this.loaderService.isLoading.next(false);
+      console.log("WLEK ACTION TYPE>>>>>>>>>>>>>",this.actionType);
       if (this.actionType == "update") {
 
         let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi3.data, 'select', '-1'));
-
+        console.log("this.aminfo.selectedRowId>>>>>>>>>>>>",this.amInfo.selectedRowId);
         let jsonVal = [{
           objectId: this.objectId,
           selectedRowId: JSON.stringify(this.handleSelectedRowIds(this.amInfo.selectedRowId, "form,button")),
@@ -7201,7 +7207,6 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
           const getDynamicReportData = await lastValueFrom(getDynamicReportDataUrl);
           dataa = getDynamicReportData.data;
         }else{
-
           try{
           console.log("IS GETTING FORM DATA");
           console.log("JSON VAL>>>>>>>>>>>>>>",jsonVal);
@@ -7213,9 +7218,9 @@ console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
             dataa=this.amInfo.selectedRowId.form;
           }
         }
-
+        console.log("DATAAAA from get dynamic form Data>>>>>",dataa);
        
-let jsonData1='[';
+//let jsonData1='[';
 let count = 0;
         for (let i = 0; i < dataa.length; i++) {
           this.loaderService.isLoading.next(true);
@@ -7223,15 +7228,15 @@ let count = 0;
           let colValue = dataa[i].colValue;
           let colType = dataa[i].colType;
 
-          if(this.listOfHeaders.some(header => header.name === colName)){
-            if(count == 0){
-              jsonData1 +="{\""+colName+"\":"+colValue; 
-              count = 1;
-            }else{
-              jsonData1 +=",\""+colName+"\":"+colValue; 
-            }
+          // if(this.listOfHeaders.some(header => header.name === colName)){
+          //   // if(count == 0){
+          //   //   jsonData1 +="{\""+colName+"\":"+colValue; 
+          //   //   count = 1;
+          //   // }else{
+          //   //   jsonData1 +=",\""+colName+"\":"+colValue; 
+          //   // }
 
-          }
+          // }
           // Remove time from date value
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
@@ -7364,14 +7369,13 @@ let count = 0;
                   }
           this.loaderService.isLoading.next(false);
         }
-        jsonData1 +="}]"
-       console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
-      this.gridStaticValue=JSON.parse(jsonData1);
-      if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
-        this.showGrid = true;
-        this.informationservice.setAdvancedSearchShowGrid(true);
-      }
-        
+       // jsonData1 +="}]"
+      //  console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
+        //  this.gridStaticValue=JSON.parse(jsonData1);
+        setTimeout(()=>{
+        this.showGrid=false;
+        },100);
+          this.showGrid = true;
 
           this.loadFieldDependencyForForm();
 
@@ -7776,7 +7780,13 @@ console.log('COLUMN_ID--------------------->',data[i])
     }
     console.log("BUTTON PASSED>>>>>>>>>",buttonPassed);
     if(buttonPassed){
-
+//       const control = this.dynamicForm.get('MEDIA_PATH');
+// const maxLength = control?.value?.length; // Log the actual length of the file data
+// console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
+      console.log("this.dynamicForm>>>>>>",this.dynamicForm);
+      console.log("this.isPageGrid>>>>>>",this.isPageGrid);
+      console.log("data1:::::::::::::::::" ,data1);
+      console.log("data1.blobFile>>>>>>>>",data1.blobFile)
     if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
       
       let splitedString = decodedString.split("|");
@@ -8071,7 +8081,6 @@ console.log('COLUMN_ID--------------------->',data[i])
       //  console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
         //this.dynamicForm.get("MEDIA_PATH").markAsDirty();
         if (this.dynamicForm.status == "INVALID" && !this.isPageGrid) {
-
           this.commonFunctions.alert("alert", "Please fill in mandatory fields");
         } else {
           this.http.post(GlobalConstants.callProcedure, obj).subscribe((data: any) => {
@@ -8370,8 +8379,12 @@ let dataa:any=[];
 
         this.gridStaticValue=dataa.grid;
 if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
+  setTimeout(()=>{
+    this.showGrid=false;
+    },100);
+    setTimeout(()=>{
       this.showGrid = true;
-      this.informationservice.setAdvancedSearchShowGrid(true);
+    },100);
 }
         
       }
@@ -8463,7 +8476,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           for(let j=0;j<checkParameters.data.length;j++){
             if(formControlsArray[i].key==checkParameters.data[j].paramName){
               jsonarray.push({colName:formControlsArray[i].key,colVal:formControlsArray[i].value});
-
+            }
             // else{
             //   jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
             // }
@@ -8574,7 +8587,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
   
      
 
-        }
+
 
 
       }
@@ -8616,18 +8629,10 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
       }else if (buttonAction == "9"){
         this.submitForm();
       }   else if(buttonAction == "11"){
-    // if (foreignId === colName) {
-    //               this.handleFormFieldValues(colName, colValue);
-    //           } else if (colName === this.amInfo.primaryColumn) {
-    //               this.handleFormFieldValues(colName, colValue);
-    //                   }
-          this.loaderService.isLoading.next(false);
-                
-       console.log("Form DAta>>>>>>>>",this.dynamicForm.value);
-
-         const getApiMethodDataApi = from(axios.get(GlobalConstants.getApiMethodData + url));
-       const getApiMethodUrl = await lastValueFrom(getApiMethodDataApi);
-      let fullUrl=getApiMethodUrl.data;
+        let formData = this.dynamicForm.value;
+        if (formData) {
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+        }
 
         let customerId = -1;
         let sessionId = -1;
@@ -8686,7 +8691,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
               jsonArr += "},";
             }
           }
-          //console.log("hey 3333 >>>>>>>>>>>");
           // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
@@ -8736,7 +8740,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
               JsonForDataWhenSkip += "},";
             }
           }
-          //console.log("hrty213234562436244356");
           JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
           this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
@@ -8763,7 +8766,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           this.mainJsonForApi = jsonArr;
         }
 
-        //console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
         let apiUrl = GlobalConstants.callingApi + url;
         const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
         const ResultOfCallingApi = await lastValueFrom(callingApi);
@@ -8819,7 +8821,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           }
         }
 
-        //console.log("this.listOfData ====",this.listOfData);
         this.informationservice.setListOFData(this.listOfData);
       }
     });
@@ -8830,8 +8831,6 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
 
   showTheGridIntoForm() {
     if (this.listOfHeaders.length > 0) {
-      //this.showGrid = true;
-      //this.informationservice.setAdvancedSearchShowGrid(true);
       this.agColumnsJson = [];
       this.agColumnsJson.push(
         {
@@ -8849,7 +8848,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
           for (let t = 0; t < this.listOfHeaders[i].query.length; t++) {
             let item = {
               id: this.listOfHeaders[i].query[t].ID,
-              // name: this.listOfHeaders[i].query[t].NAME
+              name: this.listOfHeaders[i].query[t].NAME
             };
             lastvalue.push(item);
           }
@@ -8897,24 +8896,7 @@ if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
     console.log('LastObject>>>>>>>>',this.LastObject);
 
   }
-  generateFinalResult = (jsonData: any[], lastObject: any[]) => {
-    return jsonData.map(table => {
-        // Filter columns for the current table based on the lastObject
-        const filteredColumns = lastObject.flatMap(entry => 
-            table.columns.filter((column:any) => column.colName in entry).map((column:any) => ({
-                ...column,
-                colValue: entry[column.colName]
-            }))
-        );
 
-        // Collect the result for the current table
-        return {
-            tableName: table.tableName,
-            orderNo: table.orderNo,
-            columns: filteredColumns
-        };
-    }).filter(table => table.columns.length > 0); // Remove tables with no columns
-};
   async submitForm() {
     this.submitGridData++;
 console.log("HONEEE333333333333");
@@ -9028,14 +9010,12 @@ console.log("HONEEE333333333333");
                 } else {
                   params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
                 }
-                let gridData: any[]=[];
 
                 let jsonVal = [{
                   objectId: this.objectId,
                   selectedRowId: params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button")),
                   primaryColumn: "ROW_ID",
-                  dynamicTable: jsonData,
-                  gridData:gridData
+                  dynamicTable: jsonData
                 }];
 
                 this.ruleCallApiData=params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button"));
@@ -9084,76 +9064,33 @@ console.log("HONEEE333333333333");
 
 
                     if (this.LastObject.length > 1){
-                      const columnsInLastObject: { columns: any[]; tableName: any; orderNo: any; }[] = [];
-                      const columnsNotInLastObject: { columns: any[]; tableName: any; orderNo: any; }[] = [];
+                      //  for (let i = 0; i < this.LastObject.length; i++) {
+                         // for(let j = 0; j < jsonData.length;j++){
+  
+                         const data = JSON.parse(JSON.stringify(jsonData));
+  
+                         for (let i = 0; i < this.LastObject.length; i++) {
+                          // Clone the jsonDataTemplate to avoid modifying the original
                       
-                      // Create a set of column names from LastObject for filtering
-                      const lastObjectColumnNames = new Set(
-                          this.LastObject.flatMap((entry:any) => Object.keys(entry))
-                      );
+                          // Get values from LastObject based on the current index
+                          const values = this.LastObject[i] || {};
                       
-                      // Process each table in jsonData
-                      jsonData.forEach((table:any) => {
-                          const tableColumnsInLastObject: any[] = [];
-                          const tableColumnsNotInLastObject: any[] = [];
-                      
-                          table.columns.forEach((column:any) => {
-                              if (lastObjectColumnNames.has(column.colName)) {
-                                  // Columns present in LastObject
-                                  const updatedColumn = { ...column }; // Clone the column to avoid mutation
-                                  this.LastObject.forEach((values:any) => {
-                                      if (values[column.colName] !== undefined) {
-                                          updatedColumn.colValue = values[column.colName];
-                                      }
-                                  });
-                                  tableColumnsInLastObject.push(updatedColumn);
-                              } else {
-                                  // Columns not present in LastObject
-                                  tableColumnsNotInLastObject.push(column);
-                              }
+                          data.forEach((table:any) => {
+                              table.columns.forEach((column: any) => {
+                                  if (values[column.colName]) {
+                                      column.colValue = values[column.colName];
+                                  }
+                              });
                           });
-                      
-                          // Aggregate results
-                          if (tableColumnsInLastObject.length > 0) {
-                              columnsInLastObject.push({
-                                  columns: tableColumnsInLastObject,
-                                  tableName: table.tableName,
-                                  orderNo: table.orderNo
-                              });
-                          }
-                      
-                          if (tableColumnsNotInLastObject.length > 0) {
-                              columnsNotInLastObject.push({
-                                  columns: tableColumnsNotInLastObject,
-                                  tableName: table.tableName,
-                                  orderNo: table.orderNo
-                              });
-                          }
-                      });
-                      
-                      // Combine columnsInLastObject and columnsNotInLastObject into finalResult
-                      const finalResult = jsonData.map((table:any) => {
-                          const inLastObject = columnsInLastObject.find(t => t.tableName === table.tableName);
-                          const notInLastObject = columnsNotInLastObject.find(t => t.tableName === table.tableName);
-                      
-                          return {
-                              tableName: table.tableName,
-                              orderNo: table.orderNo,
-                              columns: [
-                                  ...(inLastObject ? inLastObject.columns : []),
-                                  ...(notInLastObject ? notInLastObject.columns : [])
-                              ]
-                          };
-                      });
-                         const finalData = this.generateFinalResult(jsonData,this.LastObject);
+                          const jsonDataSnapshot = JSON.parse(JSON.stringify(data));
+                          console.log('Updated jsonData:', jsonDataSnapshot);
+  
                             jsonVal = [{
                               objectId: this.objectId,
                               selectedRowId: params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button")),
                               primaryColumn: "ROW_ID",
-                              dynamicTable: columnsNotInLastObject,
-                              gridData: finalData
+                              dynamicTable: jsonDataSnapshot
                             }];
-                            console.log('jsonVal>>>>>',jsonVal)
                             this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
                               (res: any) => {
                                 this.commonFunctions.alert("alert", res.description);
@@ -9164,7 +9101,7 @@ console.log("HONEEE333333333333");
                                 this.commonFunctions.alert("alert", error.error.message);
                                 this.counterOfSave = 0;
                               });
-                      
+                      }
                       }else{
                         this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
                           (res: any) => {
@@ -9292,7 +9229,7 @@ console.log("HONEEE333333333333");
           }
         }
         requiredFields = requiredFields.slice(0, -2);
-        console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+       // console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
         console.log("requiredFields>>>>>>>>",requiredFields);
         this.commonFunctions.alert("alert", "Please fill in the following mandatory fields = " + requiredFields);
       }

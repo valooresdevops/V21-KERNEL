@@ -28,8 +28,6 @@ import { EditorPreviewComponent } from '../in-display/object-builder/editor/edit
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
 
-import { Router } from '@angular/router';
-
 interface SanitizedRecord {
   ID: number;  // or the appropriate type for your IDs
   Records: SafeHtml;
@@ -52,7 +50,6 @@ parentForm:FormGroup;
   public subsVar: Subscription;
   public showDashboard: boolean;
   constructor(
-    private router: Router,
     private http: HttpClient,
     private eventEmitterService: EventEmitterService,
     public commonFunctions: CommonFunctions,
@@ -69,17 +66,16 @@ parentForm:FormGroup;
     document.addEventListener('contextmenu', this.onGlobalRightClick.bind(this));
   }
 
-  public intervalId: any ;
-
-
-
+  public intervalIdColumn: any;
+  public intervalIdLine: any;
+  public intervalIdBar: any;
+  public intervalIdArea: any;
 
   public chartTitle: String = '';
   public description: String='';
   public objectWidth: String='';
   public liveData : any[] = [];
   public chartBarCount: Number = 0;
-  // public chartBarCountIndexes: any[] = [];
   public chartLineCount: Number = 0;
   public chartAreaCount: Number = 0;
   public chartColumnCount: Number = 0;
@@ -135,14 +131,11 @@ parentForm:FormGroup;
   public gridIndexes :number[]= [];
   public  :number[]= [];
   gridIndexesMapping :Map<number, number> = new Map();
-  // liveDataIndexesMapping :Map<number, number> = new Map();
+  liveDataIndexesMapping :Map<number, number> = new Map();
   gridCounter : number = 0;
   liveChartsCounter : number = 0;
 
  editorIndexes: number[] = [];
- 
- liveIndexes: number[] = [];
- liveValue: any[] = [];
 
   valueFromSecondObject: string;
 
@@ -151,13 +144,11 @@ parentForm:FormGroup;
   sanitizedContent: SanitizedRecord[] = [];
 
   chartOptions: Highcharts.Options = {};
-  chartConstruct: Highcharts.Chart[] = [];
   chartBar: Highcharts.Chart | undefined;
   chartLine: Highcharts.Chart | undefined;
   chartArea: Highcharts.Chart | undefined;
   chartColumn: Highcharts.Chart | undefined;
 
-  
   ngOnInit(): void {
     this.parentForm = this.fb.group({
       report_id: [''] // Initialize form control with default value
@@ -254,8 +245,7 @@ parentForm:FormGroup;
     });
   }
   
-
-
+  
   editorIndexesMapping: Map<number, any> = new Map();
 
   setupEditorIndexesMapping(): void {
@@ -270,235 +260,9 @@ parentForm:FormGroup;
   editorIndexMapping(id: number): SafeHtml | undefined {
     return this.editorIndexesMapping.get(id);
   }
-
-
-  liveIndexesMapping: Map<number, any> = new Map();
-
-  setupLiveIndexesMapping(): void {
-    this.liveValue.forEach((data, index) => {
-      this.liveIndexesMapping.set(index, data);
-    });
-    console.log("Live Indexes Mapping", this.liveIndexesMapping);
-  }
-
-
-  LiveIndexes(id: number){
-    return this.liveIndexesMapping.get(id);
-  }
-
-liveChartRecords: Map<number, any> = new Map();
-
-
-// constructLiveChart(indexx: number) {
-//   const slideArray = <T>(arr: T[]): T[] => {
-//     if (!Array.isArray(arr)) {
-//       console.warn('Input is not an array:', arr);
-//       return arr;
-//     }
-//     if (arr.length === 0) return arr;
-//     const lastElement = arr.pop();
-//     arr.unshift(lastElement!);
-//     return arr;
-//   };
-
-//   const maxValues = 4;
-
-//   setTimeout(() => {
-//     if (this.liveIndexesMapping.has(indexx)) {
-//       let dataArray = this.liveIndexesMapping.get(indexx);
-
-//       let ids = dataArray.map((item: { ID: any; }) => item.ID);
-//       let names = dataArray.map((item: { NAME: any; }) => item.NAME);
-
-//       console.log("Initial IDs:", ids);
-//       console.log("Initial Names:", names);
-
-//       const currentChart = this.liveChartRecords.get(indexx);
-
-//       if (currentChart) {
-//         if (currentChart.series[0]) {
-//           currentChart.series[0].setData(names, true);
-//         }
-//         if (currentChart.xAxis[0]) {
-//           currentChart.xAxis[0].setCategories(ids, true);
-//         }
-//       }
-
-//       this.intervalId = setInterval(() => {
-//         if (this.liveIndexesMapping.has(indexx)) {
-//           dataArray = this.liveIndexesMapping.get(indexx);
-
-//           ids = slideArray(ids);
-//           names = slideArray(names);
-
-//           if (names.some(isNaN)) {
-//             console.error('Invalid values in names:', names);
-//             return;
-//           }
-
-//           if (ids.length > maxValues || names.length > maxValues) {
-//             ids = ids.slice(-maxValues);
-//             names = names.slice(-maxValues);
-//           }
-
-//           // Generate a new series with rotated names
-//           const newSeriesData = names.map((name: any, index: any) => ({ name, y: names }));
-
-//           if (currentChart && currentChart.series[0]) {
-//             // Update the series data with the new series
-//             currentChart.series[0].setData(newSeriesData, true);
-//           }
-
-//           if (currentChart.xAxis[0]) {
-//             currentChart.xAxis[0].setCategories(ids, false);
-//           }
-
-//           currentChart.redraw();
-
-//           // Enhance animation effect
-//           currentChart.update({
-//             animation: {
-//               duration: 500,
-//               easing: 'easeInOutSine',
-//               complete: () => {
-//                 currentChart.redraw();
-//               }
-//             }
-//           });
-//         } else {
-//           console.warn('Index not found:', indexx);
-//         }
-
-//         if (this.informationservice.getBreakLiveDataBar()) {
-//           clearInterval(this.intervalId);
-//         }
-//       }, 1500);
-//     } else {
-//       console.warn('Index not found:', indexx);
-//     }
-//   }, 100);
-// }
-
-idss: any[]  = [];
-namess: any[]  = [];
-
-constructLiveChart(indexx: number) {
-  const slideArray = <T>(arr: T[]): T[] => {
-    if (!Array.isArray(arr)) {
-      console.warn('Input is not an array:', arr);
-      return arr;
-    }
-    if (arr.length === 0) return arr;
-    const lastElement = arr.pop();
-    arr.unshift(lastElement!);
-    return arr;
-  };
-
-  const maxValues = 4;
-
-  setTimeout(() => {
-    if (this.liveIndexesMapping.has(indexx)) {
-      let dataArray = this.liveIndexesMapping.get(indexx);
-
-      this.idss[indexx] = dataArray.map((item: { ID: any; }) => item.ID);
-      this.namess[indexx] = dataArray.map((item: { NAME: any; }) => item.NAME);
-
-      console.log("Initial IDs:", this.idss[indexx]);
-      console.log("Initial Names:", this.namess[indexx]);
-
-      const currentChart = this.liveChartRecords.get(indexx);
-
-      if (currentChart) {
-        if (currentChart.series[0]) {
-          currentChart.series[0].setData(this.namess[indexx], true);
-        }
-        if (currentChart.xAxis[0]) {
-          currentChart.xAxis[0].setCategories(this.idss[indexx], true);
-        }
-      }
-
-      this.intervalId = setInterval(() => {  
-        if(!this.informationService.getBreakLiveData()){
-
-        if (this.liveIndexesMapping.has(indexx)) {
-          dataArray = this.liveIndexesMapping.get(indexx);
-
-          this.idss[indexx] = slideArray(this.idss[indexx]);
-          this.namess[indexx] = slideArray(this.namess[indexx]);
-
-          // Ensure names are numbers or transform them if necessary
-          let validNames = this.namess[indexx].map((name: any) => Number(name));
-          if (validNames.some(isNaN)) {
-            console.error('Invalid values in names:', this.namess[indexx]);
-            return;
-          }
-
-          if (this.idss[indexx].length > maxValues || validNames.length > maxValues) {
-            this.idss[indexx] = this.idss[indexx].slice(-maxValues);
-            validNames = validNames.slice(-maxValues);
-          }
-
-          // Create a new series with valid names as values
-          const newSeriesData = validNames.map((value: any) => ({ y: value }));
-
-          if (currentChart && currentChart.series[0]) {
-            // Update the series data with the new series
-            currentChart.series[0].setData(newSeriesData, true);
-          }
-
-          if (currentChart.xAxis[0]) {
-            currentChart.xAxis[0].setCategories(this.idss[indexx], false);
-          }
-
-          // Enhance animation effect
-          currentChart.update({
-            plotOptions: {
-              bar: {
-                animation: {
-                  duration: 500,
-                  easing: 'easeInOutSine'
-                }
-              }
-            }
-          });
-
-          currentChart.redraw();
-        } else {
-          console.warn('Index not found:', indexx);
-        }
-
-        if (this.informationservice.getBreakLiveData()) {
-          clearInterval(this.intervalId);
-        }
-      }}, 1500);
-    } else {
-      console.warn('Index not found:', indexx);
-    }
-  }, 100);}
-
-
-
-
-
-
-
-
+  
   onSelectTab() {
-    this.namess=[];
-    this.idss=[];
-    this.liveChartRecords.clear();
-    this.liveIndexes = [];
-    this.liveValue= [];
-    // this.cleanupChart();
-
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-      this.intervalId = null;
-      // this.chartBar.destroy();
-    }
-    
-  this.chartBarCount = 0;
-    // this.chartBarCountIndexes = [];
+    this.chartBarCount = 0;
     this.chartLineCount = 0;
     this.chartAreaCount = 0;
     this.chartColumnCount = 0;
@@ -520,7 +284,11 @@ constructLiveChart(indexx: number) {
   //  this.data = from(axios.post(GlobalConstants.displayDashboard + this.informationservice.getSelectedTabId(),{}));
     console.log("data>>>>>",this.data);
     
-    this.informationservice.setBreakLiveData(true);
+    this.informationservice.setBreakLiveDataBar(true);
+    this.informationservice.setBreakLiveDataLine(true);
+    this.informationservice.setBreakLiveDataArea(true);
+    this.informationservice.setBreakLiveDataColumn(true);
+
     this.tabName = this.informationservice.getSelectedTabName();
     this.data.subscribe(
       (res: any) => {
@@ -537,19 +305,27 @@ constructLiveChart(indexx: number) {
             
             if(this.allData[i].isLive == 1)
               {
-                console.log("LiveData infos>>>>>>>>>>", this.allData[i].data);
-                console.log("this.liveIndexes.push(this.data[i].Id);>>>>>>",this.allData[i]);
-                this.liveIndexes.push(i);
-                const extractedData = this.allData[i].data.records.map((record: { ID: any; NAME: any; })  => ({
-                  ID: record.ID,
-                  NAME: record.NAME
-                }));
-                this.liveValue.push(extractedData);
-
-                this.informationService.setBreakLiveData(false);
+                if(this.allData[i].data.chartType == 3) // bar
+                {
+                  this.chartBarCount = i;
+                  this.informationservice.setBreakLiveDataBar(false);
+                }
+                if(this.allData[i].data.chartType == 4) // line
+                {
+                  this.chartLineCount = i;
+                  this.informationservice.setBreakLiveDataLine(false);
+                }
+                if (this.allData[i].data.chartType == 5) // area
+                {
+                  this.chartAreaCount = i;
+                  this.informationservice.setBreakLiveDataArea(false);
+                }
+                if (this.allData[i].data.chartType == 7) // column
+                {
+                  this.chartColumnCount = i;
+                  this.informationservice.setBreakLiveDataColumn(false);
+                }
               }
-              console.log("this.liveIndexes.id>>>>>>",this.liveIndexes);
-              console.log("this.liveValue>>>>>>>",this.liveValue);
           }
           
           if(this.allData[i].type == 'Grid')
@@ -570,6 +346,7 @@ constructLiveChart(indexx: number) {
             // console.log("editorValue>>>>>",this.editorValue);
           this.objectWidth = this.allData[i].objectWidth;
           console.log("objectWidth>>>>",this.objectWidth);
+          // alert(this.objectWidth)
        //   this.calculateFlexBasis(this.objectWidth);
         }
 
@@ -687,21 +464,27 @@ constructLiveChart(indexx: number) {
             //   this.chartType = 'clock gauge';
             // }
 
-            // const trackColors = Highcharts.getOptions().colors.map(color =>
-            //   new Highcharts.Color(color).setOpacity(0.3).get());
+            const trackColors = Highcharts.getOptions().colors.map(color =>
+              new Highcharts.Color(color).setOpacity(0.3).get());
 
 
-            //   const getNow = () => {
-            //     const now = new Date();
+              const getNow = () => {
+                const now = new Date();
             
-            //     return {
-            //         date: now,
-            //         hours: now.getHours() + now.getMinutes() / 60,
-            //         minutes: now.getMinutes() * 12 / 60 + now.getSeconds() * 12 / 3600,
-            //         seconds: now.getSeconds() * 12 / 60
-            //     };
-            // };
-
+                return {
+                    date: now,
+                    hours: now.getHours() + now.getMinutes() / 60,
+                    minutes: now.getMinutes() * 12 / 60 + now.getSeconds() * 12 / 3600,
+                    seconds: now.getSeconds() * 12 / 60
+                };
+            };
+        
+            let now = getNow();
+          
+          
+        
+          
+             
             if (this.chartType == 'bar')
               {
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
@@ -710,7 +493,7 @@ constructLiveChart(indexx: number) {
                   this.names.push(Number(this.allData[i].data.records[j].NAME));
                   this.names1.push(Number(this.allData[i].data.records[j].NAME));
                 }
-                      if(this.allData[i].is3d == 1 && this.allData[i].isLive != 1){
+                      if(this.allData[i].is3d == 1){
                         this.newChartObject = [
                           {
                             chart: {type: this.chartType,
@@ -752,243 +535,115 @@ constructLiveChart(indexx: number) {
                           }
                         ]
                       }else 
-                      // if (this.allData[i].isLive == 1 && this.allData[i].is3d != 1) {
-                      //     // Initialize ids and names arrays
-                      //     this.ids1 = [];
-                      //     this.names = [];
-                      //     this.names1 = [];
+                      if (this.allData[i].isLive == 1) {
+                          // Initialize ids and names arrays
+                          this.ids1 = [];
+                          this.names = [];
+                          this.names1 = [];
                           
-                      //     // Populate ids and names with data
-                      //     for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                      //       const id = this.allData[i].data.records[j].ID;
-                      //       const name = Number(this.allData[i].data.records[j].NAME);
-                      //       this.ids1.push(id);    // Store real IDs
-                      //       this.names.push(name); // Store names (data values)
-                      //       this.names1.push(name); // For initial display
-                      //     }
-                          
-                      //     const windowSize = 1; // Number of values to move each interval
-                      //     const maxValues = 4; // Maximum number of values to display at any time
-                          
-                      //     // Function to slide array values
-                      //     const slideArray = <T>(arr: T[]): T[] => {
-                      //       if (arr.length === 0) {
-                      //         console.warn("Array is empty, cannot slide.");
-                      //         return arr;
-                      //       }
-                      //       // Slide the array: move the first element to the end
-                      //       const [firstElement, ...rest] = arr;
-                      //       return [...rest, firstElement];
-                      //     };
-                          
-                      //     this.newChartObject = [
-                      //       {
-                      //         chart: {
-                      //           type: this.chartType,
-                      //           events: {
-                      //             load: () => {
-                      //               this.chartBar = Highcharts.charts[this.chartBarCount.valueOf()];
-                      //               console.log("Chart loaded>>>", this.chartBar);
-                        
-                      //               // Update the chart with the initial data
-                      //               this.chartBar.series[0].setData(this.names1, true, true, true);
-                      //               this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
-                        
-                                    
-        
-        
-                      //               this.intervalIdBar = setInterval(() => {
-                      //                 if (this.chartBar) {
-                      //                   // Slide ids array
-                      //                   this.ids1 = slideArray(this.ids1);
-                                    
-                      //                   // Slide names array if needed
-                      //                   this.names1 = slideArray(this.names1);
-                                    
-                      //                   // Trim to the last 'maxValues' values
-                      //                   if (this.ids1.length > maxValues) {
-                      //                     this.ids1 = this.ids1.slice(-maxValues);
-                      //                   }
-                      //                   if (this.names1.length > maxValues) {
-                      //                     this.names1 = this.names1.slice(-maxValues);
-                      //                   }
-                                    
-                      //                   // Update the chart with the rotated values
-                      //                   this.chartBar.series[0].setData(this.names1, true, true, true);
-                                    
-                      //                   // Update xAxis categories and force redraw
-                      //                   this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
-                      //                   this.chartBar.redraw(); // Force chart redraw
-                                    
-                      //                   // Log current state (for debugging purposes)
-                      //                   console.log("Updated names:", this.names1);
-                      //                   console.log("Updated IDs1:", this.ids1);
-                                    
-                      //                   // Stop condition (if needed)
-                      //                   if (this.informationservice.getBreakLiveDataBar()) {
-                      //                     clearInterval(this.intervalIdBar);
-                      //                   }
-                      //                 }
-                      //               }, 1500); // Update interval (1.5 seconds)
-                                    
-                      //             }
-                      //           }
-                      //         },
-                      //         title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
-                      //         xAxis: {
-                      //           categories: this.ids
-                      //         },
-                      //         yAxis: {
-                      //           title: {
-                      //             text: 'Value', align: 'center'
-                      //           }
-                      //         },
-                      //         plotOptions: {
-                      //           series: {
-                      //             pointPadding: 0.2, // Adjust the spacing between bars
-                      //             groupPadding: 0.1, // Adjust the spacing between groups
-                      //             borderWidth: 0,
-                      //             pointWidth: 20 // Set the width of each bar (adjust as needed)
-                      //           }
-                      //         },
-                      //         tooltip: {
-                      //           headerFormat: '',
-                      //           pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
-                      //         },
-                      //         series: [{
-                      //           name: this.allData[i].Title,
-                      //           data: this.names,
-                      //           color: 'green',
-                      //         }]
-                      //       }
-                      //     ];
-                      // }
-
-                      if (this.allData[i].isLive == 1 && this.allData[i].is3d != 1) {
-                        // Initialize ids and names arrays
-                        this.ids1 = [];
-                        this.names = [];
-                        this.names1 = [];
-                      
-                        // Populate ids and names with data
-                        for (let j = 0; j < this.allData[i].data.records.length; j++) {
-                          const id = this.allData[i].data.records[j].ID;
-                          const name = Number(this.allData[i].data.records[j].NAME);
-                          this.ids1.push(id);    // Store real IDs
-                          this.names.push(name); // Store names (data values)
-                          this.names1.push(name); // For initial display
-                        }
-                      
-                        const windowSize = 1; // Number of values to move each interval
-                        const maxValues = 4; // Maximum number of values to display at any time
-                      
-                        // Function to slide array values
-                        // const slideArray = <T>(arr: T[]): T[] => {
-                        //   if (arr.length === 0) {
-                        //     console.warn("Array is empty, cannot slide.");
-                        //     return arr;
-                        //   }
-                        //   // Slide the array: move the first element to the end
-                        //   const [firstElement, ...rest] = arr;
-                        //   return [...rest, firstElement];
-                        // };
-                      
-                        this.newChartObject = [
-                          {
-                            chart: {
-                              type: this.chartType,
-                              events: {
-                                load: () => {
-                                  // Ensure chartBar is properly initialized
-                                  const newChart = Highcharts.charts[i];
-                                  this.chartConstruct.push(newChart);
-                                  // this.chartBar = Highcharts.charts[this.chartBarCount.valueOf()];
-                                  // console.log("this.chartBarCount.valueOf()>>>>>>",this.chartBarCount.valueOf())
-                                  
-                                  // if (!this.chartBar) {
-                                  //   console.error("ChartBar not initialized correctly.");
-                                  //   return;
-                                  // }
-                                  console.log("newChart>>>>>>",newChart);
-                                  this.liveChartRecords.set(i, newChart);
-                                  // console.log("Chart loaded>>>", this.chartBar);
-                                  // alert(this.names1)
-                                  this.constructLiveChart(i);
-                                  // Use a timeout to ensure chart is ready
-                                  // setTimeout(() => {
-                                  //   // Update the chart with the initial data
-                                  //   if (this.chartBar && this.chartBar.series) {
-                                  //     this.chartBar.series[0].setData(this.names1, true, true, true);
-                                  //     this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
-                                  //   }
-                      
-                                  //   this.intervalIdBar = setInterval(() => {
-                                  //     if (this.chartBar && this.chartBar.series) {
-                                  //       // Slide ids array
-                                  //       this.ids1 = slideArray(this.ids1);
-                      
-                                  //       // Slide names array if needed
-                                  //       this.names1 = slideArray(this.names1);
-                      
-                                  //       // Trim to the last 'maxValues' values
-                                  //       if (this.ids1.length > maxValues) {
-                                  //         this.ids1 = this.ids1.slice(-maxValues);
-                                  //       }
-                                  //       if (this.names1.length > maxValues) {
-                                  //         this.names1 = this.names1.slice(-maxValues);
-                                  //       }
-                                  //       // Update the chart with the rotated values
-                                  //       this.chartBar.series[0].setData(this.names1, true, true, true);
-                      
-                                  //       // Update xAxis categories and force redraw
-                                  //       this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
-                                  //       this.chartBar.redraw(); // Force chart redraw
-                      
-                                  //       // Log current state (for debugging purposes)
-                                  //       console.log("Updated names:", this.names1);
-                                  //       console.log("Updated IDs1:", this.ids1);
-                      
-                                  //       // Stop condition (if needed)
-                                  //       if (this.informationservice.getBreakLiveDataBar()) {
-                                  //         clearInterval(this.intervalIdBar);
-                                  //       }
-                                  //     }
-                                  //   }, 1500); // Update interval (1.5 seconds)
-                      
-                                  // }, 100); // Delay to ensure chart is fully loaded
-
-                             
-                                }
-                              }
-                            },
-                            title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
-                            xAxis: {
-                              categories: this.ids
-                            },
-                            yAxis: {
-                              title: {
-                                text: 'Value', align: 'center'
-                              }
-                            },
-                            plotOptions: {
-                              series: {
-                                pointPadding: 0.2, // Adjust the spacing between bars
-                                groupPadding: 0.1, // Adjust the spacing between groups
-                                borderWidth: 0,
-                                pointWidth: 20 // Set the width of each bar (adjust as needed)
-                              }
-                            },
-                            tooltip: {
-                              headerFormat: '',
-                              pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
-                            },
-                            series: [{
-                              name: this.allData[i].Title,
-                              data: this.names,
-                              color: 'green',
-                            }]
+                          // Populate ids and names with data
+                          for (let j = 0; j < this.allData[i].data.records.length; j++) {
+                            const id = this.allData[i].data.records[j].ID;
+                            const name = Number(this.allData[i].data.records[j].NAME);
+                            this.ids1.push(id);    // Store real IDs
+                            this.names.push(name); // Store names (data values)
+                            this.names1.push(name); // For initial display
                           }
-                        ];
+                          
+                          const windowSize = 1; // Number of values to move each interval
+                          const maxValues = 4; // Maximum number of values to display at any time
+                          
+                          // Function to slide array values
+                          const slideArray = <T>(arr: T[]): T[] => {
+                            if (arr.length === 0) {
+                              console.warn("Array is empty, cannot slide.");
+                              return arr;
+                            }
+                            // Slide the array: move the first element to the end
+                            const [firstElement, ...rest] = arr;
+                            return [...rest, firstElement];
+                          };
+                          
+                          this.newChartObject = [
+                            {
+                              chart: {
+                                type: this.chartType,
+                                events: {
+                                  load: () => {
+                                    this.chartBar = Highcharts.charts[this.chartBarCount.valueOf()];
+                                    console.log("Chart loaded>>>", this.chartBar);
+                        
+                                    // Update the chart with the initial data
+                                    this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                        
+                                    
+        
+        
+                                    this.intervalIdBar = setInterval(() => {
+                                      if (this.chartBar) {
+                                        // Slide ids array
+                                        this.ids1 = slideArray(this.ids1);
+                                    
+                                        // Slide names array if needed
+                                        this.names1 = slideArray(this.names1);
+                                    
+                                        // Trim to the last 'maxValues' values
+                                        if (this.ids1.length > maxValues) {
+                                          this.ids1 = this.ids1.slice(-maxValues);
+                                        }
+                                        if (this.names1.length > maxValues) {
+                                          this.names1 = this.names1.slice(-maxValues);
+                                        }
+                                    
+                                        // Update the chart with the rotated values
+                                        this.chartBar.series[0].setData(this.names1, true, true, true);
+                                    
+                                        // Update xAxis categories and force redraw
+                                        this.chartBar.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                        this.chartBar.redraw(); // Force chart redraw
+                                    
+                                        // Log current state (for debugging purposes)
+                                        console.log("Updated names:", this.names1);
+                                        console.log("Updated IDs1:", this.ids1);
+                                    
+                                        // Stop condition (if needed)
+                                        if (this.informationservice.getBreakLiveDataArea()) {
+                                          clearInterval(this.intervalIdBar);
+                                        }
+                                      }
+                                    }, 1500); // Update interval (1.5 seconds)
+                                    
+                                  }
+                                }
+                              },
+                              title: {text: this.allData[i].Title, align: 'center', style: { fontSize: '16px' }},
+                              xAxis: {
+                                categories: this.ids
+                              },
+                              yAxis: {
+                                title: {
+                                  text: 'Value', align: 'center'
+                                }
+                              },
+                              plotOptions: {
+                                series: {
+                                  pointPadding: 1, // Adjust the spacing between bars
+                                  groupPadding: 0.2, // Adjust the spacing between groups
+                                  borderWidth: 0,
+                                }
+                              },
+                              tooltip: {
+                                headerFormat: '',
+                                pointFormat: '{point.y}' // Changed from {point.name} to {point.x}
+                              },
+                              series: [{
+                                name: this.allData[i].Title,
+                                data: this.names,
+                                color: 'green',
+                              }]
+                            }
+                          ];
                       }
                       
                       
@@ -1028,6 +683,7 @@ constructLiveChart(indexx: number) {
                       }
                    
               }
+              
               else if (this.chartType == 'heatmap') {
                 this.newChartObject = [{
                   chart: {
@@ -1127,7 +783,10 @@ constructLiveChart(indexx: number) {
                   }
               }];
   
-              }
+              } 
+              
+              
+              
               else if(this.chartType == 'line'){
                 
   
@@ -1139,7 +798,7 @@ constructLiveChart(indexx: number) {
                     this.liveLineChartNames.push(Number(this.allData[i].data.records[j].NAME));
                     this.liveLineChartIds.push(Number(this.allData[i].data.records[j].NAME));
                   }
-                  if(this.allData[i].is3d == 1 && this.allData[i].isLive != 1){
+                  if(this.allData[i].is3d == 1){
                     this.newChartObject = [
                       {
                         chart: {
@@ -1189,7 +848,7 @@ constructLiveChart(indexx: number) {
                     ];
                   }
                   else
-                  if (this.allData[i].isLive == 1 && this.allData[i].is3d != 1) {
+                  if (this.allData[i].isLive == 1) {
                       // Initialize ids and names arrays
                       this.ids1 = [];
                       this.names = [];
@@ -1207,6 +866,16 @@ constructLiveChart(indexx: number) {
                       const windowSize = 1; // Number of values to move each interval
                       const maxValues = 4; // Maximum number of values to display at any time
                       
+                      // Function to slide array values
+                      const slideArray = <T>(arr: T[]): T[] => {
+                        if (arr.length === 0) {
+                          console.warn("Array is empty, cannot slide.");
+                          return arr;
+                        }
+                        // Slide the array: move the first element to the end
+                        const [firstElement, ...rest] = arr;
+                        return [...rest, firstElement];
+                      };
                       
                       this.newChartObject = [
                         {
@@ -1214,10 +883,49 @@ constructLiveChart(indexx: number) {
                             type: 'line',
                             events: {
                               load: () => {
-                                const newChart = Highcharts.charts[i];
-                                this.chartConstruct.push(newChart);
-                                this.liveChartRecords.set(i, newChart);
-                                this.constructLiveChart(i);
+                                this.chartLine = Highcharts.charts[this.chartLineCount.valueOf()];
+                                console.log("Chart loaded>>>", this.chartLine);
+                    
+                                // Update the chart with the initial data
+                                this.chartLine.series[0].setData(this.names1, true, true, true);
+                                this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                    
+                                
+    
+    
+                                this.intervalIdLine = setInterval(() => {
+                                  if (this.chartLine) {
+                                    // Slide ids array
+                                    this.ids1 = slideArray(this.ids1);
+                                
+                                    // Slide names array if needed
+                                    this.names1 = slideArray(this.names1);
+                                
+                                    // Trim to the last 'maxValues' values
+                                    if (this.ids1.length > maxValues) {
+                                      this.ids1 = this.ids1.slice(-maxValues);
+                                    }
+                                    if (this.names1.length > maxValues) {
+                                      this.names1 = this.names1.slice(-maxValues);
+                                    }
+                                
+                                    // Update the chart with the rotated values
+                                    this.chartLine.series[0].setData(this.names1, true, true, true);
+                                
+                                    // Update xAxis categories and force redraw
+                                    this.chartLine.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                    this.chartLine.redraw(); // Force chart redraw
+                                
+                                    // Log current state (for debugging purposes)
+                                    console.log("Updated names:", this.names1);
+                                    console.log("Updated IDs1:", this.ids1);
+                                
+                                    // Stop condition (if needed)
+                                    if (this.informationservice.getBreakLiveDataArea()) {
+                                      clearInterval(this.intervalIdLine);
+                                    }
+                                  }
+                                }, 1500); // Update interval (1.5 seconds)
                                 
                               }
                             }
@@ -1260,7 +968,8 @@ constructLiveChart(indexx: number) {
                   }
                 ];
               }
-              }
+              } 
+              
               else if (this.chartType == 'area') {
                 
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
@@ -1270,7 +979,7 @@ constructLiveChart(indexx: number) {
                   this.names1.push(Number(this.allData[i].data.records[j].NAME));
                 }
               
-                if (this.allData[i].is3d == 1 && this.allData[i].isLive != 1) {
+                if (this.allData[i].is3d == 1) {
                   this.newChartObject = [
                     {
                       chart: {
@@ -1312,7 +1021,7 @@ constructLiveChart(indexx: number) {
                   ];
                 }
                 else
-                if (this.allData[i].isLive == 1 && this.allData[i].is3d != 1) {
+                if (this.allData[i].isLive == 1) {
                     // Initialize ids and names arrays
                     this.ids1 = [];
                     this.names = [];
@@ -1330,7 +1039,16 @@ constructLiveChart(indexx: number) {
                     const windowSize = 1; // Number of values to move each interval
                     const maxValues = 4; // Maximum number of values to display at any time
                     
-                    // alert(this.chartAreaCount.valueOf())
+                    // Function to slide array values
+                    const slideArray = <T>(arr: T[]): T[] => {
+                      if (arr.length === 0) {
+                        console.warn("Array is empty, cannot slide.");
+                        return arr;
+                      }
+                      // Slide the array: move the first element to the end
+                      const [firstElement, ...rest] = arr;
+                      return [...rest, firstElement];
+                    };
                     
                     this.newChartObject = [
                       {
@@ -1338,10 +1056,48 @@ constructLiveChart(indexx: number) {
                           type: 'area',
                           events: {
                             load: () => {
-                              const newChart = Highcharts.charts[i];
-                              this.chartConstruct.push(newChart);
-                              this.liveChartRecords.set(i, newChart);
-                              this.constructLiveChart(i);
+                              this.chartArea = Highcharts.charts[this.chartAreaCount.valueOf()];
+                              console.log("Chart loaded>>>", this.chartArea);
+                  
+                              // Update the chart with the initial data
+                              this.chartArea.series[0].setData(this.names1, true, true, true);
+                              this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                  
+                              this.intervalIdArea = setInterval(() => {
+                                if (this.chartArea) {
+                                  // Slide ids array
+                                  this.ids1 = slideArray(this.ids1);
+                              
+                                  // Slide names array if needed
+                                  this.names1 = slideArray(this.names1);
+                              
+                                  // Trim to the last 'maxValues' values
+                                  if (this.ids1.length > maxValues) {
+                                    this.ids1 = this.ids1.slice(-maxValues);
+                                  }
+                                  if (this.names1.length > maxValues) {
+                                    this.names1 = this.names1.slice(-maxValues);
+                                  }
+                              
+                                  // Update the chart with the rotated values
+                                  this.chartArea.series[0].setData(this.names1, true, true, true);
+                              
+                                  // Update xAxis categories and force redraw
+                                  this.chartArea.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                  this.chartArea.redraw(); // Force chart redraw
+                              
+                                  // Log current state (for debugging purposes)
+                                  console.log("Updated names:", this.names1);
+                                  console.log("Updated IDs1:", this.ids1);
+                              
+                                  // Stop condition (if needed)
+                                  if (this.informationservice.getBreakLiveDataArea()) {
+                                    clearInterval(this.intervalIdArea);
+                                  }
+                                }
+                              }, 1500); // Update interval (1.5 seconds)
+  
+  
                             }
                           }
                         },
@@ -1407,6 +1163,9 @@ constructLiveChart(indexx: number) {
                   ];
                 }
               } 
+              
+              
+              
               else if(this.chartType == 'semiPie')
                 {
                   const transformedData = this.allData[i].data.records.map((item:any) => [item.ID, parseFloat(item.NAME)]);
@@ -1515,8 +1274,7 @@ constructLiveChart(indexx: number) {
                 }]
             }];
                 }
-              }
-              else if(this.chartType == 'scatter')
+              } else if(this.chartType == 'scatter')
                 {
                   
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
@@ -1587,14 +1345,20 @@ constructLiveChart(indexx: number) {
                       }]
                     }
                   ];}
-              }
+              } 
+              
+              
+              
               else if(this.chartType == 'column'){
+                  
+             
+                
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
                     this.ids.push(this.allData[i].data.records[j].ID);
                     this.names.push(Number(this.allData[i].data.records[j].NAME));
                   }
-                  if(this.allData[i].is3d == 1 && this.allData[i].isLive !=1){
+                  if(this.allData[i].is3d == 1){
                     this.newChartObject  = [{
                       chart: {
                         renderTo: 'container',
@@ -1643,8 +1407,11 @@ constructLiveChart(indexx: number) {
                     }]
                     }]
                   }
+                  
+                  
                   else
-                    if (this.allData[i].isLive == 1 && this.allData[i].is3d != 1) {
+                  
+                    if (this.allData[i].isLive == 1) {
                       // Initialize ids and names arrays
                       this.ids1 = [];
                       this.names = [];
@@ -1662,7 +1429,16 @@ constructLiveChart(indexx: number) {
                       const windowSize = 1; // Number of values to move each interval
                       const maxValues = 4; // Maximum number of values to display at any time
                       
-
+                      // Function to slide array values
+                      const slideArray = <T>(arr: T[]): T[] => {
+                        if (arr.length === 0) {
+                          console.warn("Array is empty, cannot slide.");
+                          return arr;
+                        }
+                        // Slide the array: move the first element to the end
+                        const [firstElement, ...rest] = arr;
+                        return [...rest, firstElement];
+                      };
                       
                       this.newChartObject = [
                         {
@@ -1670,10 +1446,50 @@ constructLiveChart(indexx: number) {
                             type: 'column',
                             events: {
                               load: () => {
-                                const newChart = Highcharts.charts[i];
-                                this.chartConstruct.push(newChart);
-                                this.liveChartRecords.set(i, newChart);
-                                this.constructLiveChart(i);
+                                this.chartColumn = Highcharts.charts[this.chartColumnCount.valueOf()];
+                                console.log("Chart loaded>>>", this.chartColumn);
+                    
+                                // Update the chart with the initial data
+                                this.chartColumn.series[0].setData(this.names1, true, true, true);
+                                this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), true);
+                    
+                                
+
+
+                                this.intervalIdColumn = setInterval(() => {
+                                  if (this.chartColumn) {
+                                    // Slide ids array
+                                    this.ids1 = slideArray(this.ids1);
+                                
+                                    // Slide names array if needed
+                                    this.names1 = slideArray(this.names1);
+                                
+                                    // Trim to the last 'maxValues' values
+                                    if (this.ids1.length > maxValues) {
+                                      this.ids1 = this.ids1.slice(-maxValues);
+                                    }
+                                    if (this.names1.length > maxValues) {
+                                      this.names1 = this.names1.slice(-maxValues);
+                                    }
+                                
+                                    // Update the chart with the rotated values
+                                    this.chartColumn.series[0].setData(this.names1, true, true, true);
+                                
+                                    // Update xAxis categories and force redraw
+                                    this.chartColumn.xAxis[0].setCategories(this.ids1.map(id => id.toString()), false);
+                                    this.chartColumn.redraw(); // Force chart redraw
+                                
+                                    // Log current state (for debugging purposes)
+                                    console.log("Updated names:", this.names1);
+                                    console.log("Updated IDs1:", this.ids1);
+                                
+                                    // Stop condition (if needed)
+                                    if (this.informationservice.getBreakLiveDataArea()) {
+                                      clearInterval(this.intervalIdColumn);
+                                    }
+                                  }
+                                }, 1500); // Update interval (1.5 seconds)
+                                
                               }
                             }
                           },
@@ -1738,7 +1554,8 @@ constructLiveChart(indexx: number) {
                   }]
                 }];}
           
-              }
+            } 
+              
               else if (this.chartType == 'pie') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++) {
@@ -1801,8 +1618,7 @@ constructLiveChart(indexx: number) {
                     }]
                   }];
                 }
-              }
-              else if (this.chartType == 'candlestick') {
+              } else if (this.chartType == 'candlestick') {
                 const transformedData1 =this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.open_price),
@@ -1839,8 +1655,7 @@ constructLiveChart(indexx: number) {
                     }
                   }]
                 }]
-              }
-              else if (this.chartType == 'ohlc') {
+              } else if (this.chartType == 'ohlc') {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.open_price),
@@ -1874,8 +1689,7 @@ constructLiveChart(indexx: number) {
                     }
                   }]
                 }]
-              }
-              else if (this.chartType == 'stockColumn') {
+              } else if (this.chartType == 'stockColumn') {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.volume)]);
@@ -1911,8 +1725,7 @@ constructLiveChart(indexx: number) {
                     }
                   }]
                 }]
-              }
-              else if (this.chartType == 'stockLine') {
+              } else if (this.chartType == 'stockLine') {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.close_price)]);
@@ -1938,8 +1751,7 @@ constructLiveChart(indexx: number) {
                     }
                 }]
                 }]
-              }
-              else if (this.chartType == 'stockArea') {
+              } else if (this.chartType == 'stockArea') {
                 const transformedData1 = this.allData[i].data.records.map((item: any) => [ 
                   Number(item.timestamp),
                   Number(item.close_price)]);
@@ -1981,8 +1793,7 @@ constructLiveChart(indexx: number) {
                         ]
                     }
                 }]}]
-              }
-              else if (this.chartType == 'VU solid') {
+              } else if (this.chartType == 'VU solid') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                 {
@@ -2083,8 +1894,7 @@ constructLiveChart(indexx: number) {
                     }]
                   }];
                 
-              }
-              else if (this.chartType == 'VU meter') {
+              } else if (this.chartType == 'VU meter') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
@@ -2182,8 +1992,7 @@ constructLiveChart(indexx: number) {
                     }]
                   }];
                 
-              }
-              else if (this.chartType == 'Speedometer') {
+              } else if (this.chartType == 'Speedometer') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
@@ -2260,8 +2069,7 @@ constructLiveChart(indexx: number) {
                     }]
                   }];
                 
-              }
-              else if (this.chartType == 'Dual Axes Speedometer') {
+              } else if (this.chartType == 'Dual Axes Speedometer') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
@@ -2357,8 +2165,7 @@ constructLiveChart(indexx: number) {
                   }],
                   }];
                 
-              }
-              else if (this.chartType == 'Speedometer solid') {
+              } else if (this.chartType == 'Speedometer solid') {
                 let pieData: any[] = [];
                 for (let j = 0; j < this.allData[i].data.records.length; j++)
                   {
@@ -2786,17 +2593,11 @@ this.sanitizedContent.push(sanitizedObj);
     }
 
     this.setupEditorIndexesMapping();
-
-
-    this.setupLiveIndexesMapping();
-
     // console.log("sanitized>>>>>>",this.sanitizedContent);
     // for (let i = 0; i < this.editorValue.length; i++) {
     // console.log("final Value>>>>>>>", this.editorIndexMapping(this.data.ID).value);
     // }
-    console.log("liveChartRecords>>>>>>",this.liveChartRecords);
-
-    console.log("chartConstruct>>>>",this.chartConstruct);
+    
   },
     (error: any) => {
       console.error("Error occurred:", error);
@@ -2810,7 +2611,6 @@ this.sanitizedContent.push(sanitizedObj);
   //   const baseWidth = 33.33; // Base percentage for flex-basis
   //   return `calc(${baseWidth * objectWidth}% - 20px)`;
   // }
-  
 
   ngAfterViewInit(): void {
     this.toggleAlertsVisibility();
