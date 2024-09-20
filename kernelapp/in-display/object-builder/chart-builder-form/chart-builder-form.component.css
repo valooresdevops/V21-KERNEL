@@ -1,5 +1,44 @@
-.box{
+.box {
+    position: absolute;
+    display: flex;
     width: 30%;
-    margin-left: 100px;
-    margin-top: 30px;
-}
+    height: 30%; /* Ensure the box has a defined height */
+    margin-left: 0%;
+    margin-top: 30%;
+    min-width: fit-content;
+    justify-content: center; /* Center the chart container horizontally */
+    align-items: center; /* Center the chart container vertically */
+  }
+  
+  .chart-container {
+    width: 90%;
+    height: 90%;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  }
+  
+
+
+  .boxForCharts {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 30%; /* Ensure the box has a defined height */
+    margin-left: 5%;
+    margin-top: 12%;
+    min-width: fit-content;
+    justify-content: center; /* Center the chart container horizontally */
+    align-items: center; /* Center the chart container vertically */
+  }
+
+  .boxForStocks {
+    position: absolute;
+    display: flex;
+    width: 30%;
+    height: 30%; /* Ensure the box has a defined height */
+    margin-left: 5%;
+    margin-top: 12%;
+    min-width: fit-content;
+    justify-content: center; /* Center the chart container horizontally */
+    align-items: center; /* Center the chart container vertically */
+  }

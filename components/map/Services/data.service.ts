@@ -21,8 +21,11 @@ export class DataService {
   private datePickerFromTimeline:number = 0;
   private deviceCommonLocationHits: number = 0;
   getSimulationData: any;
+  private shapeIdDate:any;
+  private valuedate:any;
+  private mapType:any;
+  private headerType:any;
 
- 
   constructor() { }
 
   getFromTimeline() {
@@ -124,5 +127,31 @@ export class DataService {
   }
   setDeviceCommonLocationHits(deviceCommonLocationHits: any) {
     this.deviceCommonLocationHits = deviceCommonLocationHits;
+  }
+  setshapeIdDate(shapeIdDate:any){
+    this.shapeIdDate=shapeIdDate;
+  }
+  getshapeIdDate(){
+    return this.shapeIdDate;
+  }
+  setvaluedate(valuedate:any){
+    console.log("settttttttttttttttttt value in service:",valuedate);
+    this.valuedate=valuedate;
+  }
+  getvaluedate(){
+    console.log("value in service:",this.valuedate);
+    return this.valuedate;
+  }
+  setmapType(mapType:any){
+    this.mapType=mapType;
+  }
+  getmapType(){
+    return this.mapType;
+  }
+  setheaderType(headerType:any){
+    this.headerType=headerType;
+  }
+  getheaderType(){
+    return this.headerType;
   }
 }

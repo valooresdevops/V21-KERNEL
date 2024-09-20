@@ -63,7 +63,7 @@ export class InDisplayLogsComponent implements OnInit {
       {
         headerName: 'Details',
         field: 'changes',
-        cellRenderer: 'buttonRenderer',
+        cellRenderer: ButtonRendererComponent,
         cellRendererParams: {
           onClick: this.onRunButtonClick.bind(this),
           label: ''

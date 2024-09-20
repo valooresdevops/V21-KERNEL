@@ -27,6 +27,8 @@ export class InputComponent implements ControlValueAccessor {
   public isDisabled!: boolean;
   public jsonEmpty: any[] = [];
   public fieldLookupName: string = '';
+  private readonly emojiRegex: RegExp = /([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g;
+
 
   @Input() public type: any; // used to set the input type
   @Input() public placeholder: any; // used to set input element placeholder
@@ -55,7 +57,7 @@ export class InputComponent implements ControlValueAccessor {
   
 
   // Max Length for an input
-  @Input() public maxlength: number = 9999;
+  @Input() public maxlength: number = 999;
   @Input() public defaultValue: string = '';
 
   // Indisplay paramters
@@ -104,11 +106,45 @@ export class InputComponent implements ControlValueAccessor {
         value = (<HTMLInputElement>event.target).value;
         this.changed(value);
         this.parentForm.controls[this.fieldName].markAsTouched();
+      }else if(this.type == 'amount'){
+        value = value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
       }else {
-        // Check if input type is of text type to return value
-        value = (<HTMLInputElement>event.target).value;
-        this.changed(value);
-        this.parentForm.controls[this.fieldName].markAsTouched();
+        let inputElement = <HTMLInputElement>event.target;
+
+        let value = inputElement.value;
+
+      /////////Sigma
+       if (value.match(this.emojiRegex)) {
+         value = value.replace(this.emojiRegex, '');} 
+
+      /////////Sigma
+    //   if (/\d/.test(value)) {
+    //     // Remove existing commas before processing
+    //     const cleanedValue = value.replace(/,/g, '');
+    
+    //     // Extract and format the numeric part
+    //     const formattedValue = cleanedValue.replace(/\d+/g, (match) => {
+    //         return new Intl.NumberFormat().format(Number(match));
+    //     });
+    
+    //     // Replace the original numeric part with the formatted part
+    //     value = formattedValue;
+    // }
+    
+      // end new code
+      
+      
+
+         this.parentForm.controls[this.fieldName].setValue(value);
+   this.parentForm.controls[this.fieldName].markAsTouched();
+
+   // Notify that the value has changed
+   this.changed(value);
+       // value = (<HTMLInputElement>event.target).value;
+       
+       // this.changed(value);
+       
+       // this.parentForm.controls[this.fieldName].markAsTouched();
       }
     }
   }
@@ -232,7 +268,7 @@ export class InputComponent implements ControlValueAccessor {
       height: this.lookupHeight,
       data: data 
     });
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().subscribe((result:any) => {
       if (result) {
         
         this.parentForm?.controls[this.fieldName].setValue(localStorage.getItem('agGidSelectedLookup_(' + this.fieldName + ')_id'));

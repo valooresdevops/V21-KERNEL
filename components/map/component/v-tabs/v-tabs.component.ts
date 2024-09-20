@@ -1,5 +1,5 @@
  import { Component, ContentChildren,QueryList, AfterContentInit, Input,} from '@angular/core';
-import { TabEmitterService } from 'src/app/Kernel/services/tab-emitter.service';
+import { TabEmitterService } from 'src/app/Kernel/components/map/Services/tab-emitter.service';
 import { TabComponent } from './v-tab.components';
 
 @Component({

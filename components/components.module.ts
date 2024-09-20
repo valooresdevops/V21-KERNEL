@@ -77,7 +77,15 @@ import {VHighChartsComponent} from './v-highcharts/v-highcharts.component';
 import { NavbarComponent } from './map/component/menu/menu.component';
 import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-stocks.component';
 // import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-stocks.component';
-
+import { TextmenuComponent } from './map/component/textmenu/textmenu.component';
+import { HeaderComponent } from './map/component/header/header.component';
+import { PropertiesComponent } from './map/component/properties/properties.component';
+import { TimelineComponent } from './map/timeline/timeline.component';
+import { MapOfflineComponent } from './map/map-offline/map-offline.component';
+import { PopupNameShapeComponent } from './map/component/popup-name-shape/popup-name-shape.component';
+import { BubbleButtonComponent } from './bubble-button/bubble-button.component';
+import { ObjectSizeManagerPopupComponent } from '../kernelapp/dashboard/object-size-manager-popup/object-size-manager-popup.component';
+import { AlertComponent } from './alert/alert.component';
 @NgModule({
     declarations: [
         ModalSideNavComponent,
@@ -134,7 +142,16 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
         VDynamicReportComponent,
         VHighChartsComponent,
         VHighchartsStocksComponent,
-        NavbarComponent
+        NavbarComponent,
+        TextmenuComponent,
+        HeaderComponent,
+        PropertiesComponent,
+        TimelineComponent,
+        MapOfflineComponent,
+        PopupNameShapeComponent,
+        BubbleButtonComponent,
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
 
     ],
     imports: [
@@ -199,7 +216,16 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
         ToastrModule,
         VHighChartsComponent,
         VHighchartsStocksComponent,
-        NavbarComponent
+        NavbarComponent,
+        TextmenuComponent,
+        HeaderComponent,
+        PropertiesComponent,
+        TimelineComponent,
+        MapOfflineComponent,
+        PopupNameShapeComponent,
+        BubbleButtonComponent,
+        ObjectSizeManagerPopupComponent,
+        AlertComponent
 
     ],
     schemas: [
@@ -208,6 +234,8 @@ import { VHighchartsStocksComponent } from './v-highcharts-stocks/v-highcharts-s
     providers: [
         PopupComponent,
         MapComponent,
+        TimelineComponent,
+        MapOfflineComponent,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: Http_Interceptor,

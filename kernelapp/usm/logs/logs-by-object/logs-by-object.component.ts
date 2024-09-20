@@ -1,6 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , ChangeDetectorRef } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import axios from 'axios';
+import { from, lastValueFrom } from 'rxjs';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -32,7 +34,10 @@ export class LogsByObjectComponent implements OnInit {
     logoutDate: new UntypedFormControl({value: '', disabled: false},),
     menuName:new UntypedFormControl({value: '', disabled: false},)
   });
-  constructor(public datepipe: DatePipe, private commonFunctions: CommonFunctions) { }
+  constructor(public datepipe: DatePipe,
+              private commonFunctions: CommonFunctions,
+              private cdr : ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     $("#dropdownStyle").addClass('vh-100');
@@ -41,13 +46,13 @@ export class LogsByObjectComponent implements OnInit {
     this.agColumnsJson = [
       {
         headerName: 'Employee Name',
-        field: 'empName',
+        field: 'empname',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Menu',
-        field: 'menuPath',
+        field: 'menu',
         filter: 'agTextColumnFilter',
         sortable: true
       },
@@ -59,13 +64,13 @@ export class LogsByObjectComponent implements OnInit {
       },
       {
         headerName: 'Hint',
-        field: 'operationHint',
+        field: 'operationhint',
         filter: 'agTextColumnFilter',
         sortable: true
       },
       {
         headerName: 'Operation Date',
-        field: 'operationDate',
+        field: 'operationdate',
         filter: 'agTextColumnFilter',
         sortable: true
       }
@@ -74,18 +79,34 @@ export class LogsByObjectComponent implements OnInit {
   }
   ngOnChanges(): void {this.submitForm();}
 
-  submitForm() {
+
+  ////////Sigma
+  async submitForm() {
     if (this.ObjectForm.status != "INVALID") {
       $("#dropdownStyle").removeClass('vh-100');
 
 
-      const loginDate = this.ObjectForm.get('loginDate').value == "" ? "-1" : this.datepipe.transform(this.ObjectForm.get('loginDate').value, 'dd-MM-YYYY');
+      // const loginDate = this.ObjectForm.get('loginDate').value == "" ? "-1" : this.datepipe.transform(this.ObjectForm.get('loginDate').value, 'YYYY-MM-dd');
 
-      const logoutDate = this.ObjectForm.get('logoutDate').value == "" ? "-1" : this.datepipe.transform(this.ObjectForm.get('logoutDate').value, 'dd-MM-YYYY');
+      // const logoutDate = this.ObjectForm.get('logoutDate').value == "" ? "-1" : this.datepipe.transform(this.ObjectForm.get('logoutDate').value, 'YYYY-MM-dd');
+
+      const loginDate = this.datepipe.transform(this.ObjectForm.get('loginDate').value, 'MM-dd-yyyy');
+      const logoutDate = this.datepipe.transform(this.ObjectForm.get('logoutDate').value, 'MM-dd-yyyy');
+
 
       let application = this.ObjectForm.get('application').value == "" ? "-1" : this.ObjectForm.get('application').value;
+      application = application.toString();
+if (application.length === 1) {
+  application ='00' + application;
+      } else {
+        application ='0' + application;
+      }
       //parseInt to eliminate leading zeros
-      const menuName = parseInt(this.ObjectForm.get('menuName').value == "" ? "-1" : this.ObjectForm.get('menuName').value,10);
+      let menuName = (this.ObjectForm.get('menuName').value == "" ? "-1" : this.ObjectForm.get('menuName').value);
+      console.log("menu name >>>>", menuName);
+      console.log("menu name type>>>>", typeof menuName);
+      // menuName = parseInt(menuName);
+
       //console.log('logoutdate',logoutDate);
 
       if (loginDate != null && logoutDate != null && logoutDate != "-1" && loginDate != "-1") {
@@ -103,32 +124,49 @@ export class LogsByObjectComponent implements OnInit {
       //  console.log('logoutdate:',logoutDate);
       //  console.log('application:',application);
       //  console.log('menuName:',menuName);
-
-  this.objectLogsGrid = GlobalConstants.getObjectLogsApi + application + "/" + menuName + "/" + loginDate + "/" + logoutDate;
+      const getLogsByObjApi = from(axios.get(GlobalConstants.getObjectLogsApi + application + "/" + menuName + "/" + loginDate + "/" + logoutDate,{}));
+      const getLogsByObj = await lastValueFrom(getLogsByObjApi);
+      this.objectLogsGrid = getLogsByObj.data;
+      console.log("typeoffffffff", typeof this.objectLogsGrid);
+   console.log("objectLogsGrid>>>>>>>>>>>>  ", this.objectLogsGrid);
+  // this.objectLogsGrid = GlobalConstants.getObjectLogsApi + application + "/" + menuName + "/" + loginDate + "/" + logoutDate;
 
 //console.log ("objectLogsGrid",this.objectLogsGrid);
 this.isShown = true;
   }
 }
 
-  onChangeApplicationName(value: any) {
-    if (value != '') {
-       this.menuIsDisabled = false;
-       this.menuIsRequired = true;
-        const defaultRoleJson = { 'id': value };
-        value = value == 0 ? value : "0" + value;
-        this.getMenuName = GlobalConstants.getMenuName + value;
-        //alert("getMenuName"+this.getMenuName);
-        this.menuNameBody = defaultRoleJson;
+onChangeApplicationName(value: any) {
+  value = value.toString();
+  if (value !== '') {
+      this.menuIsDisabled = false;
+      this.menuIsRequired = true;
+      const defaultRoleJson = { 'id': value };
 
-    } else {
+      // Check the length of the value and format accordingly
+      console.log("value lengthhh>>>",value.length);
+      if (value.length === 1) {
+          value ='00' + value;
+      } else {
+          value ='0' + value;
+      }
+
+      this.getMenuName = GlobalConstants.getMenuNameByPCode + value;
+      this.cdr.detectChanges();
+      //alert("getMenuName"+this.getMenuName);
+      this.menuNameBody = defaultRoleJson;
+      console.log("this.menuNameBody", this.menuNameBody);
+      console.log("app valuee>>>>>",value);
+  } else {
       this.getMenuName = "";
       this.menuIsRequired = false;
       this.menuIsDisabled = true;
-    }
-     // Set menuIsDisabled flag based on menuIsRequired flag
-  this.menuIsDisabled = !this.menuIsRequired;
   }
+
+  // Set menuIsDisabled flag based on menuIsRequired flag
+  this.menuIsDisabled = !this.menuIsRequired;
+}
+
 }
 
 

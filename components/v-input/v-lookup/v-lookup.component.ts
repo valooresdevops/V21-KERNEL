@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -10,7 +10,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
   styleUrls: ['./v-lookup.component.css']
 })
 export class VLookupComponent implements OnInit {
-
+  @Output() lookupDataSelected = new EventEmitter<any>();
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
   public inDisplayGrid = GlobalConstants.fetchInDispMappingApi;
@@ -22,6 +22,7 @@ export class VLookupComponent implements OnInit {
   public lookupSelection: string = "";
   public label:any;
   public readonly:boolean;
+  
   constructor(private dialogRef: MatDialogRef<VLookupComponent>, @Inject(MAT_DIALOG_DATA) public lookupData: any,
     public informationservice: InformationService) { }
 
@@ -54,7 +55,9 @@ export class VLookupComponent implements OnInit {
     } else {
       this.setupEditableColumns();
     }
+    
   }
+  
 
   //   if(this.lookupStaticData != "-1") {
   //     this.agColumnsJson = [
@@ -107,7 +110,7 @@ export class VLookupComponent implements OnInit {
   //   }
   setupReadOnlyColumns(): void {
     if (this.lookupStaticData != "-1") {
-      console.log('1 Selection ===================== ', this.lookupSelection);
+      // console.log('1 Selection ===================== ', this.lookupSelection);
 
       this.agColumnsJson = [
         {
@@ -167,7 +170,7 @@ export class VLookupComponent implements OnInit {
         }
       ];
     } else {
-      console.log('2 Selection ===================== ', this.lookupSelection);
+      // console.log('2 Selection ===================== ', this.lookupSelection);
       
       this.agColumnsJson = [
         {
@@ -209,10 +212,14 @@ export class VLookupComponent implements OnInit {
 
   submitLookup(): void {
      this.informationservice.setLookUpSubmitValue(localStorage.getItem("agGidSelectedLookup_("+this.lookupFieldName+")_id"))
+    //  const selectedLookupData = localStorage.getItem("agGidSelectedLookup_("+this.lookupFieldName+")_id");
     // localStorage.setItem("agGidSelectedLookup_("+this.lookupFieldName+")_id", "");
     // localStorage.setItem("agGidSelectedLookup_("+this.lookupFieldName+")_name", "");
     this.dialogRef.close("closed");
+    // this.lookupDataSelected.emit(selectedLookupData); // Emit an event with the selected lookup data
+
   }
+  
 
   closeDialog(): void {
     this.dialogRef.close();

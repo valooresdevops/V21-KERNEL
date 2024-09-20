@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, forwardRef, Input, OnChanges, OnInit,ViewChild, Output, SimpleChanges, ViewEncapsulation, Renderer2, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, EventEmitter, forwardRef, Input, OnChanges, OnInit,ViewChild, Output, SimpleChanges, ViewEncapsulation, Renderer2, ElementRef } from '@angular/core';
 import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR, FormGroupDirective, NgForm, } from '@angular/forms';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
@@ -60,7 +60,6 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   @Input() public dropdownClass: any = -1;
   @Input() public phoneNumberValue: any;
   @Input() public isphone: boolean;
-
   // Indisplay variables
   @Input() public hasSuspendedStyle: boolean = false;
   @Input() public isForIndisplay: boolean = false;
@@ -76,8 +75,44 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
     return this.parentForm.get(this.fieldName) as UntypedFormControl;
   }
 
+  private observer: MutationObserver;
+
   constructor(private http: HttpClient, private commonFunctions: CommonFunctions,
     private renderer: Renderer2, private el: ElementRef) { }
+
+    ngAfterViewInit() {
+      this.checkIfAtBottom();
+      this.initObserver();
+    }
+  
+    ngOnDestroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+      }
+    }
+
+    private checkIfAtBottom() {
+      const rect = this.el.nativeElement.getBoundingClientRect();
+      const threshold = window.innerHeight * 0.35;
+      const isAtBottom = window.innerHeight - rect.bottom < threshold;
+    
+      if (isAtBottom) {
+        this.renderer.addClass(this.el.nativeElement, 'bottom-dropdown');
+      } else {
+        this.renderer.removeClass(this.el.nativeElement, 'bottom-dropdown');
+      }
+    }
+  
+    private initObserver() {
+      this.observer = new MutationObserver(() => {
+        this.checkIfAtBottom();
+      });
+  
+      this.observer.observe(this.el.nativeElement, {
+        childList: true,
+        subtree: true
+      });
+    }
 
   ngOnInit(): void
   {
@@ -110,7 +145,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
   }
 
   public loadData(): Promise<void> {
-    console.log("11111111")
+    // console.log("11111111")
     return new Promise<void>((resolve) => {
       if (this.dataApi != '' || this.dataJSON != null) {
         this.dropdownList = [];
@@ -126,7 +161,7 @@ export class DropDownComponent implements ControlValueAccessor, OnChanges, OnIni
             let dropdownDataPromise: Promise<any>;
   
             if (this.dataBody != '') {
-              dropdownDataPromise = axios.post(this.dataApi, this.dataBody);
+              dropdownDataPromise = axios.get(this.dataApi, this.dataBody);
             } else {
               dropdownDataPromise = axios.get(this.dataApi);
             }
@@ -340,7 +375,7 @@ private extractDropdownValues(jsonData: any): void {
   ngOnChanges(changes: SimpleChanges): void
   {
     this.loadData();
-    console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+    // console.log("Change was detected <<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
   }
 
   onItemSelect(item: any)

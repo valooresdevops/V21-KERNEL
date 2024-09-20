@@ -11,7 +11,7 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
 import { AgRendererComponent } from 'ag-grid-angular';
 import { InformationService } from 'src/app/Kernel/services/information.service';
-
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
   selector: 'advanced-form',
@@ -19,13 +19,26 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
   styleUrls: ['./advanced-form.component.css']
 })
 export class AdvancedFormComponent implements OnInit {
+
+  gridOptions: GridOptions;
+  rowData: any[] = [
+    { make: "Toyota", model: "Celica", price: 35000 },
+    { make: "Ford", model: "Mondeo", price: 32000 },
+    { make: "Porsche", model: "Boxster", price: 72000 }
+  ];
+
   @ViewChild('agGrid', { static: true }) agGrid!: AgGridAngular;
 
   constructor(@Inject(MAT_DIALOG_DATA) public lookupData: any,
     private dialogRef: MatDialogRef<AdvancedFormComponent>,
     private refreshService: RefreshDialogService,
     private http: HttpClient,
-    public informationservice: InformationService) { }
+    public informationservice: InformationService,
+  ) { this.gridOptions = {
+    rowData: this.rowData,
+    // Define columns here if needed
+  };}
+    
 
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
@@ -176,6 +189,19 @@ export class AdvancedFormComponent implements OnInit {
   }
 
 
+  onGridReady(params: any) {
+    params.api.sizeColumnsToFit();
+    this.getAllRowsData(params.api);
+  }
+
+  getAllRowsData(api : any) {
+    let allRowData : any[]= [];
+    api.forEachNode((node: any) => {
+      allRowData.push(node.data);
+    });
+    console.log('All Row Data:', allRowData);
+    // Now you can save allRowData
+  }
 
   CreateGridSaveNew() {
     this.agColumnsJson = [
@@ -236,8 +262,10 @@ export class AdvancedFormComponent implements OnInit {
           values: this.conditions,
         },
         editable: true,
-        cellDataType: true
+        cellDataType: true,
+        cellClass: 'ag-rich-select-list, ag-rich-select-list-item, ag-rich-select-list-item:hover'
       },
+      
       {
         headerName: 'Value',
         field: 'value',
@@ -289,10 +317,11 @@ export class AdvancedFormComponent implements OnInit {
   }
 
   async gridEventSave(event: any) {
-console.log("event >>>>>>> ",event);     
+  console.log("event >>>>>>> ",event);     
       const addList = event[0].addList;
       this.addList = JSON.stringify(addList);
       let Object = JSON.parse(this.addList);
+      console.log("adlisttttttttttt:",addList);
       for (let i = 0; i < Object.length; i++) {
         let beginCondition = '';
         let field = '';
@@ -358,31 +387,75 @@ console.log("event >>>>>>> ",event);
 
     this.closeDialog(event[0]);
   }
+
+  
+
 }
 
+// class DropdownCellRenderer {
+//   setValues(filteredValues: any) {
+//     throw new Error('Method not implemented.');
+//   }
+//   eGui: any;
+
+//   init(params: any) {
+//     if (params.value != undefined) {
+//       if (params.value.name != undefined) {
+//         this.eGui = document.createElement('div');
+//         this.eGui.innerHTML = `<span style="position:fixed;background-color: yellow; text-overflow: ellipsis; z-index: 9999999999999999999 !important;">${params.value.name}</span>`;
+//       } else {
+//         this.eGui = document.createElement('div');
+//         this.eGui.innerHTML = `<span style="overflow: hidden;background-color: yellow;position:fixed;top:0; text-overflow: ellipsis; z-index: 9999999999999999999 !important;">${params.value}</span>`;
+//       }
+//     }
+//   }
+//   getGui() {
+//     return this.eGui;
+//   }
+//   refresh(params: any) {
+//     return false;
+//   }
+// }
 class DropdownCellRenderer {
-  setValues(filteredValues: any) {
-    throw new Error('Method not implemented.');
-  }
-  eGui: any;
+  eGui: HTMLElement | null = null;
 
   init(params: any) {
-    if (params.value != undefined) {
-      if (params.value.name != undefined) {
-        this.eGui = document.createElement('div');
-        this.eGui.innerHTML = `<span style="overflow: hidden; text-overflow: ellipsis">${params.value.name}</span>`;
-      } else {
-        this.eGui = document.createElement('div');
-        this.eGui.innerHTML = `<span style="overflow: hidden; text-overflow: ellipsis">${params.value}</span>`;
-      }
+    if (params.value !== undefined) {
+      const span = document.createElement('span');
+      span.style.cssText = `
+        
+        
+        background-color: #f0f0f0 !important; /* Green background */
+        color: #333 !important; /* Dark text color */
+        border-radius: 5px !important; /* Rounded corners */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; /* Subtle shadow for depth */
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        overflow: hidden !important; /* Ensure content is visible outside */
+        z-index: 2147483646 !important; /* Ensure it's on top */
+        position: absolute !important; /* Adjusted to ensure visibility */
+        top:100 !important;
+        margin-bottom:10% !important;
+      `;
+
+      span.textContent = params.value.name !== undefined ? params.value.name : params.value;
+
+      this.eGui = document.createElement('div');
+      this.eGui.style.cssText = `
+        position: absolute; /* Ensure absolute positioning */
+        top: 0; /* Adjust positioning as needed */
+        left: 0; /* Adjust positioning as needed */
+        bottom:20;
+      `;
+      this.eGui.appendChild(span);
     }
   }
+
   getGui() {
-    return this.eGui;
+    return this.eGui!;
   }
+
   refresh(params: any) {
     return false;
   }
 }
-
-

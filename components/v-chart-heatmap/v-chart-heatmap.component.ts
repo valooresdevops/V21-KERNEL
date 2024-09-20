@@ -104,7 +104,7 @@ export class VChartHeatmapComponent implements OnInit {
               color: '#78819e',
               gridLineWidth: 0,
             },
-            padding: '0px'
+            // padding: '0'
           },
           gridLineWidth: 0,
         },
@@ -118,7 +118,7 @@ export class VChartHeatmapComponent implements OnInit {
                 gridLineWidth: 0,
 
               },
-              padding: '0px'
+              // padding: '0'
             },
             gridLineWidth: 0,
           },

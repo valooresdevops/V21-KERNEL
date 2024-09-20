@@ -3,7 +3,7 @@ import {MatDatepickerInputEvent, MatDatepickerModule} from '@angular/material/da
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatNativeDateModule} from '@angular/material/core';
-import { UntypedFormControl } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import Swal from 'sweetalert2';
@@ -18,8 +18,8 @@ export class DatePickerComponent implements OnInit {
   endTime: string;
   selectedEndDate: any;
   isFilledBefore:boolean=false;
-  startDateControl = new UntypedFormControl();
-  endDateControl = new UntypedFormControl(); 
+  startDateControl = new FormControl();
+  endDateControl = new FormControl(); 
   time:any;
   @ViewChild('beginTimeInput') beginTimeInput!: ElementRef<HTMLInputElement>;
   @ViewChild('endTimeInput') endTimeInput!: ElementRef<HTMLInputElement>;
@@ -58,8 +58,8 @@ this.selectedStartDate=formattedDate;
       this.dataService.setendDate('');
 
 
-       this.startDateControl = new UntypedFormControl(date1);
-        this.endDateControl = new UntypedFormControl(date2);
+       this.startDateControl = new FormControl(date1);
+        this.endDateControl = new FormControl(date2);
 
     }else{
     

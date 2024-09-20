@@ -1,0 +1,111 @@
+<body>
+  <div class="header">
+    <h1>Master Link Analysis</h1>
+  </div>
+  <hr>
+
+  <div class="content">
+    <form [formGroup]="gridForm" enctype="multipart/form-data">
+      <div class="row">
+        <div class="col-lg-5">
+          <v-input formControlName="title" type="text" formControlName="title" [parentForm]="gridForm" label="Title" fieldName="title" required="true"></v-input>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-5">
+          <v-input formControlName="query" [parentForm]="gridForm" type="lookup" [lookupDataApi]="getQueryName" lookupWidth="700px" lookupHeight="700px" label="Source Query" fieldName="query" id="lookupDropdown" (ngModelChange)="onDropdownChange($event)">></v-input>
+          <!-- <button #hiddenSubmitButton type="submit" style="display: none;"></button> -->
+        <!-- (lookupDataSelected)="onLookupDataSelected($event)"--> 
+        </div>
+      </div>
+      <div *ngIf="isReload">
+      <div class="hr-with-text">
+        <span>Nodes</span>
+      </div>
+      <v-grid 
+  allowSideBar="true"
+  [dataApi]="test"
+  [agColumns]="agColumns"
+  [pagination]="true"
+  [paginationPageSize]="15"
+  agToolBar="ad"
+  agPrimaryKey="nodeName"
+  [agOnGridEvents]="true"
+  (onGridEventSave)="gridEventSave($event)"
+  [showOrHideButton]="true"
+  [hideBTN]="true"
+  (gridReady)="onGridReady($event)"
+  >
+</v-grid>
+
+
+      <hr>
+      <div class="hr-with-text">
+        <span>Links</span>
+      </div>
+      <v-grid
+      
+        allowSideBar="true"
+        [dataApi]="test"
+        [agColumns]="agColumns2"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        agToolBar="ad"
+
+        [agOnGridEvents]="true"
+        (onGridEventSave)="gridEventSave2($event)"
+        [showOrHideButton]="true"
+        [hideBTN]="true"
+        (gridReady)="onGridReady2($event)"
+      ></v-grid>
+
+      <div id="addInfo" *ngIf="isVisible">
+        <div class="hr-with-text">
+        <span>Nodes Informations</span>
+      </div>
+      <v-grid 
+  allowSideBar="true"
+  [dataApi]="test"
+  [agColumns]="agColumns3"
+  [pagination]="true"
+  [paginationPageSize]="15"
+  agToolBar="ad"
+  agPrimaryKey="nodeName"
+  [agOnGridEvents]="true"
+  (onGridEventSave)="gridEventSave3($event)"
+  [showOrHideButton]="true"
+  [hideBTN]="true"
+  (gridReady)="onGridReady3($event)">
+</v-grid>
+
+<hr>
+      <div class="hr-with-text">
+        <span>Links Informations</span>
+      </div>
+      <v-grid
+      
+        allowSideBar="true"
+        [dataApi]="test"
+        [agColumns]="agColumns4"
+        [pagination]="true"
+        [paginationPageSize]="15"
+        agToolBar="ad"
+
+        [agOnGridEvents]="true"
+        (onGridEventSave)="gridEventSave4($event)"
+        [showOrHideButton]="true"
+        [hideBTN]="true"
+        (gridReady)="onGridReady4($event)"
+      ></v-grid>
+
+</div>
+</div>
+      <div class="button-container">
+        <v-button value="Add Info" (click)="addInfo()"></v-button>
+        <v-button value="Save" (click)="saveMasterLinkData()"></v-button>
+      </div>
+    </form>
+  </div>
+
+</body>

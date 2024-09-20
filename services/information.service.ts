@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class InformationService {
   public twiceClose: String = '';
   public userRoleId: string = '';
   public agGidSelectedNode: string = '';
+  public agGidSelectedCell: string = '';
   public popupBreadcrumb: any;
   public previousMainTab2: string = '';
   public previousTabIdSelected: string = '';
@@ -53,22 +55,80 @@ export class InformationService {
   public selectMonths : any = '';
   public customScreenBuilderPath : string = '';
   public lookUpSubmitValue : any = '';
+  public ISExport : boolean =false;
+  public isRowGroup : any = '';
+  public selectedChart : any = '';
+  public navBreadCrumb : any[] =[];
+  public vcisrowData : any ;
+  public checkParentMenu : number=0;
+  public checkParentMenuFirst : String = "";
+  public bubbleButton: any;
+  public selectedGridNode : any;
+  public advancedSearchFunctionData:any='';
+  public dashboardContentSize :number;
+  public dynamicSearchApiData :any;
+  private actionType:any;
+  public agGridNodeData : Object;
+  public reloadGrid : boolean = true;
+  public selectedNodeVGrid : object;
+  public selectedColumnFormOpening : any;
+  public selectedColumnValue : boolean = false;
+  public mainPreviewScreenType : boolean = false;
+  public advancedSearchShowGrid : boolean = false;
+  public advancedSearchShowGridMain:boolean=true;
+  public isDisplayAll:boolean=false;
+  public breakLiveDataBar: any;
+  public breakLiveDataLine: any;
+  public breakLiveDataArea: any;
+  public breakLiveDataColumn: any;
+  public formRecentData : any[] =[];
+  public isFromMainPreviewForm: any;
 
-  
-  
   constructor() { }
 
- 
-  
+  private bubbleMenusSubject = new BehaviorSubject<any[]>([]);
+  bubbleMenus$ = this.bubbleMenusSubject.asObservable();
+
+  setBubbleMenus(menus: any[]) {
+    this.bubbleMenusSubject.next(menus);
+  }
   //authentication still has a localstorage
   setLogeduserId(logeduserIdVal: string) {
     this.logeduserId = logeduserIdVal;
   }
   
+  getBubbleButton(){
+    return this.bubbleButton;
+  }
+  setBubbleButton(bubbleButton:any){
+    this.bubbleButton = bubbleButton;
+  }
+
+  getSelectedChart(){
+    return this.selectedChart;
+  }
+  setSelectedChart(selectedChart : any){
+    this.selectedChart = selectedChart;
+  }
   getLogeduserId() {
     return this.logeduserId;
   }
 
+  setNavBreadCrumb(navBreadCrumb: any[]) {
+    this.navBreadCrumb = navBreadCrumb;
+  }
+  
+  getNavBreadCrumb() {
+    return this.navBreadCrumb;
+  }
+
+  setIsRowGroup(isRowGroup: String) {
+    this.isRowGroup = isRowGroup;
+  }
+  
+  getIsRowGroup() {
+    return this.isRowGroup;
+  }
   setLookUpSubmitValue(lookUpSubmitValue: string) {
     this.lookUpSubmitValue = lookUpSubmitValue;
   }
@@ -144,6 +204,13 @@ export class InformationService {
   
   getAgGidSelectedNode() {
     return this.agGidSelectedNode;
+  }
+
+  setAgGidSelectedCell(agGidSelectedCellVal :string){
+    this.agGidSelectedCell = agGidSelectedCellVal;
+  }
+  getAgGidSelectedCell(){
+    return this.agGidSelectedCell;
   }
 
   setSelectedTabId(selectedTabIdVal: string){
@@ -513,4 +580,168 @@ export class InformationService {
   getCustomScreenBuilderPath(){
       return this.customScreenBuilderPath;
   }
+
+  setISExport(ISExport: any) {
+    this.ISExport = ISExport;
+  }
+
+  getISExport(){
+      return this.ISExport;
+  }
+
+  setVcisrowData(vcisrowData: any) {
+    this.vcisrowData = vcisrowData;
+  }
+
+  getVcisrowData(){
+      return this.vcisrowData;
+  }
+
+getSelectedGridNode(){
+  return this.selectedGridNode;
+}
+setSelectedGridNode(Node : any){
+  this.selectedGridNode = Node;
+}
+
+setAdvancedSearchFunctionData(advancedSearchFunctionData: any) {
+  this.advancedSearchFunctionData = advancedSearchFunctionData;
+}
+
+getAdvancedSearchFunctionData() {
+  return this.advancedSearchFunctionData;
+}
+getreloadGrid(){
+  return this.reloadGrid;
+}
+setreloadGrid(check : boolean){
+  this.reloadGrid = check;
+}
+getSelectedNodeVGrid(){
+  return this.selectedNodeVGrid;
+}
+setSelectedNodeVGrid(node : object){
+this.selectedNodeVGrid = node;
+}
+
+setDashboardContentSize(dashboardContentSize: any) {
+  this.dashboardContentSize = dashboardContentSize;
+}
+
+getDashboardContentSize() {
+  return this.dashboardContentSize;
+}
+
+getDynamicSearchApiData(){
+  return this.dynamicSearchApiData;
+}
+setDynamicSearchApiData(dynamicSearchApiData:any){
+  this.dynamicSearchApiData = dynamicSearchApiData;
+}
+setactionType(actionType: any) {
+  this.actionType = actionType;
+}
+
+getactionType() {
+  return this.actionType;
+}
+
+getAgGridNodeData(){
+  return this.agGridNodeData ;
+  }
+
+setAgGridNodeData(data : object){
+this.agGridNodeData = data;
+}
+
+
+
+getSelectedColumnValue(){
+  return this.selectedColumnValue;
+}
+setSelectedColumnValue(selectedColumnValue:any){
+  this.selectedColumnValue = selectedColumnValue;
+}
+
+
+
+getSelectedColumnFormOpening(){
+  return this.selectedColumnFormOpening;
+}
+setSelectedColumnFormOpening(selectedColumnFormOpening:any){
+  this.selectedColumnFormOpening = selectedColumnFormOpening;
+}
+removeSelectedColumnFormOpening(){
+  this.selectedColumnFormOpening = '';
+}
+
+
+getMainPreviewScreenType(){
+  return this.mainPreviewScreenType;
+}
+setMainPreviewScreenType(mainPreviewScreenType:any){
+  this.mainPreviewScreenType = mainPreviewScreenType;
+}
+getAdvancedSearchShowGrid(){
+  return this.advancedSearchShowGrid;
+}
+setAdvancedSearchShowGrid(advancedSearchShowGrid:any){
+  this.advancedSearchShowGrid = advancedSearchShowGrid;
+}
+getAdvancedSearchShowGridMain(){
+  return this.advancedSearchShowGridMain;
+}
+setAdvancedSearchShowGridMain(advancedSearchShowGridMain:any){
+  this.advancedSearchShowGridMain = advancedSearchShowGridMain;
+}
+setIsDisplayALL(DisplayALL: boolean) {
+  this.isDisplayAll = DisplayALL;
+}
+
+getIsDisplayALL() {
+  return this.isDisplayAll;
+}
+
+getBreakLiveDataBar(){
+  return this.breakLiveDataBar;
+}
+setBreakLiveDataBar(breakLiveDataBar:any){
+  this.breakLiveDataBar = breakLiveDataBar;
+}
+
+getBreakLiveDataLine(){
+  return this.breakLiveDataLine;
+}
+setBreakLiveDataLine(breakLiveDataLine:any){
+  this.breakLiveDataLine = breakLiveDataLine;
+}
+
+getBreakLiveDataArea(){
+  return this.breakLiveDataArea;
+}
+setBreakLiveDataArea(breakLiveDataArea:any){
+  this.breakLiveDataArea = breakLiveDataArea;
+}
+
+getBreakLiveDataColumn(){
+  return this.breakLiveDataColumn;
+}
+setBreakLiveDataColumn(breakLiveDataColumn:any){
+  this.breakLiveDataColumn = breakLiveDataColumn;
+}
+
+setFormRecentData(formRecentData: any[]) {
+  this.formRecentData = formRecentData;
+}
+
+getFormRecentData() {
+  return this.formRecentData;
+}
+setIsFromMainPreviewForm(isFromMainPreviewForm: any) {
+  this.isFromMainPreviewForm = isFromMainPreviewForm;
+}
+
+getIsFromMainPreviewForm() {
+  return this.isFromMainPreviewForm;
+}
 }

@@ -19,14 +19,18 @@ export class NavbarComponent  implements OnInit{
   // hierarchyData: Node[] = [this.generateComplexJSON(10)
     // Your JSON data here
   // ];
+
+  // @Input() re:any;
   @Input() SimulID:any;
   @Output() displayclusters2   = new EventEmitter();
   @ViewChild('navigationBar') navigationBar: ElementRef;
+  @Output() openProperties = new EventEmitter();  
+
   jsonData: any[] = [/* Your JSON data goes here */];
   newItem: any;
   simulproperties: any;
   hierarchyobj:any;
-
+  showPropertiesForm:boolean=false;
   ngAfterViewInit() {
     const parentElement = this.elementRef.nativeElement.querySelector('.navigation-bar');
     this.renderer.listen(parentElement, 'click', (event: Event) => {
@@ -37,7 +41,13 @@ export class NavbarComponent  implements OnInit{
       }
     });
   }
-
+  onOpenProperties() {
+    console.log("onOpenProperties this.simulationID",this.SimulationID);
+ 
+    this.openProperties.emit(this.SimulationID);
+    //  $("#openproperties").click();
+    this.showPropertiesForm=true;
+  }
   menuClickHandler(event: Event) {
     // Your click event handler logic here
     console.log('Menu clicked!');
@@ -86,19 +96,19 @@ export class NavbarComponent  implements OnInit{
 
   ngOnInit(): void{
 // //178564
-this.parentSimulID=181663;
+// this.parentSimulID=8149;
 
-     this.datacrowdservice.displaysequence2(181663).then(((res:any)=>{
-console.log("resss",res);
-console.log("resss parsed",JSON.parse(res[0]));
-let arr:any[]=[];
-arr.push(JSON.parse(res[0]));
+//      this.datacrowdservice.displaysequence2(8149).then(((res:any)=>{
+// console.log("resss",res);
+// console.log("resss parsed",JSON.parse(res[0]));
+// let arr:any[]=[];
+// arr.push(JSON.parse(res[0]));
 
- this.hierarchyData=arr;
-//  this.hierarchyData=this.convertData(this.jsonData);
+//  this.hierarchyData=arr;
+// //  this.hierarchyData=this.convertData(this.jsonData);
 
 
-    }))
+//     }))
 
 
 }
@@ -301,17 +311,24 @@ this.hierarchyobj=JSON.parse(res[0]);
   currentTab: Node;
   lastClickedTab: Node; // Add this property
 reportType:any;
-  constructor(public datacrowdservice:DatacrowdService, private renderer: Renderer2,private elementRef: ElementRef) {
+  constructor(public datacrowdservice:DatacrowdService, private renderer: Renderer2,private elementRef: ElementRef,
+   
+  ) {
     const complexJSON: Node = this.generateComplexJSON(5);
     console.log(JSON.stringify(complexJSON, null, 2));
   }
 
   showSubMenu(item: Node) {
-    console.log('item >> ',item)
+    console.log('item >>> ',item)
     this.currentTab = item;
     this.lastClickedTab = item; // Update last clicked tab
     this.displaySenario(item);
- 
+  let obj:any={
+      action:"displaysenario",
+      simulID:item.id,
+      reportType:this.reportType
+    }
+    this.displayclusters2.emit(obj);
 
   }
 
@@ -329,12 +346,12 @@ reportType:any;
 
   displaySenario(item: Node)
   {
-    let obj:any={
-      action:"displaysenario",
-      simulID:item.id,
-      reportType:this.reportType
-    }
-    this.displayclusters2.emit(obj);
+    // let obj:any={
+    //   action:"displaysenario",
+    //   simulID:item.id,
+    //   reportType:this.reportType
+    // }
+    // this.displayclusters2.emit(obj);
     this.addNewActiveTab(item.id)
 
   }
@@ -597,16 +614,19 @@ if(typeof this.SimulName=="undefined"){
   let finalvalue:any=$('#'+ this.SimulationID+' .smartinput').val();
   $('#'+ this.SimulationID+' .smartinput').attr('readonly', 'readonly');
    await this.datacrowdservice.updateLocReportNameById(finalvalue,this.SimulationID);
-  
 
-   var button = $('.submenu-item').filter(function() {
+  // let obj:any={"table_id": this.SimulationID }
+
+  //  await this.datacrowdservice.SaveSimul(obj);
+
+   var button :any= $('.menu-item').filter(function() {
     return $(this).find('span:contains('+firstValue+')').length > 0;
 });
 console.log('firstValue',firstValue)
 console.log('SimulationID',this.SimulationID)
 
 console.log("buttonzzz",button);
-if(button.length > 0) {
+if(button.prevObject.length > 0) {
   button.find('span:contains('+firstValue+')').text(finalvalue); // Change 'new text value' to your desired text
   console.log('updateSimulNameById>>>>>',this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue));
   this.hierarchyData=this.updateSimulNameById(this.hierarchyData[0],this.SimulationID,finalvalue);
@@ -738,6 +758,10 @@ async deleteSimul(){
   
   
 }
+
+
+
+
 onIconHover(state: boolean): void {
   this.isHovered = state;
 }
@@ -802,6 +826,24 @@ updateSimulNameById(root:any, id:any, newName:any) {
   return false;  // Did not find the id
 }
 
+call(event:any,param:any){
+  console.log("param",param)
+  let obj:any={
+    action:param,
+
+  }
+  this.displayclusters2.emit(obj);
+  if(param=="refresh"){
+    console.log("mmmmmmmmmm",$('#SendData'));
+    if($('#SendData').length>0){
+      $('#SendData').click();
+    }
+  }
+  event.preventDefault();
+
+}
+
+
 
 }
 interface TreeNode {
@@ -810,5 +852,3 @@ interface TreeNode {
   id: number;
   children?: TreeNode[] | string[];
 }
-
-

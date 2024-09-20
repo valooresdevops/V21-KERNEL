@@ -1,14 +1,19 @@
 <form [formGroup]="chartForm">
-  <div class="box" style="position:absolute"  *ngFor="let options of newChartObject; let i = index" cdkDrag >
+  <h1 style="text-align: center;">{{newTitle}}</h1>
+  <div  style="position:absolute;"  *ngFor="let options of newChartObject; let i = index" >
   <div class="chart-row">
-   <ng-container >
-     <div class="chart-container">
-       <v-highcharts [Highcharts]="Highcharts" [options]="options"></v-highcharts>
+     <div class="chart-container" id="chartContainer" style="width: 500px; display: flex; justify-content: center; align-items: center; padding-top: 5%;">
+       <v-highcharts [sizeCheck]="true" [Highcharts]="Highcharts" [options]="options" ></v-highcharts>
      </div>
-   </ng-container>
- </div>   
+ </div>  
+ <div *ngIf="isDescription" style="padding-bottom: 10px;">
+{{description}}
  </div>
- <div class="box" style="position:absolute"  *ngFor="let options of stockObject; let i = index" >
+ <div>
+
+ </div> 
+ </div>
+ <div class="boxForStocks" style="position:absolute"  *ngFor="let options of stockObject; let i = index" >
   <div class="chart-row">
    <ng-container >
      <div class="chart-container">

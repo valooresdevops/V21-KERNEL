@@ -1,0 +1,9 @@
+/* Example styles for CKEditor */
+.ck-editor__editable_inline {
+    min-height: 200px;
+  }
+  
+  .button-group {
+    margin-top: 10px;
+  }
+  

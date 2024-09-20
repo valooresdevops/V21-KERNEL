@@ -1,7 +1,7 @@
 import { DatePipe, ɵNullViewportScroller } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, NgZone, OnInit, Renderer2 } from '@angular/core';
-import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Inject, Input, NgZone, OnInit, Renderer2 ,Optional, ViewEncapsulation} from '@angular/core';
+import { AbstractControl, UntypedFormArray, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { Subscription, from, lastValueFrom, map } from 'rxjs';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
@@ -18,14 +18,17 @@ import { VRejectedComponent } from 'src/app/Kernel/components/v-rejected/v-rejec
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { DynamicReportSaveComponent } from '../dynamic-report-save/dynamic-report-save.component';
 import { DynamicReportResultComponent } from 'src/app/Kernel/components/v-dynamic-report/dynamic-report-result/dynamic-report-result.component';
+import { Console } from 'console';
 
 
 @Component({
   selector: 'am-preview-form',
   templateUrl: './am-preview-form.component.html',
-  styleUrls: ['./am-preview-form.component.css']
+  styleUrls: ['./am-preview-form.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AmPreviewFormComponent implements OnInit {
+  @Input() mainPreviewDataInput: any[]=[];
 
   hiddenForm = new UntypedFormGroup({});
   menuForm = new UntypedFormGroup({});
@@ -65,6 +68,7 @@ export class AmPreviewFormComponent implements OnInit {
   public selectedTabName: any;
   public listOfAllFields : any ;
   public allData : any;
+  public choosenField: any;
   //test2
   public userId: number = Number(this.informationservice.getLogeduserId())
   public whereConditionAr: any[] = [];
@@ -84,6 +88,7 @@ export class AmPreviewFormComponent implements OnInit {
   public roleId: any;
   public isExcluded: string = "";
   public listOfData: any;
+  public listOfDataFormOpening: any;
   public listOfRuleData: any[] = [];
   public mainJsonForApi = "";
   public mainJsonForDataWhenSkip = "";
@@ -106,6 +111,13 @@ export class AmPreviewFormComponent implements OnInit {
   public LastObject: any = [];
   public gridColumns: AgColumns[] = [];
   public allColumnsAr: any[] = [{ id: '', name: '' }];
+  dialogTitle: string = '';
+  public isGeneralGrid:any;
+  public gridStaticValue: any;
+public hiddenColumns:any[]=[];
+public queryType:any;
+public hasSourceQuery:any;  // maxFileSize: number = 5 * 1024 * 1024; // 5MB in bytes
+
   public operators = [
     { id: '', name: '' },
     { id: 1, name: 'And' },
@@ -116,7 +128,7 @@ export class AmPreviewFormComponent implements OnInit {
   public isUpdateInDynamicReport:boolean=false;
 
   // Dynamic Rule Builder Data
-  public ruleAction = [{ id: 1, name: 'On Change' }, { id: 2, name: 'On Load' }, { id: 3, name: 'On Before Save' }, { id: 4, name: 'On After Save' }, { id: 5, name: 'Where Condition' }];
+  public ruleAction = [{ id: 1, name: 'On Change' }, { id: 2, name: 'On Load' }, { id: 3, name: 'On Before Save' }, { id: 4, name: 'On After Save' }, { id: 5, name: 'Where Condition' }, {id:6 , name: 'On Search'}];
   public conditions = [{ id: 1, name: '=' }, { id: 2, name: '!=' }, { id: 8, name: 'Fill Into' }, { id: 3, name: '>' }, { id: 4, name: '<' }, { id: 6, name: '<=' }, { id: 7, name: '>=' }, { id: 5, name: 'between' }, { id: 9, name: '>CURRENT_DATE' }, { id: 10, name: '<CURRENT_DATE' }, { id: 11, name: '>=CURRENT_DATE' }, { id: 12, name: '>=CURRENT_DATE' }, { id: 13, name: 'Get CURRENT_DATE' }, { id: 14, name: 'Field Value' }, { id: 15, name: 'Include' },{ id: 16, name: '!Include' }];
   public dateTypes = [{ id: 1, name: 'Date' }, { id: 2, name: 'Field' }, { id: 3, name: 'Value' }, { id: 4, name: 'Field Value' }, { id: 5, name: 'Execute Query' }];
   public operations = [{ id: 1, name: '=' }, { id: 6, name: '!=' }, { id: 2, name: '>' }, { id: 3, name: '<' }, { id: 4, name: '<=' }, { id: 5, name: '>=' }];
@@ -136,9 +148,12 @@ export class AmPreviewFormComponent implements OnInit {
     { id: 3, name: 'Execute Query' }
   ];
   public ruleCallApiData:any=[];
+  public getFieldDynamicTitle:any;
+  public getFieldDynamicTitleValue: string = '';
+  public submitGridData :number = 0;
 
-  constructor(private dialogRef: MatDialogRef<AmPreviewFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public lookupData: any,
+  constructor(@Optional() private dialogRef: MatDialogRef<AmPreviewFormComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public lookupData: any,
     private http: HttpClient,
     private eventEmitterService: EventEmitterService,
     public commonFunctions: CommonFunctions,
@@ -151,18 +166,45 @@ export class AmPreviewFormComponent implements OnInit {
     private elRef: ElementRef,
     private refreshService: RefreshDialogService,
     private ngZone: NgZone,
-    public informationservice: InformationService
+    public informationservice: InformationService,
+    private fb: UntypedFormBuilder
   ) {
   }
 
 
-
+  // maxLength: number = 20000;  // Example value, can be dynamic
+////////Sigma
+  // maxFileSizeAndLength(maxSizeMB: number): ValidatorFn {
+  //   return (control: AbstractControl): { [key: string]: any } | null => {
+  //     if (control.value) {
+  //       const file = control.value as File;
+  //       const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  //       const actualLength = file.size;
+  
+  //       // Dynamically set maxLength based on actual length
+  //       this.maxLength = actualLength;
+  
+  //       // Validate file size
+  //       if (file.size > maxSizeBytes) {
+  //         return { 'maxFileSizeExceeded': true };
+  //       }
+  
+  //       // Validate actual length vs maxLength (if any other condition applies)
+  //       if (this.maxLength && file.size > this.maxLength) {
+  //         return { 'actualLengthExceeded': true };
+  //       }
+  //     }
+  
+  //     return null; // No errors
+  //   };
+  // }
+  
 
   async loadAllFormColumns(objectId: number) {
     this.loaderService.isLoading.next(true);
     const allColumnsLibraryUrl = from(axios.get(GlobalConstants.getColumnsApi + objectId));
     const allColumns = await lastValueFrom(allColumnsLibraryUrl);
-    console.log('allcolumns>>>>>>>',allColumns)
+    //console.log('allcolumns>>>>>>>',allColumns)
     this.allColumnsLibrary = allColumns.data;
     this.loaderService.isLoading.next(false);
   }
@@ -230,7 +272,7 @@ export class AmPreviewFormComponent implements OnInit {
         returnedValue = moment(colVal).format('MM/DD/YYYY');
       } else if (colType.toUpperCase() == "DATE TIME") {
         let dateParts = colVal.split('T');
-        console.log("dateParts>>>>>>>>>>>>>>>>>>>> :", dateParts);
+        //console.log("dateParts>>>>>>>>>>>>>>>>>>>> :", dateParts);
         if(dateParts.length > 1){
         returnedValue = dateParts[0] + ' ' + dateParts[1].substring(0, 5);
         }else if(dateParts.length == 1 ){
@@ -484,6 +526,7 @@ export class AmPreviewFormComponent implements OnInit {
   }
 
   closeDialog(clickOnTab: boolean): void {
+    console.log("CLICK ON TAB>>>>>>>>>>>",clickOnTab);
     let TimeNumber;
     this.informationservice.setSameSession("");
     //test2
@@ -526,7 +569,7 @@ export class AmPreviewFormComponent implements OnInit {
 
 
         this.informationservice.setDynamicService("formData_" + selectedTabName, '');
-
+if(!this.informationservice.getIsFromMainPreviewForm()){
         setTimeout(() => {
           if (clickOnTab) {
             let tabs = $(".tab-title");
@@ -538,17 +581,21 @@ export class AmPreviewFormComponent implements OnInit {
             }
             for (let i = 0; i < activeTabsList.length; i++) {
               if (i == activeTabsList.length - 1) {
+                console.log("TAB>>>>>>>>>>>>>>>>>>>","#" + activeTabsList[i].offsetParent.id + " .tab .tab-title");
+
                 $("#" + activeTabsList[i].offsetParent.id + " .tab .tab-title")[0].click();
               }
             }
           }
         }, 1000);
+      }else{
+      }
       } else {
         this.dialog.closeAll();
       }
     }
-
-
+    this.listOfDataFormOpening = undefined;
+this.informationservice.removeSelectedColumnFormOpening();
   }
 
   ngOnDestroy() {
@@ -556,9 +603,9 @@ export class AmPreviewFormComponent implements OnInit {
     let substring: string = 'Initiation';
     let mainString : string = this.informationservice.getPopupBreadcrumb();
     let checkExisting  = this.informationservice.getCheckExisting();
-    console.log("localStorage.getItem(closeTwice) =======>",localStorage.getItem("closeTwice"));
+    //console.log("localStorage.getItem(closeTwice) =======>",localStorage.getItem("closeTwice"));
     if(localStorage.getItem("closeTwice") == "true"){
-      console.log("heyyy should close another one")
+      //console.log("heyyy should close another one")
       localStorage.setItem("closeTwice","false");
       this.closeDialog(true);
      }
@@ -577,8 +624,8 @@ export class AmPreviewFormComponent implements OnInit {
     this.informationservice.getPopupBreadcrumb() == "Authorized Signature"){
       if(this.informationservice.getOpenLikeForm() == 'yes'){
         this.informationservice.setReopen('yes');
-        console.log("this.actionType >>>>>> ",this.actionType);
-        console.log("this.informationservice.getAgGidSelectedNode()=",this.informationservice.getAgGidSelectedNode())
+        //console.log("this.actionType >>>>>> ",this.actionType);
+        //console.log("this.informationservice.getAgGidSelectedNode()=",this.informationservice.getAgGidSelectedNode())
         this.closeDialog(true);
       }
       else if(this.informationservice.getReopen() == 'yes'){
@@ -636,6 +683,9 @@ export class AmPreviewFormComponent implements OnInit {
   async dynamicDRBOnBeforeSave(objectId: number) {
     try {
       this.canProceedWithSave = true;
+      //const control = this.dynamicForm.get('MEDIA_PATH');
+//const maxLength = control?.value?.length; // Log the actual length of the file data
+//console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
       let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/3/0";
       const dynamicDRBOnBeforeSaveUrl = from(axios.post(url));
       const dynamicDRBOnBeforeSave = await lastValueFrom(dynamicDRBOnBeforeSaveUrl);
@@ -789,6 +839,7 @@ export class AmPreviewFormComponent implements OnInit {
                   }
                   else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                     executeOnFieldSetAdv = ruleData[i].data;
+                //    console.log("111111111111111111111111");
                   }
                   else if (action == "Execute Rule Business") {
                     executeRuleBusiness = ruleData[i].data;
@@ -1000,6 +1051,8 @@ export class AmPreviewFormComponent implements OnInit {
                   } else if (action == "Show Field" || action == "Hide Field") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                    //console.log("111111111111111111111111");
+
                     this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
                   } else if (action == "Required") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
@@ -1133,7 +1186,7 @@ export class AmPreviewFormComponent implements OnInit {
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnBeforeSave error >>> ", error)
+      //console.log("dynamicDRBOnBeforeSave error >>> ", error)
     }
   }
 
@@ -1171,10 +1224,14 @@ export class AmPreviewFormComponent implements OnInit {
           let ProcName;
           let ProcParams;
           let executeQuery;
+          let openingForm;
+          let url;
+          let responseJson;
+          let jsonRequest;
           let ruleData = JSON.parse(dynamicDRBOnAfterSave.data[i].ruleData);
           let isExcluded = JSON.parse(dynamicDRBOnAfterSave.data[i].isExcluded);
 
-
+console.log('RuleData: ',ruleData)
           let actionType;
 
 
@@ -1186,6 +1243,9 @@ export class AmPreviewFormComponent implements OnInit {
           }
 
           if (isExcluded != 1) {
+            if(this.actionType == undefined){
+              this.actionType = actionType;
+            }
             if (this.actionType == actionType) {
               for (let i = 0; i < ruleData.length; i++) {
                 if (ruleData[i].step == 1) {
@@ -1195,7 +1255,7 @@ export class AmPreviewFormComponent implements OnInit {
                   endOfUrl = ruleData[i].data;
                 }
                 if (ruleData[i].step == 3) {
-                  console.log("ruleData>>>>>>>>",ruleData[i]);
+                  //console.log("ruleData>>>>>>>>",ruleData[i]);
                   Apiparams = ruleData[i].data;
                 }
                 if (ruleData[i].step == 21) {
@@ -1227,6 +1287,18 @@ export class AmPreviewFormComponent implements OnInit {
                 }
                 if (ruleData[i].step == 47) {
                   executeQuery = ruleData[i].data;
+                }
+                if (ruleData[i].step == 8) {
+                  openingForm = ruleData[i].data;
+                }
+                if (ruleData[i].step == 9) {
+                  url = ruleData[i].data;
+                }
+                if (ruleData[i].step == 91) {
+                  jsonRequest = ruleData[i].data;
+                }
+                if (ruleData[i].step == 92) {
+                  responseJson = ruleData[i].data;
                 }
               }
               //Call Rest Api from Rules
@@ -1469,6 +1541,206 @@ export class AmPreviewFormComponent implements OnInit {
                   }
                 }
               }
+              ///////Sigma
+              else if(type == 8){
+                let formData = this.dynamicForm.value;
+                let selectedTabName = this.informationservice.getSelectedTabName();
+        
+                if(formData){
+                  this.listOfData = JSON.parse(JSON.stringify(formData));
+                }
+                this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
+               //let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+        
+              //  if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
+              //   params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
+              //  }
+               //console.log("params>>>>>>>>>>>",params);
+                let data = [{
+                  actionType: this.amInfo.actionType,
+                  objectId: openingForm,
+                  isFromGridClick: 0,
+                  primaryColumn: this.columnId,
+                  buttonClick: this.columnTypeCode,
+                 // selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
+                }];
+        
+              //console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+                this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
+                  width: "80%",
+                  height: "80%",
+                  data: data
+                });
+        
+                this.dataservice.PushdialogArray(this.dialogRef);
+                this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+                this.informationservice.setListOFData(this.listOfData);
+                this.dialogRef.disableClose = true;   
+              }
+              else if(type == 9){
+
+                let dataa:any=[];
+        let formData = this.dynamicForm.value;
+
+        if (formData) {
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+          this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
+        }
+
+        const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
+        const getApiJsons = await lastValueFrom(getApiJsonsApi);
+
+        let requestJsonString=getApiJsons.data[0].requestJson;
+        for(let i=0;i<jsonRequest.length;i++){
+          for(let j=0;j<Object.keys(this.dynamicForm.value).length;j++){
+            if(Object.keys(this.dynamicForm.value)[j]==JSON.parse(jsonRequest)[i].fieldName){
+              requestJsonString=requestJsonString.replaceAll("#"+JSON.parse(jsonRequest)[i].jsonParameter+"#",this.dynamicForm.get(JSON.parse(jsonRequest)[i].fieldName).value);
+            }
+          }
+        }
+
+        let responseJsonString=getApiJsons.data[0].responseJson;
+        let json={"requestJson":requestJsonString,
+                  "responseJson":responseJsonString
+        }
+
+           const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
+           const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
+
+          dataa=runDynamicBuilt.data;
+        let count = 0;
+        for (let i = 0; i < dataa.form.length; i++) {
+          this.loaderService.isLoading.next(true);
+          let colName = dataa.form[i].colName.toUpperCase();
+          let colValue = dataa.form[i].colValue;
+          let colType = dataa.form[i].colType;
+
+          if (colType == "date") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = date.toISOString().substring(0, 10);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+
+          if (colType == "date time") {
+            // let date = new Date(colValue.substring(0, 10));
+            // colValue = date.toISOString().slice(0, 16);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "time") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = colValue.toString();
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "checkbox") {
+            if(colValue=="true"){
+
+              colValue=true;
+
+            }else{
+              colValue=false;
+            }
+          }
+
+          if (colType == "lookup") {
+            let occ = 0;
+            if (colValue.includes(",")) {
+              let colArrayVal = colValue.split(",")
+              for (let o = 0; o < colArrayVal.length; o++) {
+                for (let h = 0; h < this.test.length; h++) {
+                  if (this.test[h].query) {
+                    for (let k = 0; k < this.test[h].query.length; k++) {
+                      if (this.test[h].query[k].ID == colArrayVal[o] && this.test[h].name == colName) {
+                        occ = occ + 1;
+                        break;
+                      }
+
+                    }
+                  }
+                }
+                this.handleFormFieldValues(colName, colValue);
+                $('#' + colName + "_lookupName").val("Selected (" + occ + ")");
+
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colValue);
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', "Selected (" + occ + ")");
+
+              }
+            } else {
+
+              let b = false;
+              let colId = '';
+              let fieldName = '';
+              for (let h = 0; h < this.test.length; h++) {
+
+                if (this.test[h].query) {
+
+
+                  for (let k = 0; k < this.test[h].query.length; k++) {
+                    //elie updated
+                    if (this.test[h].query[k].ID == colValue && colName==this.test[h].name) {
+                      b = true;
+                      colId = this.test[h].query[k].ID;
+                      fieldName = colName;
+                      colValue = this.test[h].query[k].NAME;
+                      break;
+                    }
+                  }
+                }
+
+                if (b) {
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colId);
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', colValue);
+                break;
+
+                }
+              }
+
+              this.handleFormFieldValues(colName, colId);
+              if(this.dynamicForm.controls[fieldName + "_lookupName"]){
+                this.dynamicForm.controls[fieldName + "_lookupName"].setValue(colValue);
+              }
+               $('#' + fieldName + "_lookupName").val(colValue);
+            }
+          }
+
+
+          if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
+            console.log("FETET HON KAMEN");
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "hidden") {
+            if (colName == "UPDATE_DATE") {
+              let currentDateTime = this.datepipe.transform((new Date), 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, currentDateTime);
+            } else if (colName == "UPDATED_BY") {
+              this.handleFormFieldValues(colName, this.userId);
+            } else if (colName == "CREATED_BY") {
+              this.handleFormFieldValues(colName, colValue);
+            } else if (colName == "CREATION_DATE") {
+              let date = new Date(colValue);
+              let datee = this.datepipe.transform(date, 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, datee);
+            } else {
+              this.handleFormFieldValues(colName, colValue);
+            }
+          }
+
+          this.loaderService.isLoading.next(false);
+        }
+
+        this.gridStaticValue=dataa.grid;
+if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
+  setTimeout(()=>{
+    this.showGrid=false;
+    },100);
+    setTimeout(()=>{
+      this.showGrid = true;
+    },100);
+}
+              }
             }
           }
           this.loaderService.isLoading.next(false);
@@ -1476,7 +1748,7 @@ export class AmPreviewFormComponent implements OnInit {
       }
 
     } catch (error) {
-      console.log("dynamicDRBOnAfterSave error >>> ", error)
+      //console.log("dynamicDRBOnAfterSave error >>> ", error)
     }
   }
 
@@ -1539,16 +1811,19 @@ export class AmPreviewFormComponent implements OnInit {
             }
           }
           let actionType;
-
-
           if (JSON.parse(dynamicDRBOnload.data[j].actionType) == 1) {
             actionType = "saveNew";
           }
           else if (JSON.parse(dynamicDRBOnload.data[j].actionType) == 2) {
             actionType = "update";
           }
+          console.log("Action type >>>>>> : " ,actionType);
+
           if (isExcluded != 1) {
-            this.loaderService.isLoading.next(true);
+           // this.loaderService.isLoading.next(true);
+           if(this.actionType == undefined){
+            this.actionType = actionType;
+           }
             if (this.actionType == actionType) {
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
@@ -1558,11 +1833,14 @@ export class AmPreviewFormComponent implements OnInit {
                   if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     action = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
                   }
+
                   if (ruleData[i].step == 44) {
                     if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field") {
                       executeOnFieldAdv = ruleData[i].data;
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                 //     console.log("111111111111111111111111");
+
                       executeOnFieldSetAdv = ruleData[i].data;
                     }
                     else if (action == "Execute Rule Business") {
@@ -1572,7 +1850,7 @@ export class AmPreviewFormComponent implements OnInit {
                     else if (action == "Show Button") {
                     ////elie///////
                     executeOnFieldAdv = ruleData[i].data;
-                    
+
                     }
                     //////////
                     else if (action == "Execute Query") {
@@ -1830,8 +2108,8 @@ export class AmPreviewFormComponent implements OnInit {
                 }
               }
               else {
-console.log("ruleID >>>>>>>>>",ruleId);
-console.log("ruleData >>>>",ruleData);
+//console.log("ruleID >>>>>>>>>",ruleId);
+//console.log("ruleData >>>>",ruleData);
 
                 TypeOfAction = ruleData[0].data;
                 for (let i = 0; i < ruleData.length; i++) {
@@ -1853,7 +2131,7 @@ console.log("ruleData >>>>",ruleData);
                           }
 
                       }
-                        console.log("choosenField=",choosenField)
+                        //console.log("choosenField=",choosenField)
                     } else if (ruleData[i].step == 10 && ruleData[i].data != '') {
                       let queryData = ruleData[i].data;
 
@@ -1967,7 +2245,7 @@ console.log("ruleData >>>>",ruleData);
                       }
                     } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
                       executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
-console.log("executeAction >>>>>>>>>>",executeAction);
+//console.log("executeAction >>>>>>>>>>",executeAction);
                     } else if (ruleData[i].step == 42) {
                       if (ruleData[i].data != "") {
                         // if ($("#field_" + ruleData[i].data)[0]) {
@@ -1985,6 +2263,8 @@ console.log("executeAction >>>>>>>>>>",executeAction);
                         executeOnField = ruleData[i].data;
                       }
                       if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
+                      //  console.log("111111111111111111111111");
+
                         executeOnFieldSet = ruleData[i].data;
                       }
                       if (executeAction == "Execute Query") {
@@ -2200,9 +2480,11 @@ console.log("executeAction >>>>>>>>>>",executeAction);
                       if (executeAction == "Show Field" || executeAction == "Show Button") {
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Hide Field" || executeAction == "Hide Button") {
-console.log("Hide Button 1");
+//console.log("Hide Button 1");
                         this.dynamicActionsOnChange(executeAction, executeOnField);
                       } else if (executeAction == "Show FieldSet") {
+                  //      console.log("111111111111111111111111");
+
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                       } else if (executeAction == "Hide FieldSet") {
                         this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
@@ -2213,7 +2495,7 @@ console.log("Hide Button 1");
                       } else if (executeAction == "Read Only") {
                         if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
                           if (executeOnField.length >= 1) {
-console.log("executeOnField >>>>>>>>>>",executeOnField);
+//console.log("executeOnField >>>>>>>>>>",executeOnField);
                             for (let u = 0; u < executeOnField.length; u++) {
                               let fieldId: any;
                               if (executeOnField[u].id) {
@@ -2352,11 +2634,909 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnload error >>> ", error)
+      //console.log("dynamicDRBOnload error >>> ", error)
+    }
+  }
+
+  async dynamicDRBOnSearch(objectId: number) {
+    try {
+
+      console.log("0000000000000000000000000000");
+      let url = GlobalConstants.getDBRGridByRuleActionAndColumnId + objectId + "/6/0";
+      const dynamicDRBOnsearchUrl = from(axios.post(url));
+      const dynamicDRBOnsearch = await lastValueFrom(dynamicDRBOnsearchUrl);
+      console.log('dynamicDRBOnsearch>>',dynamicDRBOnsearch.data);
+      if (dynamicDRBOnsearch.data.length > 0) {
+        let step0 = JSON.parse(dynamicDRBOnsearch.data[0].ruleData)[0];
+        for (let j = 0; j < dynamicDRBOnsearch.data.length; j++) {
+          let ruleAction = this.commonFunctions.filterArrayById(this.ruleAction, dynamicDRBOnsearch.data[j].ruleAction)[0].name;
+          let choosenField;
+          let ruleId = dynamicDRBOnsearch.data[j].ruleId;
+          let condition;
+          let conditionValue: string = '';
+          let executeAction;
+          let executeOnField: string | any[];
+          let executeQuery;
+          let executeOnFieldSet: any;
+          let ruleData = JSON.parse(dynamicDRBOnsearch.data[j].ruleData);
+          console.log(ruleData);
+          let elements: string[];
+          let comboValueField: any;
+          let defaultField: any;
+          let renameFieldsearch: any;
+          let hasAdvanced = JSON.parse(dynamicDRBOnsearch.data[j].hasAdvancedConditions);
+          let dataParams = [];
+          let finalIfConditions: any;
+          let Rule: any;
+          let action: any;
+          let executeOnFieldAdv: any;
+          let executeOnFieldSetAdv: any;
+          let ruleIdAdv: any;
+          let alertValueAdv: any;
+          let renameFieldAdv: any;
+          let executeRuleBusiness: any;
+          let defaultTest: any;
+          let listOfFields: any = [];
+          let minusCURRENT_DATE: any;
+          let fillintofield: any;
+          let executeAction2: any;
+          let executeOnField2: any;
+          let executeQuery1: any;
+          let checkedValue: any;
+          let choosenField2: any;
+          let operator: any;
+          let operatorOption: any;
+          let operatorQuery: any;
+          let valueToOperate: any;
+          let jsonQbe: any[] = [];
+          let queryRes: any;
+          let included: any = '';
+          let valueOfFieldSelected: any;
+          let choosenValue: any;
+          let TypeOfAction: any;
+          let isExcluded = JSON.parse(dynamicDRBOnsearch.data[j].isExcluded);
+          for (let t = 0; t < ruleData.length; t++) {
+            if (ruleData[t].step == 1) {
+              this.listOfRuleData.push(ruleData[t].data);
+            }
+          }
+          let actionType;
+          if (JSON.parse(dynamicDRBOnsearch.data[j].actionType) == 1) {
+            actionType = "saveNew";
+          }
+          else if (JSON.parse(dynamicDRBOnsearch.data[j].actionType) == 2) {
+            actionType = "update";
+          }
+          if (isExcluded != 1) {
+          //  this.loaderService.isLoading.next(true);
+          if(this.actionType == undefined){
+            this.actionType = actionType;
+          }
+          console.log("ACTION TYPE 11111>>>>>>>>>>>>>",this.actionType);
+          console.log("ACTION TYPE 222222>>>>>>>>>>>>>",actionType);
+
+            if (this.actionType == actionType) {
+              if (hasAdvanced == 1) {
+                for (let i = 0; i < ruleData.length; i++) {
+                  if (ruleData[i].step == 0) {
+                    Rule = ruleData[i].data;
+                  } else if (ruleData[i].step == 52) { }
+                  if (ruleData[i].step == 4 && ruleData[i].data != "") {
+                    action = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
+                  }
+
+                  if (ruleData[i].step == 44) {
+                    if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field") {
+                      executeOnFieldAdv = ruleData[i].data;
+                    }
+                    else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                   //   console.log("111111111111111111111111");
+                   console.log("11111111111111111111111111111111");
+
+                      executeOnFieldSetAdv = ruleData[i].data;
+                    }
+                    else if (action == "Execute Rule Business") {
+                      executeRuleBusiness = ruleData[i].data;
+                      ruleIdAdv = executeRuleBusiness;
+                    }
+                    else if (action == "Show Button") {
+                    ////elie///////
+                    executeOnFieldAdv = ruleData[i].data;
+
+                    }
+                    //////////
+                    else if (action == "Execute Query") {
+                      executeQuery = ruleData[i].data;
+                      const defaultValueUrl = from(axios.post(GlobalConstants.getQbeIdApi + executeQuery + "/0", this.jsonEmpty));
+                      const defaultValuee = await lastValueFrom(defaultValueUrl);
+                      // this.dynamicForm.controls[defaultField].setValue(defaultValuee.data[0]);
+                      this.handleFormFieldValues(defaultField, defaultValuee.data[0]);
+                    }
+                    else if (action == "Alert") {
+                      alertValueAdv = ruleData[i].data;
+                    }
+                  }
+                  else if (ruleData[i].step == 6) {
+                    renameFieldAdv = ruleData[i].data;
+                  }
+                }
+                let jsonObject = JSON.parse(Rule);
+                if (jsonObject != -1) {
+                  let addList = jsonObject.addList;
+                  let secondList = JSON.stringify(addList);
+                  let Object = JSON.parse(secondList);
+
+                  for (let i = 0; i < Object.length; i++) {
+                    let beginCondition = '';
+                    let field = '';
+                    let condition = '';
+                    let value = '';
+                    let endCondition = '';
+                    let operator = '';
+                    let name = '';
+                    if (Object[i].beginCondition == undefined) {
+                      beginCondition = '';
+                    }
+                    else if (Object[i].beginCondition != undefined) {
+                      beginCondition = Object[i].beginCondition.name;
+                    }
+                    if (Object[i].field == undefined) {
+                      field = '';
+                      name = '';
+                    }
+                    else if (Object[i].field != undefined) {
+                      field = Object[i].field.id;
+                      name = Object[i].field.name;
+                    }
+                    if (Object[i].condition == undefined) {
+                      condition = '';
+                    }
+                    else if (Object[i].condition != undefined) {
+                      condition = Object[i].condition.name;
+                    }
+                    if (Object[i].value == undefined) {
+                      value = '';
+                    }
+                    else if (Object[i].value != undefined) {
+                      value = Object[i].value;
+                    }
+                    if (Object[i].endCondition == undefined) {
+                      endCondition = '';
+                    }
+                    else if (Object[i].endCondition != undefined) {
+                      endCondition = Object[i].endCondition.name;
+                    }
+                    if (Object[i].operator == undefined) {
+                      operator = '';
+                    }
+                    else if (Object[i].operator != undefined) {
+                      operator = Object[i].operator.name;
+                    }
+
+                    let item = {
+                      "beginCondition": beginCondition,
+                      "field": field,
+                      "condition": condition,
+                      "value": value,
+                      "endCondition": endCondition,
+                      "operator": operator,
+                      "name": name
+                    }
+
+                    dataParams.push(item);
+                  }
+
+
+                  for (let i = 0; i < dataParams.length; i++) {
+                    let val = dataParams[i].value;
+                    let condition = '';
+                    switch (dataParams[i].condition) {
+                      case '=':
+                        condition = "==";
+                        if (i == 0) {
+                          finalIfConditions = "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      case 'included':
+                        condition = "included";
+                        included = condition;
+                        valueOfFieldSelected = this.dynamicForm.controls[dataParams[i].name]?.value;
+                        choosenValue = dataParams[i].value;
+                        if (i == 0) {
+                          finalIfConditions = "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      case '!included':
+                        condition = "!included";
+                        included = condition;
+                        valueOfFieldSelected = this.dynamicForm.controls[dataParams[i].name]?.value;
+                        choosenValue = dataParams[i].value;
+                        if (i == 0) {
+                          finalIfConditions = "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      case '!=':
+                        condition = dataParams[i].condition;
+                        if (i == 0) {
+                          finalIfConditions = "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += "'" + this.dynamicForm.controls[dataParams[i].name]?.value + "'" + condition + "'" + dataParams[i].value + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      case '<':
+                      case '>':
+                      case '>=':
+                      case '<=':
+                        condition = dataParams[i].condition;
+                        if (i == 0) {
+                          finalIfConditions = this.dynamicForm.controls[dataParams[i].name]?.value + condition + dataParams[i].value + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += this.dynamicForm.controls[dataParams[i].name]?.value + condition + dataParams[i].value + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      case '< CURRENT_DATE':
+                      case '> CURRENT_DATE':
+                        if (dataParams[i].value = "") {
+
+                          let conditionsVar = dataParams[i].condition.split(" ");
+
+
+
+                          let field = this.dynamicForm.controls[dataParams[i].field]?.value;
+                          let fieldDate = new Date(field);
+                          let conditionDate = new Date();
+                          if (i == 0) {
+                            finalIfConditions = "'" + fieldDate + "'" + conditionsVar[0] + "'" + conditionDate + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                          }
+                          else {
+                            finalIfConditions += "'" + fieldDate + "'" + conditionsVar[0] + "'" + conditionDate + "'" + this.DynamicAdvancedOperator(dataParams[i].operator);
+                          }
+                        } else {
+
+                          let conditionsVar = dataParams[i].condition.split(" ");
+                          let field = this.dynamicForm.controls[dataParams[i].field]?.value;
+                          let fieldDate = new Date(field);
+                          let conditionDate = new Date();
+
+                          if (conditionsVar[0].includes('<')) {
+                            let datedif = conditionDate.getFullYear() - fieldDate.getFullYear();
+
+                            if (i == 0) {
+                              finalIfConditions = datedif + conditionsVar[0] + val + " " + this.DynamicAdvancedOperator(dataParams[i].operator);
+                            }
+                            else {
+                              finalIfConditions += datedif + conditionsVar[0] + val + " " + this.DynamicAdvancedOperator(dataParams[i].operator);
+                            }
+                          } else {
+                            let datedif = fieldDate.getFullYear() - conditionDate.getFullYear();
+                            if (datedif < 0) {
+                              datedif = -datedif;
+                            }
+                            if (i == 0) {
+                              finalIfConditions = datedif + conditionsVar[0] + val + " " + this.DynamicAdvancedOperator(dataParams[i].operator);
+                            }
+                            else {
+                              finalIfConditions += datedif + conditionsVar[0] + val + " " + this.DynamicAdvancedOperator(dataParams[i].operator);
+                            }
+                          }
+                        }
+                        break;
+                      case "Get CURRENT_DATE (Year)":
+                        let conditionsVar = condition.split(" ");
+                        // let field = $("#field_" + dataParams[i].field).val().toString();
+                        let field = this.dynamicForm.controls[dataParams[i].name]?.value;
+                        let fieldDate = new Date(field);
+                        let conditionDate = new Date();
+                        let datedif = fieldDate.getFullYear() - conditionDate.getFullYear();
+                        if (i == 0) {
+                          finalIfConditions = datedif + '<' + dataParams[i].value + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        else {
+                          finalIfConditions += datedif + '<' + dataParams[i].value + this.DynamicAdvancedOperator(dataParams[i].operator);
+                        }
+                        break;
+                      default:
+                    }
+                    //let field = $("#field_" + dataParams[i].field).val().toString();
+                    listOfFields.push(dataParams[i].field);
+                  }
+                  var result;
+                  if (included == 'included') {
+                    result = valueOfFieldSelected.includes(choosenValue);
+                  }
+                  else if (included == "!included") {
+                    result = !valueOfFieldSelected.includes(choosenValue);
+                  }
+                  else {
+                    result = eval(finalIfConditions);
+                  }
+                  if (result) {
+                    if (action == 'Alert') {
+                      this.commonFunctions.alert("alert", alertValueAdv);
+                      for (let i = 0; i < listOfFields.length; i++) {
+                        this.dynamicForm.controls[listOfFields[i]].setValue('').change();
+                      }
+
+                    } else if (action == "Show Field" || action == "Hide Field") {
+
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                    } else if (action == "Show Button" || action =="Hide Button") {
+                      ////elie/////
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                      //////////
+                    } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
+                      console.log("111111111111111111111111");
+
+                      this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
+                    } else if (action == "Required") {
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                    } else if (action == "Optional") {
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                    } else if (action == "Read Only") {
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                    } else if (action == "Remove Read Only") {
+                      this.dynamicActionsOnChange(action, executeOnFieldAdv);
+                    } else if (action == "Rename Field") {
+                      document.getElementById("lbl_" + executeOnFieldAdv).innerHTML = renameFieldAdv;
+                    } else if (action == "Execute Rule Business") {
+                      // columnId = -1
+                      // this.dynamicDRBOnchange(columnId, ruleIdAdv);
+                    } else if (executeAction == "Execute Query") {
+                      if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
+                        // this.dynamicForm.controls[defaultField].setValue(defaultTest);
+                        this.handleFormFieldValues(defaultField, defaultTest);
+                      }
+                    }
+                  }
+                }
+              }
+              else {
+
+                TypeOfAction = ruleData[0].data;
+                console.log("TypeOfAction >>>>>>>>>",TypeOfAction);
+
+                for (let i = 0; i < ruleData.length; i++) {
+                  if (TypeOfAction == 2) {
+                    if (ruleData[i].step == 1) {
+                      if (ruleData[i].data != "") {
+
+                          let id = ruleData[i].data;
+                          let data = this.test.filter((el: any) => {
+                            return el.id === ruleData[i].data;
+                          });
+                          choosenField = data[0].name;
+                            if (choosenField == "mat-checkbox") {
+                              for (let i = 0; i < this.test.length; i++) {
+                                if (id == this.test[i].id) {
+                                  choosenField = this.test[i].name;
+                                }
+                              }
+                          }
+
+                      }
+                        //console.log("choosenField=",choosenField)
+                    } else if (ruleData[i].step == 10 && ruleData[i].data != '') {
+                      let queryData = ruleData[i].data;
+
+                      let queryResult = queryData == null ? -1 : queryData;
+                      let jsonQbe: any[] = [];
+                      if (queryResult != -1) {
+                        const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + queryResult));
+                        const paramNames = await lastValueFrom(paramNamesUrl);
+
+                        jsonQbe.push(
+                          {
+                            queryId: queryResult,
+                            parameters: [
+                              {
+                                paramName: 'actionType',
+                                paramValue: '' + this.actionType + ''
+                              },
+                              {
+                                paramName: 'userId',
+                                paramValue: this.userId
+                              }
+                            ],
+                            link: [],
+                            isHidden: [],
+                            whereCond: this.getWhereCond
+                          }
+                        )
+                        console.log("333333333333333333333333333333333333");
+                        if (paramNames.data.length > 0) {
+                          // Filter ROW_ID information to get only the ones for Grid
+                          let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+                          if (params != undefined) {
+                            let filteredParams: any = this.handleSelectedRowIds(params, "tab,form,grid,button,combo");
+                            for (let i = 0; i < filteredParams.length; i++) {
+                              for (let j = 0; j < paramNames.data.length; j++) {
+                                if (filteredParams[i].colname.toUpperCase() == paramNames.data[j].paramName.toUpperCase()) {
+                                  let colName = filteredParams[i].colname;
+                                  let colVal = filteredParams[i].colvalue;
+                                  jsonQbe.push(
+                                    {
+                                      queryId: queryResult,
+                                      parameters: [
+                                        {
+                                          paramName: colName,
+                                          paramValue: colVal
+                                        }
+                                      ],
+                                      link: this.testLinks,
+                                      isHidden: [],
+                                      whereCond: this.getWhereCond
+                                    }
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        } else {
+                          jsonQbe.push(
+                            {
+                              queryId: queryResult,
+                              parameters: [
+                                {
+                                  paramName: '',
+                                  paramValue: ''
+                                }
+                              ],
+                              link: [],
+                              isHidden: [],
+                              whereCond: this.getWhereCond
+                            }
+                          );
+                        }
+                      }
+                      const queryUrl = from(axios.post(GlobalConstants.getQbeIdApi + queryResult + "/0", jsonQbe));
+                      const queryAdd = await lastValueFrom(queryUrl);
+                      executeQuery1 = queryAdd.data[0];
+                    }
+                  } else {
+                    console.log('ruleData[i].step :',ruleData[i].step);
+                    if (ruleData[i].step == 1) {
+                      console.log(ruleData[i].data);
+                      if (ruleData[i].data != "") {
+                        let id = ruleData[i].data;
+                        let data = this.test.filter((el: any) => {
+                          return el.id === ruleData[i].data;
+                        });
+                        choosenField = data[0].name;
+                          if (choosenField == "mat-checkbox") {
+                            for (let i = 0; i < this.test.length; i++) {
+                              if (id == this.test[i].id) {
+                                choosenField = this.test[i].name;
+                              }
+                            }
+                        }
+                      }
+                    } else if (ruleData[i].step == 2) {
+                      if (ruleData[i].data != "") {
+                        condition = this.commonFunctions.filterArrayById(this.conditions, ruleData[i].data)[0].name;
+                      }
+                    } else if (ruleData[i].step == 33) { // in case of coma separated
+                      if (ruleData[i].data.indexOf(',') != -1) {
+                        conditionValue = '-1';
+                        elements = ruleData[i].data.split(',');
+                        comboValueField = this.dynamicForm.controls[choosenField]?.value;
+                        for (let n = 0; n < elements.length; n++) {
+                          if (Number(elements[n]) === Number(comboValueField)) {
+                            conditionValue = comboValueField;
+                          }
+                        }
+                      } else {
+
+                        conditionValue = ruleData[i].data;
+                      }
+                    } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
+                      executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
+  //console.log("executeAction >>>>>>>>>>",executeAction);
+                    } else if (ruleData[i].step == 42) {
+                      if (ruleData[i].data != "") {
+                        // if ($("#field_" + ruleData[i].data)[0]) {
+                        //   defaultField = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
+                        // } else {
+                        //   defaultField = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
+                        // }
+                          let data = this.test.filter((el: any) => {
+                            return el.id === ruleData[i].data;
+                          });
+                          defaultField = data[0].name;
+                      }
+                    } else if (ruleData[i].step == 44) {
+                      if (executeAction == "Show Field" || executeAction == "Hide Field" || executeAction == "Required" || executeAction == "Optional" || executeAction == "Read Only" || executeAction == "Remove Read Only" || executeAction == "Rename Field" || executeAction == "Show Button" || executeAction == "Hide Button") {
+                        executeOnField = ruleData[i].data;
+                      }
+                      if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
+                        console.log("111111111111111111111111");
+
+                        executeOnFieldSet = ruleData[i].data;
+                      }
+                      if (executeAction == "Execute Query") {
+                        executeQuery = ruleData[i].data;
+                        const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + executeQuery));
+                        const paramNames = await lastValueFrom(paramNamesUrl);
+
+                        let jsonQbe: any[] = [];
+                        jsonQbe.push(
+                          {
+                            queryId: executeQuery,
+                            parameters: [
+                              {
+                                paramName: 'actionType',
+                                paramValue: '' + this.actionType + ''
+                              },
+                              {
+                                paramName: 'userId',
+                                paramValue: this.userId
+                              }
+                            ],
+                            link: [],
+                            isHidden: [],
+                            whereCond: this.getWhereCond
+                          }
+                        )
+
+                        if (paramNames.data.length > 0) {
+                          // Filter ROW_ID information to get only the ones for Grid
+                          let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+                          if (params != undefined) {
+                            let filteredParams: any = this.handleSelectedRowIds(params, "grid,form,button");
+                            for (let i = 0; i < filteredParams.length; i++) {
+                              for (let j = 0; j < paramNames.data.length; j++) {
+                                if (filteredParams[i].colname.toUpperCase() == paramNames.data[j].paramName.toUpperCase()) {
+                                  let colName = filteredParams[i].colname;
+                                  let colVal = filteredParams[i].colvalue;
+                                  jsonQbe.push(
+                                    {
+                                      queryId: executeQuery,
+                                      parameters: [
+                                        {
+                                          paramName: colName,
+                                          paramValue: colVal
+                                        }
+                                      ],
+                                      link: [],
+                                      isHidden: [],
+                                      whereCond: this.getWhereCond
+                                    }
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        }
+                        else {
+                          jsonQbe.push(
+                            {
+                              queryId: executeQuery,
+                              parameters: [
+                                {
+                                  paramName: '',
+                                  paramValue: ''
+                                }
+                              ],
+                              link: [],
+                              isHidden: [],
+                              whereCond: this.getWhereCond
+                            }
+                          );
+                        }
+                        const defaultValueUrl = from(axios.post(GlobalConstants.getQbeIdApi + executeQuery + "/0", this.jsonEmpty));
+                        const defaultValuee = await lastValueFrom(defaultValueUrl);
+                        queryRes = defaultValuee.data;
+                        //hon
+                        if (queryRes.toString().toUpperCase() == 'EMPTY') {
+                          queryRes = '';
+                        } else {
+                          queryRes = queryRes;
+                        }
+                        //jp
+                        if (queryRes.length > 1) {
+                          let modifiedData = queryRes.map((entry: any) => {
+                            return {
+                              ID: entry[0],
+                              NAME: entry[1]
+                            };
+                          });
+                          queryRes = modifiedData;
+                        }
+                      }
+                    }
+                    else if (ruleData[i].step == 6) {
+                      renameFieldsearch = ruleData[i].data;
+                    } else if (ruleData[i].step == 5) {
+                      minusCURRENT_DATE = ruleData[i].data;
+                    } else if (ruleData[i].step == 51 && ruleData[i].data != '') {
+                      fillintofield = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
+                    } else if (ruleData[i].step == 52 && ruleData[i].data != '') {
+                      choosenField2 = ruleData[i].data;
+                    }
+                    // else if (ruleData[i].step == 29) {
+                    //   if (ruleData[i].data != "") {// + or -
+                    //     operator = this.commonFunctions.filterArrayById(this.plusMinusOperator, ruleData[i].data)[0].name
+                    //   }
+                    // } else if (ruleData[i].step == 30) {
+                    //   if (ruleData[i].data != "") {
+                    //     operatorOption = ruleData[i].data;
+                    //   }
+                    // } else if (ruleData[i].step == 301) {
+                    //   if (ruleData[i].data != "") {
+                    //     operatorQuery = ruleData[i].data;
+                    //   }
+                    // }
+                    else if (ruleData[i].step == 31) {
+                      if (ruleData[i].data != "") {
+                        valueToOperate = ruleData[i].data;
+                        checkedValue = ruleData[i].data;
+                      }
+                    } else if (ruleData[i].step == 102 && ruleData[i].data != '') {
+                      executeAction2 = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
+                    }
+                    else if (ruleData[i].step == 41 && executeAction2 != "") {
+                      executeOnField2 = ruleData[i].data;
+                    }
+                    else if (ruleData[i].step == 10 && ruleData[i].data != '') {
+                      let queryData = ruleData[i].data;
+
+                      let queryResult = queryData == null ? -1 : queryData;
+                      let jsonQbe: any[] = [];
+                      if (queryResult != -1) {
+                        const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + queryResult));
+                        const paramNames = await lastValueFrom(paramNamesUrl);
+
+                        jsonQbe.push(
+                          {
+                            queryId: queryResult,
+                            parameters: [
+                              {
+                                paramName: 'actionType',
+                                paramValue: '' + this.actionType + ''
+                              },
+                              {
+                                paramName: 'userId',
+                                paramValue: this.userId
+                              }
+                            ],
+                            link: [],
+                            isHidden: [],
+                            whereCond: this.getWhereCond
+                          }
+                        )
+
+                        if (paramNames.data.length > 0) {
+                          // Filter ROW_ID information to get only the ones for Grid
+                          let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+                          if (params != undefined) {
+                            let filteredParams: any = this.handleSelectedRowIds(params, "tab,form,grid,button,combo");
+                            for (let i = 0; i < filteredParams.length; i++) {
+                              for (let j = 0; j < paramNames.data.length; j++) {
+                                if (filteredParams[i].colname.toUpperCase() == paramNames.data[j].paramName.toUpperCase()) {
+                                  let colName = filteredParams[i].colname;
+                                  let colVal = filteredParams[i].colvalue;
+                                  jsonQbe.push(
+                                    {
+                                      queryId: queryResult,
+                                      parameters: [
+                                        {
+                                          paramName: colName,
+                                          paramValue: colVal
+                                        }
+                                      ],
+                                      link: this.testLinks,
+                                      isHidden: [],
+                                      whereCond: this.getWhereCond
+                                    }
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        } else {
+                          jsonQbe.push(
+                            {
+                              queryId: queryResult,
+                              parameters: [
+                                {
+                                  paramName: '',
+                                  paramValue: ''
+                                }
+                              ],
+                              link: [],
+                              isHidden: [],
+                              whereCond: this.getWhereCond
+                            }
+                          );
+                        }
+                      }
+                      const queryUrl = from(axios.post(GlobalConstants.getQbeIdApi + queryResult + "/0", jsonQbe));
+                      const queryAdd = await lastValueFrom(queryUrl);
+                      executeQuery1 = queryAdd.data[0];
+                    }
+                  }
+
+                }
+
+                if (ruleAction == "On Search") {
+                  // Normal Field Condition
+                  if (step0.data == 3) {
+
+                    if (this.dynamicIfCondition(this.getValueOfControlName(choosenField), conditionValue, -1, condition)) {
+                      if (executeAction == "Show Field" || executeAction == "Show Button") {
+                        this.dynamicActionsOnChange(executeAction, executeOnField);
+                      } else if (executeAction == "Hide Field" || executeAction == "Hide Button") {
+  //console.log("Hide Button 1");
+                        this.dynamicActionsOnChange(executeAction, executeOnField);
+                      } else if (executeAction == "Show FieldSet") {
+                        this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                        console.log("111111111111111111111111");
+
+                      } else if (executeAction == "Hide FieldSet") {
+                        this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                      } else if (executeAction == "Required") {
+                        this.dynamicActionsOnChange(executeAction, executeOnField);
+                      } else if (executeAction == "Optional") {
+                        this.dynamicActionsOnChange(executeAction, executeOnField);
+                      } else if (executeAction == "Read Only") {
+                        if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
+                          if (executeOnField.length >= 1) {
+  //console.log("executeOnField >>>>>>>>>>",executeOnField);
+                            for (let u = 0; u < executeOnField.length; u++) {
+                              let fieldId: any;
+                              if (executeOnField[u].id) {
+                                fieldId = executeOnField[u].id;
+                              } else {
+                                fieldId = executeOnField[u];
+                              }
+
+                              if ($("#field_" + fieldId)[0]) {
+                                $("#field_" + fieldId).prop('disabled', true);
+                                $("#field_" + fieldId).addClass('disabled-field');
+                              } else {
+                                $(".field_" + fieldId).addClass('disabled-field');
+                                $(".field_" + fieldId).css("pointer-events", "none");
+                              }
+                            }
+                          } else {
+                            let fieldId: any;
+                            if (executeOnField[0].id) {
+                              fieldId = executeOnField[0].id;
+                            } else {
+                              fieldId = executeOnField[0];
+                            }
+
+                            if ($("#field_" + fieldId)) {
+                              $("#field_" + fieldId).addClass('disabled-field');
+                            } else {
+                              $(".field_" + fieldId).addClass('disabled-field');
+                              $(".field_" + fieldId).css("pointer-events", "none");
+                            }
+                          }
+                        }
+                      } else if (executeAction == "Remove Read Only") {
+
+
+                        if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
+                          if (executeOnField.length >= 1) {
+                            for (let u = 0; u < executeOnField.length; u++) {
+                              let fieldId: any;
+                              if (executeOnField[u].id) {
+                                fieldId = executeOnField[u].id;
+                              } else {
+                                fieldId = executeOnField[u];
+                              }
+
+
+
+
+                              if ($("#field_" + fieldId)[0]) {
+
+                                for (let c = 0; c < this.test.length; c++) {
+                                  if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
+                                    this.test[c].qbeReadOnly = false;
+                                    $('#' + this.test[c].name + "_lookupName").prop("readonly", false);
+                                    $('#' + this.test[c].name).prop("readonly", false);
+
+
+                                    break;
+                                  }
+                                }
+                                $("#field_" + fieldId).prop('disabled', false);
+                                $("#field_" + fieldId).removeClass('disabled-field');
+                              } else {
+                                $(".field_" + fieldId).removeClass('disabled-field');
+                                $(".field_" + fieldId).css("pointer-events", "all");
+                              }
+                            }
+                          } else {
+
+                            let fieldId: any;
+                            if (executeOnField[0].id) {
+                              fieldId = executeOnField[0].id;
+                            } else {
+                              fieldId = executeOnField[0];
+                            }
+
+                            if ($("#field_" + fieldId)) {
+                              for (let c = 0; c < this.test.length; c++) {
+                                if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
+                                  this.test[c].qbeReadOnly = false;
+                                  $('#' + this.test[c].name + "_lookupName").prop("readonly", false);
+                                  $('#' + this.test[c].name).prop("readonly", false);
+
+
+                                  break;
+                                }
+                              }
+                              $("#field_" + fieldId).prop('disabled', false);
+                              $("#field_" + fieldId).removeClass('disabled-field');
+                            } else {
+                              $(".field_" + fieldId).removeClass('disabled-field');
+                              $(".field_" + fieldId).css("pointer-events", "all");
+                            }
+                          }
+                        }
+                      }
+                      else if (executeAction == "Rename Field") {
+
+                        document.getElementById("lbl_" + executeOnField).innerHTML = renameFieldsearch;
+                      }
+                      else if (executeAction == "Execute Query") {
+                        let element = this.test.filter((el: any) => {
+                          return defaultField === el.name;
+                        });
+                        if (element[0].columnType) {
+                          if (element[0].columnType == "combo") {
+                            for (let i = 0; i < this.test.length; i++) {
+                              if (this.test[i].name == defaultField) {
+                                this.test[i].query = queryRes;
+                              }
+                            }
+                          } else {
+                            this.dynamicForm.controls[defaultField].setValue(queryRes);
+                          }
+                        }
+                      }
+                    }
+                  }
+                  if (TypeOfAction == 2) {
+                    this.dynamicForm.controls[choosenField]?.setValue(executeQuery1);
+                  }
+                  if (condition == 'Fill Into') { }
+
+                  if (executeAction2 == "Hide Field" || executeAction2 == "Read Only" || executeAction2 == "Required" || executeAction2 == "Optional" || executeAction2 == "Remove Read Only" || executeAction2 == "Rename Field" || executeAction2 == "Show Button" || executeAction2 == "Hide Button") {
+                    if (executeQuery1 == checkedValue) {
+                      this.dynamicActionsOnChange(executeAction2, executeOnField2);
+                    }
+
+                  }
+                }
+              }
+            } else {
+            }
+          }
+          this.loaderService.isLoading.next(false);
+        }
+      }
+    } catch (error) {
+      //console.log("dynamicDRBOnsearch error >>> ", error)
     }
   }
 
   async dynamicDRBOnchange(columnId: number, ruleId: number) {
+    
+
     try {
       let url = '';
       if (columnId != -1 && ruleId == -1) {
@@ -2364,6 +3544,7 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
       }
       if (columnId == -1 && ruleId != -1) {
         url = GlobalConstants.getDBRGridByRuleActionAndRuleIdApi + this.objectId + "/1" + "/" + ruleId;
+
       }
       const onChangeUrlApi = from(axios.post(url));
       const onChangeUrl = await lastValueFrom(onChangeUrlApi);
@@ -2371,6 +3552,7 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
       if (onChangeUrl.data.length > 0) {
         for (let j = 0; j < onChangeUrl.data.length; j++) {
           let ruleAction = this.commonFunctions.filterArrayById(this.ruleAction, onChangeUrl.data[j].ruleAction)[0].name;
+
           let choosenField: any;
           let checkBoxName: any;
           let comparedField;
@@ -2396,6 +3578,7 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
           let actionDecisions;
           let alertValue;
           let ruleData = JSON.parse(onChangeUrl.data[j].ruleData);
+          console.log('ruleData>>>>>>>>',ruleData)
           let elements: string[];
           let comboValueField: any;
           let defaultField: any;
@@ -2426,6 +3609,8 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
           let included: any = '';
           let valueOfFieldSelected: any;
           let choosenValue: any;
+          let fieldToFillInValue: any;
+
           let isExcluded = JSON.parse(onChangeUrl.data[j].isExcluded);
 
 
@@ -2436,9 +3621,17 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
           }
           else if (JSON.parse(onChangeUrl.data[j].actionType) == 2) {
             actionType = "update";
+          }else if (JSON.parse(onChangeUrl.data[j].actionType) == 3) {
+            actionType = "onForm";
           }
+
           if (isExcluded != 1) {
-            if (actionType == this.actionType) {
+            if(this.actionType == undefined){
+              this.actionType = actionType;
+            }
+
+            if (actionType == this.actionType || actionType == "onForm") {
+
               if (hasAdvanced == 1) {
                 for (let i = 0; i < ruleData.length; i++) {
                   if (ruleData[i].step == 0) {
@@ -2457,9 +3650,12 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
                   if (ruleData[i].step == 44) {
                     if (action == "Show Field" || action == "Hide Field" || action == "Required" || action == "Optional" || action == "Read Only" || action == "Remove Read Only" || action == "Rename Field" || action == "Hide Button" || action == "Show Button") {
                       executeOnFieldAdv = ruleData[i].data;
+
                     }
                     else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                       executeOnFieldSetAdv = ruleData[i].data;
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
                     }
                     else if (action == "Execute Rule Business") {
                       executeRuleBusiness = ruleData[i].data;
@@ -2772,10 +3968,14 @@ console.log("executeOnField >>>>>>>>>>",executeOnField);
                       this.dynamicForm.controls[listOfFields[i]].setValue('').change();
                     }
                   } else if (action == "Show Field" || action == "Hide Field" || action == "Hide Button" || action == "Show Button") {
-console.log("Hide Button 2");
+//console.log("Hide Button 2")
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Show FieldSet" || action == "Hide FieldSet") {
                     this.dynamicActionsOnChange(action, executeOnFieldSetAdv);
+                    this.informationservice.setAdvancedSearchShowGrid(true);
+                   // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
+
                   } else if (action == "Required") {
                     this.dynamicActionsOnChange(action, executeOnFieldAdv);
                   } else if (action == "Optional") {
@@ -2795,7 +3995,7 @@ console.log("Hide Button 2");
                 }
               } else {
 
-console.log("ruleData >>>>>>>>",ruleData);
+console.log("ruleData2 >>>>>>>>",ruleData);
                 for (let i = 0; i < ruleData.length; i++) {
                   if (ruleData[i].step == 0) {
                     if (ruleData[i].data != "") {
@@ -2808,6 +4008,8 @@ console.log("ruleData >>>>>>>>",ruleData);
                         return el.id === ruleData[i].data;
                       });
                       choosenField = data[0].name;
+                      console.log('choosenField>>>>>>>>>', choosenField )
+
                         if (choosenField == "mat-checkbox") {
                           for (let i = 0; i < this.test.length; i++) {
                             if (id == this.test[i].id) {
@@ -2815,7 +4017,6 @@ console.log("ruleData >>>>>>>>",ruleData);
                             }
                           }
                       }
-
                     }
 console.log("choosenField=",choosenField);
                   } else if (ruleData[i].step == 2) {
@@ -2860,7 +4061,7 @@ console.log("dateTypes=",dateTypes);
                       //   comparedField = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       // }
                     }
-console.log("comparedField =",comparedField);
+//console.log("comparedField =",comparedField);
                   } else if (ruleData[i].step == 202) {
                     if (ruleData[i].data != "") {
                       // comparedToField = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
@@ -2953,19 +4154,25 @@ console.log("comparedField =",comparedField);
                     if (ruleData[i].data != "") {
                       betweendate1 = ruleData[i].data;
                     }
+                    console.log("betweendate1>>>>>>",betweendate1)
                   } else if (ruleData[i].step == 23) {
                     if (ruleData[i].data != "") {
                       betweendate2 = ruleData[i].data;
                     }
+                    console.log("betweendate2>>>>>>",betweendate2)
+
                   } else if (ruleData[i].step == 24) {
                     if (ruleData[i].data != "") {
                       // fieldToFillIn = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
                       if ($("#field_" + ruleData[i].data)[0]) {
                         fieldToFillIn = $("#field_" + ruleData[i].data).attr("class").split(" ")[0];
-                        console.log("fieldToFillIn >>>",fieldToFillIn);
+                        //console.log("fieldToFillIn >>>",fieldToFillIn);
                       } else {
                         fieldToFillIn = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       }
+                      console.log("fieldToFillIn>>>>>>",fieldToFillIn);
+                      let fieldToFillInValue = this.dynamicForm.controls[choosenField]?.value;
+                      this.choosenField = fieldToFillIn;
                     }
                   } else if (ruleData[i].step == 26) {
                     if (ruleData[i].data != "") {
@@ -2975,28 +4182,40 @@ console.log("comparedField =",comparedField);
                         fillIntoChoosen = $(".field_" + ruleData[i].data).attr("class").split(" ")[0];
                       }
                     }
+                    console.log("fillIntoChoosen>>>>>>",fillIntoChoosen)
+
                   } else if (ruleData[i].step == 25) {
                     if (ruleData[i].data != "") {
                       fieldToFillInOrder = ruleData[i].data;
                     }
+                    console.log("fieldToFillInOrder>>>>>>",fieldToFillInOrder)
+
                   } else if (ruleData[i].step == 28) {
                     if (ruleData[i].data != "") {
                       typeOfFillInto = ruleData[i].data;
                     }
+                    console.log("typeOfFillInto>>>>>>",typeOfFillInto)
+
                   } else if (ruleData[i].step == 27) {
                     if (ruleData[i].data != "") {
                       minusCURRENT_DATE = ruleData[i].data;
 
                     }
+                    console.log("minusCURRENT_DATE>>>>>>",minusCURRENT_DATE)
+
                   }
                   else if (ruleData[i].step == 29) {
                     if (ruleData[i].data != "") {// + or -
                       operator = this.commonFunctions.filterArrayById(this.plusMinusOperator, ruleData[i].data)[0].name
                     }
+                    console.log("operator>>>>>>",operator)
+
                   } else if (ruleData[i].step == 30) {
                     if (ruleData[i].data != "") {
                       operatorOption = ruleData[i].data;
                     }
+                    console.log("operatorOption>>>>>>",operatorOption)
+
                   } else if (ruleData[i].step == 301) {
                     if (ruleData[i].data != "") {
                       operatorQuery = ruleData[i].data;
@@ -3010,6 +4229,8 @@ console.log("valueToOperate=",valueToOperate);
                     if (ruleData[i].data != "") {
                       operations = this.commonFunctions.filterArrayById(this.operations, ruleData[i].data)[0].name;
                     }
+                    console.log("operations=",operations);
+
                   } else if (ruleData[i].step == 211) {
                     if (ruleData[i].data != "") {
                       typeOfDifference = ruleData[i].data;
@@ -3050,7 +4271,7 @@ console.log("valueToOperate=",valueToOperate);
                     } else {
                       conditionValue = ruleData[i].data;
                     }
-console.log("conditionValue=",conditionValue);
+//console.log("conditionValue=",conditionValue);
                   } else if (ruleData[i].step == 42) {
                     if (ruleData[i].data != "") {
                       // testId = ruleData[i].data;
@@ -3058,32 +4279,36 @@ console.log("conditionValue=",conditionValue);
                       //   return el.id === ruleData[i].data;
                       // });
                       // defaultField = data[0].name;
-                      // console.log("defaultField=",defaultField);
+                      // //console.log("defaultField=",defaultField);
 
 
                       //jppppppppppp
                       let testIds = Array.isArray(ruleData[i].data) ? ruleData[i].data : [ruleData[i].data];
-                    
+
                       let data = this.test.filter((el: any) => {
                         return testIds.includes(el.id);
                       });
-                    
+
                       let defaultFields = data.map(el => el.name);
-                    
+
                       defaultField = defaultFields.join(', ');
-                                        
+
                     }
                   } else if (ruleData[i].step == 4 && ruleData[i].data != "") {
                     executeAction = this.commonFunctions.filterArrayById(this.executionAction, ruleData[i].data)[0].name;
                   } else if (ruleData[i].step == 44) {
-console.log("executeAction=",executeAction);
+//console.log("executeAction=",executeAction);
                     if (ruleData[i].data != "") {
                       if (executeAction == "Show Field" || executeAction == "Hide Field" || executeAction == "Required" || executeAction == "Optional" || executeAction == "Read Only" || executeAction == "Remove Read Only" || executeAction == "Rename Field" || executeAction == "Hide Button" || executeAction == "Show Button") {
                         executeOnField = ruleData[i].data;
+
                       }
                     }
                     if (executeAction == "Show FieldSet" || executeAction == "Hide FieldSet") {
                       executeOnFieldSet = ruleData[i].data;
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                    console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111",executeOnFieldSet);
+
                     }
                     if (executeAction == "Execute Rule Business") {
                       executeRuleBusiness = ruleData[i].data;
@@ -3180,7 +4405,7 @@ console.log("executeAction=",executeAction);
                         });
                         queryRes = modifiedData;
                       }
-console.log("queryRes ===",queryRes)
+//console.log("queryRes ===",queryRes)
                     }
                     if (executeAction == "Alert") {
                       alertValue = ruleData[i].data;
@@ -3200,6 +4425,8 @@ console.log("queryRes ===",queryRes)
               }
 console.log("ruleAction >>>>>>>=",ruleAction)
               if (ruleAction == "On Change") {
+                console.log("condition >>>>>>>=",condition)
+
                 if (condition == '=' || condition == '!=') {
                   if (dateTypes == 'Value' && condition != 'between') {
                     if (executeAction == "Alert") {
@@ -3212,7 +4439,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     }
                     else if (executeAction == 'Execute Query') {
                       for (let c = 0; c < this.test.length; c++) {
-                        console.log('default field -----123---->',defaultField);
+                        //console.log('default field -----123---->',defaultField);
                         // if (this.test[c].name == defaultField && this.test[c].columnType == "lookup") {
                         //   $('#' + this.test[c].name).val(queryRes);
                         //   $('#' + this.test[c].name + "_lookupName").val(queryRes);
@@ -3227,7 +4454,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       }
 
                       let choosenFieldValue: any = this.dynamicForm.controls[choosenField]?.value;
-                      console.log("choosenFieldValue----------->",choosenFieldValue)
+                      //console.log("choosenFieldValue----------->",choosenFieldValue)
                       //JANA AND RONY
                       if (this.dynamicIfCondition(conditionValue, choosenFieldValue, -1, condition)) {
                       //change here---> (change data of the dropdown):
@@ -3239,7 +4466,9 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       this.handleFormFieldValues(defaultField,queryRes);
                      }else{
                       this.dynamicForm.removeControl(defaultField);
-                      this.dynamicForm.addControl(defaultField, new UntypedFormControl(''));
+                      // this.dynamicForm.addControl(defaultField, new UntypedFormControl('', [this.maxFileSizeAndLength(5)]));
+                      this.dynamicForm.addControl(defaultField,new UntypedFormControl(''));
+
                       data[0].query = [];
                       this.cdr.detectChanges();
                       data[0].query = queryRes;
@@ -3385,12 +4614,17 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     }
                     if (executeAction == "Show Field" || executeAction == "Show Button") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
+
                     }
                     else if (executeAction == "Hide Field" || executeAction == "Hide Button") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     }
                     else if (executeAction == "Show FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                      this.informationservice.setAdvancedSearchShowGrid(true);
+                     // console.log("Nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn111111111111");
+
+
                     } else if (executeAction == "Hide FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                     } else if (executeAction == "Required") {
@@ -3398,15 +4632,11 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     } else if (executeAction == "Optional") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Read Only") {
-                      console.log("readOnly>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-                      console.log("choosenField>>>>>> :",choosenField);
-                      console.log("conditionValue>>>>>>>>>>",conditionValue)
-                      console.log("condition>>>>>>>>>>",condition)
+
 
 
 
                       if (this.dynamicIfCondition(this.dynamicForm.controls[choosenField]?.value, conditionValue, -1, condition)) {
-                        console.log("executeOnField>>>>>>>>>>",executeOnField)
 
                         if (executeOnField.length >= 1) {
                           for (let u = 0; u < executeOnField.length; u++) {
@@ -3421,7 +4651,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
                             if ($("#field_" + fieldId)[0]) {
                               for (let c = 0; c < this.test.length; c++) {
-                                console.log(this.test[c].columnType)
+                                //console.log(this.test[c].columnType)
 
                                 if (this.test[c].id === fieldId && this.test[c].columnType == "lookup") {
                                   this.test[c].qbeReadOnly = true;
@@ -3431,7 +4661,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
                                   break;
                                 }else if(this.test[c].id === fieldId && this.test[c].columnType == "phone number"){
-                                  console.log("11111111111111111122222222221111111111111111111",this.test[c]);
+                                  //console.log("11111111111111111122222222221111111111111111111",this.test[c]);
                                   this.test[c].qbeReadOnly = true;
                                 }
                               }
@@ -3651,10 +4881,12 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     }
                   }
                 } else if (condition == 'Fill Into') {
+                  console.log("typeOfFillInto >>>>>>>=",typeOfFillInto)
 
                   if (typeOfFillInto == undefined) {
                     let choosenValue;
                     for (let i = 0; i < this.test.length; i++) {
+
                       if (this.test[i].name == choosenField) {
                         if (this.test[i].columnType == "combo") {
                           for (let j = 0; j < this.test[i].query.length; j++) {
@@ -3664,6 +4896,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                           }
                         } else {
                           choosenValue = this.dynamicForm.controls[choosenField]?.value;
+                        
                         }
                       }
                     }
@@ -3692,6 +4925,13 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - valueToOperate);
                       } else if (operator == '+') {
                         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() + valueToOperate);
+                      }else if (operator == 'Sum'){
+                        const newValue = choosenValue + valueToOperate;
+                        console.log("newValue>>>>>>>",newValue);
+                        console.log("choosenValue>>>>>>>",choosenValue);
+                        console.log("fieldToFillIn>>>>>>>",fieldToFillIn);
+                        this.dynamicForm.controls[fieldToFillIn].setValue(newValue);
+
                       }
                       let lastDate = this.datepipe.transform(thirtyDaysAgo, 'yyyy-MM-dd');
                       this.dynamicForm.controls[fieldToFillIn].setValue(lastDate);
@@ -3848,10 +5088,22 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     this.handleFormFieldValues(fieldToFillIn, time);
                   } else if (typeOfFillInto == 2) { // get the value of a choosen field rule 26
                     let valueOfField = this.dynamicForm.controls[fillIntoChoosen]?.value
-
-                    if (minusCURRENT_DATE[0] == "1") {
-                      valueOfField = this.calculateDifference(valueOfField);
+                    let fieldToFillInValue = this.dynamicForm.controls[this.choosenField]?.value;
+                    console.log('choosenField>>>>>>>>>',choosenField);
+                    console.log("valueOfField >>>>>>>=",valueOfField);
+                    if (Array.isArray(minusCURRENT_DATE) && minusCURRENT_DATE.length > 0) {
+                      if (minusCURRENT_DATE[0] === "1") {
+                        valueOfField = this.calculateDifference(valueOfField);
+                      }                 
+                     } else {
+                      console.log('valueOfField>>>>>>>>',valueOfField);
+                      console.log('fieldToFillInValue>>>>>>>>',fieldToFillInValue);
+                      valueOfField = Number(valueOfField) + Number(fieldToFillInValue);
+                        console.log('valueField.??.>>>>>>',valueOfField);
                     }
+                 
+
+  
                     this.handleFormFieldValues(fieldToFillIn, valueOfField);
 
 
@@ -3866,6 +5118,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       this.dynamicDRBOnchange(columnId, ruleId);
                     } else if (executeAction == "Show Field") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
+
                     } else if (executeAction == "Hide Field") {
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Hide Button") {
@@ -3874,6 +5127,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                       this.dynamicActionsOnChange(executeAction, executeOnField);
                     } else if (executeAction == "Show FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
+                      this.informationservice.setAdvancedSearchShowGrid(true);
                     } else if (executeAction == "Hide FieldSet") {
                       this.dynamicActionsOnChange(executeAction, executeOnFieldSet);
                     } else if (executeAction == "Required") {
@@ -3890,7 +5144,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                     let comparedFieldValue = this.dynamicForm.controls[comparedField]?.value;
                      if(condition == 'Include'){
                       const include = choosenFieldValue.includes(comparedFieldValue);
-                      console.log("includeValue is =",include);
+                      //console.log("includeValue is =",include);
                       if(include == true){
                       this.commonFunctions.alert("alert", alertValue);
                       this.handleFormFieldValues(choosenField, "");
@@ -3899,21 +5153,20 @@ console.log("ruleAction >>>>>>>=",ruleAction)
                   }
                 }
               }
-            } else {
+            }else {
 
             }
           }
         }
       }
     } catch (error) {
-      console.log("dynamicDRBOnchange error >>> ", error);
+      //console.log("dynamicDRBOnchange error >>> ", error);
     }
   }
 
 
   // Function To avoid repetition for Actions(hide,show,required,..)
   dynamicActionsOnChange(executeAction: any, execution: any) {
-
     let fieldsetColumns: any[] = [];
     let data_1: any[] = [];
     for (let i = 0; i < execution.length; i++) {
@@ -3956,6 +5209,8 @@ console.log("ruleAction >>>>>>>=",ruleAction)
     }
 
     if (executeAction == "Show FieldSet") {
+      console.log("111111111111111111111111");
+      this.informationservice.setAdvancedSearchShowGrid(true);
       if (fieldsetColumns.length >= 1) {
         for (let u = 0; u < fieldsetColumns.length; u++) {
           const field = this.dynamicForm.get(fieldsetColumns[u].columnName);
@@ -3996,6 +5251,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
     if (executeAction == "Hide FieldSet") {
       if (fieldsetColumns.length > 1) {
+
         for (let u = 0; u < fieldsetColumns.length; u++) {
           const field = this.dynamicForm.get(fieldsetColumns[u].columnName);
           if (field) {
@@ -4026,6 +5282,10 @@ console.log("ruleAction >>>>>>>=",ruleAction)
 
             this.clearFormControl(fieldsetColumns[0].columnName);
           }
+        }else{
+          $("#fieldSet_" +execution).hide();
+          // this.clearFormControl(execution);
+
         }
       }
     }
@@ -4059,7 +5319,7 @@ console.log("ruleAction >>>>>>>=",ruleAction)
     }
 
     if (executeAction == "Read Only") {
-console.log('execution-----------> :',execution)
+//console.log('execution-----------> :',execution)
       if (execution.length >= 1) {
         for (let u = 0; u < execution.length; u++) {
           if ($("#field_" + execution[u])[0]) {
@@ -4271,7 +5531,7 @@ console.log('execution-----------> :',execution)
   }
 
   async loadAM(isFromDialogClose: boolean) {
-    console.log("this.amInfo======", this.amInfo);
+    //console.log("this.amInfo======", this.amInfo);
 
     try {
       this.ListToFillData = [{ 'fieldToFillIn': '', 'choosenValue': '', 'fieldToFillInOrder': '', 'choosenFielddd': '' }];
@@ -4289,9 +5549,20 @@ console.log('execution-----------> :',execution)
         this.actionType == 'update';
       }
 
+
+      // if(this.amInfo.objectId.includes("~N~")){
+      //   let part:String [] =this.amInfo.objectId.split('|');
+      // this.amInfo.objectId =part[1].trim();
+      // }
+
+      if (this.amInfo.objectId.toString().indexOf("~N~") !== -1) {
+        let part:String [] =this.amInfo.objectId.split('|');
+      this.amInfo.objectId =part[1].trim();
+      }
       const getAllTabsUrl = from(axios.get(GlobalConstants.getAllTabs + this.amInfo.objectId));
       const getAllTabs = await lastValueFrom(getAllTabsUrl);
       this.allTabsTemp=getAllTabs.data;
+      console.log("ALL TABS DATA>>>>>>>>",getAllTabs.data);
       this.loaderService.isLoading.next(true);
       for (let i = 0; i < getAllTabs.data.length; i++) {
 
@@ -4325,13 +5596,13 @@ console.log('execution-----------> :',execution)
         // )
 
         let isGrid = 1;
-console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
+//console.log("getAllTabs.data[i] ====",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == 1) {
           isGrid = 0;
         } else {
           isGrid = getAllTabs.data[i].isGrid;
         }
-console.log("isGrid ========",isGrid);
+//console.log("isGrid ========",isGrid);
         // If condition lookup to disable a tab on onload
         let conditionTest: any;
         let condition = getAllTabs.data[i].condition == null ? -1 : getAllTabs.data[i].condition;
@@ -4508,14 +5779,14 @@ console.log("isGrid ========",isGrid);
           }
         }
 
-        this.hiddenForm.addControl("hidden_" + getAllTabs.data[i].menuName + "_objId", new UntypedFormControl(''));
+        this.hiddenForm.addControl("hidden_" + getAllTabs.data[i].menuName + "_objId",new UntypedFormControl(''));
         this.hiddenForm.controls["hidden_" + getAllTabs.data[i].menuName + "_objId"].setValue(getAllTabs.data[i].objectId);
 
         // Handling Read Only under Tab with Parameters
 
         let isReadOnly = getAllTabs.data[i].readOnlyQbeId == null ? -1 : getAllTabs.data[i].readOnlyQbeId;
         let isReadOnlyB: boolean;
-
+        console.log("IS READ ONLY>>>>>>>",isReadOnly);
         if (isReadOnly != -1) {
           const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + isReadOnly));
           const paramNames = await lastValueFrom(paramNamesUrl);
@@ -4601,10 +5872,16 @@ console.log("isGrid ========",isGrid);
           "canAdd": getAllTabs.data[i].canAdd,
           "canDelete": getAllTabs.data[i].canDelete,
           "canModify": getAllTabs.data[i].canModify,
+          "formView": getAllTabs.data[i].formView,
           "condition": conditionTest,
           "sourceQuery": getAllTabs.data[i].sourceQuery,
           "isAdvancedSearch": getAllTabs.data[i].isAdvancedSearch,
+          "hasMultipleSelection": getAllTabs.data[i].hasMultipleSelection,
           "isQueryForm": getAllTabs.data[i].isQueryForm,
+          "hasView":getAllTabs.data[i].hasView,
+          "isFormFlip": getAllTabs.data[i].isFormFlip,
+          "isAMLoad": getAllTabs.data[i].isAMLoad,
+          "isAdvancedHidden": getAllTabs.data[i].isAdvancedHidden,
           "isDynamicReport": getAllTabs.data[i].isDynamicReport,
           "isGrid": isGrid,
           "objectId": getAllTabs.data[i].objectId,
@@ -4613,8 +5890,8 @@ console.log("isGrid ========",isGrid);
           "isSave": isSaveBtn,
           "isReadOnly": isReadOnlyB
         });
-        console.log("TEST>>>>>>>>>>>>",this.tableOptions1);
-        console.log("getAllTabs.data[i] >>>>",getAllTabs.data[i]);
+        //console.log("TEST>>>>>>>>>>>>",this.tableOptions1);
+        //console.log("getAllTabs.data[i] >>>>",getAllTabs.data[i]);
         if (getAllTabs.data[i].isMain == "1") {
           //test2
           let previousTab = this.informationservice.getPreviousMainTab();
@@ -4627,7 +5904,7 @@ console.log("isGrid ========",isGrid);
             this.informationservice.setMainTab(previousTab);
           }
           if (!previousTab) {
-            console.log("previousTab wiiiiiiii=",getAllTabs.data[i].menuName);
+            //console.log("previousTab wiiiiiiii=",getAllTabs.data[i].menuName);
             // this.informationservice.setMainTab(getAllTabs.data[i].menuName);
             this.informationservice.setMainTab(this.informationservice.getPreviousMainTab());
           }
@@ -4645,7 +5922,7 @@ console.log("isGrid ========",isGrid);
       this.dialogRef.disableClose = true;
 
     } catch (error) {
-      console.log("Onload error >>> ", error);
+      //console.log("Onload error >>> ", error);
     }
   }
 
@@ -4675,6 +5952,14 @@ console.log("isGrid ========",isGrid);
   }
 
   async ngOnInit(): Promise<void> {
+    this.informationservice.setAdvancedSearchShowGrid(true);
+    // this.gridStaticValue =  [{"STUDENT_NAME":77777,"PHONE_NUMBER":71789456}];
+    if(this.lookupData==null){
+    this.lookupData=this.mainPreviewDataInput;
+    this.actionType ='saveNew'
+    }
+    console.log("LOOKPU DATA>>>>>>>>>>>>>>",this.lookupData);
+    console.log("MAIN PREVIEW DATA INPUT>>>>>>>>>>>>>",this.mainPreviewDataInput);
 
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -4687,6 +5972,7 @@ console.log("isGrid ========",isGrid);
     //test2
     this.roleId = this.informationservice.getUserRoleId();
     if (this.amInfo == undefined) {
+      console.log("LOOKUPDATA>>>>>>>>>",this.lookupData[0]);
       this.amInfo = this.lookupData[0];
     }
 
@@ -4731,8 +6017,8 @@ console.log("isGrid ========",isGrid);
 
     this.actionType = this.amInfo.actionType;
     objectId = this.amInfo.objectId;
-
-console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
+    console.log("AM PREVIEW ON BUTTON CLICK ACTION TYPE>>>>>>>>>>>>>>",this.actionType);
+//console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
     const getMenuNameApiUrl = from(axios.get(GlobalConstants.getMenuNameApi + objectId));
     const getMenuNameApi = await lastValueFrom(getMenuNameApiUrl);
 
@@ -4888,6 +6174,7 @@ console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
 
       if (paramNames.data.length > 0) {
         // Filter ROW_ID information to get only the ones for Grid
+        console.log('this.amInfo.selectedRowId-------->',this.amInfo.selectedRowId)
         let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
         if (params != undefined) {
           let filteredParams: any = this.handleSelectedRowIds(params, "tab,form,grid");
@@ -5020,57 +6307,54 @@ console.log("objectId >>>>>>>>>>>>>>>>>>>>>>>>",objectId);
       hasSourceQuery = 1;
     }
 
-    const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
+
+
+//////////////////////////elie//////////////////////////////////////////////////////////////////////////////////
+
+
+const getTabConfigurationApiUrl = from(axios.get(GlobalConstants.getTabConfigurationApi + this.objectId));
     const getTabConfigurationApi = await lastValueFrom(getTabConfigurationApiUrl);
     isGrid = getTabConfigurationApi.data[0].isGrid;
+    console.log("getTabConfigurationApi.data>>>>>>>>>>",getTabConfigurationApi.data)
+    console.log("ELIE IS FROM BUTTON CLICK 111>>>>>>>>>>>>>>>>",this.amInfo);
+    console.log("ELIE IS FROM BUTTON CLICK 2222>>>>>>>>>>>>>>>>",this.amInfo.isFromButtonClick);
+    console.log("ELIE IS FROM BUTTON CLICK 3333>>>>>>>>>>>>>>>>",this.amInfo.buttonClick);
+    console.log("ELIE IS FROM BUTTON CLICK 4444>>>>>>>>>>>>>>>>",getTabConfigurationApi.data[0].isGrid);
 
-console.log("is grid ya  >>>>>>>>>>>>>>>>>>>>>>> : " , isGrid);
-console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
-    ////////////////elie//////////////////////////////////
-    console.log("AMINFO>>>>>>>>>>>>",this.amInfo);
-    console.log("getTabConfigurationApi.data[0].isMain>>>>>>>>>>>>",getTabConfigurationApi.data[0].isMain);
 
     if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick && getTabConfigurationApi.data[0].isMain == "1") {
-      //test2
-      console.log("this.informationservice.getPopupBreadcrumb():",this.informationservice.getPopupBreadcrumb());
-      console.log("this.informationservice.getPreviousMainTab():",this.informationservice.getPreviousMainTab());
-      console.log("getTabConfigurationApi.data[0].menuName:",getTabConfigurationApi.data[0].menuName);
-
       if (getTabConfigurationApi.data[0].menuName == this.informationservice.getPreviousMainTab()) {
         isGrid = 0;
-        console.log("tes1");
+        console.log("1111111111111111111111");
       }
-      console.log("TABLE OPTIONS>>>>>>>>>>>>> " , this.tableOptions1);
-      console.log("ALL TABS TEMP>>>>>>>>>>",this.allTabsTemp);
-      console.log("ALL TABS TEMP LENGTH>>>>>>>>>>",this.allTabsTemp.length);
-
-      //////for alert monitoring kyc general info////////////
       if(this.allTabsTemp.length>1){
       for(let i=0;i<this.allTabsTemp.length;i++){
         if(this.allTabsTemp[i].parentId==null && this.allTabsTemp[i].canModify!=null){
+          console.log("22222222222222222222");
+
           isGrid=0;
           break;
+
         }
 
       }
-      console.log("IS GRID 1st LAST>>>>",isGrid);
 
-      
     }
-      /////////////////////////////////////////////////
-      ///////////////////////////////////////////////
     }
 
     else
       if (this.amInfo.isFromLink && this.amInfo.isFromLink == 1 && !this.amInfo.isFromButtonClick) {
 
         isGrid = getTabConfigurationApi.data[0].isGrid;
+        console.log("33333333333333333333333333");
 
       } else {
         if (getTabConfigurationApi.data[0].isMain == "1" &&
             getTabConfigurationApi.data[0].isGrid == "1" &&
             this.amInfo.buttonClick == undefined) {
           isGrid = 0
+          console.log("444444444444444444");
+
         } else if (getTabConfigurationApi.data[0].isMain == "0" &&
                    getTabConfigurationApi.data[0].isGrid == "1" &&
                    this.isFromGridClick == 1) {
@@ -5085,38 +6369,57 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
       }
     if (this.amInfo.isFromButtonClick && this.amInfo.isFromButtonClick == 1) {
       isGrid = getTabConfigurationApi.data[0].isGrid;
+      console.log("66666666666666666666666");
+
     }
 
     if (getTabConfigurationApi.data[0].isMain == "1" && getTabConfigurationApi.data[0].isGrid == "0" && this.amInfo.buttonClick == 14) {
       this.actionType = 'update';
     }
+    if(this.amInfo.isFromButtonClick==undefined && this.amInfo.buttonClick==14 && getTabConfigurationApi.data[0].isGrid==1){
+      isGrid=1;
+      console.log("7777777777777777777777");
 
+    }
+    //////////////BWE\\\\\\\\\\\\\\\
+    if(this.amInfo.isFromButtonClick==undefined && this.amInfo.buttonClick==14 && getTabConfigurationApi.data[0].isGrid==0  && this.amInfo.isFromGridClick==0 && this.amInfo.actionType=="update"){
+      isGrid=0;
+      console.log("TTTTESTTTTTTT");
 
-    console.log("button grid >>>>>>>>>>>>>>>>>>>> : " , isGrid);
+    }else if(this.amInfo.buttonClick==14 && this.amInfo.isFromButtonClick==undefined && this.informationservice.getSelectedColumnFormOpening() != undefined){
+      console.log("Transformed to Save New");
+      this.actionType = 'saveNew';
+    }
+  
     this.isPageGrid = isGrid == 1 ? true : false;
+    console.log("888888888888888888888");
+
     //make buttons appear under a grid
     const getColumnsApiUrl = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
     const getColumnsApi = await lastValueFrom(getColumnsApiUrl);
     let buttons: any = getColumnsApi.data.filter((el: any) => {
-      console.log("my val >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> : " ,el);
 
       return el.columnTypeCode === "14";
     });
     this.testButtons = buttons;
-
+    console.log("TTTTTTTTTTT>>>>>>>>>>>>>",getTabConfigurationApi.data[0].isAMLoad);
+    if(getTabConfigurationApi.data[0].isAMLoad=="1"){
+      console.log("main am preview Grid is Form!!!!!");
+      isGrid=1;
+    }
     if (isGrid == 0) {
       this.informationservice.setFormToOpen("yes");
     }
     else {
       this.informationservice.setFormToOpen("no");
     }
-
+    this.isGeneralGrid=isGrid;
     const getColumnsApiUrl0 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
     const getColumns0Api = await lastValueFrom(getColumnsApiUrl0);
     if (isGrid == 1 && hasSourceQuery == 0) {
       this.agColumns = [];
       this.agColumnsJson = "";
-
+console.log("getColumnsApi.data>>>>1>>>>>>>",getColumnsApi.data)
       let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi.data, 'select', this.amInfo));
       console.log("TESTTABLE>>>>>>>>>>>",jsonData);
       let tableNames: string = '';
@@ -5184,16 +6487,19 @@ console.log("all TABS>>>>>>>>>>>>>>>",this.allTabsTemp);
         const getButtonData = await lastValueFrom(getButtonDataUrl);
         let data1 = getButtonData.data;
 
-console.log("data1 ------->",data1);
+//console.log("data1 ------->",data1);
         if (data1.blobFile != null && data1.blobFile != undefined) {
           const base64EncodedString = data1.blobFile;
           const decodedString = atob(base64EncodedString);
           let condition: any = decodedString.split("~A~")[5];
           let conditionQuery = condition == null ? -1 : condition;
+          console.log("CONDITION QUERY 1111>>>>>>>>>>>>",conditionQuery);
            if(condition == 'null'){
             conditionQuery = -1;
            }
-          if (conditionQuery != -1 && conditionQuery != "") {
+           console.log("CONDITION QUERY 2222>>>>>>>>>>>>",conditionQuery);
+
+          if (conditionQuery != -1 && conditionQuery != "" && conditionQuery!=undefined && conditionQuery!="undefined") {
             const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + conditionQuery));
             const paramNames = await lastValueFrom(paramNamesUrl);
 
@@ -5262,8 +6568,8 @@ console.log("data1 ------->",data1);
             }
           }
 
-          if (conditionQuery != "" && conditionQuery != null) {
-            console.log("test hahahahhahahaha ");
+          if (conditionQuery != "" && conditionQuery != null && conditionQuery != -1 && conditionQuery!=undefined && conditionQuery!="undefined") {
+            //console.log("test hahahahhahahaha ");
             const conditionUrl = from(axios.post(GlobalConstants.getQbeIdApi + conditionQuery + "/0", jsonCondition));
             const ConditionResult = await lastValueFrom(conditionUrl);
             if (ConditionResult.data[0] == 1) {
@@ -5433,29 +6739,47 @@ console.log("data1 ------->",data1);
 
       const getColumnsApiUrl3 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
       const getColumnsApi3 = await lastValueFrom(getColumnsApiUrl3);
-
       const getAllFieldSetsApiUrl = from(axios.get(GlobalConstants.getAllFieldSetsApi + this.objectId));
       const getAllFieldSetsApi = await lastValueFrom(getAllFieldSetsApiUrl);
       this.dynamicForm = new UntypedFormGroup({});
+      // this.dynamicForm = new UntypedFormGroup({
+      //   file: new UntypedFormControl(null, [this.maxFileSize(5)]) // Max file size 5 MB
+      // });
       this.loaderService.isLoading.next(true);
+      const fieldSetsMap = new Map<number, any[]>();
+      for (const column of getColumnsApi3.data) {
+          if (!fieldSetsMap.has(column.fieldSetId)) {
+              fieldSetsMap.set(column.fieldSetId, []);
+          }
+          fieldSetsMap.get(column.fieldSetId).push(column);
+      }
+
+
+
       for (let g = 0; g < getAllFieldSetsApi.data.length; g++) {
+        const fieldSetId = getAllFieldSetsApi.data[g].id;
         let data_0 = getColumnsApi3.data.filter((el: any) => {
           return Number(el.groupId) === Number(getAllFieldSetsApi.data[g].id);
         });
+        let isFieldSetSuspended = true; // Assume fieldset should be suspended
+
         // data_0[i].columnTypeCode;
         this.test.push({ fieldSetId: getAllFieldSetsApi.data[g].id, fieldSetName: getAllFieldSetsApi.data[g].name });
         for (let i = 0; i < data_0.length; i++) {
           this.loaderService.isLoading.next(true);
-          console.log("DATA>>>>>>>>>>>>",data_0[i].tableId);
+          // //console.log("DATA>>>>>>>>>>>>",data_0[i].tableId);
           if (data_0[i].tableId == -1) {
-console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
+// //console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
             this.columnTypeCode = data_0[i].columnTypeCode;
           }
           // Handle Mandatory Fields
           if (data_0[i].isMandatory == 1 || data_0[i].isMandatory == 2) {
+            // console.log("data_0[i].isMandatory = true>>>>>>>",data_0[i])
             data_0[i].isMandatory = true;
           } else {
+            // console.log("data_0[i].isMandatory = false>>>>>>>",data_0[i])
             data_0[i].isMandatory = false;
+            // console.log("data_0[i].isMandatory>>>>>",data_0[i].isMandatory , data_0[i])
           }
 
           // Handle Mandatory on fields based on a query
@@ -5532,24 +6856,29 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
           const mandatoryQueryUrl = from(axios.post(GlobalConstants.getQbeIdApi + mandatoryQueryId + "/0", jsonQbe_mandatoryQuery));
           const mandatoryQuery = await lastValueFrom(mandatoryQueryUrl);
-
           if (mandatoryQuery.data[0] == 1) {
             data_0[i].mandatoryQuery = true;
           } else {
             data_0[i].mandatoryQuery = false;
           }
+          // console.log('data_0[i]>>>',data_0)
 
           // Handle suspended Fields
+        
           if (data_0[i].isSuspended == 1) {
             data_0[i].isSuspended = true;
           } else {
             data_0[i].isSuspended = false;
+            isFieldSetSuspended = false;
           }
 
           // Handle readOnly on fields based on a query
           if (data_0[i].qbeReadOnly != undefined) {
             const qbeReadOnlyUrl = from(axios.post(GlobalConstants.getQbeIdApi + data_0[i].qbeReadOnly + "/0", this.jsonEmpty));
             const qbeReadOnly = await lastValueFrom(qbeReadOnlyUrl);
+            console.log("QBE READ ONL1>>>>>>>>>>>>",qbeReadOnly.data);
+            console.log("QBE READ ONL222>>>>>>>>>>>>", data_0[i].qbeReadOnly);
+
             data_0[i].qbeReadOnly = qbeReadOnly.data[0] ? true : false;
           } else {
             data_0[i].qbeReadOnly = false;
@@ -5635,7 +6964,7 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
           // Append field to dynamicForm
           //add Validators.email
-          this.dynamicForm.addControl(data_0[i].name, new UntypedFormControl(''));
+          this.dynamicForm.addControl(data_0[i].name,  new UntypedFormControl('')) // Adjust maxSizeMB as needed;
 
           // Handle basic standard columns automatically
           if (data_0[i].name == "UPDATE_DATE") {
@@ -5803,7 +7132,22 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
             }
           }
-
+          //load data from previous form
+          if(this.listOfDataFormOpening == undefined){
+            if(this.informationservice.getSelectedColumnFormOpening() != ''  && this.informationservice.getSelectedColumnFormOpening() != undefined ){
+              this.listOfDataFormOpening = this.informationservice.getSelectedColumnFormOpening();
+            }
+          }
+          if (this.listOfDataFormOpening != undefined) {
+            if (this.listOfDataFormOpening.columns == undefined) {
+              this.dynamicForm.patchValue(this.listOfDataFormOpening);
+              const controlNames = Object.keys(this.dynamicForm.controls);
+              let data = controlNames.filter((el: any) => {
+                return el === data_0[i].name;
+              });
+              this.handleFormFieldValues(data[0], this.dynamicForm.controls[data[0]]?.value);
+            }
+          }
           // close a dialog and return data
           if(this.listOfData == undefined){
             if(this.informationservice.getListOfData() != ''){
@@ -5828,17 +7172,27 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
               this.test_1 = '1';
             }
           } else {
-            this.listOfHeaders.push(data_0[i])
+            this.listOfHeaders.push(data_0[i]);
           }
           this.loaderService.isLoading.next(false);
         }
+        if(getAllFieldSetsApi.data[g].name == 'suspended' || getAllFieldSetsApi.data[g].name == 'New Columns' ){
+           $("#fieldSet_" + fieldSetId).hide();
+        }
+        if(isFieldSetSuspended){
+          getAllFieldSetsApi.data[g].isHidden = '1';
+          $("#fieldSet_" + fieldSetId).hide();
+        }
+
       }
 
+      
       this.loaderService.isLoading.next(false);
+      console.log("WLEK ACTION TYPE>>>>>>>>>>>>>",this.actionType);
       if (this.actionType == "update") {
 
         let jsonData = JSON.parse(this.dynamicFormQuering(getColumnsApi3.data, 'select', '-1'));
-
+        console.log("this.aminfo.selectedRowId>>>>>>>>>>>>",this.amInfo.selectedRowId);
         let jsonVal = [{
           objectId: this.objectId,
           selectedRowId: JSON.stringify(this.handleSelectedRowIds(this.amInfo.selectedRowId, "form,button")),
@@ -5853,19 +7207,36 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
           const getDynamicReportData = await lastValueFrom(getDynamicReportDataUrl);
           dataa = getDynamicReportData.data;
         }else{
-          console.log("JSON VAL>>>>>>>>>>>>>>>>>>>>",jsonVal);
+          try{
+          console.log("IS GETTING FORM DATA");
+          console.log("JSON VAL>>>>>>>>>>>>>>",jsonVal);
           const getDynamicFormDataUrl = from(axios.post(GlobalConstants.getDynamicFormData, jsonVal));
           const getDynamicFormData = await lastValueFrom(getDynamicFormDataUrl);
           dataa = getDynamicFormData.data;
+          }catch(error){
+            console.log("ERROR>>>>>>>>",error);
+            dataa=this.amInfo.selectedRowId.form;
+          }
         }
-
-
-
+        console.log("DATAAAA from get dynamic form Data>>>>>",dataa);
+       
+//let jsonData1='[';
+let count = 0;
         for (let i = 0; i < dataa.length; i++) {
           this.loaderService.isLoading.next(true);
           let colName = dataa[i].colName.toUpperCase();
           let colValue = dataa[i].colValue;
           let colType = dataa[i].colType;
+
+          // if(this.listOfHeaders.some(header => header.name === colName)){
+          //   // if(count == 0){
+          //   //   jsonData1 +="{\""+colName+"\":"+colValue; 
+          //   //   count = 1;
+          //   // }else{
+          //   //   jsonData1 +=",\""+colName+"\":"+colValue; 
+          //   // }
+
+          // }
           // Remove time from date value
           if (colType == "date") {
             let date = new Date(colValue.substring(0, 10));
@@ -5888,16 +7259,16 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
           if (colType == "checkbox") {
             //test1
-            console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
+            //console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
             if(colValue=="true"){
 
               colValue=true;
-              console.log("TRUE CHECKBOX",colValue);
+              //console.log("TRUE CHECKBOX",colValue);
 
             }else{
 
               colValue=false;
-              console.log("FALSE CHECKBOX",colValue);
+              //console.log("FALSE CHECKBOX",colValue);
 
             }
           }
@@ -5971,6 +7342,7 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
 
           if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
             this.handleFormFieldValues(colName, colValue);
+           
           }
 
           if (colType == "hidden") {
@@ -5991,45 +7363,39 @@ console.log("data_0 >>>>>>>>>>>>>> ",data_0[i]);
           }
 
           if (foreignId === colName) {
-            this.handleFormFieldValues(colName, colValue);
+              this.handleFormFieldValues(colName, colValue);
           } else if (colName === this.amInfo.primaryColumn) {
-            this.handleFormFieldValues(colName, colValue);
-          }
+              this.handleFormFieldValues(colName, colValue);
+                  }
           this.loaderService.isLoading.next(false);
         }
+       // jsonData1 +="}]"
+      //  console.log("JSON DATA BWE>>>>>>>>>>",jsonData1);
+        //  this.gridStaticValue=JSON.parse(jsonData1);
+        setTimeout(()=>{
+        this.showGrid=false;
+        },100);
+          this.showGrid = true;
 
-        // Load field dependencies
-        setTimeout(async () => {
           this.loadFieldDependencyForForm();
-        }, 100);
 
         this.dynamicDRBOnload(this.objectId);
       }
       this.isFromGridClick = 0;
 
       // Hide all fieldsets that contain all it's fields hidden
-      setTimeout(() => {
         this.handleFormFieldsetsAfterLoad();
         this.showTheGridIntoForm();
-      }, 150);
 
       // Run Dynamic Rule Builder onLoad rules
-      setTimeout(() => {
-console.log("befor calling the load rules");
         this.dynamicDRBOnload(this.objectId);
-      }, 1200)
     }
-    setTimeout(() => {
       this.handleSaveButton();
-    }, 900);
 
     this.loaderService.isLoading.next(false);
     this.listOfData = undefined;
-    //fill the form (after close a popup)
-    console.log("this.test >>>>>>>>><><><><>>>>>>>>>",this.test);
+    this.listOfDataFormOpening = undefined;
     this.allData = this.test;
-    console.log("in the end of getAllColums ==",this.columnTypeCode);
-    console.log("this.amInfo=",this.amInfo)
 
     //test2
     let selectedTabName = this.informationservice.getSelectedTabName();
@@ -6041,11 +7407,15 @@ console.log("befor calling the load rules");
         this.setFormValues();
       }
     }
+    setTimeout(() => {
+      this.handleDialogTitle();
+    }, 100)
+
   }
 
 
   handleSaveButton() {
-    console.log("handleSaveButton()");
+    //console.log("handleSaveButton()");
     let groupId = '';
     for (let i = 0; i < this.testButtons.length; i++) {
       if (this.testButtons[i].name == 'Check Existing') {
@@ -6103,7 +7473,7 @@ console.log("befor calling the load rules");
     this.dynamicForm.controls[fieldName].setValue('');
     if (this.dynamicForm.get(fieldName)) {
       this.dynamicForm.removeControl(fieldName);
-      this.dynamicForm.addControl(fieldName, new UntypedFormControl(''));
+      this.dynamicForm.addControl(fieldName, new UntypedFormControl('')) // Adjust maxSizeMB as needed);
       if (value == 0) {
         this.dynamicForm.controls[fieldName].setValue('0');
       } else {
@@ -6115,99 +7485,162 @@ console.log("befor calling the load rules");
       this.cdr.detectChanges();
     }
   }
+  async handleFormFieldValues(fieldName: string, value: any) {
+    const getFieldDynamicTitleUrl =await axios.post(GlobalConstants.getFieldDynamicTitle + this.objectId);
+    const responseaxios =  getFieldDynamicTitleUrl.data;
 
-  handleFormFieldValues(fieldName: string, value: any) {
-    // for (let i = 0; i < this.test.length; i++) {
-    //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
-    //     localStorage.setItem("signatureImage",value);
-    //     this.oldsignature = value;
-    //     break;
-    //   }
-    // }
-    // let data = this.test.filter((el: any) => {
-    //   return el.name === fieldName;
-    // });
-    // this.dynamicForm.controls[fieldName].setValue('');
-    // if (this.dynamicForm.get(fieldName)) {
-    //   this.dynamicForm.removeControl(fieldName);
-    //   this.dynamicForm.addControl(fieldName, new FormControl(''));
+        this.getFieldDynamicTitle = responseaxios;
+        const fieldNames = fieldName.split(',');
 
-    //jppppppppppp
-    console.log("fieldName=",fieldName);
-    console.log("CHECKBOX VALUE>>>>>>",value);
-    const fieldNames = fieldName.split(',');
+        // Loop over each field name
+        for (let j = 0; j < fieldNames.length; j++) {
+            const currentFieldName = fieldNames[j].trim();
+            if(this.getFieldDynamicTitle == currentFieldName){
+              this.getFieldDynamicTitleValue ='/'+ value;
+             }
+        for (let i = 0; i < this.test.length; i++) {
 
-    // Loop over each field name
-    for (let j = 0; j < fieldNames.length; j++) {
-        const currentFieldName = fieldNames[j].trim();
-    for (let i = 0; i < this.test.length; i++) {
-      
-      if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
-        localStorage.setItem("signatureImage",value);
-        this.oldsignature = value;
-        break;
+          if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+            localStorage.setItem("signatureImage",value);
+            this.oldsignature = value;
+            break;
+          }
+        }
+        let data = this.test.filter((el: any) => {
+          return el.name === currentFieldName;
+        });
+
+        //jp and charbel <3
+
+        // this.dynamicForm.controls[currentFieldName].setValue('');
+
+        if (this.dynamicForm.get(currentFieldName)) {
+          this.dynamicForm.removeControl(currentFieldName);
+          this.dynamicForm.addControl(currentFieldName,  new UntypedFormControl('')) // Adjust maxSizeMB as needed);
+
+          if (value == null || value == 'null' || value == 'empty') {
+            value = '';
+          }
+          if(data[0] != undefined && data[0].columnType == "combo"){
+            let newQuery : any;
+            newQuery = data[0].query;
+            // change this code to a dynamic code
+            // if(newQuery = [0]){
+            //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+            // }
+            data[0].query = [];
+            this.cdr.detectChanges();
+            data[0].query = newQuery;
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+            this.dynamicForm.controls[currentFieldName].setValue(value);
+        }else if(data[0] != undefined && data[0].columnType == "phone number"){
+          this.cdr.detectChanges();
+          this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+        }
+          else {
+            this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+          }
+          if (value != null) {
+            this.registerTouchedField(currentFieldName);
+          }
+          this.cdr.detectChanges();
+        }
       }
-    }
-    let data = this.test.filter((el: any) => {
-      return el.name === currentFieldName;
-    });
-
-    //jp and charbel <3
-
-    // this.dynamicForm.controls[currentFieldName].setValue('');
-    if (this.dynamicForm.get(currentFieldName)) {
-      this.dynamicForm.removeControl(currentFieldName);
-      this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
-
-      if (value == null || value == 'null' || value == 'empty') {
-        value = '';
       }
-      if(data[0] != undefined && data[0].columnType == "combo"){
-        let newQuery : any;
-        newQuery = data[0].query;
-        // change this code to a dynamic code
-        // if(newQuery = [0]){
-        //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
-        // }
-        console.log("newQuery ===>",newQuery);
-        data[0].query = [];
-        this.cdr.detectChanges();
-        data[0].query = newQuery;
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-    } else if(data[0] != undefined && data[0].columnType == "checkbox"){
-      console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
-        this.dynamicForm.controls[currentFieldName].setValue(value);
-    }
-      else {
-        this.dynamicForm.controls[currentFieldName].setValue(value.toString());
-      }
-      if (value != null) {
-        this.registerTouchedField(currentFieldName);
-      }
-      this.cdr.detectChanges();
-    }
-  }
-  }
+  // handleFormFieldValues(fieldName: string, value: any) {
+  //   // for (let i = 0; i < this.test.length; i++) {
+  //   //   if (this.test[i].columnType == "signature" && this.test[i].name == fieldName) {
+  //   //     localStorage.setItem("signatureImage",value);
+  //   //     this.oldsignature = value;
+  //   //     break;
+  //   //   }
+  //   // }
+  //   // let data = this.test.filter((el: any) => {
+  //   //   return el.name === fieldName;
+  //   // });
+  //   // this.dynamicForm.controls[fieldName].setValue('');
+  //   // if (this.dynamicForm.get(fieldName)) {
+  //   //   this.dynamicForm.removeControl(fieldName);
+  //   //   this.dynamicForm.addControl(fieldName, new FormControl(''));
+
+  //   //jppppppppppp
+  //   //console.log("fieldName=",fieldName);
+  //   //console.log("CHECKBOX VALUE>>>>>>",value);
+  //   const fieldNames = fieldName.split(',');
+
+  //   // Loop over each field name
+  //   for (let j = 0; j < fieldNames.length; j++) {
+  //       const currentFieldName = fieldNames[j].trim();
+  //   for (let i = 0; i < this.test.length; i++) {
+
+  //     if (this.test[i].columnType == "signature" && this.test[i].name == currentFieldName) {
+  //       localStorage.setItem("signatureImage",value);
+  //       this.oldsignature = value;
+  //       break;
+  //     }
+  //   }
+  //   let data = this.test.filter((el: any) => {
+  //     return el.name === currentFieldName;
+  //   });
+
+  //   //jp and charbel <3
+
+  //   // this.dynamicForm.controls[currentFieldName].setValue('');
+  //   if (this.dynamicForm.get(currentFieldName)) {
+  //     this.dynamicForm.removeControl(currentFieldName);
+  //     this.dynamicForm.addControl(currentFieldName, new UntypedFormControl(''));
+
+  //     if (value == null || value == 'null' || value == 'empty') {
+  //       value = '';
+  //     }
+  //     if(data[0] != undefined && data[0].columnType == "combo"){
+  //       let newQuery : any;
+  //       newQuery = data[0].query;
+  //       // change this code to a dynamic code
+  //       // if(newQuery = [0]){
+  //       //   newQuery = [{id: '0', name: 'NO'}, {id: '1', name: 'YES'}]
+  //       // }
+  //       //console.log("newQuery ===>",newQuery);
+  //       data[0].query = [];
+  //       this.cdr.detectChanges();
+  //       data[0].query = newQuery;
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //   } else if(data[0] != undefined && data[0].columnType == "checkbox"){
+  //     //console.log("CHECKBOX VALUE 3333333>>>>>>>>>>",value);
+  //       this.dynamicForm.controls[currentFieldName].setValue(value);
+  //   }
+  //     else {
+  //       this.dynamicForm.controls[currentFieldName].setValue(value.toString());
+  //     }
+  //     if (value != null) {
+  //       this.registerTouchedField(currentFieldName);
+  //     }
+  //     this.cdr.detectChanges();
+  //   }
+  // }
+  // }
 
   async loadFieldDependencyForForm() {
-
+console.log('objectId------>',this.objectId)
     const getFieldDependenciesUrl = from(axios.post(GlobalConstants.getFieldDependencies + this.objectId));
     const getFieldDependencies = await lastValueFrom(getFieldDependenciesUrl);
     let data = getFieldDependencies.data;
+    console.log('data---------->',data)
 
 
     let fieldName: string = '';
     for (let i = 0; i < data.length; i++) {
+console.log('COLUMN_ID--------------------->',data[i])
 
-
-      if ($("#field_" + data[i].COLUMN_ID).length > 0) {
-        fieldName = $("#field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
+      if ($("#field_" + data[i].column_id).length > 0) {
+        fieldName = $("#field_" + data[i].column_id).attr("class").split(" ")[0];
       } else {
-        fieldName = $(".field_" + data[i].COLUMN_ID).attr("class").split(" ")[0];
+        fieldName = $(".field_" + data[i].column_id).attr("class").split(" ")[0];
       }
 
 
-      const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + data[i].DEPENDENT_QBE_ID));
+      const paramNamesUrl = from(axios.get(GlobalConstants.getParamsNameApi + data[i].dependent_qbe_id));
       const paramNames = await lastValueFrom(paramNamesUrl);
       let dataa = paramNames.data;
       // this.jsonQbe = [];
@@ -6215,7 +7648,7 @@ console.log("befor calling the load rules");
       let jsonQbe: any[] = [];
       jsonQbe.push(
         {
-          queryId: data[i].DEPENDENT_QBE_ID,
+          queryId: data[i].dependent_qbe_id,
           parameters: [
             {
               paramName: 'actionType',
@@ -6256,7 +7689,7 @@ console.log("befor calling the load rules");
       }
 
       if (hasEmptyValues == 0) {
-        const dependentDefaultValUrl = from(axios.post(GlobalConstants.getQbeIdApi + data[i].DEPENDENT_QBE_ID + "/0", jsonQbe));
+        const dependentDefaultValUrl = from(axios.post(GlobalConstants.getQbeIdApi + data[i].dependent_qbe_id + "/0", jsonQbe));
         const dependentDefaultVal = await lastValueFrom(dependentDefaultValUrl);
         let b = false;
         let colId = '';
@@ -6297,30 +7730,100 @@ console.log("befor calling the load rules");
       }
     }
   }
-//jp
-  async onShowButtonForm(buttonId: number) {
+
+  /////////IMPORTANT AN DYNAMIC BUTTON AND DYNAMIC SEARCH\\\\\\\\\\\\\\\\\\
+
+  async onShowButtonForm(buttonId: number,fromButtonOrSearch:string) {
+    let buttonMandatory='';
+    let buttonPassed=false;
+    console.log("BUTTON TRIGGERED!!!!!!!!!!!!!");
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
     let mainTab = this.informationservice.getMainTab();
-    const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
-    const getButtonData = await lastValueFrom(getButtonDataUrl);
-    let data1 = getButtonData.data;
-    this.columnTypeCode = data1.columnType;
+    let data1:any;
+    let decodedString='';
+    console.log("fromButtonOrSearch>>>>>>>>>>>>>>>",fromButtonOrSearch);
+    if(fromButtonOrSearch=="dynamicButton"){
 
-    if (data1.blobFile != null && data1.blobFile != undefined) {
-      const base64EncodedString = data1.blobFile;
-      const decodedString = atob(base64EncodedString);
+        const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
+        const getButtonData = await lastValueFrom(getButtonDataUrl);
+        data1 = getButtonData.data;
+        this.columnTypeCode = data1.columnType;
+        const base64EncodedString = data1.blobFile;
+        decodedString = atob(base64EncodedString);
 
-      let procedureName = decodedString.split("~A~")[0];
-      let buttonAction: any = decodedString.split("~A~")[1];
-      let isMainPreview: any = decodedString.split("~A~")[4];
+        console.log("ALL BUTTON DATA>>>>>>>>>>>>>",getButtonData.data);
 
-      let params = decodedString.split("~A~")[2];
-      let url = decodedString.split("~A~")[3];
-      let otherCondition = decodedString.split("~A~")[6];
-      let alertValue = decodedString.split("~A~")[7];
-      let thirdCondition = decodedString.split("~A~")[8];
-      let alertMessage = decodedString.split("~A~")[9];
+    }else{
+
+        const getSearchButtonFunctionDataApi = from(axios.get(GlobalConstants.getSearchButtonFunctionData + this.objectId));
+        const getSearchButtonFunctionData = await lastValueFrom(getSearchButtonFunctionDataApi);
+        data1 = getSearchButtonFunctionData.data[0];
+        this.columnTypeCode = 14;
+        decodedString=getSearchButtonFunctionData.data[0].blobFile;
+    }
+    console.log("DATA111111>>>>>>>>>>>>>",data1);
+
+    console.log("buttonMandatory>>>>>>>>",data1.buttonMandatory);
+    console.log("form status>>>>>>>>",this.dynamicForm.status);
+
+     if(data1.buttonMandatory=="1"){
+      console.log("AALOOOOOOOOOOO");
+      if (this.dynamicForm.status == 'INVALID'){
+        console.log("FETET LA HONE BUTTONNNNN");
+        this.submitForm();
+      }else{
+        buttonPassed=true;
+
+      }
+    }else{
+      buttonPassed=true;
+    }
+    console.log("BUTTON PASSED>>>>>>>>>",buttonPassed);
+    if(buttonPassed){
+//       const control = this.dynamicForm.get('MEDIA_PATH');
+// const maxLength = control?.value?.length; // Log the actual length of the file data
+// console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
+      console.log("this.dynamicForm>>>>>>",this.dynamicForm);
+      console.log("this.isPageGrid>>>>>>",this.isPageGrid);
+      console.log("data1:::::::::::::::::" ,data1);
+      console.log("data1.blobFile>>>>>>>>",data1.blobFile)
+    if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
+      
+      let splitedString = decodedString.split("|");
+      console.log("SPLITED STRING>>>>>>>>>>>>>>",splitedString);
+      splitedString.forEach(async (part, index) => {
+
+      let procedureName = part.split("~A~")[0];
+      let buttonAction: any = part.split("~A~")[1];
+      let isMainPreview: any = part.split("~A~")[4];
+      let params = part.split("~A~")[2];
+      let url = part.split("~A~")[3];
+      let otherCondition = part.split("~A~")[6];
+      let alertValue = part.split("~A~")[7];
+      let thirdCondition = part.split("~A~")[8];
+
+      let alertMessage = part.split("~A~")[9];
+      let jsonRequest = part.split("~A~")[10];
+      let jsonResponse = part.split("~A~")[11];
+      let selectedColsFormOpening = part.split("~A~")[12];
+
+
+
       this.buttonObjectId = procedureName;
+        console.log("procedureName>>>>>>>>>",procedureName);
+        console.log("buttonAction>>>>>>>>>",buttonAction);
+        console.log("isMainPreview>>>>>>>>>",isMainPreview);
+        console.log("params>>>>>>>>>",params);
+        console.log("url>>>>>>>>>",url);
+        console.log("otherCondition>>>>>>>>>",otherCondition);
+        console.log("alertValue>>>>>>>>>",alertValue);
+        console.log("thirdCondition>>>>>>>>>",thirdCondition);
+        console.log("alertMessage>>>>>>>>>",alertMessage);
+        console.log("jsonRequest>>>>>>>>>",jsonRequest);
+        console.log("jsonResponse>>>>>>>>>",jsonResponse);
+        console.log("selectedColsFormOpening>>>>>>>>>",selectedColsFormOpening);
+
+
       // Call Procedure
       if (buttonAction == 2) {
         let obj;
@@ -6498,13 +8001,20 @@ console.log("befor calling the load rules");
             for (let i = 0; i < arrayFromString.length; i++) {
               let formControlName = "";
               if ($("#field_" + arrayFromString[i]).length > 0) {
-                formControlName = $("#field_" + arrayFromString[i]).attr("class").split(" ")[0];
-                if (i == 0) {
-                  allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                const element = $("#field_" + arrayFromString[i]);
+                const classAttribute = element.attr("class");
+              
+                if (classAttribute) {
+                  formControlName = classAttribute.split(" ")[0];
+                  if (i == 0) {
+                    allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  } else {
+                    allParameters = allParameters + "~" + formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  }
                 } else {
-                  allParameters = allParameters + "~" + formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
+                  console.warn(`Element with ID 'field_${arrayFromString[i]}' does not have a class attribute.`);
                 }
-              } else if ($(".field_" + arrayFromString[i]).length > 0) {
+               }else if ($(".field_" + arrayFromString[i]).length > 0) {
                 formControlName = $(".field_" + arrayFromString[i]).attr("class").split(" ")[0];
                 if (i == 0) {
                   allParameters = formControlName + "/" + this.dynamicForm.controls[formControlName]?.value;
@@ -6554,7 +8064,22 @@ console.log("befor calling the load rules");
           }
         }
 
+      //   const invalidControls:any[] = [];
 
+      //   Object.keys(this.dynamicForm.controls).forEach(key => {
+      //     const control = this.dynamicForm.get(key);
+          
+      //     if (control instanceof UntypedFormControl && control.invalid) {
+      //       invalidControls.push(key);
+      //     } else if ((control instanceof UntypedFormGroup || control instanceof UntypedFormArray) && control.invalid) {
+      //       invalidControls.push(key);
+      //     }
+      //   });
+      //   console.log("IVALID FORM CONTROLS>>>>>>>",invalidControls);
+      //   console.log("DYNAMIC FORM>>>>>>>>>>>",this.dynamicForm);
+      //   console.log("REVERSE IS PAGE GRID>>>>>>",!this.isPageGrid);
+      //  console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+        //this.dynamicForm.get("MEDIA_PATH").markAsDirty();
         if (this.dynamicForm.status == "INVALID" && !this.isPageGrid) {
           this.commonFunctions.alert("alert", "Please fill in mandatory fields");
         } else {
@@ -6568,20 +8093,70 @@ console.log("befor calling the load rules");
       // Form Opening
       else if (buttonAction == "1") {
 
+
+console.log("dynamicFormStatus>>>>>>>", this.dynamicForm);
+// const control = this.dynamicForm.get('MEDIA_PATH');
+// const maxLength = control?.value?.length; // Log the actual length of the file data
+// console.log("MEDIA_PATH Max Length>>>>>>>>>", maxLength);
         let formData = this.dynamicForm.value;
+        if (this.gridStaticValue != undefined) {
+          const gridData = this.gridStaticValue[0];
+      
+          // Update formData with values from gridData
+          for (const key in gridData) {
+              if (gridData.hasOwnProperty(key) && key in formData) {
+                  formData[key] = gridData[key];
+              }
+          }
+      }
+      
+      // Log updated formData to see the changes
+        console.log('formData>>>>>>>>>>',formData);
+    if (selectedColsFormOpening !== undefined && selectedColsFormOpening !== null && selectedColsFormOpening !== '') {
+          const selectedColsName = from(axios.post(GlobalConstants.getColNameByColIds +selectedColsFormOpening));
+  const selectedColsNameVal = await lastValueFrom(selectedColsName);
+  const formattedArrayKeys = selectedColsNameVal.data.map((key:any) => key.toUpperCase());
+
+
+// Get the common keys
+const commonKeys = formattedArrayKeys.filter((key:any) => key in formData);
+
+// Create the new object with only common keys
+const resultObject: { [key: string]: string } = commonKeys.reduce((acc: { [x: string]: any; }, key: string | number) => {
+    acc[key] = formData[key];
+    return acc;
+}, {});
+console.log('tthis.informationservice.getSelectedColumnFormOpening()',this.informationservice.getSelectedColumnFormOpening());
+if(this.informationservice.getSelectedColumnFormOpening() != undefined){
+let object = this.informationservice.getSelectedColumnFormOpening();
+
+const mergedObject = {
+  ...object,
+  ...resultObject
+};
+
+this.informationservice.setSelectedColumnFormOpening(mergedObject);
+
+}else{
+  this.informationservice.setSelectedColumnFormOpening(resultObject);
+}
+console.log('SelectedColumnFormOpening>>>',this.informationservice.getSelectedColumnFormOpening());
+}
+     
         //test2
         let selectedTabName = this.informationservice.getSelectedTabName();
+        console.log('selectedTabName>>>>>>>>>>',selectedTabName);
 
         if(formData){
           this.listOfData = JSON.parse(JSON.stringify(formData));
+
         }
         this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
        let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
 
-       if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
+       if(this.informationservice.getAgGidSelectedNodeRule() != undefined && this.informationservice.getAgGidSelectedNodeRule() != null && this.informationservice.getAgGidSelectedNodeRule() != ''){
         params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
        }
-       console.log("params>>>>>>>>>>>",params);
         let data = [{
           actionType: this.amInfo.actionType,
           objectId: this.buttonObjectId,
@@ -6591,7 +8166,7 @@ console.log("befor calling the load rules");
           selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
         }];
 
-console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+//console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
           width: "80%",
           height: "80%",
@@ -6601,12 +8176,459 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         this.dataservice.PushdialogArray(this.dialogRef);
         //test2
         this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+        // if(this.informationservice.getSelectedColumnFormOpening() != undefined){
+        //   this.listOfData = this.informationservice.getSelectedColumnFormOpening();
+        // }
         this.informationservice.setListOFData(this.listOfData);
         this.dialogRef.disableClose = true;
       }
       // Call Api
       else if (buttonAction == "3") {
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+let dataa:any=[];
+        let formData = this.dynamicForm.value;
+        if (formData) {
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+          this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
+        }
+        console.log("Button Data>>>>>>>",part);
+        console.log("button action 1>>>>>>",formData);
+        console.log("11111>>>>>>",part.split("~A~")[0]);
+        console.log("22222>>>>>>",part.split("~A~")[1]);
+        console.log("33333>>>>>>",part.split("~A~")[2]);
+        console.log("44444>>>>>>",part.split("~A~")[3]);
+        console.log("55555>>>>>>",part.split("~A~")[5]);
+        console.log("66666>>>>>>",part.split("~A~")[6]);
+        console.log("77777>>>>>>",part.split("~A~")[7]);
+        console.log("88888>>>>>>",part.split("~A~")[8]);
+        console.log("99999>>>>>>",part.split("~A~")[9]);
+        console.log("10101010>>>>>>",part.split("~A~")[10]);
+        console.log("11111111>>>>>>",part.split("~A~")[11]);
+        console.log("SHOW API>>>>>>>>>>>>>>>>>>>>",url);
+        const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
+        const getApiJsons = await lastValueFrom(getApiJsonsApi);
 
+        let requestJsonString=getApiJsons.data[0].requestJson;
+        for(let i=0;i<JSON.parse(jsonRequest).length;i++){
+          for(let j=0;j<Object.keys(this.dynamicForm.value).length;j++){
+            if(Object.keys(this.dynamicForm.value)[j]==JSON.parse(jsonRequest)[i].fieldName){
+              requestJsonString=requestJsonString.replaceAll("#"+JSON.parse(jsonRequest)[i].jsonParameter+"#",this.dynamicForm.get(JSON.parse(jsonRequest)[i].fieldName).value);
+            }
+          }
+        }
+
+        let responseJsonString=getApiJsons.data[0].responseJson;
+        // console.log("jspnReponse>>>>>>>>>>>",JSON.parse(jsonResponse));
+        // for(let i=0;i<JSON.parse(jsonResponse).length;i++){
+        //   responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i].jsonParameter+"#",JSON.parse(jsonResponse)[i].fieldName);
+        // }
+        // console.log("method id>>>>>>>>>>>>>>",url);
+        
+        if(fromButtonOrSearch!='dynamicButton'){
+          requestJsonString=this.informationservice.getDynamicSearchApiData();
+        }
+
+       // console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
+       // console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
+        let json={"requestJson":requestJsonString,
+                  "responseJson":responseJsonString
+        }
+           const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
+           const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
+        console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
+        console.log("this.listOfHeaders>>>>>>>>>>",this.listOfHeaders);
+//jp1111111111111111111111111111
+
+          dataa=runDynamicBuilt.data;
+        console.log("DATAAAA>>>>>>>>>>>",dataa);
+        // let jsonData1='[';
+        let count = 0;
+        for (let i = 0; i < dataa.form.length; i++) {
+          console.log("FETET");
+          this.loaderService.isLoading.next(true);
+          let colName = dataa.form[i].colName.toUpperCase();
+          let colValue = dataa.form[i].colValue;
+          let colType = dataa.form[i].colType;
+
+          if (colType == "date") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = date.toISOString().substring(0, 10);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+
+          if (colType == "date time") {
+            // let date = new Date(colValue.substring(0, 10));
+            // colValue = date.toISOString().slice(0, 16);
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "time") {
+            let date = new Date(colValue.substring(0, 10));
+            colValue = colValue.toString();
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "checkbox") {
+            //test1
+            //console.log("THIS IS A CHECKBOX>>>>>>>>>>",colValue);
+            if(colValue=="true"){
+
+              colValue=true;
+              //console.log("TRUE CHECKBOX",colValue);
+
+            }else{
+
+              colValue=false;
+              //console.log("FALSE CHECKBOX",colValue);
+
+            }
+          }
+
+          if (colType == "lookup") {
+
+            let occ = 0;
+            if (colValue.includes(",")) {
+              let colArrayVal = colValue.split(",")
+              for (let o = 0; o < colArrayVal.length; o++) {
+                for (let h = 0; h < this.test.length; h++) {
+                  if (this.test[h].query) {
+                    for (let k = 0; k < this.test[h].query.length; k++) {
+                      if (this.test[h].query[k].ID == colArrayVal[o] && this.test[h].name == colName) {
+                        occ = occ + 1;
+                        break;
+                      }
+
+                    }
+                  }
+                }
+                this.handleFormFieldValues(colName, colValue);
+                $('#' + colName + "_lookupName").val("Selected (" + occ + ")");
+
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colValue);
+                localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', "Selected (" + occ + ")");
+                // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_id', colValue);
+                // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_name', "Selected (" + occ + ")");
+
+              }
+            } else {
+
+              let b = false;
+              let colId = '';
+              let fieldName = '';
+              for (let h = 0; h < this.test.length; h++) {
+
+                if (this.test[h].query) {
+
+
+                  for (let k = 0; k < this.test[h].query.length; k++) {
+                    //elie updated
+                    if (this.test[h].query[k].ID == colValue && colName==this.test[h].name) {
+                      b = true;
+                      colId = this.test[h].query[k].ID;
+                      fieldName = colName;
+                      colValue = this.test[h].query[k].NAME;
+                      break;
+                    }
+                  }
+                }
+
+                if (b) {
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_id', colId);
+                  localStorage.setItem('agGidSelectedLookup_(' + colName + ')_name', colValue);
+                  // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_id', colId);
+                  // this.informationservice.setDynamicService('agGidSelectedLookup_(' + colName + ')_name', colValue);
+                  break;
+
+                }
+              }
+
+              this.handleFormFieldValues(colName, colId);
+              if(this.dynamicForm.controls[fieldName + "_lookupName"]){
+                this.dynamicForm.controls[fieldName + "_lookupName"].setValue(colValue);
+              }
+               $('#' + fieldName + "_lookupName").val(colValue);
+            }
+          }
+
+
+          if (colType == "text" || colType == "textarea" || colType == "combo" || colType == "number" || colType == "file" || colType == "phone number" || colType == "e-mail" || colType == "signature" || colType == "checkbox") {
+            console.log("FETET HON KAMEN");
+            this.handleFormFieldValues(colName, colValue);
+          }
+
+          if (colType == "hidden") {
+            if (colName == "UPDATE_DATE") {
+              let currentDateTime = this.datepipe.transform((new Date), 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, currentDateTime);
+            } else if (colName == "UPDATED_BY") {
+              this.handleFormFieldValues(colName, this.userId);
+            } else if (colName == "CREATED_BY") {
+              this.handleFormFieldValues(colName, colValue);
+            } else if (colName == "CREATION_DATE") {
+              let date = new Date(colValue);
+              let datee = this.datepipe.transform(date, 'MM/dd/yyyy');
+              this.handleFormFieldValues(colName, datee);
+            } else {
+              this.handleFormFieldValues(colName, colValue);
+            }
+          }
+
+          this.loaderService.isLoading.next(false);
+        }
+
+        this.gridStaticValue=dataa.grid;
+if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
+  setTimeout(()=>{
+    this.showGrid=false;
+    },100);
+    setTimeout(()=>{
+      this.showGrid = true;
+    },100);
+}
+        
+      }
+      // Close Popup
+      else if (buttonAction == "4") {
+
+        this.closeDialog(true);
+
+      } else if (buttonAction == "5") {
+
+        let formData = this.dynamicForm.value;
+        if (formData) {
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+          this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
+        }
+        
+        console.log("Button Data>>>>>>>",part);
+        console.log("button action 1>>>>>>",formData);
+        console.log("11111>>>>>>",part.split("~A~")[0]);
+        console.log("22222>>>>>>",part.split("~A~")[1]);
+        console.log("33333>>>>>>",part.split("~A~")[2]);
+        console.log("44444>>>>>>",part.split("~A~")[3]);
+        console.log("55555>>>>>>",part.split("~A~")[5]);
+        console.log("66666>>>>>>",part.split("~A~")[6]);
+        console.log("77777>>>>>>",part.split("~A~")[7]);
+        console.log("88888>>>>>>",part.split("~A~")[8]);
+        console.log("99999>>>>>>",part.split("~A~")[9]);
+        console.log("10101010>>>>>>",part.split("~A~")[10]);
+        console.log("11111111>>>>>>",part.split("~A~")[11]);
+        console.log("1212121212>>>>>>",part.split("~A~")[12]);
+        console.log("131313131313>>>>>>",part.split("~A~")[13]);
+        let reportId=part.split("~A~")[13];
+        console.log("REPORT IDDDD>>>>>>>>>>>>>>>>>",reportId);
+          const checkParametersApi = from(axios.get(GlobalConstants.checkParameters +reportId));
+          const checkParameters = await lastValueFrom(checkParametersApi);
+
+          console.log("CHECK PARAMETERS>>>>>>>>>>>>>>",checkParameters.data);
+
+          const formControlsArray: Array<{ key: string; value: any }> = [];
+
+          Object.keys(this.dynamicForm.controls).forEach(key => {
+            const control = this.dynamicForm.get(key);
+            if (control instanceof UntypedFormControl) {
+              formControlsArray.push({ key, value: control.value });
+            }
+            //  else if (control instanceof UntypedFormGroup) {
+            //   const nestedControls = getFormControlsValues(control);
+            //   if (nestedControls.length > 0) {
+            //     formControlsArray.push({ key, value: JSON.parse(nestedControls) });
+            //   }
+            // }
+          });
+        
+        console.log("FORM CONTROLS ARRAY>>>>>>>>>>>>",formControlsArray);
+        let jsonarray:any[]=[];
+        let jsonarrayToBeSent:any[]=[];
+
+
+
+        const checkViewExistsApi = from(axios.post(GlobalConstants.checkViewExists+this.objectId));
+        const checkViewExists = await lastValueFrom(checkViewExistsApi);
+        console.log("checkViewExists>>>>>>>>>>>>>",checkViewExists.data);
+        if(checkViewExists.data[0].hasView!="0"){
+          console.log("FETET LA HONE");
+          const fetchColumnAndViewDataApi = from(axios.post(GlobalConstants.fetchColumnAndViewData+this.informationservice.getLogeduserId()+"/"+this.objectId+"/"+checkViewExists.data[0].formView));
+          const fetchColumnAndViewData = await lastValueFrom(fetchColumnAndViewDataApi);
+  
+          console.log("FETCH ALL INSERTED DATA>>>>>>>>>>>>>>>",fetchColumnAndViewData.data);  
+          this.informationservice.setFormRecentData(fetchColumnAndViewData.data);
+
+          for(let i=0;i<fetchColumnAndViewData.data.length;i++){
+            console.log("fetchColumnAndViewData.data>>>>>",fetchColumnAndViewData.data);
+            for(let j=0;j<checkParameters.data.length;j++){
+              console.log("checkParameters.data>>>>>",checkParameters.data[i]);
+
+              if(fetchColumnAndViewData.data[i].colName==checkParameters.data[j].paramName){
+                jsonarray.push({colName:fetchColumnAndViewData.data[i].colName,colVal:fetchColumnAndViewData.data[i].colVal});
+               }
+              //  else{
+              //    jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
+              //  }
+            }
+          }
+
+        }else{
+  
+
+        for(let i=0;i<formControlsArray.length;i++){
+          for(let j=0;j<checkParameters.data.length;j++){
+            if(formControlsArray[i].key==checkParameters.data[j].paramName){
+              jsonarray.push({colName:formControlsArray[i].key,colVal:formControlsArray[i].value});
+            }
+            // else{
+            //   jsonarray.push({colName:checkParameters.data[j].paramName,colVal:"1"});
+            // }
+          }
+
+        }
+
+      }
+      console.log("JSON ARRAY>>>>>>",jsonarray);
+      let z=0;
+      for(let i=0;i<checkParameters.data.length;i++){
+        if(JSON.stringify(jsonarray).includes(checkParameters.data[i].paramName)){
+          jsonarrayToBeSent.push({colName:jsonarray[z].colName,colVal:jsonarray[z].colVal});
+          z++;
+        }
+        else{
+          jsonarrayToBeSent.push({colName:checkParameters.data[i].paramName,colVal:"1"});
+
+        }
+      }
+      console.log("ARRAY TO BE SENT>>>>>>>>>",jsonarrayToBeSent);
+        let jsonParams = {
+          columns: jsonarrayToBeSent
+        };
+
+
+
+
+  //       if(checkParameters.data.length!=0){
+  //         for(let i=0;i<formControlsArray.length;i++){
+  //           for(let j=0;j<checkParameters.data.length;j++){
+  //             if(formControlsArray[i].key==checkParameters.data[j].paramName){
+  // if (this.gridStaticValue[0] != '' && this.gridStaticValue.length != 1) {
+  //             }
+  //           }
+  //         }
+  //       }else{
+  //         jsonarray.push({colName:"random",colVal:"802660"});
+  
+  //       }
+
+        console.log("JSON PARAMS>>>>>>>>>>>",jsonParams);
+                                                    // let customerId = -1;
+                                                    // let userId = this.informationservice.getLogeduserId();
+                                                    // let params = this.informationservice.getAgGidSelectedNode();
+                                                    // customerId = JSON.parse(params)[0].COLVALUE;
+                                                    // let customerType=JSON.parse(params)[2].COLVALUE;
+                                                    // //console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
+                                                    // let jsonArr: string = "{";
+                                                    // jsonArr += "\"" + "columns" + "\" : [";
+                                                    // jsonArr += "{";
+                                                    // jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "custId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
+                                                    // jsonArr += "}"
+                                                    // jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
+                                                    // //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
+                                                    // //  const ResultOfCallingApi = await lastValueFrom(callingApi);
+                                                    // let headerOptions = new HttpHeaders({
+                                                    //   'Content-Type': 'application/json',
+                                                    //   'Accept': 'application/pdf'
+                                                    //   //   'Accept': 'application/octet-stream', // for excel file
+                                                    // });
+                                                    //  let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+
+                                                    // if(customerType==='7'){
+                                                    //   url=url.replace("31900","31899");
+                                                    // }
+        // url is : executeReportwithOneParam/31849
+              // let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7001/api/" + url;
+
+              // this.http.post(ApiUrl, JSON.parse(jsonArr), requestOptions).pipe(map((data: any) => {
+              //   let blob = new Blob([data], {
+              //     type: 'application/pdf' // must match the Accept type
+              //   });
+              //   var link = document.createElement('a');
+              //   link.href = window.URL.createObjectURL(blob);
+              //   // link.download = 'samplePDFFile.pdf';
+              //   link.target = '_blank';
+              //   link.click();
+              //   window.URL.revokeObjectURL(link.href);
+
+              // })).subscribe((result: any) => {
+              // });
+
+              let urlParam=GlobalConstants.executeReportwithParameters;
+              let headerOptions = new HttpHeaders({
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/pdf'
+                  
+                  //   'Accept': 'application/octet-stream', // for excel file
+              });
+              let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+                   
+              this.http.post(urlParam+reportId, jsonParams, requestOptions).pipe(map((data: any) => {
+                  let blob = new Blob([data], {
+                      type: 'application/pdf' // must match the Accept type
+                      // type: 'application/octet-stream' // for excel 
+                  });
+                  var link = document.createElement('a');
+                  link.href = window.URL.createObjectURL(blob);
+                  //link.download = 'samplePDFFile.pdf';
+                  link.target = '_blank';
+                  link.click();
+                  window.URL.revokeObjectURL(link.href);
+
+  })).subscribe((result: any) => {
+  });
+
+  
+     
+
+
+
+
+      }
+      else if (buttonAction == "7") {
+
+        let formData = this.dynamicForm.value;
+        let selectedTabName = this.informationservice.getSelectedTabName();
+
+        if(formData){
+          this.listOfData = JSON.parse(JSON.stringify(formData));
+        }
+        this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
+       //let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+
+      //  if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
+      //   params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
+      //  }
+       //console.log("params>>>>>>>>>>>",params);
+        let data = [{
+          actionType: this.amInfo.actionType,
+          objectId: this.buttonObjectId,
+          isFromGridClick: 0,
+          primaryColumn: this.columnId,
+          buttonClick: this.columnTypeCode,
+         // selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
+        }];
+
+      //console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
+        this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
+          width: "80%",
+          height: "80%",
+          data: data
+        });
+
+        this.dataservice.PushdialogArray(this.dialogRef);
+        this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
+        this.informationservice.setListOFData(this.listOfData);
+        this.dialogRef.disableClose = true;
+      }else if (buttonAction == "9"){
+        this.submitForm();
+      }   else if(buttonAction == "11"){
         let formData = this.dynamicForm.value;
         if (formData) {
           this.listOfData = JSON.parse(JSON.stringify(formData));
@@ -6669,7 +8691,6 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               jsonArr += "},";
             }
           }
-          console.log("hey 3333 >>>>>>>>>>>");
           // jsonArr += "]," + "\"" + "sessionId" + "\"" + ":" + "\"" + sessionId + "\"" + "," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           // jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "}";
@@ -6719,7 +8740,6 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               JsonForDataWhenSkip += "},";
             }
           }
-          console.log("hrty213234562436244356");
           JsonForDataWhenSkip += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" +  "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForDataWhenSkip = JsonForDataWhenSkip;
           this.informationservice.setMainJsonForDataWhenSkip(this.mainJsonForDataWhenSkip);
@@ -6742,12 +8762,10 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               jsonArr += "},";
             }
           }
-          console.log("hommmmmmmmm2 >>>>>>");
           jsonArr += "]," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + nearBy + "\"" + "," + "\"" + "sameSession" + "\"" + ":" + "\"" + sameSession + "\"" + "}";
           this.mainJsonForApi = jsonArr;
         }
 
-        console.log("this.mainJsonForApi) = ",this.mainJsonForApi);
         let apiUrl = GlobalConstants.callingApi + url;
         const callingApi = from(axios.post(apiUrl, JSON.parse(this.mainJsonForApi)));
         const ResultOfCallingApi = await lastValueFrom(callingApi);
@@ -6803,93 +8821,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
           }
         }
 
-        console.log("this.listOfData ====",this.listOfData);
         this.informationservice.setListOFData(this.listOfData);
       }
-      // Close Popup
-      else if (buttonAction == "4") {
-
-
-        console.log("selectedTabName --->",this.informationservice.getChoosenTab())
-        this.closeDialog(true);
-      } else if (buttonAction == "5") {
-        let customerId = -1;
-        let userId = this.informationservice.getLogeduserId();
-        let params = this.informationservice.getAgGidSelectedNode();
-        customerId = JSON.parse(params)[0].COLVALUE;
-        let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
-        let jsonArr: string = "{";
-        jsonArr += "\"" + "columns" + "\" : [";
-        jsonArr += "{";
-        jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "custId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
-        jsonArr += "}"
-        jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
-        //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
-        //  const ResultOfCallingApi = await lastValueFrom(callingApi);
-        let headerOptions = new HttpHeaders({
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf'
-          //   'Accept': 'application/octet-stream', // for excel file
-        });
-        let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
-
-        if(customerType==='7'){
-          url=url.replace("31900","31899");
-        }
-        // url is : executeReportwithOneParam/31849
-        let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7001/api/" + url;
-
-        this.http.post(ApiUrl, JSON.parse(jsonArr), requestOptions).pipe(map((data: any) => {
-          let blob = new Blob([data], {
-            type: 'application/pdf' // must match the Accept type
-          });
-          var link = document.createElement('a');
-          link.href = window.URL.createObjectURL(blob);
-          // link.download = 'samplePDFFile.pdf';
-          link.target = '_blank';
-          link.click();
-          window.URL.revokeObjectURL(link.href);
-
-        })).subscribe((result: any) => {
-        });
-      }else if (buttonAction == "7") {
-
-        let formData = this.dynamicForm.value;
-        let selectedTabName = this.informationservice.getSelectedTabName();
-
-        if(formData){
-          this.listOfData = JSON.parse(JSON.stringify(formData));
-        }
-        this.informationservice.setDynamicService("formData_" + selectedTabName, JSON.stringify(formData));
-       //let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
-
-      //  if(this.informationservice.getAgGidSelectedNodeRule() != undefined){
-      //   params =typeof (this.informationservice.getAgGidSelectedNodeRule()) == "string" ? JSON.parse(this.informationservice.getAgGidSelectedNodeRule()) : this.informationservice.getAgGidSelectedNodeRule();
-      //  }
-       console.log("params>>>>>>>>>>>",params);
-        let data = [{
-          actionType: this.amInfo.actionType,
-          objectId: this.buttonObjectId,
-          isFromGridClick: 0,
-          primaryColumn: this.columnId,
-          buttonClick: this.columnTypeCode,
-         // selectedRowId: this.handleSelectedRowIds(params, "grid,button,form,combo,gridlink"),
-        }];
-
-      console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
-        this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
-          width: "80%",
-          height: "80%",
-          data: data
-        });
-
-        this.dataservice.PushdialogArray(this.dialogRef);
-        this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
-        this.informationservice.setListOFData(this.listOfData);
-        this.dialogRef.disableClose = true;
-      }
+    });
     }
+  }
   }
 
 
@@ -6940,7 +8876,9 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
           });
         }
       }
+      console.log("this.test>>>>>>>>>",this.test);
       this.gridColumns.push(this.agColumnsJson);
+      console.log("gridColumns>>>>>>>",this.gridColumns)
       this.showGrid = true;
     }
 
@@ -6948,14 +8886,20 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
   }
 
   gridEventSave(event: any) {
+    console.log('event>>>>>>>>',event);
     this.LastObject = [];
     const addList = event[0].addList;
+    console.log('addList>>>>>>>>',addList);
+
     this.addList = JSON.stringify(addList);
     this.LastObject = JSON.parse(this.addList);
+    console.log('LastObject>>>>>>>>',this.LastObject);
+
   }
 
   async submitForm() {
-
+    this.submitGridData++;
+console.log("HONEEE333333333333");
     let ProbInGridIntoForm: any = 0;
     if(this.tableOptionTemp[0].isDynamicReport!='1'){
     if(this.dynamicForm.get('PARTY_TYPE_CODE') !== null){
@@ -6971,9 +8915,52 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       }
     }
   }
-}
+  }
     await this.dynamicDRBOnBeforeSave(this.objectId);
+    console.log("this.TestingDynmicForm>>>>>>", this.dynamicForm);
+
+    const fileExtensions = /\.(xlsx|xls|csv|doc|docx|ppt|pptx|txt|pdf)$/i;
+    const imageMimeType = /image\/.*/;
+    /////Sigma
     if (this.canProceedWithSave) {
+//       Object.keys(this.dynamicForm.controls).forEach(field => {
+//         const control = this.dynamicForm.get(field);
+    
+//         if (control) {
+//           const value = control.value;
+    
+//           // Check if the value is a URL or MIME type
+//           if (value && typeof value === 'string' &&
+//               (fileExtensions.test(value) || imageMimeType.test(value))) {
+//             const actualLength = value.length;
+//             console.log("actualLength>>>>>>>>>",actualLength);
+//             // Dynamically set the maxLength validator
+//             control.setValidators([Validators.maxLength(actualLength)]);
+//             control.updateValueAndValidity();
+//             console.log("Value being checked:", value);
+// console.log("File extensions match:", fileExtensions.test(value));
+// console.log("Image MIME type match:", imageMimeType.test(value));
+
+//           }
+//         }
+//       });
+    
+    
+      
+      
+      console.log("honeee22222222222>>>>>",ProbInGridIntoForm);
+      console.log("this.TestDynmicForm>>>>>>",this.dynamicForm);
+//       const control = this.dynamicForm.get('MEDIA_PATH');
+// if (control) {
+//   const actualLength = control.value ? control.value.length : 0;
+  
+//   // Set the maxLength validator dynamically to match actual length
+//   control.setValidators([Validators.maxLength(actualLength)]);
+
+//   // Update the form control validity
+//   control.updateValueAndValidity();
+// }
+
 
       this.loaderService.isLoading.next(true);
       //for the grid into the form
@@ -7000,17 +8987,18 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
       }
       if (this.dynamicForm.status != 'INVALID' && ProbInGridIntoForm == 0) {
+        console.log("HONEEEE111111>>>>>",ProbInGridIntoForm);
         this.actionType = this.amInfo.actionType;
         if (this.actionType == 'saveNew') {
-          console.log("TEST RUN>>>>>>>>",this.tableOptionTemp[0].isDynamicReport);
+          //console.log("TEST RUN>>>>>>>>",this.tableOptionTemp[0].isDynamicReport);
           if(this.tableOptionTemp[0].isDynamicReport=='1'){
             this.counterOfSave=0
           }
 
-          console.log("SAVE COUNTER>>>>>>>>>>",this.counterOfSave);
+          //console.log("SAVE COUNTER>>>>>>>>>>",this.counterOfSave);
 
           if (this.counterOfSave == 0) {
-            console.log("this.objectId ====",this.objectId);
+            //console.log("this.objectId ====",this.objectId);
             this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe(async (data: any) => {
               let jsonData = JSON.parse(this.dynamicFormQuering(data, 'saveNew', this.amInfo));
 
@@ -7031,7 +9019,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                 }];
 
                 this.ruleCallApiData=params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button"));
-                console.log("tableOptionTemp>>>>>>",this.tableOptionTemp);
+                //console.log("tableOptionTemp>>>>>>",this.tableOptionTemp);
 
 
 
@@ -7040,14 +9028,14 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
                 if(this.tableOptionTemp[0].isDynamicReport=='1'){
 
-                  console.log("IS A DYNAMIC REPORT");
-                  console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
+                  //console.log("IS A DYNAMIC REPORT");
+                  //console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
 
                   if(this.previewDynamicReportbool){
 
 
 
-                    console.log("PREVIEW DYNAMIC DATA");
+                    //console.log("PREVIEW DYNAMIC DATA");
                     let info = {
                       userId:localStorage.getItem('LogeduserId'),
                       isGrid:this.isPageGrid,
@@ -7063,7 +9051,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                       height: '90%',
                     });
 
-                    dialogRef.afterClosed().subscribe(result => {
+                    dialogRef.afterClosed().subscribe((result: any) => {
                     });
 
 
@@ -7073,17 +9061,60 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                   this.insertDynamicReport(jsonVal);
                   }
                   }else{
-                    console.log("IS IN DISPLAY INSERT");
-                    this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
-                      (res: any) => {
-                        this.commonFunctions.alert("alert", res.description);
-                        this.informationservice.setOpenLikeForm("no");
-                        this.dynamicDRBOnAfterSave(this.objectId);
-                      },
-                      (error) => {
-                        this.commonFunctions.alert("alert", error.error.message);
-                        this.counterOfSave = 0;
-                      });
+
+
+                    if (this.LastObject.length > 1){
+                      //  for (let i = 0; i < this.LastObject.length; i++) {
+                         // for(let j = 0; j < jsonData.length;j++){
+  
+                         const data = JSON.parse(JSON.stringify(jsonData));
+  
+                         for (let i = 0; i < this.LastObject.length; i++) {
+                          // Clone the jsonDataTemplate to avoid modifying the original
+                      
+                          // Get values from LastObject based on the current index
+                          const values = this.LastObject[i] || {};
+                      
+                          data.forEach((table:any) => {
+                              table.columns.forEach((column: any) => {
+                                  if (values[column.colName]) {
+                                      column.colValue = values[column.colName];
+                                  }
+                              });
+                          });
+                          const jsonDataSnapshot = JSON.parse(JSON.stringify(data));
+                          console.log('Updated jsonData:', jsonDataSnapshot);
+  
+                            jsonVal = [{
+                              objectId: this.objectId,
+                              selectedRowId: params == -1 ? params : JSON.stringify(this.handleSelectedRowIds(params, "grid,button")),
+                              primaryColumn: "ROW_ID",
+                              dynamicTable: jsonDataSnapshot
+                            }];
+                            this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
+                              (res: any) => {
+                                this.commonFunctions.alert("alert", res.description);
+                                this.informationservice.setOpenLikeForm("no");
+                                this.dynamicDRBOnAfterSave(this.objectId);
+                              },
+                              (error) => {
+                                this.commonFunctions.alert("alert", error.error.message);
+                                this.counterOfSave = 0;
+                              });
+                      }
+                      }else{
+                        this.http.post<any>(GlobalConstants.previewInsertDynamicApi, jsonVal, { headers: GlobalConstants.headers }).subscribe(
+                          (res: any) => {
+                            this.commonFunctions.alert("alert", res.description);
+                            this.informationservice.setOpenLikeForm("no");
+                            this.dynamicDRBOnAfterSave(this.objectId);
+                          },
+                          (error) => {
+                            this.commonFunctions.alert("alert", error.error.message);
+                            this.counterOfSave = 0;
+                          });
+                      }
+                    //console.log("IS IN DISPLAY INSERT");
                   }
 
 
@@ -7097,11 +9128,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
                   dynamicTable: jsonData
                 }];
 
-                console.log("EEEEEEEEEEEEEEEE>>>>>>>>>>>>>>",this.tableOptionTemp);
+                //console.log("EEEEEEEEEEEEEEEE>>>>>>>>>>>>>>",this.tableOptionTemp);
                 if(this.tableOptionTemp[0].isDynamicReport=='1'){
 
-                  console.log("IS A DYNAMIC REPORT");
-                  console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
+                  //console.log("IS A DYNAMIC REPORT");
+                  //console.log("DYNAMIC REPORT JSONVALUE>>>>>>>>",jsonVal);
                   this.insertDynamicReport(jsonVal);
 
               }else{
@@ -7137,6 +9168,8 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
               dynamicTable: jsonData
             }];
 
+            console.log("jsonData ------------ > " , jsonData);
+            console.log("jsonVal  ------------ > " , jsonVal);
             this.ruleCallApiData=JSON.stringify(this.handleSelectedRowIds(this.amInfo.selectedRowId, "form,button"));
 
             this.http.post<any>(GlobalConstants.updateDynForm, jsonVal, { headers: GlobalConstants.headers }).subscribe(
@@ -7153,6 +9186,8 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
         }
       }
       else if (this.dynamicForm.status == 'INVALID' && ProbInGridIntoForm == 0) {
+        console.log("this.InvaliddynamicForm>>>>>>>>", this.dynamicForm);
+        console.log("TESTTTTTTTTTTTTTTTTTTTTT");
         const formControls: { [key: string]: AbstractControl } = this.dynamicForm.controls;
         let requiredFields: string = '';
         // Now you can iterate through the form controls
@@ -7194,6 +9229,8 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
           }
         }
         requiredFields = requiredFields.slice(0, -2);
+       // console.log("MEDIA_PATH>>>>>>>>>",this.dynamicForm.get('MEDIA_PATH').errors);
+        console.log("requiredFields>>>>>>>>",requiredFields);
         this.commonFunctions.alert("alert", "Please fill in the following mandatory fields = " + requiredFields);
       }
       this.loaderService.isLoading.next(false);
@@ -7209,7 +9246,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
     this.actionType = "saveNew";
     //test2
     // General Info
-    console.log("this.informationservice.getSelectedTabName()=", this.informationservice.getSelectedTabName());
+    //console.log("this.informationservice.getSelectedTabName()=", this.informationservice.getSelectedTabName());
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
 
     let params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
@@ -7220,7 +9257,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       selectedRowId: this.handleSelectedRowIds(params, "gridlink,grid,form,combo,button"),
       isFromGridClick: 1
     }];
-    console.log("data =========", data);
+    //console.log("data =========", data);
     this.dialogRef = this.dialog.open(AmPreviewFormComponent, {
       width: "80%",
       height: "80%",
@@ -7240,7 +9277,7 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
     this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName())
 
     //test2
-    console.log("this.informationservice.getAgGidSelectedNode()==============",this.informationservice.getAgGidSelectedNode());
+    //console.log("this.informationservice.getAgGidSelectedNode()==============",this.informationservice.getAgGidSelectedNode());
     let dd = JSON.parse(this.informationservice.getAgGidSelectedNode())
 
     let data = [{
@@ -7265,11 +9302,33 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
   }
 
-  onSearchSubmit(getWhereCond: any) {
-    this.getWhereCond = getWhereCond.data;
-    this.getAllColums();
-  }
+  // onSearchSubmit(getWhereCond: any) {
+  //   this.getWhereCond = getWhereCond.data;
+  //   this.getAllColums();
 
+  //   this.dynamicDRBOnSearch(this.objectId);
+
+  // }
+  onSearchSubmit(getWhereCond: any) {
+    // this.getWhereCond = getWhereCond.data;
+    console.log("RESET FETET HON????????");
+    setTimeout(() => {
+
+      this.dynamicDRBOnSearch(this.objectId);
+     
+      console.log("WHERE CONDITION>>>>>>>>>>>>>>>",getWhereCond);
+
+      console.log("IS GENERAL GRID>>>>>>>>>>>>>>>",this.isGeneralGrid);
+ 
+      this.getWhereCond = getWhereCond.result;
+      if(this.isGeneralGrid==1){
+       console.log("NNNNNNNNNNNNNNN>>>>>>>>>>>>><<<<<<<<<<<<<");
+        //this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectId + '/-1/previewForm/');
+        this.getAllColumsForGrid(); 
+      }
+    }, 1000);
+    
+   }
   async onDeleteClick() {
     this.actionType = "select";
     //test2
@@ -7286,50 +9345,51 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
       whereConditions: this.whereConditionAr
     }];
     this.http.post<any>(GlobalConstants.dynamicDeleteFormBuilderApi, jsonVal).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.commonFunctions.alert("alert", "Deleted Successfully");
         this.getAllColums();
       },
-      error: (error) => {
-        console.log(error);
+      error: (error: any) => {
+        //console.log(error);
       }
     });
   }
 
   handleDialogTitle() {
-    let previousMainTab = this.informationservice.getPreviousMainTab();
-    console.log("previousMainTab>>>>>>",previousMainTab);
-    let previousMainHeader = this.informationservice.getPreviousMainTab2();
-    console.log("previousMainHeader>>>",previousMainHeader);
+    const previousMainTab = this.informationservice.getPreviousMainTab();
+    const previousMainHeader = this.informationservice.getPreviousMainTab2();
+    
     this.informationservice.setPreviousMainTab2(previousMainTab);
 
-    let dialogTitle: string = this.informationservice.getPopupBreadcrumb() == null ? "-1" : this.informationservice.getPopupBreadcrumb();
-    console.log("dialogTitle>>>>>>>>>>",dialogTitle);
-    console.log("selectedTabName >>>>>>",this.selectedTabName)
-    if (dialogTitle.indexOf(this.selectedTabName) == 0) {
-      dialogTitle = this.selectedTabName;
-    }
-    else if (dialogTitle.includes("/" + this.selectedTabName + "/") || dialogTitle.endsWith("/" + this.selectedTabName)) {
+    let dialogTitle: string = this.informationservice.getPopupBreadcrumb() || "-1";
 
- //  else if (dialogTitle.indexOf(this.selectedTabName) != -1) {
-      dialogTitle = dialogTitle.replace(this.selectedTabName + "/", "").replace("/" + this.selectedTabName, "");
-    } else if (dialogTitle == "-1") {
-      dialogTitle = this.selectedTabName;
+    // Update dialogTitle based on selectedTabName
+    if (dialogTitle.startsWith(this.selectedTabName)) {
+        dialogTitle = this.selectedTabName;
+    } else if (dialogTitle.includes(`/${this.selectedTabName}/`) || dialogTitle.endsWith(`/${this.selectedTabName}`)) {
+        dialogTitle = dialogTitle
+            .replace(`${this.selectedTabName}/`, "")
+            .replace(`/${this.selectedTabName}`, "");
+    } else if (dialogTitle === "-1") {
+        dialogTitle = this.selectedTabName;
     } else {
-      if (previousMainTab != null && previousMainTab != previousMainHeader) {
-        //dialogTitle = dialogTitle + "/" + this.selectedTabName;
         dialogTitle = this.selectedTabName;
-      } else {
-        dialogTitle = this.selectedTabName;
-      }
     }
 
+    // Clean up title to avoid double slashes
     dialogTitle = dialogTitle.replace("//", "/");
+
+    // Update the breadcrumb for the current dialog
     this.informationservice.setPopupBreadcrumb(dialogTitle);
 
-    $(".dialogTitle").html("<span>" + dialogTitle + "</span>")
-    $(".dialogTitle span").css({ "font-size": "15px", "letter-spacing": "1px", "color": "var(--popup-title-color)", "font-weight": "bold" });
-  }
+    // Use Angular property binding to update the title in the template
+    this.updateDialogTitle(dialogTitle);
+}
+
+updateDialogTitle(title: string) {
+    // Assuming dialogTitle is a property bound to your template
+    this.dialogTitle = title;
+}
 
   triggerClickOnElementWithId(id: string) {
     const element = document.getElementById(id);
@@ -7340,11 +9400,11 @@ console.log("data testtt>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",data);
 
   //send data for the query(Ex: customer_id)
   handleSelectedRowIds(data: any, compare: string) {
-    console.log('data--------> ',data);
-    console.log('compare--------> ',compare);
+    //console.log('data--------> ',data);
+    //console.log('compare--------> ',compare);
 
     let newDD: any;
-console.log("data >>>>>>>>>>>>testing ids =",data);
+//console.log("data >>>>>>>>>>>>testing ids =",data);
     try {
       let dd: any;
       if (typeof (data) == "string") {
@@ -7366,7 +9426,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
         });
       }
     } catch (error) {
-      console.log("error on handleSelectedRowIds >>>> ", error)
+      //console.log("error on handleSelectedRowIds >>>> ", error)
       newDD = -1;
     }
     return newDD;
@@ -7397,6 +9457,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
       const arabicLettersRegex = /[\u0600-\u06FF]/g;
       // const englishLettersRegex = /[a-zA-Z]/;
       let arabicInput = this.dynamicForm.controls[fields.name]?.value;
+      console.log("fields.name>>>>>>>>>>>>>>>>>>>>>>>>>>>",fields.name);
       if (arabicInput != "") {
         if (!arabicLettersRegex.test(arabicInput)) {
           this.commonFunctions.alert("alert", "Please Fill Arabic Letters");
@@ -7412,7 +9473,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
 
       let value = this.dynamicForm.get(name).value;
       this.dynamicForm.removeControl(name);
-      this.dynamicForm.addControl(name, new UntypedFormControl());
+      this.dynamicForm.addControl(name, new UntypedFormControl(''));
 
       if (value != "" && value != null) {
         this.handleFormFieldValues(name, value);
@@ -7428,9 +9489,17 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
   registerTouchedField(fieldName: string) {
     this.showRequiredMessage = this.showRequiredMessage.filter(item => item !== fieldName);
     const control = this.dynamicForm.get(fieldName);
+    console.log("FIELD NAME TOUCH FIELD >>>>>>>>>",fieldName);
     if (control) {
       control.markAsTouched();
     }
+  }
+
+  runAmountFormat(fieldName: string) {
+    let amountValue = this.dynamicForm.get(fieldName);
+    amountValue = amountValue.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    this.dynamicForm.controls[fieldName].setValue(amountValue);
   }
 
   EmailValidation(fieldName: any) {
@@ -7515,7 +9584,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
     if(!this.isPageGrid){
       this.submitForm();
     }else{
-      console.log("GRID SELECTED DATA>>>>>>>>",this.informationservice.getAgGidSelectedNode());
+      //console.log("GRID SELECTED DATA>>>>>>>>",this.informationservice.getAgGidSelectedNode());
       this.insertDynamicReport(this.informationservice.getAgGidSelectedNode());
     }
 
@@ -7532,7 +9601,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
   }
 
   async insertDynamicReport(jsonVal:any){
-    console.log("IS PAGE GRID>>>>>>>>>>>>>>",this.isPageGrid);
+    //console.log("IS PAGE GRID>>>>>>>>>>>>>>",this.isPageGrid);
     if(this.isPageGrid){
       if(this.informationservice.getDynamicReportId()==''){
 
@@ -7551,7 +9620,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
           height: '25%',
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: any) => {
         });
 
       }else{
@@ -7592,7 +9661,7 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
           height: '20%',
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: any) => {
         });
 
     }else{
@@ -7603,7 +9672,422 @@ console.log("data >>>>>>>>>>>>testing ids =",data);
       }
     }
   }
+
+
+
+ getAllColumsForGrid() {
+    // Filter array on needed data
+    let getMainTab = this.AllTabs.filter(function (el: any) {
+      return el.isMain == 1;
+    });
+
+    this.objectId = getMainTab[0].objectId;
+    let x = this.tableOptions1[0].canAdd == null ? -1 : this.tableOptions1[0].canAdd;
+    let y = this.tableOptions1[0].canDelete == null ? -1 : this.tableOptions1[0].canDelete;
+    let z = this.tableOptions1[0].canModify == null ? -1 : this.tableOptions1[0].canModify;
+    let w = this.tableOptions1[0].sourceQuery == null ? -1 : this.tableOptions1[0].sourceQuery;
+    //this.jsonQbe = [];
+
+    if (this.getWhereCond == undefined) {
+      this.getWhereCond = ' ';
+
+    } else {
+    //  this.getWhereCond = this.formatWhereCond(this.getWhereCond);
+    this.getWhereCond =this.getWhereCond ;
+    }
+
+    let jsonQbe_canAdd: any[] = [];
+    jsonQbe_canAdd.push(
+      {
+        queryId: x,
+        parameters: [
+          {
+            paramName: 'actionType',
+            paramValue: '' + this.actionType + ''
+          },
+          {
+            paramName: 'userId',
+            paramValue: this.userId
+          }
+        ],
+        link: [],
+        isHidden: [],
+        whereCond: this.getWhereCond
+      }
+    )
+
+    this.http.post<any>(GlobalConstants.getQbeIdApi + x + "/0", jsonQbe_canAdd, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+      this.canAdd = data[0];
+
+      let jsonQbe_canDelete: any[] = [];
+      jsonQbe_canDelete.push(
+        {
+          queryId: y,
+          parameters: [
+            {
+              paramName: 'actionType',
+              paramValue: '' + this.actionType + ''
+            },
+            {
+              paramName: 'userId',
+              paramValue: this.userId
+            }
+          ],
+          link: [],
+          isHidden: [],
+          whereCond: this.getWhereCond
+
+        }
+      )
+
+      this.http.post<any>(GlobalConstants.getQbeIdApi + y + "/0", jsonQbe_canDelete, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+        this.canDelete = data[0];
+
+        let jsonQbe_canUpdate: any[] = [];
+        jsonQbe_canUpdate.push(
+          {
+            queryId: y,
+            parameters: [
+              {
+                paramName: 'actionType',
+                paramValue: '' + this.actionType + ''
+              },
+              {
+                paramName: 'userId',
+                paramValue: this.userId
+              }
+            ],
+            link: [],
+            isHidden: [],
+            whereCond: this.getWhereCond
+          }
+        )
+
+        this.http.post<any>(GlobalConstants.getQbeIdApi + z + "/0", jsonQbe_canUpdate, { headers: GlobalConstants.headers }).subscribe(async (data: any) => {
+          this.canUpdate = data[0];
+
+          if (this.canAdd == "1") {
+            this.toolBar += "a";
+          }
+
+          if (this.canUpdate == "1") {
+            this.toolBar += "m";
+          }
+
+          if (this.canDelete == "1") {
+            this.toolBar += "d";
+          }
+
+          // this.http.get<any>(GlobalConstants.getParamsNameApi + w, { headers: GlobalConstants.headers }).subscribe((data0: any) => {
+          //   if (data0 != null && data0.length != 0) {
+          //     let colName = data0[0].paramName;
+          //     let colVal = this.informationservice.getAgGidSelectedNode();
+          //     colName = data0[0].paramName;
+          //     if (colName == "userId") {
+          //       this.jsonQbe = [
+          //         {
+          //           queryId: w,
+          //           parameters: [
+          //             {
+          //               paramName: colName,
+          //               paramValue: this.informationservice.getLogeduserId()
+          //             }
+          //           ],
+          //           link: []
+          //         }
+          //       ]
+          //     } else {
+          //       this.jsonQbe = [
+          //         {
+          //           queryId: w,
+          //           parameters: [
+          //             {
+          //               paramName: colName,
+          //               paramValue: colVal
+          //             }
+          //           ],
+          //           link: []
+          //         }
+          //       ]
+          //     }
+          //   } else {
+          //     this.jsonQbe = [
+          //       {
+          //         queryId: w,
+          //         parameters: [
+          //           {
+          //             paramName: '',
+          //             paramValue: ''
+          //           }
+          //         ],
+          //         link: []
+          //       }
+          //     ]
+          //   }
+
+          const getColumnsApiUrl0 = from(axios.get(GlobalConstants.getColumnsApi + this.objectId));
+          const getColumns0Api = await lastValueFrom(getColumnsApiUrl0);
+          let linkColumn: any = getColumns0Api.data.filter((el: any) => {
+            return el.isLink === "1";
+          });
+          let hiddenColumn: any = getColumns0Api.data.filter((el: any) => {
+            return el.isGridHidden === "1";
+          });
+
+
+          //elie///////////////////////////////////////////
+          if(w!='' || w!=null){
+          const getColumnsQueryApi = from(axios.get(GlobalConstants.getColumnsQuery + w));
+          const getColumnsQuery = await lastValueFrom(getColumnsQueryApi);
+
+          if(getColumnsQuery.data.length!=0){
+          let linkQueryColumn: any = getColumnsQuery.data.filter((el: any) => {
+            return el.isLink === "1";
+          });
+          for (let f = 0; f < linkQueryColumn.length; f++) {
+            let item = {
+              colName: linkQueryColumn[f].name,
+              isLink: linkQueryColumn[f].isLink,
+              menuName: linkQueryColumn[f].menus,
+              colDesc:linkQueryColumn[f].columnDescription
+            }
+            this.testLinks.push(item);
+          }
+        }
+      }
+          /////////////////////////////////////////////////
+
+          for (let f = 0; f < linkColumn.length; f++) {
+            let item = {
+              colName: linkColumn[f].name,
+              isLink: linkColumn[f].isLink,
+              menuName: linkColumn[f].menus,
+              colDesc:linkColumn[f].columnDescription
+            }
+            this.testLinks.push(item);
+
+          }
+          for (let f = 0; f < hiddenColumn.length; f++) {
+            let item = {
+              colName: hiddenColumn[f].name,
+              isGridHidden: hiddenColumn[f].isGridHidden,
+              menuName: hiddenColumn[f].menus,
+              colDesc:hiddenColumn[f].columnDescription
+            }
+            this.hiddenColumns.push(item);
+
+          }
+
+          let jsonQbe_sourceQuery: any[] = [];
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: 'actionType',
+                  paramValue: '' + this.actionType + ''
+                },
+                {
+                  paramName: 'userId',
+                  paramValue: this.userId
+                }
+              ],
+              link: [],
+              isHidden: [],
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+            }
+          )
+
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: '',
+                  paramValue: ''
+                }
+              ],
+              link: this.testLinks,
+              isHidden:[],
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+
+            }
+          );
+
+          jsonQbe_sourceQuery.push(
+            {
+              queryId: w,
+              parameters: [
+                {
+                  paramName: '',
+                  paramValue: ''
+                }
+              ],
+              link:[],
+              isHidden: this.hiddenColumns,
+              objectId: this.objectId,
+              whereCond: this.getWhereCond
+
+            }
+          );
+         this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            if(data == 2){
+              this.queryType =3;
+            }else{
+              this.queryType =1;
+            }
+
+          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/"+this.queryType, jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            this.sourceQuery = data;
+            if (this.sourceQuery != "-1") {
+              this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
+                // let tableName = dataa[0].tableName;
+
+                let gridHeaders = data[0].headers[0];
+                let gridResults = data[0].result[0];
+                this.agColumns = [];
+                this.columnId = "ROW_ID";
+                this.agColumnsJson = gridHeaders;
+                this.agColumns.push(this.agColumnsJson);
+                this.gridStaticData = gridResults;
+                this.test_1 = '1';
+                this.hasSourceQuery = 1;
+              });
+            } else {
+
+              let jsonArr: string = "[";
+
+              this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((data: any) => {
+
+                let dataa = data.filter((el: any) => {
+                  return el.columnTypeCode != 14;
+                });
+                let uniqueArray = dataa.filter(
+                  (item: any, index: any, self: any) =>
+                    index === self.findIndex((t: any) => t.tableName === item.tableName)
+                );
+
+                setTimeout(() => {
+
+                  let tblName: any;
+                  let tableName = '';
+                  let count = 0;
+                  for (let k = 0; k < uniqueArray.length; k++) {
+                    jsonArr += "{\"" + "columns" + "\" : [";
+                    tableName = uniqueArray[k].tableName
+                    for (let i = 0; i < dataa.length; i++) {
+                      count++;
+                      if (tableName == dataa[i].tableName) {
+                        // tblName = tableName;
+                        let colName = dataa[i].name;
+                        jsonArr += "{";
+                        if (i == dataa.length - 1) {
+                          jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + colName + "\"";
+                          jsonArr += "}";
+                        } else {
+                          jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + colName + "\"";
+                          jsonArr += "},";
+                        }
+                      }
+                    }
+
+                    if (k == uniqueArray.length - 1) {
+                      jsonArr += "],";
+                      jsonArr += "\"" + "tableName" + "\"" + ":" + "\"" + tableName + "\"";
+                      jsonArr += "}]";
+                    }
+                    else {
+                      jsonArr += "],";
+                      jsonArr += "\"" + "tableName" + "\"" + ":" + "\"" + tableName + "\"";
+                      jsonArr += "},";
+                    }
+                    jsonArr = jsonArr.replace("},]", "}]");
+                  }
+
+                  let jsonData = JSON.parse(jsonArr);
+                  let tableNames: string = '';
+                  for (let u = 0; u < jsonData.length; u++) {
+                    tableNames = tableNames + "," + jsonData[u].tableName;
+                  }
+                  tableNames = tableNames.substring(1);
+                  this.http.post<any>(GlobalConstants.getColumnIdApi, tableNames).subscribe((data: any) => {
+                    this.columnId = data.description;
+                    this.informationservice.setROW_ID(data.description);
+
+                    let jsonVal = [{
+                      objectId: this.objectId,
+                      selectedRowId: -1,
+                      primaryColumn: this.columnId,
+                      dynamicTable: JSON.parse(jsonArr)
+                    }];
+
+                    this.http.post<any>(GlobalConstants.getDynamicGridHeaders, jsonVal, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+                      this.agColumnsJson = data;
+                      this.agColumns.push(this.agColumnsJson);
+                      this.previewGridApi = GlobalConstants.getDynamicGridData;
+                      this.previewGridApiParam = jsonVal;
+                      this.test_1 = '1';
+                      // this.getAllColums();
+                    });
+                  });
+                }, 1000);
+              });
+            }
+          });
+        });
+          // });
+          // }
+        });
+      });
+    });
+    //   }
+    // }
+    this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe(async (data: any) => {
+      for (let i = 0; i < data.length; i++) {
+        this.menuForm.addControl(data[i].name,  new UntypedFormControl(''));
+        // nadine
+        if (data[i].columnTypeCode == 14) {
+
+          const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + data[i].id));
+          const getButtonData = await lastValueFrom(getButtonDataUrl);
+
+          let data1 = getButtonData.data;
+          console.log("DATA BUTTON>>>>>>",data1);
+
+          if (data1.blobFile != null && data1.blobFile != undefined) {
+            const base64EncodedString = data1.blobFile;
+            const decodedString = atob(base64EncodedString);
+            console.log("DECODED STRING",decodedString);
+            let n = decodedString.split("~A~");
+            // let lastPart = n.pop();
+            let lastPart = decodedString.split("~A~")[4];
+            console.log("LAST PART>>>>>>>>>",lastPart);
+            if (lastPart == "false") {
+              data[i].mainAndPreview = false;
+            } else {
+              data[i].mainAndPreview = true;
+            }
+          }
+        }
+      }
+      this.test = data;
+     // console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
+    });
+  }
+
+
+
+
 }
+
+
+
+
+
+
+
 
 
 class DropdownCellRenderer {

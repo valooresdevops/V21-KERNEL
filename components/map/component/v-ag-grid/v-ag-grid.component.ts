@@ -75,17 +75,28 @@ public groupDefaultExpanded = -1;
   gridOptions: GridOptions;
   selectedarray:any[]=[];
   dataselected:any[]=[];
+  mapType:any;
   constructor(private dataservice:DataService ) {
   }
   @ViewChild('popup') popup: any;
   ngOnInit(): void {
-
+console.log("rowData-------",this.rowData);
     //console.log('rowdata>>>',this.rowData);
     if(localStorage.getItem('multiselection')){
       this.multiselection=JSON.parse(localStorage.getItem('multiselection'));
     }
-   
+   if(this.treeData==true){
+        this.groupDefaultExpanded=-1;
+      
+      }else{
+      
+        this.groupDefaultExpanded=0;
+      
+      }
+      this.mapType=this.dataservice.getmapType();
+      localStorage.setItem('mapType',  this.mapType);
 
+    console.log("this.mapType in aggrid----------",this.mapType);
   }
   frameworkComponents = {
     btnCellRenderer: GenderRenderer,
@@ -102,9 +113,27 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
       // custom item
       name: 'Copy',
       action: () => {
-        //console.log('params>>>', params);
-        //console.log('params>>>', params.node.key);
-        navigator.clipboard.writeText(params.value);
+         // Check if navigator.clipboard is available and we're in a secure context
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(params.node.key)
+        .then(() => console.log('Copying to clipboard was successful!'))
+        .catch(err => console.error('Failed to copy text: ', err));
+    } else {
+      console.warn('Clipboard API is not available in this context.');
+      // Inline fallback method if Clipboard API is not available
+      const textarea = document.createElement("textarea");
+      textarea.textContent = params.node.key;
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        console.log('Copying to clipboard using fallback method.');
+      } catch (error) {
+        console.error("Fallback copy to clipboard failed.", error);
+      }
+    }
+        
       },
       cssClasses: ['redFont', 'bold'],
     },
@@ -129,9 +158,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
         // custom item
         name: 'Copy',
         action: () => {
-          //console.log('params>>>', params);
-          //console.log('params>>>', params.node.key);
-          navigator.clipboard.writeText(params.value);
+          // Check if navigator.clipboard is available and we're in a secure context
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(params.node.key)
+              .then(() => console.log('Copying to clipboard was successful!'))
+              .catch(err => console.error('Failed to copy text: ', err));
+          } else {
+            console.warn('Clipboard API is not available in this context.');
+            // Inline fallback method if Clipboard API is not available
+            const textarea = document.createElement("textarea");
+            textarea.textContent = params.node.key;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+              document.execCommand("copy");
+              document.body.removeChild(textarea);
+              console.log('Copying to clipboard using fallback method.');
+            } catch (error) {
+              console.error("Fallback copy to clipboard failed.", error);
+            }
+          }
         },
         cssClasses: ['redFont', 'bold'],
       },
@@ -148,7 +194,12 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
             let deviceselected = params.node.key;
             // this.dataservice.setDHselectedDevice(deviceselected);
             localStorage.setItem('deviceselected', deviceselected);
-            $('#RunDeviceHistory1').click();
+            if(localStorage.getItem('mapType')=='online'){
+              $('#RunDeviceHistory1').click();
+
+            }else if(localStorage.getItem('mapType')=='offline'){
+            $('#RunDeviceHistoryOffline').click();
+            }
           },
           cssClasses: ['redFont', 'bold'],
         },
@@ -156,9 +207,26 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
           // custom item
           name: 'Copy',
           action: () => {
-            //console.log('params>>>', params);
-            //console.log('params>>>', params.node.key);
-            navigator.clipboard.writeText(params.node.key);
+            // Check if navigator.clipboard is available and we're in a secure context
+            if (navigator.clipboard && window.isSecureContext) {
+              navigator.clipboard.writeText(params.node.key)
+                .then(() => console.log('Copying to clipboard was successful!'))
+                .catch(err => console.error('Failed to copy text: ', err));
+            } else {
+              console.warn('Clipboard API is not available in this context.');
+              // Inline fallback method if Clipboard API is not available
+              const textarea = document.createElement("textarea");
+              textarea.textContent = params.node.key;
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                console.log('Copying to clipboard using fallback method.');
+              } catch (error) {
+                console.error("Fallback copy to clipboard failed.", error);
+              }
+            }
           },
           cssClasses: ['redFont', 'bold'],
         },
@@ -247,84 +315,82 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
 
 
 
-  onSelectionChanged(event:any) {
-    
-    //if is distinct
-    // let outputArray : String[]=[];
-    // let uniqueMakes = new Set();
 
+  onSelectionChanged(event:any) {
+
+ 
     if(this.distinct==true){
-    //console.log("event>>>>",event.api.getRenderedNodes());
     let renderedNodes= event.api.getRenderedNodes()
-    //console.log("getSelectedNodes()>>>>",event.api.getSelectedNodes());
 
     this.selectedarray=event.api.getSelectedNodes();
     this.sendDataToParent();
-    
-
-
-   
+  
     const selectedRows = event.api.getSelectedRows();
-    //console.log("selectedRows>>>>",selectedRows);
-    // const deviceid = selectedRows[0].Device_id;
-    // this.multiselection.push(deviceid);
-    // //console.log("multiselection>>>>", this.multiselection);
+ 
     event.api.forEachNode((rowNode:any, index:any) => {
       let make = rowNode.selected;
-      
-      //console.log("rowNode>>>",rowNode.selected);
-      
-     
 
       if(make==true){
-        //console.log("this is>>>",rowNode.key);
         const deviceid = rowNode.key;
-    
-
-        //console.log("multiselection>>>>333", this.multiselection);
-        if(!this.multiselection.includes(deviceid)){
-          // this.json.device=rowNode.key;
-          // this.json.count=rowNode.allChildrenCount;
-          // //console.log("json>>>>", this.json);
-          // this.arrayofdevices.push(this.json);
-          // //console.log("arrayofdevices>>>>", this.arrayofdevices);
-          if(deviceid !=null){
-            this.multiselection.push(deviceid);
-          }
-         
-          //console.log("multiselection>>>>4444", this.multiselection);
-          localStorage.setItem("multiselection", JSON.stringify(this.multiselection))
-
-          const coordSelected=rowNode.allLeafChildren[0].data.Coord;
-          let json={
-            deviceid:deviceid,
-            coordSelected:coordSelected
-          }
-          
-          this.arrayCoords.push(json);
-          localStorage.setItem("arrayCoords", JSON.stringify(this.arrayCoords))
-
-        }
-      }else{
-        const deviceid = rowNode.key;
-        const index = this.multiselection.indexOf(deviceid);
-        //console.log("index>>>>", index);
-      for(let i=0;i<this.arrayCoords.length;i++){
-        const index2 = this.arrayCoords[i].deviceid.indexOf(deviceid);
-        //console.log("index2>>>>", index2);
-        if (index2 > -1) {
-          this.arrayCoords.splice(index2, 1);
-          //console.log("multiselection>>>>5555", this.multiselection);
-          localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
-        }
-      }
-            
+        if (!this.multiselection.includes(deviceid)) {
+            if (deviceid != null) {
+                this.multiselection.push(deviceid);
+            }
+            localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+            const coordSelected = rowNode.allLeafChildren[0].data.Coord;
+            let json = {
+                deviceid: deviceid,
+                coordSelected: coordSelected
+            };
         
-        if (index > -1) {
-          this.multiselection.splice(index, 1);
-          //console.log("multiselection>>>>5555", this.multiselection);
-          localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+            let existingCoords = [];
+            try {
+                existingCoords = JSON.parse(localStorage.getItem("jsonCoords")) || [];
+                if (!Array.isArray(existingCoords)) {
+                    existingCoords = [];
+                }
+            } catch (e) {
+                existingCoords = [];
+            }
+            existingCoords.push(json);
+            localStorage.setItem("jsonCoords", JSON.stringify(existingCoords));
         }
+        
+        console.log("jsonCoords________     ", localStorage.getItem("jsonCoords") )
+
+
+        //old mechye
+      //   const deviceid = rowNode.key;
+      //   if(!this.multiselection.includes(deviceid)){
+      //     if(deviceid !=null){
+      //       this.multiselection.push(deviceid);
+      //     }
+      //              localStorage.setItem("multiselection", JSON.stringify(this.multiselection))
+      //     const coordSelected=rowNode.allLeafChildren[0].data.Coord;
+      //       let json={
+      //         deviceid:deviceid,
+      //         coordSelected:coordSelected
+      //       }
+      //     this.arrayCoords.push(json);
+      //     localStorage.setItem("jsonCoords", JSON.stringify(json))
+      //     localStorage.setItem("arrayCoords", JSON.stringify(this.arrayCoords))
+      //   }
+      // }else{
+      //   const deviceid = rowNode.key;
+      //   const index = this.multiselection.indexOf(deviceid);
+      // for(let i=0;i<this.arrayCoords.length;i++){
+      //   const index2 = this.arrayCoords[i].deviceid.indexOf(deviceid);
+      //   if (index2 > -1) {
+      //     this.arrayCoords.splice(index2, 1);
+      //     localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+      //   }
+      // }
+        
+      //   if (index > -1) {
+      //     this.multiselection.splice(index, 1);
+      //     //console.log("multiselection>>>>5555", this.multiselection);
+      //     localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+      //   }
       }
     });
     }else{
@@ -354,6 +420,102 @@ if(condColumndefs=='date' || condColumndefs=='lat' || condColumndefs=='lng')
       });
     }
  }  
+
+ 
+//   onSelectionChanged(event:any) {
+
+//     if(this.distinct==true){
+//     let renderedNodes= event.api.getRenderedNodes()
+//     this.selectedarray=event.api.getSelectedNodes();
+//     this.sendDataToParent();
+
+//     const selectedRows = event.api.getSelectedRows();
+
+//     event.api.forEachNode((rowNode:any, index:any) => {
+//       let make = rowNode.selected;
+      
+//       console.log("rowNode>>>",rowNode);
+      
+     
+
+//       if(make==true){
+//         //console.log("this is>>>",rowNode.key);
+//         const deviceid = rowNode.key;
+    
+
+//         //console.log("multiselection>>>>333", this.multiselection);
+//         if(!this.multiselection.includes(deviceid)){
+//           // this.json.device=rowNode.key;
+//           // this.json.count=rowNode.allChildrenCount;
+//           // //console.log("json>>>>", this.json);
+//           // this.arrayofdevices.push(this.json);
+//           // //console.log("arrayofdevices>>>>", this.arrayofdevices);
+//           if(deviceid !=null){
+//             this.multiselection.push(deviceid);
+//           }
+         
+//           //console.log("multiselection>>>>4444", this.multiselection);
+//           localStorage.setItem("multiselection", JSON.stringify(this.multiselection))
+
+//           const coordSelected=rowNode.allLeafChildren[0].data.Coord;
+//           let json={
+//             deviceid:deviceid,
+//             coordSelected:coordSelected
+//           }
+          
+//           this.arrayCoords.push(json);
+//           localStorage.setItem("arrayCoords", JSON.stringify(this.arrayCoords))
+
+//         }
+//       }else{
+//         const deviceid = rowNode.key;
+//         const index = this.multiselection.indexOf(deviceid);
+//         //console.log("index>>>>", index);
+//       for(let i=0;i<this.arrayCoords.length;i++){
+//         const index2 = this.arrayCoords[i].deviceid.indexOf(deviceid);
+//         //console.log("index2>>>>", index2);
+//         if (index2 > -1) {
+//           this.arrayCoords.splice(index2, 1);
+//           //console.log("multiselection>>>>5555", this.multiselection);
+//           localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+//         }
+//       }
+            
+        
+//         if (index > -1) {
+//           this.multiselection.splice(index, 1);
+//           //console.log("multiselection>>>>5555", this.multiselection);
+//           localStorage.setItem("multiselection", JSON.stringify(this.multiselection));
+//         }
+//       }
+//     });
+//     }else{
+//       event.api.forEachNode((rowNode:any, index:any) => {
+//         let make = rowNode.selected;
+//         if(make==true){
+
+//           if(this.treeData==true){
+//             const simulid = rowNode.data.id;
+//             //console.log("simulid>>",simulid);
+//             this.displayclusters2.emit(simulid);
+
+//           }else{
+//             const deviceid = rowNode.data.Device_id;
+//             //console.log("rowNode>>",rowNode);
+  
+//             //console.log("this is deviceid>>>",deviceid);
+//     // this.json.device=rowNode.key;
+//     // this.json.count=rowNode.allChildrenCount;
+//             if(!this.multiselection.includes(deviceid)){
+//               this.multiselection.push(deviceid);
+//               //console.log("multiselection>>>>66666", this.multiselection);
+//      }
+//           }
+
+//         }
+//       });
+//     }
+//  }  
 onFirstDataRendered(params:any): void {
  if(!localStorage.getItem("multiselection")){
   params.api.sizeColumnsToFit();
@@ -383,6 +545,7 @@ autoGroupColumnDef = {
   cellRendererParams: {
     innerRenderer: 'group',
     suppressCount: true,
+    expandedByDefault: false
   },
   
 };
@@ -400,7 +563,7 @@ autoGroupColumnDef = {
 // ];
 openpopup() {
   //console.log('rowdata>>>',this.rowData)
-  //console.log('Grid2Type>>>',this.Grid2Type)
+  console.log('Grid2Type>>>',this.Grid2Type)
  $('#'+this.Grid2Type).click();
 }
 selectShapes(params:any){
@@ -427,8 +590,12 @@ onGridReady(params: GridReadyEvent) {
  
   this.gridApi = params.api;
   this.columnApi = params.columnApi;
-  //console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
+  console.log("params.api<<<<<<<",params.api);
+  console.log(" params.columnApi", params.columnApi);
+  console.log("params.api.getDisplayedRowCount():::::",params.api.getDisplayedRowCount());
   this.total=params.api.getDisplayedRowCount();
+
+ // console.log("getDisplayedRowCount",this.getDisplayedRowCount);
   // this.gridApi.deselectAll();
   this.gridApi.addEventListener('rowGroupOpened', function (event:any) {
     // Check if the row group is related to the "Device_id" column
@@ -437,6 +604,9 @@ onGridReady(params: GridReadyEvent) {
   
   });
 }
+  getDisplayedRowCount(arg0: string, getDisplayedRowCount: any) {
+    throw new Error('Method not implemented.');
+  }
 handleCheckboxChange(event: any) {
   this.isChecked = event.target.checked;
 
@@ -508,6 +678,8 @@ this.dataservice.setDHselectedDevice(this.dataselected);
   //console.log("dataaaaaaaaaaa--------------",this.dataselected);
   this.selectedarrayemit.emit(this.selectedarray);
 }
+
+
 
 
 }

@@ -1,122 +1,197 @@
 <form [formGroup]="newTabForm" class="mt-4">
-    <div class="row mb-5">
-        <div class="col-lg-4">
-            <v-input formControlName="tabName" type="text" label="Tab Name" required="true" [parentForm]="newTabForm"
-                fieldName="tabName"></v-input>
+  <div class="row mb-5">
+      <div class="col-lg-4">
+          <v-input formControlName="tabName" type="text" label="Tab Name" required="true" [parentForm]="newTabForm"
+              fieldName="tabName"></v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-input formControlName="orderField" type="text" label="Order" required="true" [parentForm]="newTabForm"
+              fieldName="orderField"></v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-input formControlName="sourceQuery" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Source Query"
+              fieldName="sourceQuery">
+          </v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-toggle label="Is Grid" formControlName="isGrid" [parentForm]="newTabForm" fieldName="isGrid"> </v-toggle>
+      </div>
+
+      <div class="col-lg-4">
+        <v-toggle label="Is AM Load" formControlName="isAMLoad" [parentForm]="newTabForm" fieldName="isAMLoad"> </v-toggle>
+    </div>
+
+      <div class="col-lg-4">
+        <v-toggle label="Is Tree Grid" formControlName="isTreeGrid" [parentForm]="newTabForm" fieldName="isTreeGrid"> </v-toggle>
+    </div>
+
+      <div class="col-lg-4">
+          <v-toggle label="Has Multiple Selection" formControlName="hasMultipleSelection" [parentForm]="newTabForm" fieldName="hasMultipleSelection"></v-toggle>
+      </div>
+
+      <div class="col-lg-4">
+          <v-toggle label="Is Query Form" formControlName="isQueryForm" [parentForm]="newTabForm" fieldName="isQueryForm" (toggleChange)="isQueryFormChange()"> </v-toggle>
+      </div>
+      <div class="col-lg-4">
+        <v-toggle label="Is Row Grouping" formControlName="isRowGroup" [parentForm]="newTabForm" fieldName="isRowGroup" (toggleChange)="isRowGroupChange()"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+    <v-dropdown *ngIf="showColumnRowGroup" formControlName="fieldGrouping"
+    label="Field Grouping" placeholder="" [parentForm]="newTabForm" [dataApi]="fieldGrouping"
+    fieldName="fieldGrouping" [multiple]="true"></v-dropdown>
+    </div>
+      <div class="col-lg-4">
+          <v-dropdown *ngIf="showQueryFormButtonCombo" formControlName="isQueryFormSelectedButtons"
+          label="Buttons" placeholder="" [parentForm]="newTabForm" [dataJSON]="queryFormpossibleButtons"
+          fieldName="isQueryFormSelectedButtons" [multiple]="true"></v-dropdown>
+
+      </div>
+      <div class="col-lg-4">
+        <v-toggle *ngIf="showColumnRowGroup"label="Is Row Group hidden" formControlName="isRowGroupHidden" [parentForm]="newTabForm" (toggleChange)="isRowGroupHidden()"
+            fieldName="isRowGroupHidden"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+        <v-dropdown *ngIf="showIsRowGroupHidden" formControlName="fieldGroupingHidden"
+        label="Field Grouping Hidden" placeholder="" [parentForm]="newTabForm" [dataApi]="fieldGrouping"
+        fieldName="fieldGroupingHidden" [multiple]="true"></v-dropdown>
         </div>
-        <div class="col-lg-4">
-            <v-input formControlName="orderField" type="text" label="Order" required="true" [parentForm]="newTabForm"
-                fieldName="orderField"></v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-input formControlName="sourceQuery" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Source Query"
-                fieldName="sourceQuery">
-            </v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-toggle label="Is Grid" formControlName="isGrid" [parentForm]="newTabForm" fieldName="isGrid"> </v-toggle>
-        </div>
-
-        <div class="col-lg-4">
-            <v-toggle label="Is Query Form" formControlName="isQueryForm" [parentForm]="newTabForm" fieldName="isQueryForm" (toggleChange)="isQueryFormChange()"> </v-toggle>
-        </div>
-
-
-
-        <!-- QUERY FORM BUTTON SELECTION -->
-        <div class="col-lg-4">
-
-            <v-dropdown *ngIf="showQueryFormButtonCombo" formControlName="isQueryFormSelectedButtons"
-            label="Buttons" placeholder="" [parentForm]="newTabForm" [dataJSON]="queryFormpossibleButtons"
-            fieldName="isQueryFormSelectedButtons" [multiple]="true"></v-dropdown>
-       
-        </div>
-
-        <!-- (onChangeEvent)="onParamSelect($event)" -->
-        <!-- ------------------------------------------- -->
-
-        <div class="col-lg-4">
-            <v-toggle label="Is Dynamic Report" formControlName="isDynamicReport" [parentForm]="newTabForm" fieldName="isDynamicReport" (toggleChange)="isDynamicReportChange()"> </v-toggle>
-        </div>
-
-     
-
-        <div class="col-lg-4">
-            <!-- <v-toggle label="Is ReadOnly" formControlName="isReadOnly" [parentForm]="newTabForm" fieldName="isReadOnly">
-            </v-toggle> -->
-
-            <v-input formControlName="readOnlyQbeId" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Is Read Only"
-                fieldName="readOnlyQbeId"></v-input>
-
-        </div>
-        <div class="col-lg-4">
-            <v-toggle label="Is Advanced Search" formControlName="isAdvancedSearch" [parentForm]="newTabForm" (toggleChange)="isAdvancedSearchChange()"
-                fieldName="isAdvancedSearch"> </v-toggle>
-        </div>
-        <div class="col-lg-4" *ngIf="showAddSearchProcedure">
-            <v-input  formControlName="addSearchProcedure" [parentForm]="newTabForm" type="lookup"
-            [lookupDataApi]="getAllProcAndPack" lookupWidth="700px" lookupHeight="700px" label="Add Procedure"
-            fieldName="addSearchProcedure">
+      <!-- (onChangeEvent)="onParamSelect($event)" -->
+      <!-- ------------------------------------------- -->
+      <div class="col-lg-4">
+        <v-toggle label="Has View" formControlName="hasView" [parentForm]="newTabForm" fieldName="hasView" (toggleChange)="hasViewChange()"> </v-toggle>
+    </div>
+    <div class="col-lg-4">
+        <v-input *ngIf="showViews" formControlName="formView" [parentForm]="newTabForm" type="lookup"
+        [lookupDataApi]="getViewList" lookupWidth="700px" lookupHeight="700px" label="View"
+        fieldName="formView">
         </v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-input formControlName="canAdd" [parentForm]="newTabForm" type="lookup" [lookupDataApi]="getSourceQuery"
-                lookupWidth="700px" lookupHeight="700px" label="Can Add" fieldName="canAdd">
-            </v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-input formControlName="canDelete" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Delete"
-                fieldName="canDelete">
-            </v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-input formControlName="canModify" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Modify"
-                fieldName="canModify">
-            </v-input>
-        </div>
-        <div class="col-lg-4">
-            <v-input formControlName="condition" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Condition"
-                fieldName="condition">
-            </v-input>
-        </div>
-
-        <div class="col-lg-4">
-            <v-input formControlName="isSave" [parentForm]="newTabForm" type="lookup"
-                [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Show Save Button"
-                fieldName="isSave">
-            </v-input>
-        </div>
-
-        <!-- <div class="col-lg-4">
-            <v-toggle label="Show Save Button" formControlName="isSave" [parentForm]="newTabForm" fieldName="isSave"></v-toggle>
-        </div> -->
     </div>
 
-    <!-- <v-grid *ngIf="actionType == 'saveNew'" allowSideBar="true" [agColumns]="agColumns"
-        [pagination]="true" [paginationPageSize]="10" agPrimaryKey="id,ownerName,tableName"
-        agToolBar="amd"   (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()"  (onGridDelete)="onDeleteClick()"  [dataApi]="getTabTables" [rowGrouping]="true" [contextmenu]="true">
-    </v-grid>  -->
 
-    <v-fieldset *ngIf="actionType == 'update'" title="Handle Tables & Columns"></v-fieldset>
-
-    <v-grid *ngIf="actionType == 'update'" allowSideBar="true" [agColumns]="agColumns" class="mb-2" [pagination]="true"
-        [paginationPageSize]="10" agPrimaryKey="id,ownerName,tableName,orderNo" [dataApi]="getTabTables" agToolBar="amd"
-        (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()"
-        [rowGrouping]="true" [contextmenu]="true">
-    </v-grid>
-
-    <br><br>
-
-    <v-fieldset *ngIf="actionType == 'update'" title="Dynamic Rule Builder"></v-fieldset>
-    <v-dynamic-rule-builder *ngIf="actionType == 'update'" [objectId]="objectId" drbPlace="tab"></v-dynamic-rule-builder>
-
-    <div class="col-lg-12 form-submit">
-        <v-button btnActionType="submit" btnType="form" [parentForm]="newTabForm" value="Save"
-            (click)="submitForm()"></v-button>
+      <div class="col-lg-4">
+        <v-toggle label="Is Title" formControlName="isDynamicTitleEnabled" [parentForm]="newTabForm" (toggleChange)="isTitleChange()"
+            fieldName="isDynamicTitleEnabled"> </v-toggle>
     </div>
+    <div class="col-lg-4" *ngIf="showisTitle">
+        <v-input  formControlName="dynamicTitleName" [parentForm]="newTabForm" type="lookup"
+        [lookupDataApi]="getAllColumns" lookupWidth="700px" lookupHeight="700px" label="Add Title Field" (toggleChange)="isTitleFieldChange()"
+        fieldName="dynamicTitleName">
+    </v-input>
+    </div>
+      <div class="col-lg-4">
+          <v-toggle label="Is Dynamic Report" formControlName="isDynamicReport" [parentForm]="newTabForm" fieldName="isDynamicReport" (toggleChange)="isDynamicReportChange()"> </v-toggle>
+      </div>
+
+
+
+      <div class="col-lg-4">
+          <!-- <v-toggle label="Is ReadOnly" formControlName="isReadOnly" [parentForm]="newTabForm" fieldName="isReadOnly">
+          </v-toggle> -->
+
+          <v-input formControlName="readOnlyQbeId" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Is Read Only"
+              fieldName="readOnlyQbeId"></v-input>
+
+      </div>
+      <div class="col-lg-4">
+          <v-toggle label="Is Advanced Search" formControlName="isAdvancedSearch" [parentForm]="newTabForm" (toggleChange)="isAdvancedSearchChange()"
+              fieldName="isAdvancedSearch"> </v-toggle>
+      </div>
+
+      <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-toggle label="Is Advanced Hidden" formControlName="isAdvancedHidden" [parentForm]="newTabForm"
+            fieldName="isAdvancedHidden"> </v-toggle>
+    </div>
+      <!-- <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+          <v-input  formControlName="addSearchProcedure" [parentForm]="newTabForm" type="lookup"
+          [lookupDataApi]="getAllProcAndPack" lookupWidth="700px" lookupHeight="700px" label="Add Procedure"
+          fieldName="addSearchProcedure">
+      </v-input>
+      </div> -->
+      <!-- <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-toggle label="Call Function On Search" formControlName="callRestApi" [parentForm]="newTabForm"  (toggleChange)="isCallApi()"
+        fieldName="callRestApi"> </v-toggle>
+    </div> -->
+    
+
+
+    <!-- <div class="col-lg-4" *ngIf="showCallApi">
+        <v-input formControlName="callRestApi2" type="text" label="End Of Url"  [parentForm]="newTabForm"
+        fieldName="callRestApi2"></v-input>
+    </div> -->
+
+     <div class="col-lg-4" *ngIf="showAddSearchProcedure">
+        <v-button btnActionType="submit" btnType="form" [parentForm]="newTabForm" value="Advanced Search Configuration"
+        (click)="openFunctionConfiguration()"></v-button>
+         <!-- <v-dropdown *ngIf="showCallApi" formControlName="callRestApi2"
+            label="Prebuilt Buttons" placeholder="" [parentForm]="newTabForm" [dataApi]="getAllButtonsUnderObject"
+            fieldName="callRestApi2"></v-dropdown> -->
+    </div>
+
+
+
+
+      <div class="col-lg-4">
+          <v-input formControlName="canAdd" [parentForm]="newTabForm" type="lookup" [lookupDataApi]="getSourceQuery"
+              lookupWidth="700px" lookupHeight="700px" label="Can Add" fieldName="canAdd">
+          </v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-input formControlName="canDelete" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Delete"
+              fieldName="canDelete">
+          </v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-input formControlName="canModify" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Can Modify"
+              fieldName="canModify">
+          </v-input>
+      </div>
+      <div class="col-lg-4">
+          <v-input formControlName="condition" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Condition"
+              fieldName="condition">
+          </v-input>
+      </div>
+
+      <div class="col-lg-4">
+          <v-input formControlName="isSave" [parentForm]="newTabForm" type="lookup"
+              [lookupDataApi]="getSourceQuery" lookupWidth="700px" lookupHeight="700px" label="Show Save Button"
+              fieldName="isSave">
+          </v-input>
+      </div>
+
+      <div class="col-lg-4">
+        <v-toggle label="Flip Form" formControlName="isFormFlip" [parentForm]="newTabForm" fieldName="isFormFlip"> </v-toggle>
+    </div>
+
+      <!-- <div class="col-lg-4">
+          <v-toggle label="Show Save Button" formControlName="isSave" [parentForm]="newTabForm" fieldName="isSave"></v-toggle>
+      </div> -->
+  </div>
+
+  <!-- <v-grid *ngIf="actionType == 'saveNew'" allowSideBar="true" [agColumns]="agColumns"
+      [pagination]="true" [paginationPageSize]="10" agPrimaryKey="id,ownerName,tableName"
+      agToolBar="amd"   (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()"  (onGridDelete)="onDeleteClick()"  [dataApi]="getTabTables" [rowGrouping]="true" [contextmenu]="true">
+  </v-grid>  -->
+
+  <v-fieldset *ngIf="actionType == 'update'" title="Handle Tables & Columns"></v-fieldset>
+
+  <v-grid *ngIf="actionType == 'update'" allowSideBar="true" [agColumns]="agColumns" class="mb-2" [pagination]="true"
+      [paginationPageSize]="10" agPrimaryKey="id,ownerName,tableName,orderNo" [dataApi]="getTabTables" agToolBar="amd"
+      (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()"
+      [rowGrouping]="true" [contextmenu]="true">
+  </v-grid>
+
+  <br><br>
+
+  <v-fieldset *ngIf="actionType == 'update'" title="Dynamic Rule Builder"></v-fieldset>
+  <v-dynamic-rule-builder *ngIf="actionType == 'update'" [objectId]="objectId" drbPlace="tab"></v-dynamic-rule-builder>
+
+  <div class="col-lg-12 form-submit">
+      <v-button btnActionType="submit" btnType="form" [parentForm]="newTabForm" value="Save"
+          (click)="submitForm()"></v-button>
+  </div>
 </form>

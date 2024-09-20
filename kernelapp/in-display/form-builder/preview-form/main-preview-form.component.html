@@ -1,36 +1,60 @@
+<div *ngIf="loaderService._loading | async" class="loading-animation animate__animated animate__fadeIn">
+  <div class="loading-elements">
+      <img src="assets/img/clientlogo.png" alt="User Icon" />
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+</div>
+
+<div *ngIf="isGridOptions==1 && isAMLoad!=1">
 <div *ngFor="let tableOption of tableOptions1">
 
-
     <div *ngIf="tableOption.isAdvancedSearch == 1">
-<v-dynamic-search [objectId]="tableOption.objectId"   [sourceQuery]="tableOption.sourceQuery" (onSearchSubmit)="onSearchSubmit($event)"></v-dynamic-search>
+<v-dynamic-search [objectId]="tableOption.objectId"   [sourceQuery]="tableOption.sourceQuery" (onSearchSubmit)="onSearchSubmit($event)" [isForForm]="false"></v-dynamic-search>
 
 </div>
   <div *ngIf="test_1 == '1'">
     <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery == '-1'" allowSideBar="true"
-      [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true"
+    [agRowSelection]="selectionType"
+      [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [isUpdateColsDef]="isUpdateColsDef"
       [paginationPageSize]="8" [dataApi]="previewGridApi" [dataApiParam]="previewGridApiParam"
       (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()" [isAdvancedSearch]="tableOption.isAdvancedSearch">
     </v-grid>
 
-    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1'" allowSideBar="true"
-      [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true"
-      [paginationPageSize]="8" [dataApiParam]="previewGridApiParam" [staticData]="gridStaticData"
-      (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()" [isAdvancedSearch]="tableOption.isAdvancedSearch">
-    </v-grid>
-
-    <!-- <div *ngFor="let fields of test">
-      <div *ngIf="fields.columnTypeCode == 14 && fields.mainAndPreview == true" class="button-container-2">
-        <v-button value="{{ fields.name }}" btnActionType="button" id="field_{{ fields.id }}"
-        (click)="onShowButtonForm(fields.id)"></v-button>
-      </div>
-    </div> -->
-
-    <div style="display: inline-block;" *ngFor="let fields of test">
-      <div *ngIf="fields.columnTypeCode == 14 && fields.mainAndPreview == true" style="display: inline-block; margin-right: 10px;">
-        <v-button style="margin-right: 10px;" value="{{ fields.name }}" btnActionType="button" id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id)"></v-button>
+    <div *ngIf="this.informationservice.getMainPreviewScreenType()">
+      <div class="header-dialog space-between mb-3" cdkDrag cdkDragRootElement=".cdk-overlay-pane" cdkDragHandle>
+        <div></div>
+        <span style="font-size: 15px; letter-spacing: 1px; color: var(--popup-title-color); font-weight: bold;">{{ newVariableTitle }}</span>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeDialog()"></button>
       </div>
     </div>
     
     
+    <v-grid *ngIf="tableOption.isGrid == 1 && tableOption.isMain == 1 && sourceQuery != '-1' && this.informationservice.getAdvancedSearchShowGridMain()" 
+    [agRowSelection]="selectionType"
+    allowSideBar="true"
+      [agPrimaryKey]="columnId" [agToolBar]="toolBar" [agColumns]="agColumns" [pagination]="true" [isTreeGrid]="isTreeGrid" [isUpdateColsDef]="isUpdateColsDef"
+      [paginationPageSize]="8" [dataApiParam]="previewGridApiParam" [staticData]="gridStaticData"
+      (onGridAdd)="onAddClick()" (onGridUpdate)="onUpdateClick()" (onGridDelete)="onDeleteClick()" [isAdvancedSearch]="tableOption.isAdvancedSearch">
+    </v-grid>
+    <div style="display: inline-block;" *ngFor="let fields of test">
+      <div *ngIf="fields.columnTypeCode == 14 && fields.mainAndPreview == true" style="display: inline-block; margin-right: 10px;">
+        <v-button style="margin-right: 10px;" value="{{ fields.name }}" btnActionType="button" id="field_{{ fields.id }}" (click)="onShowButtonForm(fields.id,'dynamicButton')"></v-button>
+      </div>
+    </div>
   </div>
+   <!---------------------------------HIDDEN USED BUTTON FOR DYNAMIC SEARCH-------------------------------->
+
+ <button style="display:none" id="searchFunctionButton_{{tableOption.objectId}}" (click)="onShowButtonForm(null,'dynamicSearch')"></button>
+
+ <!-------------------------------------------------------------------------------------------------------->  
 </div>
+
+</div>
+
+<div *ngIf="isGridOptions==0">
+<am-preview-form [mainPreviewDataInput]="mainPreviewDataFromMain"></am-preview-form>
+</div>
+
+<div *ngIf="isGridOptions==1 && isAMLoad==1">
+  <am-preview-form [mainPreviewDataInput]="mainPreviewDataFromMain"></am-preview-form>
+  </div>

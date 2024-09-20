@@ -10,6 +10,7 @@ import { ButtonRendererComponent } from './buttonRenderer.component';
 import { ExecuteQueryComponent } from './static-query-builder/execute-query/execute-query.component';
 import { ImportQueryComponent } from './import-query/import-query.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -29,11 +30,12 @@ export class QueryBuilderComponent implements OnInit {
 
   public selectedQuery:any;
   public isQueryexecute:boolean;
-
+  public breadCrumbData:any[]=[];
 
   constructor(private http: HttpClient,public commonFunctions: CommonFunctions,
     private eventEmitterService: EventEmitterService, private dialog: MatDialog,
-    public informationservice: InformationService) {
+    public informationservice: InformationService,
+    private route: ActivatedRoute) {
 
       this.onRunButtonClick = this.onRunButtonClick.bind(this);
 
@@ -43,7 +45,7 @@ export class QueryBuilderComponent implements OnInit {
    }
 
   ngOnInit(){
-    
+    //console.log("ROUTE PARAM>>>>>>>>>>>>",this.route.snapshot.data);
     this.informationservice.removeAgGridSelectedNode();
 
     this.http.delete<any>(GlobalConstants.deleteSessions+sessionStorage.getItem("session_serial"),
@@ -215,6 +217,13 @@ if (JSON.parse(this.informationservice.getAgGidSelectedNode()).length>1 || this.
         this.commonFunctions.navigateToPage(
           "/qbe/queryBuilder/formQBE/update/-1");
         }
+        if(JSON.parse(this.informationservice.getAgGidSelectedNode())[0].import_flag=="CQL"){
+          console.log('CQL button clicked');
+    
+          this.showPopup = false;
+          this.commonFunctions.navigateToPage(
+            "/qbe/queryBuilder/formCQL/update/-1");
+          }
   }
 
   }

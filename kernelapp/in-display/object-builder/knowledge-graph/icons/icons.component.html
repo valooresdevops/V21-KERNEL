@@ -1,0 +1,14 @@
+<div *ngIf="reloadGrid">
+  <v-grid 
+    [dataApi]="iconData"  
+    [agColumns]="agColumns"
+    [pagination]="true"
+    [paginationPageSize]="15"
+    agPrimaryKey="id"
+    agToolBar="amd"
+    agRowSelection="single"
+    (onGridAdd)="onAddClick()"
+    (onGridDelete)="onDeleteClick()"
+    (onGridUpdate)="onUpdateClick($event)"
+  ></v-grid>
+</div>

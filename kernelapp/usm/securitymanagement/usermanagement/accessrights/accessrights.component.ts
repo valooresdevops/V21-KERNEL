@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonFunctions } from 'src/app/Kernel/common/CommonFunctions';
 import { AgColumns } from 'src/app/Kernel/common/AGColumns';
@@ -9,10 +9,12 @@ import { EventEmitterService } from 'src/app/Kernel/services/event-emitter.servi
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Application } from 'src/app/Kernel/ArrayList/Application';
 import { AGGridComponent } from 'src/app/Kernel/components/v-grid/v-grid.components';
-import { ColDef, GridApi } from 'ag-grid-community';
-declare let alertify: any;
+import {  GridApi } from 'ag-grid-community';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { CheckboxCellRenderer } from 'src/app/Kernel/components/v-grid/components/v-grid-checkbox';
+import { CheckboxCellRendererByCell } from 'src/app/Kernel/components/v-grid/components/v-grid-checkbox-cell';
+
+declare let alertify: any;
 
 @Component({
   selector: 'accessrights',
@@ -51,16 +53,17 @@ export class AccessrightsComponent implements OnInit {
 
 
   public actionType: string = '';
-  accessRightsForm = new UntypedFormGroup({
-    applicationName: new UntypedFormControl(''),
-    applicationMenu: new UntypedFormControl(''),
-    subLevel: new UntypedFormControl(''),
-    inColumn: new UntypedFormControl(''),
-    inRights: new UntypedFormControl(''),
-    isZeroAccess: new UntypedFormControl(''),
+  accessRightsForm = new FormGroup({
+    applicationName: new FormControl(''),
+    applicationMenu: new FormControl(''),
+    subLevel: new FormControl(''),
+    inColumn: new FormControl(''),
+    inRights: new FormControl(''),
+    isZeroAccess: new FormControl(''),
 
   });
 
+  public previousnodesBAR: any;
 
   constructor(private router: Router, private commonFunctions: CommonFunctions, private http: HttpClient, private _Activatedroute: ActivatedRoute, private eventEmitterService: EventEmitterService,
     public informationservice: InformationService) {
@@ -71,19 +74,9 @@ export class AccessrightsComponent implements OnInit {
      }
 
   ngOnInit(): void {
-    //$("#formRow").addClass("vh-100");
 
-
-
-
-
-    this.UserId = this.informationservice.getUserId();
-
-    
-    
-    console.log("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD", this.UserId);
-
-    this.comboAppType = GlobalConstants.fetchUSMRolesAppComboApi;
+   this.UserId = this.informationservice.getUserId();
+   this.comboAppType = GlobalConstants.fetchUSMRolesAppComboApi;
     this._Activatedroute.paramMap.subscribe(params => {
       this.id = params.get('id');
       this.actionType = params.get('actionType');
@@ -106,7 +99,9 @@ export class AccessrightsComponent implements OnInit {
         // this.updateToshow = true;
         this.createToShow = false;
       }
-    }
+    } else {
+
+    
     if (this.menuPath == 'usm/userMgmt') {
 
 
@@ -126,26 +121,26 @@ export class AccessrightsComponent implements OnInit {
         this.createToShow = false;
       }
     }
-
+  }
 
     this.userLogedId = this.informationservice.getLogeduserId();
     //this is the column definition
     this.agColumnsJson = [
     { headerName: 'Menu Name', field: 'name', filter: 'agTextColumnFilter' },
     { headerName: 'id', field: 'id', filter: 'agTextColumnFilter', hide: "true" },
-    { headerName: 'Display', field: 'isDisplay',      cellRenderer: CheckboxCellRenderer,
+    { headerName: 'Display', field: 'isDisplay',      cellRenderer: CheckboxCellRendererByCell,
      },
-      { headerName: 'Add', field: 'isAdd',   cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Add', field: 'isAdd',   cellRenderer: CheckboxCellRendererByCell,
        },
-      { headerName: 'Modify', field: 'isModify',   cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Modify', field: 'isModify',   cellRenderer: CheckboxCellRendererByCell,
        },
-      { headerName: 'Delete', field: 'isDelete',     cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Delete', field: 'isDelete',     cellRenderer: CheckboxCellRendererByCell,
        },
-      { headerName: 'Print', field: 'isPrint',    cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Print', field: 'isPrint',    cellRenderer: CheckboxCellRendererByCell,
        },
-      { headerName: 'Export', field: 'isExport',    cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Export', field: 'isExport',    cellRenderer: CheckboxCellRendererByCell,
        },
-      { headerName: 'Translate', field: 'isTranslate',   cellRenderer: CheckboxCellRenderer,
+      { headerName: 'Translate', field: 'isTranslate',   cellRenderer: CheckboxCellRendererByCell,
        },
       //{ headerName: 'OrderMenu', field: 'orderCode', hide: "true" }
 
@@ -156,7 +151,7 @@ export class AccessrightsComponent implements OnInit {
 
 
     //used on updating data in grid
-    this.subsVar = this.eventEmitterService.onSaveClick.subscribe(value => {
+    this.subsVar = this.eventEmitterService.onSaveClick.subscribe((value: { updateList: any; }[]) => {
 
       if (this.menuPath == 'usm/userMgmt') {
         this.menuPaths = 'userMgmt';
@@ -171,22 +166,72 @@ export class AccessrightsComponent implements OnInit {
 
 
     });
-    let appValue:string='';
-    if(this.accessRightsForm.get('applicationName')?.value.length==1){
-        appValue="00"+this.accessRightsForm.get('applicationName')?.value;
-    }else{
-      appValue="0"+this.accessRightsForm.get('applicationName')?.value;
+      // let appValue = this.formatAppValue(this.accessRightsForm.get('applicationName')?.value);
 
-    }
-    console.log("LLLLLLLLLLLLLLLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>",appValue);
+    // console.log("LLLLLLLLLLLLLLLLLLLLLLLLLL>>>>>>>>>>>>>>>>>>>",appValue);
 
-    this.accessRights = GlobalConstants.getAccessRightsGrid+appValue;
-    console.log("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY>>>>>> USER ID", this.UserId);
-    console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ>>>>>> ROLE ID", this.RoleId);
-    console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK>>>>>> TABLE ID", this.id);
+    // this.accessRights = GlobalConstants.getAccessRightsGrid+appValue
+    // console.log("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY>>>>>> USER ID", this.UserId);
+    // console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ>>>>>> ROLE ID", this.RoleId);
+    // console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK>>>>>> TABLE ID", this.id);
+
+
+    //  /////////////////////////////////////// filling the grid with the previous data
+    // setTimeout(() => {
+      this.fetchGrid()
+
+      
+    // }, 500);
+
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   }
 
+  fetchGrid() {
+    
+    let appValue = this.formatAppValue(this.accessRightsForm.get('applicationName')?.value);
+    this.http.post<any>(GlobalConstants.fetchPreviousSelectedNodesBAR + this.UserId+ "/" + appValue, { headers: GlobalConstants.headers }).subscribe(
+    (res: any) => {
+      console.log("ressssssssssss>>>",res);
+ // Transform the response to the desired format
+ this.previousnodesBAR = res.map((node: {
+   menu_name: string; menu_code: string; access_code: string; 
+}) => {
+  if (node.access_code && typeof node.access_code === 'string') {
+    return {
+      'id': node.menu_code,
+      'name':node.menu_name,
+      'isDisplay': node.access_code.charAt(0) ,
+      'isAdd': node.access_code.charAt(1) ,
+      'isModify': node.access_code.charAt(2) ,
+      'isDelete': node.access_code.charAt(3),
+      'isPrint': node.access_code.charAt(4),
+      'isExport': node.access_code.charAt(5),
+      'isTranslate': node.access_code.charAt(6) 
+    };
+  } else {
+    return {
+      'id': node.menu_code,
+      'name': node.menu_name,
+      'isDisplay': '',
+      'isAdd': '',
+      'isModify': '',
+      'isDelete': '',
+      'isPrint': '',
+      'isExport': '',
+      'isTranslate': ''
+    };
+  
+  }
+});
+console.log("PREVIOUS SELECTED NODES>>>>>>>>>>>>>>", this.previousnodesBAR);
+this.agGrid.rowData = this.previousnodesBAR;
+
+    
+
+})
+
+  }
   Destroy() {
     if (this.subsVar) {
       this.subsVar.unsubscribe()
@@ -202,8 +247,6 @@ export class AccessrightsComponent implements OnInit {
 
     return value;
   }
-
-  
  
   //to return the id of the selected cell
   getSelectedCells() {
@@ -221,24 +264,16 @@ export class AccessrightsComponent implements OnInit {
 
   onAppName(value: any) {
     // this.isShown = false;
-    this.comboAppMenu = GlobalConstants.fetchUSMAppMenuComboApi + value;
+    // this.comboAppMenu = GlobalConstants.fetchUSMAppMenuComboApi + value;
   }
 
   saveApplication(){
+    let applicationName = this.formatAppValue(this.accessRightsForm.get('applicationName')?.value);
 
-   let applicationName = this.accessRightsForm.get('applicationName')?.value;
-   if(applicationName.toString().length == 1){
-        applicationName = '00'+applicationName;
-   }
-   if(applicationName.toString().length == 2){
-    applicationName = '0'+applicationName;
-}
-else{
-  applicationName=applicationName;  
-}
 
 ///////////////////////////////////////////////////////////////////////////////////
-let selectedNodesJson = JSON.parse(this.informationservice.getAgGidSelectedNode());
+let selectedCells = this.informationservice.getAgGidSelectedCell().replace(/,(\s*[\]}])/g, '$1');
+let selectedNodesJson = JSON.parse(selectedCells);
 let uniqueNodesMap = new Map();
 
 selectedNodesJson.forEach((node: { [x: string]: any; }) => {
@@ -247,12 +282,11 @@ selectedNodesJson.forEach((node: { [x: string]: any; }) => {
   uniqueNodesMap.set(id, { "id": id, "access_code": accessCode });
 });
 
-let selectedNodesBAR = JSON.stringify(Array.from(uniqueNodesMap.values()));
+let selectedNodesBAR = Array.from(uniqueNodesMap.values());
+let selectedNodesBAR_string = JSON.stringify(selectedNodesBAR)
 
-console.log("SELECTED NODES BAR:",selectedNodesBAR);
-
-
-
+console.log("SELECTED NODES BAR:",selectedNodesBAR_string);
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 let jsonParams = {};
@@ -260,14 +294,14 @@ if (this.menuPath == 'usm/userMgmt') {
   this.commonFunctions.alert("alert", "value of the user id is >> "+this.UserId);
   
 let userRoleId=this.informationservice.getUserRoleId();
-if(userRoleId!=null){
+if(this.UserId!=null){
 
   jsonParams = {
     userId: this.UserId,
     userRoleId:userRoleId,
     menuCode: applicationName,
     createdBy: this.informationservice.getLogeduserId(),
-    accessCode: selectedNodesBAR
+    accessCode: selectedNodesBAR_string
 
   };
 }else{
@@ -276,8 +310,9 @@ if(userRoleId!=null){
     userRoleId:"-1",
     menuCode: applicationName,
     createdBy: this.informationservice.getLogeduserId(),
-    accessCode: selectedNodesBAR
-  };
+    accessCode: selectedNodesBAR_string
+
+ };
 
 }
    } else if (this.menuPath == 'usm/role') {
@@ -286,15 +321,11 @@ if(userRoleId!=null){
       roleId: this.RoleId,
       menuCode: applicationName,
       createdBy: this.informationservice.getLogeduserId(),
-      accessCode: selectedNodesBAR
-    };
+      accessCode: selectedNodesBAR_string
+
+   };
 
       }
-
-
-      
-
-      console.log("JSON PARAMS ACCESS RIGHT>>>>>>>>>",jsonParams);
       this.http.post<any>(GlobalConstants.AddApplicationInAccessRight, jsonParams,
         { headers: GlobalConstants.headers }).subscribe(
         (res: any) => {
@@ -304,23 +335,22 @@ if(userRoleId!=null){
            console.log("save success !!")
           }
         });
-if(this.menuPath=='/usm/userMgmt'){
+//if(this.menuPath=='/usm/userMgmt'){
   
-  this.commonFunctions.reloadPage('/usm/userMgmt/form/update/'+this.informationservice.getUserId());
-}else{
+this.router.navigateByUrl("/usm/userMgmt/form/update/"+this.informationservice.getAgGidSelectedNode());
+// }else{
   
-  this.commonFunctions.reloadPage('/usm/role/form/update/'+this.informationservice.getUserRoleId());
-}
+//   this.commonFunctions.reloadPage('/usm/role/form/update/'+this.informationservice.getUserRoleId());
+// }
+//console.log("SUCCESSFUL SAVE FINALLY GOOD JOB!!!!!!!!!!!!!!!!!")
 
-
-console.log("SUCCESSFUL SAVE WOOOOOOOHOOOOOOOOOOO FINALLY GOOD JOB!!!!!!!!!!!!!!!!!")
   }
 
   onRowSelected(event : any){
 
-    console.log("event is :",event);
+    // console.log("event is :",event);
     
-    console.log("value of the id selected is >>> ",this.informationservice.getAgGidSelectedNode());
+    // console.log("value of the id selected is >>> ",this.informationservice.getAgGidSelectedNode());
 
   }
 
@@ -392,7 +422,13 @@ console.log("SUCCESSFUL SAVE WOOOOOOOHOOOOOOOOOOO FINALLY GOOD JOB!!!!!!!!!!!!!!
       }
     }
   }
-
-  
+  formatAppValue(appValue: string): string {
+    if (appValue.length === 1) {
+      return "00" + appValue;
+    } else if (appValue.length === 2) {
+      return "0" + appValue;
+    }
+    return appValue;
+  }
 
 }

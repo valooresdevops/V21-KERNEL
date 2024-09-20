@@ -82,16 +82,174 @@
   top: 0;
 } */
 
-/* .tab-content {
-  margin-top: 155px;
-}  */
+.tab-content {
+  overflow-y: auto;
+}  
 
 .requiredMessage{
   color: red;
-  font-size: 12px;
+  font-size: 16px;
   position: absolute;
   top: 100%;
   left: 5px;
-  font-size: 12px;
   font-weight: bold;
+}
+.dialogTitle{
+  font-size: 18px;
+  letter-spacing: 1px;
+  color: var(--popup-title-color);
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
+.v-input-style{
+  min-height: 30px;
+  max-height: 40px;
+  margin: -2px -4px;
+}
+.mb-3.col-lg-4{
+  margin:0% 0% -0.5% 0% !important;
+  height: fit-content -5px !important;
+  max-height: fit-content -10% !important;
+  gap: 0px;
+  padding: 0 ;
+}
+.required.label-required{
+   max-height: 80px !important;
+   display: block; 
+   overflow: hidden; /* Hides overflowed text */
+   text-overflow: ellipsis; /* Adds ellipsis (...) for overflowed text */
+   white-space: wrap; /* Prevents the text from wrapping */
+   
+   /* For multi-line truncation */
+   display: -webkit-box; /* Necessary for WebKit-based browsers */
+   -webkit-line-clamp: 3; /* Number of lines to show before truncating */
+   -webkit-box-orient: vertical; /* Vertical stacking for box orientation */
+}
+.form-group .row{
+    /* margin: -2px;   */
+  /* margin :0px 0px 1px 0px !important;*/
+  /* padding: 100px !important; */
+  /* row-gap: 50px !important;  */
+}
+.fieldset{
+  margin-top: -15px !important;
+  margin-bottom: -15px !important;
+ }
+ .nav-tab{
+  max-height: 45px !important;
+ }
+ .nav-tabs{
+  max-height: 45px !important;
+
+ }
+.test-cb-container{
+
+  margin-top:initial;
+ /* height: max-content;
+ width: max-content; */
+ padding: 20px;
+ display: flex ;
+ /* flex-direction: row; */
+ /* flex-basis: content; */
+ 
+ gap: 40px; 
+
+}
+.col-lg-12{
+  height: fit-content;
+}
+.form-group.row.fieldsetElem{
+  /* margin-bottom: 0 !important;
+  margin:50px 50px 50px 50px; */
+}
+/* .form-ele-parent.row.test-cb-container.align-items-center.col-lg-5.col-md-5.col-sm-12{
+  width: 300px;
+} */
+
+.form-group .row.mb-3{
+height: fit-content !important;
+margin: 0px 20px 0px 0px !important;
+}
+.row.mb-3{
+  margin: 100px 100px 100px 100px !important;
+}
+
+.form-ele-parent .row {
+  display: flex;
+  flex-wrap: wrap; /* Ensures elements wrap if they don't fit in a single row */
+  align-items: center; /* Vertically aligns checkboxes and labels */
+}
+
+.form-ele-child {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* Aligns the checkbox and its content vertically */
+}
+
+.mat-checkbox {
+  margin-right: 10px; /* Space between the checkbox and its content */
+}
+
+.label {
+  /* Display block to ensure full width */
+
+}
+.row {
+  display: flex;
+  margin: 0px !important;
+  /* flex-wrap: nowrap; Prevents wrapping of flex items */
+}
+
+.label-tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.label-tooltip-text {
+  display: none; /* Initially hidden */
+  position: absolute;
+  background-color: #555;
+  color: #080707;
+  padding: 5px;
+  border-radius: 5px;
+  z-index: 1000;
+  bottom: 125%; /* Adjust positioning as needed */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.label-tooltip-container:focus-within .label-tooltip-text,
+.label-tooltip-container:hover .label-tooltip-text {
+  display: block; /* Show tooltip on focus or hover */
+  opacity: 1;
+}
+
+.label {
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .form-ele-parent .row {
+    flex-direction: column; /* Stack items vertically on smaller screens */
+    align-items: flex-start; /* Align to the start on smaller screens */
+  }
+
+  .form-ele-child {
+    width: 100%; /* Ensure that the checkbox takes full width in smaller screens */
+    margin-bottom: 10px; /* Space between checkbox elements */
+  }
+  .mat-checkbox {
+    width: auto; /* Prevent checkbox from stretching */
+  }
+  .label{
+    padding: 15px 5px;
+  }
+  .required.label-required{
+    max-height: fit-content;
+    margin-right:initial !important;
+  }
 }

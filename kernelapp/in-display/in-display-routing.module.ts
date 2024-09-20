@@ -20,6 +20,17 @@ import { RatioBuilderFormComponent } from './object-builder/ratio-builder-form/r
 import { ChartBuilderTypeComponent } from './object-builder/chart-builder-type/chart-builder-type.component';
 import { GridBuilderComponent } from './object-builder/grid-builder/grid-builder.component';
 import { GridBuilderFormComponent } from './object-builder/grid-builder-form/grid-builder-form.component';
+import { MasterLinkAnalysisComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-analysis.component';
+import { ExecutedReportsComponent } from './object-builder/knowledge-graph/executed-reports/executed-reports.component';
+import { MasterLinkFormComponent } from './object-builder/knowledge-graph/master-link-analysis/master-link-form/master-link-form.component';
+import { APIBuilderComponent } from './api-builder/api-builder.component';
+import { APIBuilderForm } from './api-builder/api-builder-form/api-builder-form.component';
+import { EditorComponent } from './object-builder/editor/editor.component';
+import { EditorFormComponent } from './object-builder/editor/editor-form/editor-form.component';
+import { EditorPreviewComponent } from './object-builder/editor/editor-preview/editor-preview.component';
+import { IconsFormComponent } from './object-builder/knowledge-graph/icons/icons-form/icons-form.component';
+import { AlertBuilderComponent } from './object-builder/alert-builder/alert-builder.component';
+import { IconsComponent } from './object-builder/knowledge-graph/icons/icons.component';
 
 const routes: Routes = [
    {
@@ -73,6 +84,27 @@ const routes: Routes = [
          },
       ]
    },
+   {
+    path: 'apiBuilder',
+    data: { breadcrumb: 'API Builder ' },
+    children: [
+       {
+          path: '',
+          component: APIBuilderComponent
+       },
+       {
+          path: 'form/:actionType/:id',
+          data: { breadcrumb: 'API  Builder Tool' },
+          children: [
+             {
+                path: '',
+                component: APIBuilderForm
+             },
+          ],
+       }
+    ]
+ },
+
    {
       path: 'augmentedConfigScratch',
       data: { breadcrumb: 'Screen Builder ' },
@@ -185,7 +217,106 @@ const routes: Routes = [
             component: DynamicScreenComponent
          }
       ]
-   }
+   },
+   {
+      path: 'masterLink',
+      data: { breadcrumb: 'Master Link '},
+      children: [
+         {
+            path: '',
+            component: MasterLinkAnalysisComponent
+         }, {
+            path: 'add',
+            component: MasterLinkFormComponent
+         },
+      ]
+   },
+   {
+      path: 'executedReports',
+      data: { breadcrumb: 'Executed Reports '},
+      children: [
+         {
+            path: '',
+            component: ExecutedReportsComponent
+         },
+      ]
+   },
+   {
+      path: 'editor',
+      data: { breadcrumb: 'Editor '},
+      children: [
+         {
+            path: '',
+            component: EditorComponent
+         },
+      ]
+   },
+   {
+      path: 'editorForm',
+      data: { breadcrumb: 'Editor Form'},
+      children: [
+         {
+            path: '',
+            component: EditorFormComponent
+         },
+      ]
+   },
+   {
+      path: 'editorPreview',
+      data: { breadcrumb: 'Editor Preview'},
+      children: [
+         {
+            path: '',
+            component: EditorPreviewComponent
+         },
+      ]
+   },{
+      path: 'kwgIcons',
+      data:{breadcrumb:'icons'},
+      children: [
+         {
+            path:'',
+            component:IconsComponent
+         },
+         {
+            path:'add',
+            component:IconsFormComponent
+         }
+      ]
+   },
+   {
+      path: 'alertBuilder',
+      data: { breadcrumb: 'Alert Builder '},
+      children: [
+         {
+            path: '',
+            component: AlertBuilderComponent
+         },
+      ]
+   },
+
+   // {
+   //    path: 'knowledgeGraph',
+   //    data: { breadcrumb: 'Knowledge Graph' },
+   //    children: [
+   //       {
+   //          path: 'masterLink',
+   //          component: MasterLinkAnalysisComponent,
+   //       },
+   //       {
+   //          data: { breadcrumb: 'Executed Reports'},
+   //          path: 'executedReports',
+   //          component: ExecutedReportsComponent,
+   //          // children:[
+   //          //    {
+   //          //       path:'',
+   //          //       component:GridBuilderFormComponent
+   //          //    },
+   //          // ]
+   //       }
+   //    ]
+   // },
+
 ]
 
 

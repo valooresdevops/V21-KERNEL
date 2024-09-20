@@ -3,7 +3,9 @@
         <mat-slider thumbLabel 
             aria-label="unit(s)" 
             [min]="min" 
-            [max]="max" #ngSlider><input matSliderThumb [value]="value" (input)="onchange({source: ngSliderThumb, parent: ngSlider, value: ngSliderThumb.value})" #ngSliderThumb="matSliderThumb" />
+            [max]="max"
+            [value]="value"
+            (input)="onchange($event)">
         </mat-slider>
     </div>
     <div class="col-lg-2">

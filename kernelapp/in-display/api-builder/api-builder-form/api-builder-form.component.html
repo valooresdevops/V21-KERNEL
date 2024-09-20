@@ -1,0 +1,73 @@
+<form  [formGroup]="apiBuilderForm" >
+    <div class="row">
+        <div class="col-lg-12">
+            <v-fieldset title="API Information"></v-fieldset>
+            <div class="row">
+                <div class="col-lg-4">
+                    <v-input formControlName="methodId" type="text" label="Method Id" required="true"
+                        placeholder="Method Id" [parentForm]="apiBuilderForm" fieldName="methodId"></v-input>
+                </div>
+
+                <div class="col-lg-4">
+                    <v-input formControlName="methodName" type="text" label="Method Name" placeholder="Method Name"
+                        [parentForm]="apiBuilderForm" fieldName="methodName"></v-input>
+                </div>
+
+                    <div class="col-lg-4">
+                        <v-input formControlName="flagID" type="text" label="Flag ID"
+                            placeholder="Flag ID" [parentForm]="apiBuilderForm" fieldName="flagID"></v-input>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <v-input formControlName="methodType" type="text" label="Method Type" placeholder="Method Type"
+                            [parentForm]="apiBuilderForm" fieldName="methodType"></v-input>
+                    </div>
+
+
+                    <div class="col-lg-4">
+                      <v-input formControlName="methodType" type="text" label="Method Type" placeholder="Method Type"
+                          [parentForm]="apiBuilderForm" fieldName="methodType"></v-input>
+                  </div>
+
+                    <div class="col-lg-4">
+                        <v-input formControlName="header" type="text" label="Header" placeholder="Header"
+                            [parentForm]="apiBuilderForm" fieldName="header"></v-input>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <v-toggle label="Token flag" formControlName="tokeFlag"
+                            [parentForm]="apiBuilderForm" fieldName="tokeFlag" (toggleChange)="tokeFlagChange()"></v-toggle>
+                    </div>
+
+                <div class="col-lg-4" *ngIf="showToken ==true">
+                    <v-input formControlName="token" type="text" label="Token Url" placeholder="Token"
+                        [parentForm]="apiBuilderForm" fieldName="token"></v-input>
+                </div>
+
+                <div class="col-lg-4">
+                  <v-input formControlName="url" type="text" label="Url" placeholder="Token"
+                      [parentForm]="apiBuilderForm" fieldName="url"></v-input>
+              </div>
+
+                <div class="col-lg-4">
+                    <v-input formControlName="responseParameter" type="textarea" label="Response Parameter" placeholder="Response Parameter"
+                        [parentForm]="apiBuilderForm" fieldName="responseParameter"></v-input>
+                </div>
+
+                <div class="col-lg-4">
+                    <v-input formControlName="requestParameter" type="textarea" label="Request Parameter" placeholder="Request Parameter"
+                        [parentForm]="apiBuilderForm" fieldName="requestParameter"></v-input>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-lg-1" style="text-align: -webkit-center;">
+                        <v-button btnActionType="submit" btnType="form" [parentForm]="apiBuilderForm" value="Submit"
+                        (click)="submitForm()"></v-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

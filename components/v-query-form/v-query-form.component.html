@@ -64,28 +64,30 @@
     
 
    
-    <div id="allButtons">
-      <div *ngFor="let p of listOfButtons">
+    <div *ngIf="showButtons" id="allButtons">
+      <div *ngFor="let l of listOfButtons">
     
-                <div class="form-submit" *ngIf="p.id=='2'">
+                <div class="form-submit" *ngIf="l.id=='2'">
                     <v-button value="Execute" btnActionType="submit" (click)="execution()">
                         </v-button>
                 </div>
     
     
-                <div class="form-submit" *ngIf="actionType=='saveNew' && p.id=='1'">
+                <div class="form-submit" *ngIf="actionType=='saveNew' && l.id=='1'">
                   <v-button value="Save" btnActionType="submit" (click)="saveData()">
                       </v-button>
                 </div>
     
-                <div class="form-submit" *ngIf="actionType=='update' && p.id=='1'">
+                <div class="form-submit" *ngIf="actionType=='update' && l.id=='1'">
                   <v-button value="Save" btnActionType="submit" (click)="updateData()">
                       </v-button>
                 </div>
         </div>
     </div>
+
 <div>
-  <v-grid *ngIf="agColumns != undefined && showExecGrid"
+  <!-- agColumns != undefined &&  -->
+  <v-grid *ngIf="showExecGrid"
   allowSideBar="true"
   agPrimaryKey=""
   [staticData]="fetchDynamicData"
@@ -95,7 +97,6 @@
   </v-grid>
   
 </div>
-
 
 
 </form>

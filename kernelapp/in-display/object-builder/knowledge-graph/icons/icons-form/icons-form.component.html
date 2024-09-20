@@ -1,0 +1,41 @@
+<div class="form-wrapper">
+  <form [formGroup]="uploadForm">
+    <!-- Image Name Field on a separate line -->
+    <div class="form-group">
+      <v-input
+        type="text"
+        formControlName="imageName"
+        [parentForm]="uploadForm"
+        label="Icon Name"
+        fieldName="imageName"
+        required="true"
+      ></v-input>
+    </div>
+
+    <!-- Image Upload Button and Image Preview side by side -->
+    <div class="upload-preview-container">
+      <v-file
+        formControlName="imageByteStream"
+        [parentForm]="uploadForm"
+        label="Upload Icon Image"
+        (change)="onFileChange($event)"
+        fieldName="imageByteStream"
+      ></v-file>
+
+      <!-- Image preview container, adjusted to center vertically -->
+      <div class="image-preview-container" *ngIf="previewUrl || imagePreview">
+        <img [src]="previewUrl || imagePreview" alt="Image Preview" class="small-preview" />
+      </div>
+    </div>
+
+    <!-- Buttons Container with Cancel and Submit side by side -->
+    <div class="button-wrapper">
+      <v-button value="Cancel" (click)="onCancel()"></v-button>
+      <v-button
+        value="Submit"
+        [disabled]="!uploadForm.valid"
+        (click)="onSubmit()"
+      ></v-button>
+    </div>
+  </form>
+</div>

@@ -13,6 +13,7 @@ export class GlobalConstants {
   // -- Globally used headers in API requests
   // --------------------------------------------------------------------------------
   public static headerstext = new HttpHeaders().set('Content-Type', 'text');
+  public static headersCSV = new HttpHeaders().set('Content-Type', 'text/csv');
 
   public static headers = new HttpHeaders().set('Content-Type', 'application/json');
   public static loginHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
@@ -21,8 +22,10 @@ export class GlobalConstants {
   // --------------------------------------------------------------------------------
   public static sessionTimeOutCounter: any = 1000 * 600 * 600;
   // Changes on endpoint URL must be done here
-  public static endPointAddress = "10.1.8.12";
 
+  public static endPointAddress = window.location.hostname;
+
+  
   // --------------------------------------------------------------------------------
   // -- API Gateways
   // --------------------------------------------------------------------------------
@@ -69,6 +72,7 @@ export class GlobalConstants {
   public static fetchUSMRolesRoleTypeComboApi = GlobalConstants.usmGateway + 'api/getSyslines/';
   public static addUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/add/';
   public static AddApplicationInAccessRight = GlobalConstants.usmGateway + 'api/AddUSMApplication';
+    public static fetchPreviousSelectedNodesBAR = GlobalConstants.usmGateway + 'api/previousnodesBAR/'
   public static deleteUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/delete/';
   public static fetchUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/';
   public static updateUSMUserApi = GlobalConstants.usmGateway + 'api/usmuser/update/';
@@ -94,6 +98,7 @@ export class GlobalConstants {
   public static getInvalidLogsApi = GlobalConstants.usmGateway + 'api/getAllInvalidLogs/';
   // public static getApplicationCombo = GlobalConstants.usmGateway + 'api/getApplicationObjectCombo/';
   public static getMenuName = GlobalConstants.usmGateway + 'api/getMenuName/';
+  public static getMenuNameByPCode = GlobalConstants.usmGateway + 'api/getMenuNameByPCode/';
   public static getObjectLogsApi = GlobalConstants.usmGateway + 'api/getAllLogsByObject/';
   public static getFieldHistoryLog = GlobalConstants.usmGateway + 'api/getAllFieldHistoryLog';
   // public static getLogsByHeatmap=GlobalConstants.usmGateway + 'api/getAllLogsByHeatmap';
@@ -109,12 +114,16 @@ export class GlobalConstants {
   public static updateUSMUsersRoleApi = GlobalConstants.usmGateway + 'api/usmUsersRole/';
   public static getUSMAccessRightsApi = GlobalConstants.usmGateway + 'api/getUSMAccessRightsApi/';
   public static getUSMPwdExpPeriodApi = GlobalConstants.usmGateway + 'api/getPwdExpPeriodCombo/';
+  public static insertSelectedTab = GlobalConstants.usmGateway + 'api/insertSelectedTab/';
+
   //public static fetchUSMInvalidLoginApi: any;
   //public static fetchUSMFieldHistoryLog: any;
   //public static fetchUSMUSMApplicationComboApi: any;
   public static fetchUSMUserComboApi: any;
   public static fetchUSMMenuComboApi: any;
   public static getUSMApplicationEvent = GlobalConstants.usmGateway + 'api/getApplicationEvent/';
+  public static getUSMApplicationEventPopup = GlobalConstants.usmGateway + 'api/getUSMApplicationEventPopup/';
+
   static fetchLogsByObject: any;
   static fetchLogsByUser: any;
 
@@ -131,7 +140,7 @@ export class GlobalConstants {
   public static getInDisplayLogs  = GlobalConstants.usmGateway + 'api/getInDisplayLogs/';
   public static getInDisplayLogsDetails  = GlobalConstants.usmGateway + 'api/getInDisplayLogsDetails/';
 
-  
+
   // --------------------------------------------------------------------------------
   // -- CDS APIs used in the application
   // --------------------------------------------------------------------------------
@@ -175,10 +184,12 @@ export class GlobalConstants {
   public static addQueryData = GlobalConstants.qbeGateway + 'api/addQueryData';
   public static deleteQueryData = GlobalConstants.qbeGateway + 'api/deleteQueryData/';
   public static validateQuery = GlobalConstants.qbeGateway + 'api/validateQuery/';
-  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery/';
+  public static cqlValidateQuery = GlobalConstants.qbeGateway + 'api/cqlValidateQuery';
 
   public static fetchDynamicData = GlobalConstants.qbeGateway + 'api/fetchDynamicData/';
   public static cqlFetchDynamicData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicData/';
+  public static cqlFetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/cqlFetchDynamicHeaderData/';
+
 
   public static fetchDynamicHeaderData = GlobalConstants.qbeGateway + 'api/fetchDynamicHeaderData/';
   public static addParamSession = GlobalConstants.qbeGateway + 'api/addParamSession/';
@@ -208,11 +219,12 @@ export class GlobalConstants {
   public static deleteQbeAuthorizedUsers =  GlobalConstants.qbeGateway + 'api/deleteQbeAuthorizedUsers/';
   public static deleteQbeSecurityChanges =  GlobalConstants.qbeGateway + 'api/deleteQbeSecurityChanges';
   public static getQbeQueryCreatedBy =  GlobalConstants.qbeGateway + 'api/getQbeQueryCreatedBy/';
+  public static getQueryTypeApi =  GlobalConstants.qbeGateway + 'api/getQueryTypee/';
 
-  
 
 
-  
+
+
   //---------REPORT BUILDER-----------////
   public static executeReport=GlobalConstants.qbeGateway + 'api/executeReport/';
   public static getReportsData=GlobalConstants.qbeGateway + 'api/getReportsData/';
@@ -225,10 +237,19 @@ export class GlobalConstants {
   public static updateReport=GlobalConstants.qbeGateway + 'api/updateReport/';
   public static checkParameters=GlobalConstants.qbeGateway + 'api/checkParameters/';
   public static executeReportwithParameters=GlobalConstants.qbeGateway + 'api/executeReportwithParameters/';
+  public static updateAdvancedRowId = GlobalConstants.qbeGateway + 'api/updateAdvancedRowId';
+  public static fetchAdvancedRowId = GlobalConstants.qbeGateway + 'api/fetchAdvancedRowId/';
+  public static getReportsDataDropdown = GlobalConstants.qbeGateway + 'api/getReportsDataDropdown';
+
+
 
 
   // --------------------------------------------------------------------------------
   // -- WFM APIs used in the application
+
+  public static getVacationCoverageData = GlobalConstants.wfmGatewat + 'api/getVacationCoverageData';
+  public static getAddressBookData = GlobalConstants.wfmGatewat + 'api/getAddressBookData';
+  public static getHyperLinksData = GlobalConstants.wfmGatewat + 'api/getHyperLinksData';
   // --------------------------------------------------------------------------------
 
   // --------------------------------------------------------------------------------
@@ -306,6 +327,30 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static insertLogsDataApi  = GlobalConstants.inDispGatewat + 'api/insertLogsData/';
   public static getKpiGridData  = GlobalConstants.inDispGatewat + 'api/getKpiGridData/';
   public static getKpiChartData  = GlobalConstants.inDispGatewat + 'api/getKpiChartData/';
+  public static getRowFieldGrouping  = GlobalConstants.inDispGatewat + 'api/getRowFieldGrouping/';
+  public static exportCharts  = GlobalConstants.inDispGatewat + 'api/exportCharts/';
+  public static getAllButtonsUnderObject  = GlobalConstants.inDispGatewat + 'api/getAllButtonsUnderObject/';
+
+
+  public static getFieldDynamicTitle = GlobalConstants.inDispGatewat +'api/getFieldDynamicTitle/';
+  public static getAllColumnsTitle = GlobalConstants.inDispGatewat +'api/getAllColumnsTitle/';
+  public static getDynamicSearchFields = GlobalConstants.inDispGatewat +'api/getDynamicSearchFields/';
+  public static getColumnsSearchType = GlobalConstants.inDispGatewat +'api/getColumnsSearchType/';
+  public static validateComboQuery = GlobalConstants.inDispGatewat +'api/validateComboQuery/';
+  public static getColumnsForDynamicSearch = GlobalConstants.inDispGatewat +'api/getColumnsForDynamicSearch/';
+  public static insertAdvancedSearchAndFunctions = GlobalConstants.inDispGatewat +'api/insertAdvancedSearchAndFunctions/';
+  public static checkIfAdvacendFormDataExists = GlobalConstants.inDispGatewat +'api/checkIfAdvacendFormDataExists/';
+  public static getAdvancedSearchGridData = GlobalConstants.inDispGatewat +'api/getAdvancedSearchGridData/';
+  public static getAdvancedSearchFunctionData = GlobalConstants.inDispGatewat +'api/getAdvancedSearchFunctionData/';
+  public static getDynamicSearchMainDropDown = GlobalConstants.inDispGatewat +'api/getDynamicSearchMainDropDown/';
+  public static getComboQueryData = GlobalConstants.inDispGatewat +'api/getComboQueryData/';
+  public static getQueryHeadersForAdvancedSearch = GlobalConstants.inDispGatewat +'api/getQueryHeadersForAdvancedSearch/';
+  public static checkIfAdvancedSearchHasFunction = GlobalConstants.inDispGatewat +'api/checkIfAdvancedSearchHasFunction/';
+  public static getSearchButtonFunctionData = GlobalConstants.inDispGatewat +'api/getSearchButtonFunctionData/';
+  public static buildSearchJsonForApi = GlobalConstants.inDispGatewat +'api/buildSearchJsonForApi/';
+  public static fetchColumnAndViewData = GlobalConstants.inDispGatewat +'api/fetchColumnAndViewData/';
+  public static getViewList = GlobalConstants.inDispGatewat +'api/getViewList/';
+  public static checkViewExists = GlobalConstants.inDispGatewat +'api/checkViewExists/';
 
   
   
@@ -319,6 +364,7 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static callProcedure = GlobalConstants.inDispGatewat + 'api/callProcedure';
   public static updateDRBRule = GlobalConstants.inDispGatewat + 'api/updateDRBRule/';
   public static deleteDRBRule = GlobalConstants.inDispGatewat + 'api/deleteDRBRule/';
+
 
   // ----------------------IN DISPLAY: SCREEN BUILDER------------------------------------------------------------------------\
   public static fetchGridsTableData = GlobalConstants.inDispGatewat + 'api/fetchGridsTableData/';
@@ -367,16 +413,22 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static deleteFieldSetApi = GlobalConstants.inDispGatewat + 'api/deleteFieldSet/';
   public static getKpiQueryData = GlobalConstants.inDispGatewat +'api/getKpiQueryData/';
   public static decodeKpiQuery = GlobalConstants.inDispGatewat +'api/decodeKpiQuery/';
+  public static decodeAlertQuery = GlobalConstants.inDispGatewat +'api/decodeAlertQuery/';
   public static getDashboardChartData = GlobalConstants.inDispGatewat +'api/getDashboardChartData';
   public static getDashboardGridData = GlobalConstants.inDispGatewat +'api/getDashboardGridData';
   public static getDashboardKpiData = GlobalConstants.inDispGatewat +'api/getDashboardKpiData';
   public static addDashboardChart = GlobalConstants.inDispGatewat +'api/addDashboardChart/';
+  public static addDashboardAlert = GlobalConstants.inDispGatewat +'api/addDashboardAlert/';
+
   public static getDashboardTemplateData = GlobalConstants.inDispGatewat +'api/getDashboardTemplateData/';
   public static updateDashboardTempalte = GlobalConstants.inDispGatewat +'api/updateDashboardTempalte/';
   public static addDashboardTempalte = GlobalConstants.inDispGatewat +'api/addDashboardTempalte/';
   public static deleteDashboardTempalte = GlobalConstants.inDispGatewat +'api/deleteDashboardTempalte/';
   public static getDashboardTemplateName = GlobalConstants.inDispGatewat +'api/getDashboardTemplateName/';
   public static getDashboardTemplateTab = GlobalConstants.inDispGatewat +'api/getDashboardTemplateTab/';
+  public static getGetDashboardTemplateTab = GlobalConstants.inDispGatewat +'api/getGetDashboardTemplateTab/';
+  public static updateDashboardTemplateUsersIds = GlobalConstants.inDispGatewat +'api/updateDashboardTemplateUsersIds/';
+  public static getDashboardTemplateCreatedByForAccess = GlobalConstants.inDispGatewat +'api/getDashboardTemplateCreatedByForAccess/';
   public static displayDashboard = GlobalConstants.inDispGatewat +'api/displayDashboard/';
   public static addDashboardKpi = GlobalConstants.inDispGatewat +'api/addDashboardKpi/';
   public static addDashboardGrid = GlobalConstants.inDispGatewat +'api/addDashboardGrid/';
@@ -385,19 +437,76 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static selectChartRelatedToKpi =  GlobalConstants.inDispGatewat +'api/selectChartRelatedToKpi/';
   public static getAllGridforDropdown =  GlobalConstants.inDispGatewat +'api/getAllGridforDropdown/';
   public static getAllChartforDropdown =  GlobalConstants.inDispGatewat +'api/getAllChartforDropdown/';
+  public static getAllUsersData =  GlobalConstants.inDispGatewat +'api/getAllUsersData/';
   public static getAllChartScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllChartScreenBuilder/';
   public static getAllGridScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllGridScreenBuilder/';
   public static getAllKpiScreenBuilder =  GlobalConstants.inDispGatewat +'api/getAllKpiScreenBuilder/';
   public static getAllRulesApi =  GlobalConstants.inDispGatewat +'api/getDBRCombo/';
   public static getColNameAndColId =  GlobalConstants.inDispGatewat +'api/getColNameAndColId/';
   public static callingApi = GlobalConstants.inDispGatewat + 'api';
+  public static getAllQueriesHeaderList =  GlobalConstants.inDispGatewat +'api/getAllQueriesHeaderList/';
+  public static getMasterLinks = GlobalConstants.inDispGatewat + 'api/getMasterLinks/';
+  public static insertMasterLinkData = GlobalConstants.inDispGatewat + 'api/insertMasterLinkData/';
+  public static executeMasterLink = GlobalConstants.inDispGatewat + 'api/executeMasterLink/';
+  public static getExecutedReports = GlobalConstants.inDispGatewat + 'api/getExecutedReports/';
+  public static getExecutedReportData = GlobalConstants.inDispGatewat + 'api/getExecutedReportData/';
+  public static displayGraph = GlobalConstants.inDispGatewat + 'api/DisplayGraph/';
+  public static getQueryId = GlobalConstants.inDispGatewat +'api/getQueryId/'
+  public static getNodesImages = GlobalConstants.inDispGatewat + 'api/getNodesImages/';
+  public static runNextLayerProcess = GlobalConstants.inDispGatewat + 'api/runNextLayerProcess/';
+  public static editChartSize = GlobalConstants.inDispGatewat + 'api/updateSizeChart/';
+  public static editGridSize = GlobalConstants.inDispGatewat + 'api/updateSizeGrid/';
+  public static editKpiSize = GlobalConstants.inDispGatewat + 'api/updateSizeKpi/';
+  public static getHtmlElementDataApi = GlobalConstants.inDispGatewat +'api/getHtmlElementDataApi/';
+  public static insertHtmlElementDataApi = GlobalConstants.inDispGatewat +'api/insertHtmlElementDataApi/';
+  public static deleteHtmlElementDataById = GlobalConstants.inDispGatewat +'api/deleteHtmlElementDataById/';
+  public static updateHtmlElementData = GlobalConstants.inDispGatewat +'api/updateHtmlElementData/';
+  public static addDashboardHtmlElement = GlobalConstants.inDispGatewat +'api/addDashboardHtmlElement/';
+  public static insertIconData = GlobalConstants.inDispGatewat + 'api/insertIconData/';
+  public static getIconData=GlobalConstants.inDispGatewat+'api/getIconData';
+  public static updateIconData = GlobalConstants.inDispGatewat + 'api/updateIconData/';
+  public static deleteIconData = GlobalConstants.inDispGatewat + 'api/deleteIconData/';
+  public static getAlertsDataApi = GlobalConstants.inDispGatewat + 'api/getAlertsData/';
+  public static deleteAlertsDataApi = GlobalConstants.inDispGatewat + 'api/deleteAlertsData/';
+  public static updateAlertsDataApi = GlobalConstants.inDispGatewat + 'api/updateAlertsData/';
+  public static insertAlertsDataApi = GlobalConstants.inDispGatewat + 'api/insertAlertsData/';
+  public static getAlertsCountApi = GlobalConstants.inDispGatewat + 'api/getAlertsCount/';
+  public static getAlertsFunctionality = GlobalConstants.inDispGatewat + 'api/getAlertsFunctionality';
 
+
+  public static getColNameByColIds = GlobalConstants.inDispGatewat + 'api/getColNameByColIds/';
+  public static getHtmlElementData = GlobalConstants.inDispGatewat +'api/getHtmlElementData/';
+  public static editCkEditorSize = GlobalConstants.inDispGatewat + 'api/updateSizeCkEditor/';
+  public static getGeneratedReport = GlobalConstants.inDispGatewat + 'api/getGeneratedReport';
+  public static getGeneratedReportBlob = GlobalConstants.inDispGatewat + 'api/getGeneratedReportBlob';
+  public static getGeneratedReportById = GlobalConstants.inDispGatewat + 'api/getGeneratedReportById';
+  public static LatestReports = GlobalConstants.inDispGatewat + 'api/LatestReports';
+
+
+  
+
+
+
+
+  //////////////API BUILDER\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  public static getApiBuilderListDropDown = GlobalConstants.inDispGatewat + 'api/getApiBuilderListDropDown/';
+  public static getApiJsons = GlobalConstants.inDispGatewat + 'api/getApiJsons/';
+  public static getApiMethodData = GlobalConstants.inDispGatewat + 'api/getApiMethodData/';
+
+
+  public static getAPIMethodResults =GlobalConstants.inDispGatewat + 'api/GetApiMethodResult/';
+  public static getAPIMethodFormResults = GlobalConstants.inDispGatewat + 'api/GetApiMethodFormResult/';
+  public static insertApiData = GlobalConstants.inDispGatewat + 'api/InsertApiData';
+  public static updateApiData =GlobalConstants.inDispGatewat + 'api/UpdateApiData/';
+  public static deleteApiData =GlobalConstants.inDispGatewat + 'api/DeleteApiData/';
   // Dynamic Search
   public static getDynamicSearch = GlobalConstants.inDispGatewat + 'api/getDynamicSearch/';
   public static getSearchType = GlobalConstants.inDispGatewat + 'api/getSearchType/';
   public static getWhereCondition = GlobalConstants.inDispGatewat + 'api/getWhereCondition/';
   public static getThirdDropDown = GlobalConstants.inDispGatewat + 'api/getThirdDropDown/';
+  public static runDynamicBuiltApi = GlobalConstants.inDispGatewat + 'api/RunAPI/';
 
+  
   // public static getLibrary = GlobalConstants.inDispGatewat + 'api/getLibrary/';
 
 
@@ -415,9 +524,12 @@ public static getColumnsApi = GlobalConstants.inDispGatewat + 'api/getAllColumns
   public static updateQueryForm = GlobalConstants.inDispGatewat + 'api/updateQueryForm';
 
 //datacrowd
-public static  ipAddressDataCrowd = "https://"+ GlobalConstants.endPointAddress +":8088";
-public static ipAddress = "https://"+ GlobalConstants.endPointAddress +":8088";
+public static  ipAddressDataCrowd = "http://"+ GlobalConstants.endPointAddress +":8088";
+public static ipAddress = "http://"+ GlobalConstants.endPointAddress +":8088";
 public static  ipAddressKYG = "http://"+ GlobalConstants.endPointAddress +":8112/kwg";
 public static  ip = "http://"+GlobalConstants.endPointAddress ;
+public static ipAddressCassandraSpark = "http://"+ GlobalConstants.endPointAddress +":8092";
+public static ipAddressMap = "http://"+ GlobalConstants.endPointAddress +":8112/datacrowd";
+
 
 }

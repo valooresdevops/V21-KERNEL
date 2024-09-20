@@ -41,7 +41,7 @@ import { FormRoleSanctionComponent } from './securitymanagement/roles/rolesForm/
 import { RoleUsersComponent } from './securitymanagement/roles/role-users/role-users.component';
 import { InDisplayLogsComponent } from './logs/in-display-logs/in-display-logs.component';
 import { InDisplayLogsDetailsComponent } from './logs/in-display-logs/in-display-logs-details/in-display-logs-details.component';
-
+import { FiltersDataComponent } from './logs/filters/filters-data/filters-data.component';
 @NgModule({
   declarations: [
     USMComponent,
@@ -79,7 +79,8 @@ import { InDisplayLogsDetailsComponent } from './logs/in-display-logs/in-display
     FormRoleSanctionComponent,
     RoleUsersComponent,
     InDisplayLogsComponent,
-    InDisplayLogsDetailsComponent
+    InDisplayLogsDetailsComponent,
+    FiltersDataComponent
   ],
   imports: [
     ComponentsModule,

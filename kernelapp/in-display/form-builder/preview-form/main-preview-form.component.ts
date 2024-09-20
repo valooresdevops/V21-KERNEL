@@ -13,6 +13,8 @@ import { DataService } from 'src/app/Kernel/services/data.service';
 import axios from 'axios';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.service';
+import { FileDownloadService } from 'src/app/Kernel/components/map/Services/FileDownloadService.service';
+import { LoaderService } from 'src/app/Kernel/components/map/Services/loader.service';
 
 @Component({
   selector: 'main-preview-form',
@@ -23,10 +25,13 @@ import { RefreshDialogService } from 'src/app/Kernel/services/refresh-dialog.ser
 
 
 export class PreviewFormComponent implements OnInit {
+  public isGridOptions:any;
+  public isAMLoad:any;
 
   @Input() fromScreenBuilder: String = "0";
   @Input() screenBuilderObjId: any;
-
+  public newVariableTitle: string = '';
+  public mainPreviewDataFromMain:any[]=[];
   public subsVar: Subscription;
   public AllTabs: any = [];
   public tableOptions1: any[] = [];
@@ -36,6 +41,7 @@ export class PreviewFormComponent implements OnInit {
   public agColumns: AgColumns[] = [];
   public agColumnsJson: any;
   public isGrid: any | undefined;
+  public hasMultipleSelection: any | undefined;
   public isQueryForm: any | undefined;
   public isDynamicReport: any | undefined;
   public previewGridApi: string = '';
@@ -58,19 +64,26 @@ export class PreviewFormComponent implements OnInit {
   public objectMain: any;
   public testLinks: any[] = [];
   public isLink: any;
+  public queryType: any;
   public hiddenColumns: any[] = [];
   public datatobesent:any[]=[];
-
+  public selectionType:any="single";
   hiddenForm = new UntypedFormGroup({});
   menuForm = new UntypedFormGroup({});
   public userId: number = Number(this.informationservice.getLogeduserId());
-
+  public isTreeGrid: boolean =false;
+  public isAdvancedHidden: boolean =false;
+  public columnTypeCode: Number;
+  public dataReceivedFromDynnamicApi:any[]=[];
   // Variables added by Nadine
   public buttonObjectId: any;
   public amInfo: any;
   public dialogArray: any[] = [];
   public getWhereCond: any = '-1';
   // public getWhereCond: any[] = [];
+  public jp:boolean =true;
+  isUpdateColsDef: number = 0;
+  public isDialog: boolean = false;
 
 
   constructor(private http: HttpClient,
@@ -80,13 +93,19 @@ export class PreviewFormComponent implements OnInit {
     private dialog: MatDialog,
     private dataservice: DataService,
     public informationservice: InformationService,
-    private refreshService: RefreshDialogService
+    private refreshService: RefreshDialogService,
+    public loaderService: LoaderService,
+    private fileDownloadService:FileDownloadService
   ) { }
 
   onSearchSubmit(getWhereCond: any) {
    // this.getWhereCond = getWhereCond.data;
 
-    this.getWhereCond = getWhereCond;
+    this.getWhereCond = getWhereCond.result;
+    if(getWhereCond.reloadGrid == true){
+      this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectMain + '/-1/previewForm/');
+
+    }
     this.getAllColums();
   }
 
@@ -108,7 +127,6 @@ export class PreviewFormComponent implements OnInit {
 }
 
   getAllColums() {
-
     // Filter array on needed data
     let getMainTab = this.AllTabs.filter(function (el: any) {
       return el.isMain == 1;
@@ -302,7 +320,7 @@ export class PreviewFormComponent implements OnInit {
           const getColumnsQueryApi = from(axios.get(GlobalConstants.getColumnsQuery + w));
           const getColumnsQuery = await lastValueFrom(getColumnsQueryApi);
 
-          if(getColumnsQuery.data!=null || getColumnsQuery.data.length!=0){
+          if(getColumnsQuery.data.length!=0){
           let linkQueryColumn: any = getColumnsQuery.data.filter((el: any) => {
             return el.isLink === "1";
           });
@@ -356,7 +374,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: [],
               isHidden: [],
-
+              objectId: this.objectId,
               whereCond: this.getWhereCond
             }
           )
@@ -372,6 +390,7 @@ export class PreviewFormComponent implements OnInit {
               ],
               link: this.testLinks,
               isHidden:[],
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
@@ -388,15 +407,24 @@ export class PreviewFormComponent implements OnInit {
               ],
               link:[],
               isHidden: this.hiddenColumns,
+              objectId: this.objectId,
               whereCond: this.getWhereCond
 
             }
           );
-          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/1", jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+         this.http.post<any>(GlobalConstants.getQueryTypeApi + w, { headers: GlobalConstants.headers }).subscribe((data: any) => {
+            if(data == 2){
+              this.queryType =3;
+            }else{
+              this.queryType =1;
+            }
+
+          this.http.post<any>(GlobalConstants.getQbeIdApi + w + "/"+this.queryType, jsonQbe_sourceQuery, { headers: GlobalConstants.headers }).subscribe((data: any) => {
             this.sourceQuery = data;
             if (this.sourceQuery != "-1") {
               this.http.get<any>(GlobalConstants.getColumnsApi + this.objectId).subscribe((dataa: any) => {
                 // let tableName = dataa[0].tableName;
+
                 let gridHeaders = data[0].headers[0];
                 let gridResults = data[0].result[0];
                 this.agColumns = [];
@@ -404,7 +432,6 @@ export class PreviewFormComponent implements OnInit {
                 this.agColumnsJson = gridHeaders;
                 this.agColumns.push(this.agColumnsJson);
                 this.gridStaticData = gridResults;
-
                 this.test_1 = '1';
                 this.hasSourceQuery = 1;
               });
@@ -489,6 +516,7 @@ export class PreviewFormComponent implements OnInit {
               });
             }
           });
+        });
           // });
           // }
         });
@@ -506,13 +534,16 @@ export class PreviewFormComponent implements OnInit {
           const getButtonData = await lastValueFrom(getButtonDataUrl);
 
           let data1 = getButtonData.data;
+          console.log("DATA BUTTON>>>>>>",data1);
+
           if (data1.blobFile != null && data1.blobFile != undefined) {
             const base64EncodedString = data1.blobFile;
             const decodedString = atob(base64EncodedString);
-
+            console.log("DECODED STRING",decodedString);
             let n = decodedString.split("~A~");
             // let lastPart = n.pop();
             let lastPart = decodedString.split("~A~")[4];
+            console.log("LAST PART>>>>>>>>>",lastPart);
             if (lastPart == "false") {
               data[i].mainAndPreview = false;
             } else {
@@ -522,14 +553,14 @@ export class PreviewFormComponent implements OnInit {
         }
       }
       this.test = data;
+     // console.log("ALL DATA>>>>>>>>>>>>>>>>>>>>>>>>",this.test);
     });
   }
 
   ngOnInit(): void {
-
+    this.loaderService._loading.next(true);
     ///////////elie//////////////////
     this.informationservice.setDynamicReportId('');
-
 
      for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -542,11 +573,9 @@ export class PreviewFormComponent implements OnInit {
     this.informationservice.removeTabpath();
 
     this.tableOptions1 = [];
-
-    this._Activatedroute.paramMap.subscribe((params) => {
+    this._Activatedroute.paramMap.subscribe(async (params) => {
       this.objectId = this.fromScreenBuilder == "1" ? this.screenBuilderObjId : params.get('parentId');
-
-      this.http.get<any>(GlobalConstants.getAllTabs + this.objectId, { headers: GlobalConstants.headers }).subscribe((res: any) => {
+  await  this.http.get<any>(GlobalConstants.getAllTabs + this.objectId, { headers: GlobalConstants.headers }).subscribe((res: any) => {
         for (let i = 0; i < res.length; i++) {
           this.tableOptions1.push({
             "tableName": res[i].menuName, "canAdd": res[i].canAdd, "canDelete": res[i].canDelete,
@@ -554,23 +583,46 @@ export class PreviewFormComponent implements OnInit {
             "sourceQuery": res[i].sourceQuery,
             "isAdvancedSearch": res[i].isAdvancedSearch,
             "isGrid": res[i].isGrid,
+            "isTreeGrid":res[i].isTreeGrid,
+            "isAMLoad":res[i].isAMLoad,
+            "isAdvancedHidden":res[i].isAdvancedHidden,
+            "hasMultipleSelection": res[i].hasMultipleSelection,
             "isQueryForm": res[i].isQueryForm,
             "isDynamicReport": res[i].isDynamicReport,
             "isReadOnly": res[i].isReadOnly,
             "objectId": res[i].objectId,
-            "isMain": res[i].isMain
-          })
+            "isMain": res[i].isMain,
+            "isRowGrouping": res[i].isRowGroup
+          });
 
+          ///////// elie  am preview form in main preview form/////////////
+          this.mainPreviewDataFromMain= [{
+            objectId: this.objectId,
+            actionType: this.actionType,
+            isFromGridClick: 1,
+            primaryColumn: this.columnId,
+            previousTab: "-1"
+          }];
+          console.log("DATA TO SEND ELIE>>>>>>>>>>",this.mainPreviewDataFromMain);
+          ///////////////////////////////////////////////
+
+          if(res[i].isTreeGrid == 1){
+            this.isTreeGrid = true;
+          }
           if (res[i].isMain == 1) {
             this.objectMain = res[i].objectId;
           }
-
+          if(res[i].isAdvancedHidden == 1){
+            this.isAdvancedHidden = true;
+            this.informationservice.setAdvancedSearchShowGridMain(false);
+          }
           if (res[i].isMain == "1") {
 
             let previousTab = this.informationservice.getPreviousMainTab();
 
-            if (this.informationservice.getMainTab() != null && this.informationservice.getMainTab() != "") {
-
+            if (this.informationservice.getMainTab() != null && this.informationservice.getMainTab() != "")
+            {
+              this.isDialog = true;
               this.informationservice.setPreviousMainTab(this.informationservice.getMainTab())
             }
             if (previousTab) {
@@ -583,28 +635,38 @@ export class PreviewFormComponent implements OnInit {
           }
         }
         
-        console.log("TABLE OPTIONS>>>>>>>>>>>>",this.tableOptions1[0]);
         
         if(this.tableOptions1[0].isDynamicReport=='1'){
             this.informationservice.setIsDynamicReport(true);
         }else{
           this.informationservice.setIsDynamicReport(false);
         }
-        
+        if(this.tableOptions1[0].hasMultipleSelection=='1'){
+        this.selectionType="multiple";
+      }else{
+        this.selectionType="single";
+      }
         this.tableOptions1 = this.tableOptions1.filter(value => value.isMain == '1');
         this.http.get<any>(GlobalConstants.getMenuNameApi + this.objectId).subscribe((data: any) => {
           this.AllTabs = data;
+          let variableTitle = JSON.stringify(data[0].menuName);
+          this.newVariableTitle = variableTitle.replace(/"/g, '');
+          this.isGridOptions=this.tableOptions1[0].isGrid;
+          this.isAMLoad=this.tableOptions1[0].isAMLoad;
+          console.log("IS GRID OPTIONS>>>>>>>>>>>",this.isGridOptions);
+          console.log("IS AM LOAD>>>>>>>>>>>",this.isAMLoad);
+
           this.getAllColums();
         });
       });
     });
-
+    console.log("MAIN PREVIEW FORM TABLE OPTIONS>>>>>>>>>",this.tableOptions1);
     setTimeout(() => {
-
+   
     }, 1000);
 
 
-
+    this.loaderService._loading.next(false);
   }
 
   onAddClick() {
@@ -622,7 +684,8 @@ export class PreviewFormComponent implements OnInit {
       primaryColumn: this.columnId,
       previousTab: "-1"
     }];
-
+    console.log("DATA SENT TO AM PREVIEW FORM>>>>>>>>",data);
+    this.informationservice.setIsFromMainPreviewForm(true);
     const dialogRef = this.dialog.open(AmPreviewFormComponent, {
       width: "80%",
       height: "80%",
@@ -632,7 +695,10 @@ export class PreviewFormComponent implements OnInit {
     this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
     dialogRef.disableClose = true;
 
+
     dialogRef.afterClosed().subscribe(result => {
+      this.informationservice.setIsFromMainPreviewForm(false);
+
       this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectMain + '/-1/previewForm/');
     });
   }
@@ -789,18 +855,99 @@ export class PreviewFormComponent implements OnInit {
     });
   }
 
-  async onShowButtonForm(buttonId: number) {
-    let mainTab = this.informationservice.getMainTab();
-    const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
-    const getButtonData = await lastValueFrom(getButtonDataUrl);
-    let data1 = getButtonData.data;
+  async onShowButtonForm(buttonId: number,fromButtonOrSearch:string) {
+    // let mainTab = this.informationservice.getMainTab();
+    // const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
+    // const getButtonData = await lastValueFrom(getButtonDataUrl);
+    // let data1 = getButtonData.data;
 
-    if (data1.blobFile != null && data1.blobFile != undefined) {
-      const base64EncodedString = data1.blobFile;
-      const decodedString = atob(base64EncodedString);
-      let GridToOpenID = decodedString.split("~A~")[0];
-      let buttonAction: any = decodedString.split("~A~")[1];
-      let url = decodedString.split("~A~")[3];
+    // if (data1.blobFile != null && data1.blobFile != undefined) {
+    //   const base64EncodedString = data1.blobFile;
+    //   const decodedString = atob(base64EncodedString);
+    //   let GridToOpenID = decodedString.split("~A~")[0];
+    //   let buttonAction: any = decodedString.split("~A~")[1];
+    //   let url = decodedString.split("~A~")[3];
+    let buttonMandatory='';
+    let buttonPassed=true;
+    console.log("BUTTON TRIGGERED!!!!!!!!!!!!!");
+    this.informationservice.setPreviousTab(this.informationservice.getSelectedTabName());
+    let mainTab = this.informationservice.getMainTab();
+    let data1:any;
+    let decodedString='';
+    console.log("fromButtonOrSearch>>>>>>>>>>>>>>>",fromButtonOrSearch);
+    if(fromButtonOrSearch=="dynamicButton"){
+
+        const getButtonDataUrl = from(axios.get(GlobalConstants.getButtonDataApi + buttonId));
+        const getButtonData = await lastValueFrom(getButtonDataUrl);
+        data1 = getButtonData.data;
+        this.columnTypeCode = data1.columnType;
+        const base64EncodedString = data1.blobFile;
+        decodedString = atob(base64EncodedString);
+
+        console.log("ALL BUTTON DATA>>>>>>>>>>>>>",getButtonData.data);
+
+    }else{
+
+        const getSearchButtonFunctionDataApi = from(axios.get(GlobalConstants.getSearchButtonFunctionData + this.objectId));
+        const getSearchButtonFunctionData = await lastValueFrom(getSearchButtonFunctionDataApi);
+        data1 = getSearchButtonFunctionData.data[0];
+        this.columnTypeCode = 14;
+        decodedString=getSearchButtonFunctionData.data[0].blobFile;
+    }
+    console.log("DATA111111>>>>>>>>>>>>>",data1);
+
+    console.log("buttonMandatory>>>>>>>>",data1.buttonMandatory);
+    //console.log("form status>>>>>>>>",this.dynamicForm.status);
+
+    //  if(data1.buttonMandatory=="1"){
+    //   // console.log("AALOOOOOOOOOOO");
+    //   // if (this.dynamicForm.status == 'INVALID'){
+    //   //   console.log("FETET LA HONE BUTTONNNNN");
+    //   //   this.submitForm();
+    //   // }else{
+    //   //   buttonPassed=true;
+
+    //   // }
+    // }else{
+    //   buttonPassed=true;
+    // }
+    console.log("BUTTON PASSED>>>>>>>>>",buttonPassed);
+    if(buttonPassed){
+    if (data1.blobFile != null && data1.blobFile != undefined && data1.blobFile != "") {
+      
+      let splitedString = decodedString.split("|");
+      console.log("SPLITED STRING>>>>>>>>>>>>>>",splitedString);
+      splitedString.forEach(async (part, index) => {
+
+      let procedureName = part.split("~A~")[0];
+      let buttonAction: any = part.split("~A~")[1];
+      let isMainPreview: any = part.split("~A~")[4];
+      let params = part.split("~A~")[2];
+      let url = part.split("~A~")[3];
+      let otherCondition = part.split("~A~")[6];
+      let alertValue = part.split("~A~")[7];
+      let thirdCondition = part.split("~A~")[8];
+
+      let alertMessage = part.split("~A~")[9];
+      let jsonRequest = part.split("~A~")[10];
+      let jsonResponse = part.split("~A~")[11];
+      let selectedColsFormOpening = part.split("~A~")[12];
+
+
+
+      this.buttonObjectId = procedureName;
+        console.log("procedureName>>>>>>>>>",procedureName);
+        console.log("buttonAction>>>>>>>>>",buttonAction);
+        console.log("isMainPreview>>>>>>>>>",isMainPreview);
+        console.log("params>>>>>>>>>",params);
+        console.log("url>>>>>>>>>",url);
+        console.log("otherCondition>>>>>>>>>",otherCondition);
+        console.log("alertValue>>>>>>>>>",alertValue);
+        console.log("thirdCondition>>>>>>>>>",thirdCondition);
+        console.log("alertMessage>>>>>>>>>",alertMessage);
+        console.log("jsonRequest>>>>>>>>>",jsonRequest);
+        console.log("jsonResponse>>>>>>>>>",jsonResponse);
+        console.log("selectedColsFormOpening>>>>>>>>>",selectedColsFormOpening);
 
       if (buttonAction == "5") {
         let customerId = -1;
@@ -808,7 +955,6 @@ export class PreviewFormComponent implements OnInit {
         let params = this.informationservice.getAgGidSelectedNode();
         customerId = JSON.parse(params)[0].COLVALUE;
         let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
         let jsonArr: string = "{";
         jsonArr += "\"" + "columns" + "\" : [";
         jsonArr += "{";
@@ -824,9 +970,7 @@ export class PreviewFormComponent implements OnInit {
         });
         let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
 
-        console.log("URLLLLLL>>>>>>>>>",url);
         if(customerType==='7'){
-          console.log("HOLAAAA");
           url=url.replace("31860","31849");
         }
         // url is : executeReportwithOneParam/31849
@@ -846,51 +990,158 @@ export class PreviewFormComponent implements OnInit {
         });
       }
       else if(buttonAction == "3") {
-        let customerId = -1;
-        let userId = this.informationservice.getLogeduserId();
-        let params = this.informationservice.getAgGidSelectedNode();
-        customerId = JSON.parse(params)[0].COLVALUE;
-        let customerType=JSON.parse(params)[2].COLVALUE;
-        console.log("CUSTOMER TYPE>>>>>>>>>>",customerType);
-        let jsonArr: string = "{";
-        jsonArr += "\"" + "columns" + "\" : [";
-        jsonArr += "{";
-        jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "kycId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
-        jsonArr += "}"
-        jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
-        //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
-        //  const ResultOfCallingApi = await lastValueFrom(callingApi);
-        let headerOptions = new HttpHeaders({
-          'Content-Type': 'application/json',
-          'Accept': 'application/pdf'
-          //   'Accept': 'application/octet-stream', // for excel file
-        });
-        let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+        console.log("HERE FIRST");
         
-        // url is : executeReportwithOneParam/31849
-        console.log("PARAMSSSS>>>>>>>>>",params);
-        console.log("JSON ARRRRRRR>>>>>>>>>",jsonArr);
-        let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7004/api/" + url;
-        this.http.post(ApiUrl, JSON.parse(params), requestOptions).pipe(map((data: any) => {
-        })).subscribe((result: any) => {
-        });
-      }
+        console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        let dataa:any=[];
+                // let formData = this.dynamicForm.value;
+                // if (formData) {
+                //   this.listOfData = JSON.parse(JSON.stringify(formData));
+                //   this.listOfDataFormOpening = JSON.parse(JSON.stringify(formData));
+                // }
+                console.log("Button Data>>>>>>>",part);
+           //     console.log("button action 1>>>>>>",formData);
+                console.log("11111>>>>>>",part.split("~A~")[0]);
+                console.log("22222>>>>>>",part.split("~A~")[1]);
+                console.log("33333>>>>>>",part.split("~A~")[2]);
+                console.log("44444>>>>>>",part.split("~A~")[3]);
+                console.log("55555>>>>>>",part.split("~A~")[5]);
+                console.log("66666>>>>>>",part.split("~A~")[6]);
+                console.log("77777>>>>>>",part.split("~A~")[7]);
+                console.log("88888>>>>>>",part.split("~A~")[8]);
+                console.log("99999>>>>>>",part.split("~A~")[9]);
+                console.log("10101010>>>>>>",part.split("~A~")[10]);
+                console.log("11111111>>>>>>",part.split("~A~")[11]);
+                console.log("SHOW API>>>>>>>>>>>>>>>>>>>>",url);
+                const getApiJsonsApi = from(axios.get(GlobalConstants.getApiJsons + url));
+                const getApiJsons = await lastValueFrom(getApiJsonsApi);
+        
+                let requestJsonString=getApiJsons.data[0].requestJson;
+                for(let i=0;i<JSON.parse(jsonRequest).length;i++){
+               //   for(let j=0;j<Object.keys(this.dynamicForm.value).length;j++){
+                //    if(Object.keys(this.dynamicForm.value)[j]==JSON.parse(jsonRequest)[i].fieldName){
+                //      requestJsonString=requestJsonString.replaceAll("#"+JSON.parse(jsonRequest)[i].jsonParameter+"#",this.dynamicForm.get(JSON.parse(jsonRequest)[i].fieldName).value);
+                    }
+              //    }
+            //    }
+        
+                let responseJsonString=getApiJsons.data[0].responseJson;
+                // console.log("jspnReponse>>>>>>>>>>>",JSON.parse(jsonResponse));
+                // for(let i=0;i<JSON.parse(jsonResponse).length;i++){
+                //   responseJsonString=responseJsonString.replaceAll("#"+JSON.parse(jsonResponse)[i].jsonParameter+"#",JSON.parse(jsonResponse)[i].fieldName);
+                // }
+                // console.log("method id>>>>>>>>>>>>>>",url);
+                
+                if(fromButtonOrSearch!='dynamicButton'){
+                  requestJsonString=this.informationservice.getDynamicSearchApiData();
+                }
+        
+                // let params: any;
+                // if (this.amInfo.selectedRowId == undefined) {
+                //   params = -1;
+                // } else {
+                //   params = typeof (this.amInfo.selectedRowId) == "string" ? JSON.parse(this.amInfo.selectedRowId) : this.amInfo.selectedRowId;
+                // }
+               // console.log("PARAMSSSSSSSSSS>>>>>>>>>>>>",params);
+               // console.log("requestJsonString>>>>>>>>>>>>>>",requestJsonString);
+               // console.log("responseJsonString>>>>>>>>>>>>>",responseJsonString);
+               let json={};
+               if(this.informationservice.agGidSelectedNode!=''){
+                json={"requestJson":requestJsonString,
+                          "responseJson":responseJsonString,
+                          "rowid" : this.informationservice.getAgGidSelectedNode()
+                }
+              }else{
+                json={"requestJson":requestJsonString,
+                  "responseJson":responseJsonString
+        }
+              }
+              console.log("JSON TO BE SENT>>>>>>>>>>>>>>>",json);
+                   const runDynamicBuiltApi = from(axios.post(GlobalConstants.runDynamicBuiltApi+url,json));
+                   const runDynamicBuilt = await lastValueFrom(runDynamicBuiltApi);
+                console.log("RETURN DATA API>>>>>>>>>>",runDynamicBuilt.data);
+             //   console.log("this.listOfHeaders>>>>>>>>>>",this.listOfHeaders);
+        //jp1111111111111111111111111111
+        
+              //    dataa=runDynamicBuilt.data;
+                this.dataReceivedFromDynnamicApi=runDynamicBuilt.data;
+                console.log("DATAAAA>>>>>>>>>>>",this.dataReceivedFromDynnamicApi);
+
+        }
+                
+        
+        
+        
+        // let customerId = -1;
+        // let userId = this.informationservice.getLogeduserId();
+        // let params = this.informationservice.getAgGidSelectedNode();
+        // customerId = JSON.parse(params)[0].COLVALUE;
+        // let customerType=JSON.parse(params)[2].COLVALUE;
+        // let jsonArr: string = "{";
+        // jsonArr += "\"" + "columns" + "\" : [";
+        // jsonArr += "{";
+        // jsonArr += "\"" + "colName" + "\"" + ":" + "\"" + "kycId" + "\"" + "," + "\"" + "colVal" + "\"" + ":" + "\"" + customerId + "\"";
+        // jsonArr += "}"
+        // jsonArr += "]," + "\"" + "customerId" + "\"" + ":" + "\"" + customerId + "\"" + "," + "\"" + "userId" + "\"" + ":" + "\"" + userId + "\"" + "," + "\"" + "nearBy" + "\"" + ":" + "\"" + 0 + "\"" + "}";
+        // //  const callingApi = from(axios.post(url,JSON.parse(jsonArr)));
+        // //  const ResultOfCallingApi = await lastValueFrom(callingApi);
+        // let headerOptions = new HttpHeaders({
+        //   'Content-Type': 'application/json',
+        //   'Accept': 'application/pdf'
+        //   //   'Accept': 'application/octet-stream', // for excel file
+        // });
+        // let requestOptions = { headers: headerOptions, responseType: 'blob' as 'blob' };
+        
+        // // url is : executeReportwithOneParam/31849
+        // let ApiUrl = "http://" + GlobalConstants.endPointAddress + ":7004/api/" + url;
+        // this.http.post(ApiUrl, JSON.parse(params), requestOptions).pipe(map((data: any) => {
+        // })).subscribe((result: any) => {
+        // });
+      
+
       else if (buttonAction == "1") {
+        console.log("MENU OBJECT ID>>>>>>>>>>>",part.split("~A~")[0]);
+
+        setTimeout(() => {
+        console.log("HERE SECOND");
+
+        let data:any;
+        if(JSON.stringify(this.dataReceivedFromDynnamicApi)=="[]"){
+          
         let selectedRowIdd = this.informationservice.getAgGidSelectedNode();
         let nodeData = JSON.parse(selectedRowIdd);
         let newSelectedRowIdd = nodeData.filter((el: any) => {
           return el.TYPE === "BUTTON";
         });
+        console.log("DATA button222>>>",nodeData);
+        console.log("DATA button3333>>>",newSelectedRowIdd);
+
+
         let params = '';
-        
-        let data = [{
+        console.log(" this.handleSelectedRowIds(newSelectedRowIdd,>>>>>>>>>>>>>>>",this.handleSelectedRowIds(newSelectedRowIdd, "button"));
+        console.log("GRID DATA");
+
+        data = [{
           actionType:'update',
-          objectId: GridToOpenID,
+          objectId: part.split("~A~")[0],
           isFromGridClick: 0,
           primaryColumn: this.columnId,
           buttonClick: 14,
           selectedRowId: this.handleSelectedRowIds(newSelectedRowIdd, "button")
         }];
+      }else{
+        console.log("API DATA");
+        data = [{
+          actionType:'update',
+          objectId: part.split("~A~")[0],
+          isFromGridClick: 0,
+          primaryColumn: this.columnId,
+          buttonClick: 14,
+          selectedRowId: this.dataReceivedFromDynnamicApi
+        }];
+      }
+      console.log("DATA TO BE SENT FROM MAIN PREVIEW FORM TO AM PREVIEW FORM EITHER BY GRID OR BY API>>>>>>>>>>>",data);
+        
         let dialogRef = this.dialog.open(AmPreviewFormComponent, {
           width: "80%",
           height: "80%",
@@ -899,10 +1150,11 @@ export class PreviewFormComponent implements OnInit {
         this.dataservice.PushdialogArray(dialogRef);
         this.dataservice.PushOpenLikeForm(this.informationservice.getFormToOpen());
         this.dialogArray.push(dialogRef);
-
+        console.log("objectId>>>>>>>>>>>",this.objectId);
+        console.log("objectMain>>>>>>>>>>>",data[0].objectId);
         dialogRef.afterClosed().subscribe(result =>
         {
-          this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + data[0].objectId + '/-1/previewForm/');
+          this.commonFunctions.reloadPage('/dsp/augmentedConfig/form/update/' + this.objectId + '/-1/previewForm/');
 
           $(".nav-tabs").show();
           $(".nav-tabs").css({ "flex-direction": "row" });
@@ -937,42 +1189,90 @@ export class PreviewFormComponent implements OnInit {
             }
           }
         });
+      }, 2000);
+
+      }else if(buttonAction == "6"){
+        this.informationservice.setISExport(false);
+        this.informationservice.setIsDisplayALL(false);
+
+        this.dialog.closeAll();
+      
       }
-    }
+      else if(buttonAction == "8"){
+        this.informationservice.setIsDisplayALL(false);
+
+let dataselected:any=JSON.parse(this.informationservice.getAgGidSelectedNode());
+for(let i=0;i<dataselected.length;i++)
+  {
+
+    this.downloadHtmlFile(dataselected[i].COLVALUE);
+
   }
+// this.dialog.closeAll();
+this.informationservice.setISExport(true);
+
+      }
+      else if(buttonAction == "10"){
+
+        
+        this.informationservice.setIsDisplayALL(true);
+
+        this.dialog.closeAll();
+                }
+              }
+              )}
+          }
+            }
 
 
   handleSelectedRowIds(data: any, compare: string) {
     let newDD: any;
     try {
       let dd: any;
+      console.log("DATA RECEIVED>>>>>>>>>",data);
       if (typeof (data) == "string") {
         let d = data.toLowerCase();
         dd = JSON.parse(d);
+        console.log("DATA RECEIVED22222222222>>>>>>>>>",dd);
+
       } else {
         let d = JSON.stringify(data);
         dd = JSON.parse(d.toLowerCase());
+        console.log("DATA RECEIVED3333333>>>>>>>>>",dd);
+
       }
 
 
       if (compare.indexOf(",") != -1) {
         newDD = dd.filter((el: any) => {
+          console.log("NEW DDDDDDDD1111111");
+
           return el.type.toLowerCase() === compare.split(",")[0] || el.type.toLowerCase() === compare.split(",")[1];
         });
       } else {
         newDD = dd.filter((el: any) => {
+          console.log("NEW DDDDDDD2222222");
+
           return el.type.toLowerCase() === compare.toLowerCase();
         });
       }
     } catch (error) {
-      console.log("error on handleSelectedRowIds >>>> ", error)
       newDD = -1;
     }
+    console.log("NEW DDDDDDDD");
     return newDD;
   }
 
 
 
+  downloadHtmlFile(ID:any): void {
+    this.fileDownloadService.downloadFile2('SimulationReport_'+ID+'.html',ID);
+  }
+ 
+  closeDialog()
+  {
+    this.dialog.closeAll();
+  }
 
 }
 

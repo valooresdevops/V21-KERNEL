@@ -36,7 +36,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
    ngOnInit(): void {
     this.customTabTitle = this.title.replace(" ", "-");
     if(this.tabId == '') {
-      let random = Math.floor(Math.random() * (999999 - 100000)) + 100000;
+      let random = Math.floor(Math.random() * (99999 - 100000)) + 100000;
       this.tabId = "tabId_"+random.toString();
       console.log("tabId_ ==",this.tabId)
     }

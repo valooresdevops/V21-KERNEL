@@ -1,5 +1,5 @@
 import {Component, HostListener, Input, OnInit} from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'v-button',
@@ -21,8 +21,8 @@ export class ButtonComponent implements OnInit {
 
   constructor() {}
 
-  get formGroup():UntypedFormGroup {
-    return this.parentForm as UntypedFormGroup;
+  get formGroup():FormGroup {
+    return this.parentForm as FormGroup;
   }
 
   ngOnInit(): void {

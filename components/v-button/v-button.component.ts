@@ -42,7 +42,7 @@ export class ButtonComponent implements OnInit {
   }
 
   formValidation() {
-    console.log("this.formGroup =",this.formGroup);
+    // console.log("this.formGroup =",this.formGroup);
     if(this.formGroup.status == "INVALID" && this.formGroup != undefined) {
       this.formGroup.markAllAsTouched();
       if(this.allowErrorAlertOnSubmit) {

@@ -2,8 +2,8 @@
   <div *ngFor="let fields of formElem; let i = index" [formGroup]="fields.formGroup">
     <div class="row mt-2" *ngIf="!clearAll">
       <div class="col-md-2">
-        <v-dropdown  
-          id="dropdown1"
+
+        <v-dropdown
           [formControlName]="fields.typeDropdown"
           [dataJSON]="fieldsCombo"
           [allowLabel]="false"
@@ -12,11 +12,12 @@
           (onChangeEvent)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
           class="dropdown-hover"
         ></v-dropdown>
+        <!-- [disabled]="fields.isMandatory==='1' ? true : false" -->
+
       </div>
 
       <div class="col-md-2">
         <v-dropdown
-          id="dropdown2"
           [formControlName]="fields.searchType"
           [dataJSON]="fields.secondDropdownOptions"
           [allowLabel]="false"
@@ -24,6 +25,8 @@
           [parentForm]="dynamicSearchForm"
           (change)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
         ></v-dropdown>
+        <!-- [disabled]="fields.isMandatory==='1' ? true : false" -->
+
       </div>
 
       <div class="col-md-2">
@@ -39,14 +42,13 @@
           ></v-dropdown> -->
 
           <v-dropdown
-          id="dropdown3"
           [formControlName]="fields.thirdDropdown"
           [dataJSON]="fields.thirdDropdownOptions"
           [allowLabel]="false"
           [fieldName]="fields.thirdDropdown"
           [parentForm]="dynamicSearchForm"
           (change)="onDropdownChange($event, fields, fields.thirdDropdown, i)"
-          [multiple]="true"
+          [multiple]="this.isForForm ? false : true"
         ></v-dropdown>
         </ng-container>
 
@@ -67,7 +69,6 @@
         <ng-template #textInput>
           <div    style="margin-top: 16px;">
           <v-input
-            id="txt"
             [formControlName]="fields.text"
             type="text"
             [allowLabel]="false"
@@ -82,7 +83,6 @@
         <ng-template #numberInput>
           <ng-container *ngIf="isNumber[i]; else textInput">
             <v-input
-              id="nbr"
               [formControlName]="fields.text"
               type="number"
               [allowLabel]="false"

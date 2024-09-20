@@ -33,7 +33,7 @@ export class VQueryFormComponent implements OnInit {
   queryParamsForm = new UntypedFormGroup({});
   public showInput :boolean=false;
   public showExecGrid:boolean=false;
-  public parameters: any;
+  public parameters: any[]=[];
   public agGridSelectedNodes: any = '';
   public currentQuery:any;
   public formExists:boolean=false;
@@ -50,6 +50,7 @@ export class VQueryFormComponent implements OnInit {
   public paramKeysValues:any []=[];
   public conditionId:any;
   public buttonId:any;
+  public showButtons:boolean=false;
   selectedQueryForm = new UntypedFormGroup({
     selectedMainQuery : new UntypedFormControl('')
   });
@@ -84,7 +85,7 @@ export class VQueryFormComponent implements OnInit {
 
       this.listOfButtons=getQueryFormButtonJSON.data;
 
-      //console.log("LIST OF BUTTONS>>>>>>>>",this.listOfButtons);
+      console.log("LIST OF BUTTONS>>>>>>>>",this.listOfButtons);
 
       for(let i =0;i<this.listOfButtons.length;i++){
         console.log("LIST OF BUTTONS>>>>>>>>>",this.listOfButtons[i]);
@@ -99,7 +100,9 @@ export class VQueryFormComponent implements OnInit {
           
         }
       }
-      
+      setTimeout(() => {
+        this.showButtons=true;
+      }, 3000);
       
       if(this.informationservice.getAgGidSelectedNodeRule()!=null || this.informationservice.getAgGidSelectedNodeRule()!=''){
         

@@ -1,0 +1,8 @@
+<v-grid  *ngIf="isShown"
+                    allowSideBar="true"
+                     
+                    [staticData]="getApplicationEvent"
+                    [agColumns]="agColumns"
+                    [pagination]="true"
+                    [paginationPageSize]="30"
+                    agPrimaryKey="logId"></v-grid>

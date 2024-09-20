@@ -1,4 +1,4 @@
-import { HttpBackend, HttpClient  } from '@angular/common/http';
+import { HttpBackend, HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
@@ -8,15 +8,18 @@ import { GlobalConstants } from 'src/app/Kernel/common/GlobalConstants';
   providedIn: 'root'
 })
 export class DatacrowdService {
+  directionObject: { device: any; simulationId: any; directionByTime: string; };
 
   constructor(private httpClient: HttpClient) {
 
    }
-
   ipAddress:any = GlobalConstants.ipAddress;
   ipAddressKYG:any = GlobalConstants.ipAddressKYG;
   urlCassandraServer:string=this.ipAddress;
   ipAddressDataCrowd :any =GlobalConstants.ipAddressDataCrowd;
+  ipAddressCassandraSpark :any =GlobalConstants.ipAddressCassandraSpark;
+  ipAddressinDispGatewat :any =GlobalConstants.inDispGatewat;
+
   ip:any = GlobalConstants.ip;
 
 
@@ -136,10 +139,10 @@ async insertSimulation(obj:any){
 async callCassandraApi(obj:any) {
      console.log("cassandrta object >>>>>",JSON.stringify(obj))
      console.log("cassandrta object  coordinate>>>>>",obj.Coordinates)
- alert("cassandra in>>>")
+//  alert("cassandra in>>>")
  let result =await this.httpClient.post<any>(this.urlCassandraServer+"/api/getAllData",JSON.stringify(obj), {headers: GlobalConstants.headers}).toPromise();
   console.log(" cassandra result >>>>>>>>>>>>>>>>>>>>>",result)
-   alert("cassandra out>>>>");
+  //  alert("cassandra out>>>>");
  
    return result;
 
@@ -265,7 +268,12 @@ getSimulationNextAction(obj:any){
 
  
  async getExecutionParam(queryId:any){
-  let response= this.httpClient.get(this.ipAddress+"/api/getExecutionParam/"+queryId).toPromise();
+  const options = {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+  let response= this.httpClient.post<any>(this.ipAddress+"/api/getExecutionParam/"+queryId,options).toPromise();
   
    console.log('getExecutionParam>>>>>>',response);
   return response; 
@@ -273,20 +281,15 @@ getSimulationNextAction(obj:any){
  }
 
 
- async getSelectedShape(queryId:any){
-  const options = {
-    headers: {
-      'Content-Type': 'application/json',
-      'responseType': 'arraybuffer'
-    }
-  };
-  let response= this.httpClient.post(this.ipAddress+"/api/getSelectedShape/"+queryId,{ responseType: "arraybuffer" }).toPromise();
-  
-   console.log('getSelectedShape>>>>>>',response);
-   
+ async getSelectedShapes(queryId :any){
+ 
+  let response= this.httpClient.post(this.ipAddress+"/api/getSelectedShapes/",queryId,{ responseType: "text" }).toPromise();
+
   return response; 
    
  }
+
+ 
 
 
 async getgraphtools(){
@@ -359,19 +362,6 @@ async getShapelimit(){
 }
 
 
-async getdirection(v_method_log:any,devices:any){
-  console.log("devices>>>",devices)
-  let response=  this.httpClient.get(this.ipAddress+"/api/getdirection/"+v_method_log+"/"+devices, {headers: GlobalConstants.headers}).toPromise();
-  console.log('getdirection>>>>>>',response);
-  return response; 
-}
-
-async getdirectionByTime(v_method_log:any,devices:any){
-  console.log("devices>>>",devices)
-  let response=  this.httpClient.get(this.ipAddress+"/api/getdirectionByTime/"+v_method_log+"/"+devices, {headers: GlobalConstants.headers}).toPromise();
-  console.log('getdirectionByTime>>>>>>',response);
-  return response; 
-}
 
 getData() {
 
@@ -484,14 +474,21 @@ checkTableCoTravelers(simulationId:any,count:number){
 }
 
 
- async executeCoRelation(obj:any){
-  const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>(this.ipAddress+'/api/findCoRelation',obj,{ headers }).toPromise();
-   console.log('findCoRelation>>>>>>',response);
-  return response; 
+//  async executeCoRelation(obj:any){
+//   const headers = { 'Content-Type': 'application/json' };
+//   let response= this.httpClient.post<any>(this.ipAddress+'/api/findCoRelation',obj,{ headers }).toPromise();
+//    console.log('findCoRelation>>>>>>',response);
+//   return response; 
    
   
- }
+//  }
+async executeCoRelation(obj:any){
+  const headers = { 'Content-Type': 'application/json' };
+  let response= this.httpClient.post<any>(this.ipAddress+'/api/executeCorrelation',obj,{ headers }).toPromise();
+  console.log('findCoRelation>>>>>>',response);
+  return response; 
+
+}
 
  checkTableCoRelations(simulationId:any,count:number){
   
@@ -504,10 +501,10 @@ checkTableCoTravelers(simulationId:any,count:number){
 }
 
 
-getCoRelationCommonLocationHits(simulationId:any,deviceId:any){
+getCoRelationCommonLocationHits(simulationId:any){
   
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>(this.ipAddress+'/api/getCoRelationCommonLocationHits/'+simulationId+"/"+deviceId,{ headers }).toPromise();
+  let response= this.httpClient.post<any>(this.ipAddress+'/api/getCoRelationCommonLocationHits/'+simulationId,{ headers }).toPromise();
    console.log('getCoTravelerCommonLocationHits>>>>>>',response);
   return response; 
 }
@@ -636,13 +633,13 @@ async getchatbotrecords(){
 
 async displayTimelineDay(id:any){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.1.8.37:8111/kwg/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>(this.ipAddressKYG+'/api/DisplayTimelineDay/'+id+'/',{ headers }).toPromise();
    console.log('displayTimeline>>>>>>',response);
   return response; 
 }
 async DisplayTimelineYear(){
   const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.post<any>('https://10.1.8.37:8111/kwg/api/DisplayTimelineYear/',{ headers }).toPromise();
+  let response= this.httpClient.post<any>(this.ipAddressKYG+'/api/DisplayTimelineYear/',{ headers }).toPromise();
    console.log('DisplayTimelineYear>>>>>>',response);
   return response; 
 }
@@ -654,11 +651,16 @@ async finalDisplayTimeline(process :any , date:any){
   return response; 
 }
 
-async getDrillDownTimeline(simulationName :any){
-  const headers = { 'Content-Type': 'application/json' };
-  let response= this.httpClient.get<any>(this.ipAddressKYG+'/api/getDrillDownTimeline/'+simulationName+'/',{ headers }).toPromise();
-   console.log('getDrillDownTimeline>>>>>>',response);
-  return response; 
+async getDrillDownTimeline(simulationName: any): Promise<string> {
+  const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  
+  try {
+    const response = await this.httpClient.get<string>(`${this.ipAddressKYG}/api/getDrillDownTimeline/${simulationName}/`, { headers, responseType: 'text' as 'json' }).toPromise();
+    return response;
+  } catch (error) {
+    console.error('Error fetching drill down timeline:', error);
+    throw error; // Rethrow the error after logging it
+  }
 }
 
 async getFilteredData(object :any){
@@ -767,6 +769,161 @@ async getfilterDataTimeline(object :any){
 
 async getCommonDevicesTimeline(object :any){
   let response=await this.httpClient.post<any>(this.ipAddressKYG+"/api/getCommonDevicesTimeline/",object, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+async getNextActionMenuList(){
+
+  let response=  this.httpClient.get<any>(this.ipAddress+"/api/getNextActionMenuList", {headers: GlobalConstants.headers}).toPromise();
+  console.log('getNextActionMenuList>>>>>>',response);
+
+  return response; 
+}
+
+async getObjectIdNextMenu(codemenu:any){
+  console.log('codemenu>>>>>>',codemenu);
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getObjectId/"+codemenu, {headers: GlobalConstants.headers}).toPromise();
+  console.log('getNextActionMenuList>>>>>>',response);
+
+  return response; 
+}
+
+async getSimulationobject(scenariosId:any){
+  console.log('scenariosId>>>>>>',scenariosId);
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getSimulationObject/"+scenariosId, {headers: GlobalConstants.headers}).toPromise();
+  console.log('getSimulationobject>>>>>>',response);
+
+  return response; 
+}
+
+async getCountryCode() {
+  let response= await this.httpClient.get<any>(this.ipAddress+"/api/getCountryCode/").toPromise();
+  console.log('getcountry>>>>>>',response);
+  return response; 
+
+}
+async getSimulationId(){
+  let response=await this.httpClient.get<any>(this.ipAddress+"/api/getId/", {headers: GlobalConstants.headers}).toPromise();
+  console.log("getSimulationId====",response);
+  return response; 
+}
+
+async SaveSimul(object :any){
+  let response= await this.httpClient.post<any>(this.ipAddressDataCrowd+"/api/SaveSimul/",object, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+async getReportHtml(id :any,simulationID:any,offlineOnlineflag:number){
+  const headers = { 'Content-Type': 'application/json' };
+  let response= this.httpClient.post<any>(this.ipAddressKYG+'/api/getReportHtml/'+id+'/'+simulationID+'/'+offlineOnlineflag,{ headers }).toPromise();
+  return response; 
+}
+
+async getTCDSimulationObject(object:any){
+  let response=  this.httpClient.post<any>(this.ipAddress+"/api/getTCDSimulationObject/", object,{headers: GlobalConstants.headers}).toPromise();
+  console.log('getSimulationobject>>>>>>',response);
+
+  return response; 
+}
+
+
+async getPropertiesObj(SimulID:any){
+  console.log('SimulID>>>>>>',SimulID);
+  let response=  this.httpClient.get(this.ipAddress+"/api/getPropertiesObj/"+SimulID).toPromise();
+  console.log('getPropertiesObj>>>>>>',response);
+
+  return response; 
+}
+
+async getsimulation2(obj:any){
+  let response= this.httpClient.post<any>(this.ipAddress+"/api/getSimulation2/",obj).toPromise();
+  
+   console.log('getSimulation2>>>>>>',response);
+  return response; 
+   
+ }
+
+ async getmaptypesOffline(){
+  let response= await this.httpClient.get(this.ipAddress+"/api/getmaptypesOffline").toPromise();
+  
+   console.log('map types>>>>>>',response);
+  return response; 
+   
+ }
+ async getdirection(v_method_log:any,devices:any ){
+  this.directionObject = {
+    device: devices,
+    simulationId: v_method_log,
+    directionByTime: "0"
+  };
+  let response=  this.httpClient.post(this.ipAddressCassandraSpark+"/api/getLongestDistance",this.directionObject, {headers: GlobalConstants.headers}).toPromise();
+
+  return response; 
+}
+
+
+async getdirectionByTime(v_method_log:any,devices:any){
+
+  this.directionObject = {
+    device: devices,
+    simulationId: v_method_log,
+    directionByTime: "1"
+  };
+
+  let response=  this.httpClient.post(this.ipAddressCassandraSpark+"/api/getLongestDistance",this.directionObject, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+async getScanBts(object :any){
+  let response= await this.httpClient.post<any>(this.ipAddress+"/api/getScanBts/",object, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+async getExecutedReports(){
+  let response= await this.httpClient.post<any>(this.ipAddressinDispGatewat+"/api/getExecutedReports/", {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+ 
+async getFixedElementsSenario(senarioID :any){
+  let response= await this.httpClient.post<any>(this.ipAddress+"/api/getFixedElementsSenario/"+senarioID, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+
+// async GetHtmlContent(senarioID :any){
+//   let response= await this.httpClient.post<any>(this.ipAddress+"/api/GetHtmlContent/"+senarioID, {headers: GlobalConstants.headers}).toPromise();
+//   return response; 
+// }
+
+
+async GetHtmlContent(senarioID: any): Promise<any> {
+
+
+
+  // sendByteData(byteData: Uint8Array) {
+  //   const headers = new HttpHeaders({
+  //     'Content-Type': 'application/octet-stream'
+  //   });
+
+
+
+  let response = await this.httpClient.post(this.ipAddress + "/api/GetHtmlContent/" + senarioID, null,
+  { responseType: 'blob' }).toPromise();
+
+
+
+    console.log(" get html response >>>  ",response)
+
+
+  return response;
+}
+
+async MaptoMap(SimulID :any){
+
+  let response= await this.httpClient.post<any>(this.ipAddress +"/api/MapToMap/"+SimulID, {headers: GlobalConstants.headers}).toPromise();
+  return response; 
+}
+async BranchReport(BranchName :any){
+
+  let response= await this.httpClient.post<any>(this.ipAddress +"/api/BranchReport/"+BranchName, {headers: GlobalConstants.headers}).toPromise();
   return response; 
 }
 

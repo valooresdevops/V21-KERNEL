@@ -1,0 +1,11 @@
+<v-grid
+allowSideBar="true"
+[dataApi]="getExecutedReports"
+[agColumns]="agColumns"
+[pagination]="true"
+[paginationPageSize]="15"
+agToolBar="d"
+agPrimaryKey="executedReportId"
+agRowSelection="single"
+(onGridDelete)="onDeleteClick()"
+></v-grid>

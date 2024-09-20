@@ -1,0 +1,12 @@
+<v-input formControlName="title" [required]="true" [parentForm]="form" label="Title"
+type="text" id="title" fieldName="title" required></v-input>
+
+<ckeditor 
+  [editor]="editor" 
+  [(ngModel)]="content"
+  [config]="editorConfig">
+</ckeditor>
+
+<div class="button-group">
+  <v-button value="Save" (click)="onSave()" style="display: flex; justify-content: center; align-items: center;"></v-button>
+</div>

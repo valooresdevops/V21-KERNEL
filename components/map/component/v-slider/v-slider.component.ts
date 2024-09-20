@@ -1,5 +1,5 @@
 import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'v-slider',
@@ -24,13 +24,13 @@ export class SliderComponent implements ControlValueAccessor {
   @Input() public max : any;
   @Input() public label : any;
   @Input() public matAppearance : any;
-  @Input() public parentForm?: UntypedFormGroup;
+  @Input() public parentForm?: FormGroup;
   @Input() public fieldName: any;
   @Input() public value: any;
   @Input() public floatLabel: any;
 
-  get formField():UntypedFormControl {
-    return this.parentForm?.get( this.fieldName ) as UntypedFormControl;
+  get formField():FormControl {
+    return this.parentForm?.get( this.fieldName ) as FormControl;
   }
 
   constructor() {}

@@ -175,8 +175,6 @@ export class AGGridComponent implements OnInit, OnChanges {
       };
 
       if(this.agColumns[0][kk].isLink) {
-        // definition.cellRendererFramework = CheckboxCellRenderer;
-
         definition.cellRenderer = LinkCellRenderer;
         definition.cellRendererParams = {
           link: this.agColumns[0][kk].link,

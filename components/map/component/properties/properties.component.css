@@ -1,0 +1,16 @@
+#Properties{
+    position: absolute;
+    z-index: 999;
+    background-color: white;
+   left: 248px;
+    top: 96px;
+    border: 6px solid white;
+    color: black;
+    width: 300px;
+    height: 200px;
+
+}
+#row{
+    overflow: none;
+}
+

@@ -1,0 +1,110 @@
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Ensure content starts from the top */
+  min-height: 200px; /* Adjust height as needed */
+  overflow: hidden; /* Prevent scrollbars */
+  padding: 20px; /* Add padding for better spacing */
+}
+
+.centered-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center content vertically */
+  width: 100%;
+  text-align: center; /* Center text */
+  overflow: hidden;
+}
+
+.query-button {
+  margin-bottom: 20px;
+  min-width: 150px;
+  height: 40px;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #007bff; /* Default color or set via ngStyle */
+  color: white; /* Button text color */
+  width: auto; /* Allow button to fit text */
+  max-width: 100%; /* Ensure the button doesn't exceed container width */
+  white-space: nowrap; /* Prevent text from wrapping */
+  overflow: hidden; /* Hide text that overflows */
+  text-overflow: ellipsis; /* Add ellipsis (...) to indicate overflow */
+  position: relative; /* Allow for absolute positioning */
+  align-self: center; /* Center the button horizontally */
+}
+
+.results-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align content at the start */
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.results-container {
+  display: flex;
+  align-items: flex-start; /* Align items at the top */
+  justify-content: flex-start; /* Align content at the start */
+  margin-top: 5px;
+  width: 100%; /* Ensure the container takes full width */
+  flex-wrap: wrap; /* Allow text to wrap when it exceeds width */
+}
+
+.results-label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.results-content {
+  font-size: 18px; /* Adjust font size as needed */
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 10px;
+  background: white; /* Light background color */
+  color: #000000; /* Adjust text color for readability */
+  white-space: pre-wrap; /* Allow text to wrap to the next line */
+  overflow-wrap: break-word; /* Break long words if necessary */
+  width: 100%; /* Ensure it takes full width */
+  text-align: left; /* Align text to the left for better readability */
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  overflow: hidden; /* Prevent scrollbars */
+  min-height: fit-content;
+  width: 100%;
+}
+
+.button-text {
+  white-space: nowrap; /* Prevent text from wrapping to a new line */
+  overflow: hidden; /* Hide text that overflows */
+  text-overflow: ellipsis; /* Add ellipsis (...) to indicate overflow */
+  width: 100%; /* Ensure the button takes the full width */
+}
+
+.mdc-dialog__surface {
+  overflow: hidden; /* Hide vertical scrollbar */
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-surface,
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  min-height: fit-content;
+  overflow: hidden; /* Hide scrollbars */
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.count-bold {
+  font-weight: bold !important; /* Makes the count bold */
+}

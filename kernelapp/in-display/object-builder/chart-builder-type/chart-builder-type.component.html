@@ -2,26 +2,41 @@
   <v-tab tabTitle="Type">
 <form>
     <div class="example-list listContainer1">
-
-
-         <div class="box"  *ngFor="let options of newChartObject let i = index" >
-          <div class="chart-row"> 
-            <ng-container >
-              <div class="chart-container">
-                <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type,'c')"></v-highcharts>
+        <div class="container">
+          <div class="row">
+            <div class="col-md-4" *ngFor="let options of newChartObject; let i = index">
+              <div class="box" style="width: 100%;">
+                <div style="width: fit-content;"> 
+                  <ng-container>
+                    <div class="chart-container">
+                      <v-highcharts [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.chart.type, options.chart.identifier, 'c')"></v-highcharts>
+                    </div>
+                  </ng-container>
+                </div>    
               </div>
-            </ng-container>
-          </div>    
-        </div> 
-        <div class="box1"  *ngFor="let options of stockObject let i = index" >
-          <div class="chart-row"> 
-            <ng-container >
-              <div class="chart-container">
-                <v-highcharts-stocks [Highcharts]="Highcharts" [options]="options" (click)="nextTab(options.series[0].type, 's')"></v-highcharts-stocks>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6" *ngFor="let options of stockObject; let i = index">
+              <div class="box1" style="width: 100%;">
+                <div class="chart-row"> 
+                  <ng-container>
+                    <div class="chart-container" style="width: 100%;">
+                      <v-highcharts-stocks 
+                        [Highcharts]="Highcharts" 
+                        [options]="options" 
+                        (click)="nextTab(options.series[0].type, options.series[0].identifier, 's')">
+                      </v-highcharts-stocks>
+                    </div>
+                  </ng-container>
+                </div>    
               </div>
-            </ng-container>
-          </div>    
-        </div> 
+            </div>
+          </div>
+        </div>
     </div>
     <!-- <v-button  (click)="goNext()"  value="Next"></v-button> -->
 </form>
@@ -57,7 +72,17 @@
                  fieldName="Column">
         </v-input>
       </div >
-    </div>  
+    </div>
+
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="form-group">
+        <label for="describtion">Describtion</label>
+        <textarea formControlName="describtion" id="describtion" class="form-control" fieldName="describtion"></textarea>
+      </div>
+    </div>
+  </div>
+
       <v-button value="Save" (click)="Next()"></v-button>
     </form>
   </v-tab>
@@ -66,25 +91,29 @@
 
 
   <v-tab  tabTitle="Advanced Settings" *ngIf="isAdvanced==1" >
-     <form [formGroup]="chartForm">
-    <div class="col-lg-4">
-      <v-toggle label="Is Show Legend" formControlName="isShowLegend" [parentForm]="chartForm"
-        fieldName="isShowLegend"> </v-toggle>
-    </div>
-    <div class="col-lg-4">
-      <v-toggle label="Is3d" formControlName="is3d"  [parentForm]="chartForm"
-        fieldName="is3d"> </v-toggle>
-    </div>
-    <div class="col-lg-4">
-      <v-toggle label="Is Horizental" formControlName="isHorizental"  [parentForm]="chartForm" 
-      fieldName="isHorizental"> </v-toggle>
-    </div>
-    <div class="col-lg-4">
-      <v-toggle label="Is Drilldown" formControlName="isDrilldown"  [parentForm]="chartForm" 
-      fieldName="isDrilldown"> </v-toggle>
-    </div>
-    <v-button value="Submit" (click)="submit()"></v-button>
-  </form>
+    <form [formGroup]="chartForm">
+      <div class="col-lg-4">
+        <v-toggle label="Is Show Legend" formControlName="isShowLegend" [parentForm]="chartForm"
+          fieldName="isShowLegend"> </v-toggle>
+      </div>
+      <div class="col-lg-4">
+        <v-toggle label="Is3d" formControlName="is3d"  [parentForm]="chartForm"
+          fieldName="is3d"> </v-toggle>
+      </div>
+      <div class="col-lg-4">
+        <v-toggle label="Is Horizental" formControlName="isHorizental"  [parentForm]="chartForm" 
+        fieldName="isHorizental"> </v-toggle>
+      </div>
+      <div class="col-lg-4">
+        <v-toggle label="Is Drilldown" formControlName="isDrilldown"  [parentForm]="chartForm" 
+        fieldName="isDrilldown"> </v-toggle>
+      </div>
+      <div class="col-lg-4">
+        <v-toggle label="Is Live" formControlName="isLive" [parentForm]="chartForm"
+          fieldName="isLive"> </v-toggle>
+      </div>
+      <v-button value="Submit" (click)="submit()"></v-button>
+    </form>
   </v-tab>
   
 

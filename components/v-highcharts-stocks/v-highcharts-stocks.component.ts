@@ -24,6 +24,10 @@ export class VHighchartsStocksComponent implements OnInit {
       this.elementRef.nativeElement.querySelector('.chart-container'),
       this.options
     );
+
+    if (!this.options.credits) {
+      this.options.credits = { enabled: false };
+    }
   }
 
   ngOnDestroy(): void {

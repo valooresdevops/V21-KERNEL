@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, UntypedFormControl, UntypedFormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 interface HTMLInputEvent extends Event
@@ -45,7 +45,9 @@ export class VFileComponent implements ControlValueAccessor
   @Input() public hasSuspendedStyle: boolean = false;
   @Input() public readonly: any;
   @Input() public fileClass : any = -1;
+  @Input() public maxLength: number=10000000000 ; 
 
+  @Output() fileSelected = new EventEmitter<File>();
 
   // Get the form field associated with the component
   get formField(): UntypedFormControl
@@ -53,11 +55,90 @@ export class VFileComponent implements ControlValueAccessor
     return this.parentForm?.get(this.fieldName) as UntypedFormControl;
   }
 
-  constructor(private renderer: Renderer2) { }
+  constructor(private renderer: Renderer2) { if(this.required){
+    //alert(111111);
+  }else{console.log("nooo")}
+  }
 
+  @Input() maxFileSize: number; // Pass this from the dynamic form component
 
-  // Handle change event of the file input
-  public onChange(event: HTMLInputEvent): void
+  onFileSelected(event: HTMLInputEvent): void {
+    const file = event.target.files[0]; // Assuming single file upload
+    
+    if (file) {
+      const actualLength = file.size;
+  
+      // Dynamically set maxLength to actual file length
+      this.maxLength = actualLength;
+  
+      // Check file size against the maximum length
+      if (this.maxFileSize && file.size > this.maxFileSize) {
+        // Set an error if the file size exceeds maxFileSize
+        this.parentForm.get(this.fieldName).setErrors({ maxFileSizeExceeded: true });
+      } else {
+        // Proceed with file processing and update maxLength dynamically
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          let base64Data = e.target.result as string;
+          base64Data = file.name + "," + base64Data;
+  
+          const totalLength = base64Data.length;
+          this.maxLength = totalLength;
+  
+          this.filename = file.name;
+          const formData = new FormData();
+          formData.append(this.fieldName, file);
+  
+          this.changedFile({ formData, base64Data });
+  
+          this.parentForm.get(this.fieldName).setErrors(null);
+          this.parentForm.get(this.fieldName).updateValueAndValidity();
+        };
+  
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+  
+
+  // onFileSelected(event: HTMLInputEvent): void {
+  //   const file = event.target.files[0]; // Assuming single file upload
+  
+  //   if (file) {
+  //     // Check file size against the maximum length
+  //     if (this.maxFileSize && file.size > this.maxFileSize) {
+  //       // Set an error if the file size exceeds maxFileSize
+  //       this.parentForm.get(this.fieldName).setErrors({ maxFileSizeExceeded: true });
+  //     } else {
+  //       // Proceed with file processing
+  //       const reader = new FileReader();
+  //       reader.onload = (e) => {
+  //         let base64Data = e.target.result as string;
+  //         base64Data = file.name + "," + base64Data; // Concatenate filename and base64 data
+  //         const totalLength = base64Data.length;
+          
+  //         // Dynamically adjust maxLength to actual length
+  //         this.maxLength = totalLength;
+  //         this.filename = file.name;
+  
+  //         const formData = new FormData();
+  //         formData.append(this.fieldName, file);
+  
+  //         // Handle file change
+  //         this.changedFile({ formData, base64Data });
+  
+  //         // Clear errors if file is valid
+  //         this.parentForm.get(this.fieldName).setErrors(null); // Clear previous errors
+  //         this.parentForm.get(this.fieldName).updateValueAndValidity();
+  //       };
+  
+  //       reader.readAsDataURL(file); // Start reading the file
+  //     }
+  //   }
+  // }
+  
+
+  /*  public onChange(event: HTMLInputEvent): void
   {
     console.log("Change Was Done");
 
@@ -77,7 +158,7 @@ export class VFileComponent implements ControlValueAccessor
     };
 
     reader.readAsDataURL(event.target.files[0]);
-  }
+  } */
 
 
   // Handle changed file data
@@ -91,10 +172,11 @@ export class VFileComponent implements ControlValueAccessor
     }
     else
     {
-      this.changed(formData);
+     // this.changed(base64Data);
+       this.changed(formData);
+
     }
   }
-
   // Write value to the file input
   public writeValue(value: string): void
   {

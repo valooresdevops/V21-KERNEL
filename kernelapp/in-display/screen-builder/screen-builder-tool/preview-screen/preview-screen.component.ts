@@ -11,6 +11,13 @@ import { GridBuilderPreviewComponent } from 'src/app/Kernel/kernelapp/in-display
 import Highcharts from 'highcharts';
 import Highcharts3D from 'highcharts/highcharts-3d';
 Highcharts3D(Highcharts);
+
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+import { InformationService } from 'src/app/Kernel/services/information.service';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
 @Component({
   selector: 'app-preview-screen',
   templateUrl: './preview-screen.component.html',
@@ -29,15 +36,19 @@ export class PreviewScreenComponent implements OnInit {
     private sanitizer: DomSanitizer,
     @Optional() public dialogRef: MatDialogRef<PreviewScreenComponent>,
     private _Activatedroute: ActivatedRoute,
-    private http: HttpClient) { }
+    private http: HttpClient,
+    public informationservice: InformationService,
+  ) { }
 
     async ngOnInit() {
-
       this.itemsData = [];
-  
+
+
       if (this.data == null || this.data == "undefined") {
+        this.informationservice.setMainPreviewScreenType(false);
         this._Activatedroute.paramMap.subscribe(async (params:any) => {
           this.menuVariable = params.get('menuVariable');
+          console.log("this.menuVariable-----",this.menuVariable)
           const itemsDataUrl = from(axios.get(GlobalConstants.getScreenPreviewData + this.menuVariable));
           const itemsDataa = await lastValueFrom(itemsDataUrl);
           console.log("itemsDataa===",itemsDataa);
@@ -45,6 +56,8 @@ export class PreviewScreenComponent implements OnInit {
           this.itemsData = JSON.parse(data[0].screenData);
         });
       } else {
+        this.informationservice.setMainPreviewScreenType(true);
+
         this.menuVariable = this.data;
         console.log("this.menuVariable===",this.menuVariable);
   
@@ -56,7 +69,7 @@ export class PreviewScreenComponent implements OnInit {
   
   
   
-        const response = await axios.get(GlobalConstants.getScreenPreviewData + jsonString);
+        const response = await axios.get(GlobalConstants.getScreenPreviewData + this.menuVariable);
         console.log("Response:", response);
         const responseaxios = response.data;
         let data =responseaxios[0].screenData;

@@ -55,7 +55,7 @@ export class ExecuteQueryComponent implements OnInit {
     this.http.post<any>(GlobalConstants.getParamSession+"paramAdd_"+sessionStorage.getItem("session_serial"),{}).subscribe(
       async (res: any) => {
         if (res.status == 'Fail') {
-
+console.log('FAIL')
         } else {
 
           for(let i = 0; i < res.length; i++) {
@@ -133,6 +133,8 @@ export class ExecuteQueryComponent implements OnInit {
     this.showExecGrid=true;
 
     this.currentQuery=this.data.query;
+    console.log("this.currentQuery------->",this.currentQuery);
+
 
     if(this.formExists==true){
 
@@ -196,5 +198,14 @@ export class ExecuteQueryComponent implements OnInit {
           
   }
 
+  async generateReport(){
+        let json={
+          query:atob(this.currentQuery)
+        }
+        console.log("QUERY TO BE SENT>>>>>>>>",json);
+       const generateReportApi=from(axios.post("http://10.10.10.70:3033/report/"+atob(this.currentQuery)));
+       const generatedReport=await lastValueFrom(generateReportApi);
+
+  }
 
 }

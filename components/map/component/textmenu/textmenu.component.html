@@ -1,0 +1,3 @@
+<div id="textmenu" style="z-index: 99999999999999999999999; right: 11px; position: absolute; background-color: white; color: black;    width: 230px;">
+    <span id="item" class="item" *ngFor="let item of nextActionMenuList" title="{{ item.menu_name }}" (click)="CallFunctions(item.menu_code)"> {{ item.menu_name }}</span>
+  </div>

@@ -23,7 +23,7 @@ export class Http_Interceptor implements HttpInterceptor {
         this.totalRequests++;
 
         //console.log("Interceptor ---- > 111111111111111111111111111111" );
-        const serverUrl = 'http://10.1.8.136:9999/ValooresAPI/ExecutiveMethod/Invoke';
+        const serverUrl = 'http://10.1.8.136:999/ValooresAPI/ExecutiveMethod/Invoke';
 
         if (request.url.startsWith(serverUrl)) {
           const modifiedReq = request.clone({
@@ -43,7 +43,7 @@ export class Http_Interceptor implements HttpInterceptor {
   
 
       // const reqRefreshToken = localStorage.getItem('jwtAccessToken');
-      //const serverUrl = 'https://10.1.8.136:9999/cybercrowd/web/mapexplore/action/MapExploreV1Action.do?actionType=executeMapExplore';
+      //const serverUrl = 'https://10.1.8.136:999/cybercrowd/web/mapexplore/action/MapExploreV1Action.do?actionType=executeMapExplore';
 
       //if (req.url.startsWith(serverUrl)) {
       const reqWithAuth = request.clone({ headers: GlobalConstants.headers });

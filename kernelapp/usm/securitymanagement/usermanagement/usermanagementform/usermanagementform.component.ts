@@ -176,12 +176,55 @@ export class Usermanagementform implements OnInit {
     }
   }
 
+  // passwordCompare() {
+  //   var newPassword = this.userForm.get('newPassword').value;
+  //   var confirmNewPassword = this.userForm.get('confirmNewPassword').value;
+
+  //   if (newPassword != '' && confirmNewPassword != '') {
+  //     if (confirmNewPassword != newPassword) {
+  //       this.userForm.controls['newPassword'].setValue('');
+  //       this.userForm.controls['confirmNewPassword'].setValue('');
+  //       this.commonFunctions.alert("alert", 'Passwords do not match');
+  //     }
+  //   }
+  // }
+
   passwordCompare() {
     var newPassword = this.userForm.get('newPassword').value;
     var confirmNewPassword = this.userForm.get('confirmNewPassword').value;
-
+  
+    // Regular expressions to check for at least one character
+    var hasLetter = /[a-zA-Z]/.test(newPassword);
+    //  one capital letter
+    var hasCapitalLetter = /[A-Z]/.test(newPassword);
+    //  one special character
+    var hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+    // Check the length of the password should be more than +8
+    var isLengthValid = newPassword.length > 8;
+  
     if (newPassword != '' && confirmNewPassword != '') {
-      if (confirmNewPassword != newPassword) {
+      if (!hasLetter) {
+        // If password does not contain at least one Character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one character');
+      } else if (!hasCapitalLetter) {
+        // If password does not contain at least one capital Character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one uppercase character');
+      } else if (!hasSpecialChar) {
+        // If password does not contain at least one special character
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must contain at least one special character');
+      } else if (!isLengthValid) {
+        // If password length is 8 or less
+        this.userForm.controls['newPassword'].setValue('');
+        this.userForm.controls['confirmNewPassword'].setValue('');
+        this.commonFunctions.alert("alert", 'Password must be more than 8 characters long');
+      } else if (confirmNewPassword != newPassword) {
+        // If passwords do not match
         this.userForm.controls['newPassword'].setValue('');
         this.userForm.controls['confirmNewPassword'].setValue('');
         this.commonFunctions.alert("alert", 'Passwords do not match');
@@ -328,15 +371,14 @@ export class Usermanagementform implements OnInit {
     var confirmPassword = this.userForm.get('confirmNewPassword').value;
     var oldPassword = this.userForm.get('oldPassword').value;
     var password = this.userForm.get('password').value;
-
+    console.log("USERFORM>>>>>>>>>>>>",this.userForm);
     if (this.userForm.status != 'INVALID') {
       if (this.actionType == 'create') {
         if (newPassword == confirmPassword) {
           const formData = new FormData();
 
           if (this.userForm.get('media').value.get('media') != '') {
-            formData.append('media', this.userForm.get('media').value.get('media')
-            );
+          formData.append('media', this.userForm.get('media').value.get('media'));
           } else {
             var f = new File(['dummyFile'], 'DummyTxtFile.txt', {
               type: 'text/plain',
@@ -344,7 +386,7 @@ export class Usermanagementform implements OnInit {
             });
             formData.append('media', f);
           }
-
+          console.log("INFORMATION SERVICE>>>>>>>>>>>>>",this.informationservice.getLogeduserId());
           formData.append('username', this.userForm.get('username').value);
           formData.append('password', newPassword);
           formData.append('firstName', this.userForm.get('firstName').value);
@@ -371,25 +413,24 @@ export class Usermanagementform implements OnInit {
           formData.append('pwdExpPrdNbr', this.userForm.get('passwordExpiresPeriodNbr').value);
           formData.append('pwdExpPrd', this.userForm.get('passwordExpiresPeriodically').value);
           formData.append('pwdExpDate', this.datepipe.transform(this.userForm.get('passwordExpires').value, 'MM-dd-YYYY'));
-
+            console.log("FORM DATA>>>>>>>>>>",formData);
           const addUSMUser = from(axios.post(GlobalConstants.addUSMUserApi, formData));
           const addUSMUserUrl = await lastValueFrom(addUSMUser);
           let res = addUSMUserUrl.data;
-
-          if (res.body.status == 'Fail') {
-            this.commonFunctions.alert("alert", res.body.description);
+          console.log("RES>>>>>>>>>>>>",res);
+          if (res.status == 'Fail') {
+            this.commonFunctions.alert("alert", res.description);
           } else {
-            this.commonFunctions.alert("alert", res.body.description);
-            this.userId = res.body.userId;
-            this.actionType = 'update';
-            this.route.navigateByUrl(this.menuPath + "/form/" + this.actionType + "/" + this.userId);
+            this.commonFunctions.alert("alert", res.description);
+            this.userId = res.userId;
+            // this.actionType = 'update';
+            this.route.navigateByUrl("/usm/userMgmt");
             this.fetchUserData();
           }
         } else {
           this.commonFunctions.alert("alert", 'Passwords do not match');
         }
       }
-
       if (this.actionType == 'update') {
         this.showHideTabs = true;
         if (

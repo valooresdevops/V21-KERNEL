@@ -13,12 +13,14 @@ import { SavequeryComponent } from '../static-query-builder/savequery/savequery.
 import { SecurityQueryComponent } from '../static-query-builder/security-query/security-query.component';
 import { TypeQueryComponent } from '../static-query-builder/type-query/type-query.component';
 import { LinkProcedureComponent } from '../static-query-builder/link-procedure/link-procedure.component';
-import { ExecuteQueryComponent } from '../static-query-builder/execute-query/execute-query.component';
 import { ParameterBuilderComponent } from '../static-query-builder/parameter-builder/parameter-builder.component';
 import { LinkQueryComponent } from '../static-query-builder/link-query/link-query.component';
 import { InformationService } from 'src/app/Kernel/services/information.service';
 import { EventEmitterService } from 'src/app/Kernel/services/event-emitter.service';
 import { DatePipe } from '@angular/common';
+import { ExecuteCqlQueryComponent } from './execute-cqlquery/execute-cqlquery.component';
+import { ExecuteQueryComponent } from '../static-query-builder/execute-query/execute-query.component';
+import { AdvanceRowIdComponent } from './advance-row-id/advance-row-id.component';
 
 @Component({
   selector: 'app-cqlsh',
@@ -300,7 +302,7 @@ if(this.actionType=='update'){
       info = {
         query: this.myTextarea,
         actionType: this.actionType,
-        queryFlag:1
+        queryFlag:2
       };
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '700px';
@@ -360,12 +362,13 @@ if(this.actionType=='update'){
         query: this.myTextarea,
         actionType: this.actionType,
       };
+      console.log('info-------->',info);
     
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '700px';
     dialogConfig.height = '700px';
     
-    const dialogRef = this.dialog.open(ExecuteQueryComponent, {
+    const dialogRef = this.dialog.open(ExecuteCqlQueryComponent, {
       data: info,
       width: '50%',
       height: '60%',
@@ -411,7 +414,22 @@ if(this.actionType=='update'){
       this.isQuerytype = true;
     });
   }
+  openAdvanceRowIdBuilder(){
+    if(this.actionType!='update'){
+      this.showSnackBar('You have to save the query before setting its type');
+      return;
+    }
 
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.width = '700px';
+    dialogConfig.height = '700px';
+    const dialogRef =  this.dialog.open(AdvanceRowIdComponent, dialogConfig);
+    
+    dialogRef.afterClosed().subscribe(result => {
+      this.isQuerytype = true;
+    });
+
+  }
   typeQuery() {
 
     if(this.actionType!='update'){

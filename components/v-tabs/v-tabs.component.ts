@@ -1,4 +1,4 @@
-import { Component, ContentChildren, QueryList, AfterContentInit, Input, EventEmitter, Output, ViewChild, ElementRef, OnInit, } from '@angular/core';
+import { Component, ContentChildren, QueryList, AfterContentInit, Input, EventEmitter, Output, ViewChild, ElementRef, OnInit, Optional, } from '@angular/core';
 import { TabComponent } from './v-tab.components';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -18,7 +18,7 @@ import { InformationService } from 'src/app/Kernel/services/information.service'
 })
 export class TabsComponent implements AfterContentInit,OnInit {
 
-  @ContentChildren(TabComponent) tabs: QueryList<TabComponent> | any;
+  @Optional() @ContentChildren(TabComponent) tabs: QueryList<TabComponent> | any;
   @Output() tabActionClick: EventEmitter<any> = new EventEmitter;
   @ViewChild('contextMenu') contextMenu: ElementRef;
 
@@ -42,6 +42,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
   // contentChildren are set
   ngAfterContentInit() {
     setTimeout(() => {
+     // console.log("V-tabs all tabs>>>>>>>",this.tabs);
       // get all active tabs
       let activeTabs = this.tabs.filter((tab: { active: any; }) => tab.active);
 
@@ -52,6 +53,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
           return el.tabId === "tabId_" + this.informationservice.getChoosenTab();
         });
         let tab: any = data;
+      //  console.log("NG AFTER CONTENT TAB>>>>>>>>>",tab);
         this.selectTab(tab, 1);
         // localStorage.removeItem("choosenTab");
         this.informationservice.removeChoosenTab();
@@ -59,6 +61,8 @@ export class TabsComponent implements AfterContentInit,OnInit {
       } else {
         // if there is no active tab set, activate the first
         if (activeTabs.length === 0) {
+      //    console.log("NG AFTER CONTENT TAB 222>>>>>>>>>",this.tabs.first);
+
           this.selectTab(this.tabs.first, 0);
         }
       }
@@ -129,7 +133,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
             "width": "100%",
             "top": "30px",
             "left": "0px",
-            "z-index": "9999999999999999",
+            "z-index": "999999999999",
             "border-radius": "1px",
             "border": "1px solid white",
             "height": "" + contextMenuHeight + ""
@@ -145,10 +149,10 @@ export class TabsComponent implements AfterContentInit,OnInit {
       let tabLength = this.tabs._results.length;
       if (tabLength > 6) {
       //  $("#"+this.navId).css({ "display": "flex", "flex-direction": "column", "overflow-x": "auto", "height": "100px", "border": "0" });
-      $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px", "border": "0" });
+      $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px !important", "border": "0" });
 
       } else {
-        $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px", "border": "0" });
+        $("#"+this.navId).css({ "display": "flex", "flex-direction": "row", "overflow-x": "auto","overflow-y": "hidden", "height": "100px !important", "border": "0" });
       }
 
       $("#"+this.navId).show();
@@ -156,6 +160,9 @@ export class TabsComponent implements AfterContentInit,OnInit {
   }
 
   selectTab(tab: TabComponent, isFromClosedScreen: number) {
+    console.log("TAB DATA>>>>>>>>>>>>>>>>",tab);
+    console.log("TAB CLOSED SCREEN>>>>>>>>>>>>>>>>",isFromClosedScreen);
+
     if (!tab.disabled) {
       if (isFromClosedScreen == 0) {
         // deactivate all tabs
@@ -165,7 +172,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
           $(".context-menu").addClass("hidden");
           $("#context_" + tab.tabId).removeClass("hidden");
         }
-        
+
 
         if(this.informationservice.getClickedTab()==null){
         this.informationservice.setClickedTab(tab.title);
@@ -200,7 +207,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
 
           this.informationservice.setTabpath(JSON.stringify(tabJson));
         }
-        
+
       } else {
         let selectedTab: any = tab;
         if (tab.isForIndisplayModify == 1 || tab.isForIndisplayDelete == 1) {
@@ -211,7 +218,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
         // activate the tab the user has clicked on.
         selectedTab[0].active = true;
         this.informationservice.setSelectedTabName(selectedTab[0].title);
-        
+
         this.informationservice.setSelectedTabId(selectedTab[0].tabId);
       }
       this.eventEmitterService.onTabActionClickFn();
@@ -219,6 +226,7 @@ export class TabsComponent implements AfterContentInit,OnInit {
     }else{
       return
     }
+    console.log("tab path>>>>>>>>>>>>>>>>",this.informationservice.getTabpath);
 
   }
 
